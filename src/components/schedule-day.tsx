@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Flame, ListChecks } from "lucide-react";
+import { Check, Flame, ListChecks, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useOptimistic, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
@@ -32,7 +32,7 @@ export function ScheduleDay({
   dateLabel,
 }: Props) {
   const { push } = useToast();
-  const [, start] = useTransition();
+  const [pending, start] = useTransition();
   const [counts, setCounts] = useOptimistic(
     completionCounts,
     (
@@ -50,37 +50,64 @@ export function ScheduleDay({
   const done = protocols.filter((p) => (counts[p.id] ?? 0) > 0).length;
   const total = protocols.length;
 
-  function toggle(protocol: Protocol) {
+  /** Single-log: tap row to toggle done/undone */
+  function toggleSingle(protocol: Protocol) {
     start(async () => {
       try {
         const count = counts[protocol.id] ?? 0;
-        if (!protocol.allowsMultiple) {
-          setCounts({ protocolId: protocol.id, delta: count > 0 ? -1 : 1 });
-          const res = await logCompletionAction(protocol.id);
-          if (res.action === "added") {
-            const extra =
-              res.streakBonus && res.streakBonus > 0
-                ? ` · +${res.streakBonus} streak`
-                : "";
-            push(`Done · +${res.points} pts${extra}`);
-          } else {
-            push("Unchecked");
-          }
-          return;
+        setCounts({ protocolId: protocol.id, delta: count > 0 ? -1 : 1 });
+        const res = await logCompletionAction(protocol.id);
+        if (res.action === "added") {
+          const extra =
+            res.streakBonus && res.streakBonus > 0
+              ? ` · +${res.streakBonus} streak`
+              : "";
+          push(`Done · +${res.points} pts${extra}`);
+        } else {
+          push("Unchecked");
         }
-        if (count >= maxLogsPerDay(protocol)) {
-          setCounts({ protocolId: protocol.id, delta: -1 });
-          await removeOneCompletionAction(protocol.id);
-          push("Removed one log");
+      } catch (e) {
+        push(e instanceof Error ? e.message : "Could not update", "err");
+      }
+    });
+  }
+
+  /** Multi-log: explicit +1 */
+  function addOne(protocol: Protocol) {
+    start(async () => {
+      try {
+        const count = counts[protocol.id] ?? 0;
+        const max = maxLogsPerDay(protocol);
+        if (count >= max) {
+          push(`Daily limit (${max}×) reached.`, "err");
           return;
         }
         setCounts({ protocolId: protocol.id, delta: 1 });
         const res = await logCompletionAction(protocol.id);
         if (res.action === "added") {
-          push(`Logged · +${res.points} pts`);
+          const extra =
+            res.streakBonus && res.streakBonus > 0
+              ? ` · +${res.streakBonus} streak`
+              : "";
+          push(`+1 · +${res.points} pts${extra}`);
         }
       } catch (e) {
-        push(e instanceof Error ? e.message : "Could not update", "err");
+        push(e instanceof Error ? e.message : "Could not log", "err");
+      }
+    });
+  }
+
+  /** Multi-log: explicit −1 for misclicks */
+  function removeOne(protocol: Protocol) {
+    start(async () => {
+      try {
+        const count = counts[protocol.id] ?? 0;
+        if (count <= 0) return;
+        setCounts({ protocolId: protocol.id, delta: -1 });
+        await removeOneCompletionAction(protocol.id);
+        push("−1 removed");
+      } catch (e) {
+        push(e instanceof Error ? e.message : "Could not remove", "err");
       }
     });
   }
@@ -96,7 +123,9 @@ export function ScheduleDay({
       />
 
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-muted">Tap to mark done for today</p>
+        <p className="text-sm text-muted">
+          Tap to complete · multi uses + / −
+        </p>
         <Link
           href="/activities"
           className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
@@ -126,13 +155,74 @@ export function ScheduleDay({
             const count = counts[p.id] ?? 0;
             const isDone = count > 0;
             const max = maxLogsPerDay(p);
+            const multi = p.allowsMultiple;
+
+            if (multi) {
+              return (
+                <li
+                  key={p.id}
+                  className={cn(
+                    "flex items-center gap-3 rounded-2xl border px-3.5 py-3",
+                    isDone
+                      ? "border-accent/40 bg-accent/10"
+                      : "border-border bg-card",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border tabular-nums text-sm font-semibold",
+                      isDone
+                        ? "border-accent/50 bg-accent text-[#041016]"
+                        : "border-border text-muted",
+                    )}
+                  >
+                    {count}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={cn(
+                        "block font-medium leading-snug",
+                        isDone && "text-accent",
+                      )}
+                    >
+                      {p.name}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted">
+                      {p.points} pts each · {count}/{max} today
+                    </span>
+                  </span>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <button
+                      type="button"
+                      disabled={pending || count <= 0}
+                      onClick={() => removeOne(p)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted transition hover:border-red-400/40 hover:text-red-400 disabled:opacity-35"
+                      aria-label={`Remove one ${p.name}`}
+                    >
+                      <Minus className="h-4 w-4" strokeWidth={2.5} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending || count >= max}
+                      onClick={() => addOne(p)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent transition hover:bg-accent/25 disabled:opacity-35"
+                      aria-label={`Add one ${p.name}`}
+                    >
+                      <Plus className="h-4 w-4" strokeWidth={2.5} />
+                    </button>
+                  </div>
+                </li>
+              );
+            }
+
             return (
               <li key={p.id}>
                 <button
                   type="button"
-                  onClick={() => toggle(p)}
+                  disabled={pending}
+                  onClick={() => toggleSingle(p)}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition",
+                    "flex w-full items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition disabled:opacity-60",
                     isDone
                       ? "border-accent/40 bg-accent/10"
                       : "border-border bg-card hover:border-accent/30",
@@ -159,11 +249,7 @@ export function ScheduleDay({
                     </span>
                     <span className="mt-0.5 block text-xs text-muted">
                       {p.points} pts
-                      {p.allowsMultiple
-                        ? ` · ${count}/${max} today`
-                        : isDone
-                          ? " · done"
-                          : " · tap to complete"}
+                      {isDone ? " · done" : " · tap to complete"}
                     </span>
                   </span>
                 </button>
