@@ -8,8 +8,7 @@ Track Dr. Jack Kruse–inspired lifestyle protocols — light, magnetism, water,
 
 | Surface | Role |
 |---------|------|
-| **Today** (`/app`) | Daily checklist of *your* activities · suggested-now by sun phase · expandable full catalog |
-| **Place** | US ZIP sun times · lifestyle scores · place factors · optional travel ZIP |
+| **Today** (`/app`) | One home: collapsed **Place** strip (expand for ZIP/scores) · checklist · expandable catalog |
 | **Account** | Profile · history · friends · leaderboard · sun-relative reminders |
 
 - **Available / via list** — only show protocols you can actually do (e.g. rebounding if you have a rebounder)

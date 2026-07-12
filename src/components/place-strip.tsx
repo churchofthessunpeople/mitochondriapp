@@ -1,10 +1,10 @@
-import { MapPin } from "lucide-react";
+import { ChevronDown, MapPin } from "lucide-react";
 import type { Region } from "@/db/schema";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
+import { cn } from "@/lib/utils";
 
 /**
- * Compact place context for Schedule home — not a full region card.
- * Parent handles navigation / tab switch (no nested links).
+ * Compact place summary — used collapsed on Today (expand for full place).
  */
 export function PlaceStrip({
   placeLabel,
@@ -12,19 +12,31 @@ export function PlaceStrip({
   sun,
   timeZone,
   phaseHint,
+  compact,
+  showChevron,
+  expanded,
 }: {
   placeLabel?: string | null;
   region?: Region | null;
   sun?: SunTimes | null;
   timeZone?: string | null;
   phaseHint?: string | null;
+  compact?: boolean;
+  showChevron?: boolean;
+  expanded?: boolean;
 }) {
   const label = placeLabel || region?.name;
   const tz = timeZone || region?.timezone || "UTC";
 
   if (!label && !sun) {
     return (
-      <div className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-foreground/[0.02] px-3.5 py-3 text-sm transition hover:border-accent/30">
+      <div
+        className={cn(
+          "flex items-center gap-3 px-3.5 py-3 text-sm",
+          !compact &&
+            "rounded-2xl border border-dashed border-border bg-foreground/[0.02]",
+        )}
+      >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border text-muted">
           <MapPin className="h-4 w-4" />
         </span>
@@ -34,13 +46,22 @@ export function PlaceStrip({
             ZIP unlocks sunrise/sunset for your day
           </span>
         </span>
-        <span className="shrink-0 text-xs text-accent">Add →</span>
+        {showChevron ? (
+          <ChevronDown
+            className={cn(
+              "h-5 w-5 shrink-0 text-muted transition-transform",
+              expanded && "rotate-180",
+            )}
+          />
+        ) : (
+          <span className="shrink-0 text-xs text-accent">Add →</span>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-foreground/[0.03] px-3.5 py-3 transition hover:border-accent/30">
+    <div className={cn("px-3.5 py-3", !compact && "rounded-2xl border border-border bg-foreground/[0.03]")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[10px] uppercase tracking-[0.14em] text-muted">
@@ -61,7 +82,16 @@ export function PlaceStrip({
             </p>
           )}
         </div>
-        <span className="shrink-0 text-xs text-accent">Details</span>
+        {showChevron ? (
+          <ChevronDown
+            className={cn(
+              "mt-1 h-5 w-5 shrink-0 text-muted transition-transform",
+              expanded && "rotate-180",
+            )}
+          />
+        ) : (
+          <span className="shrink-0 text-xs text-accent">Details</span>
+        )}
       </div>
       {phaseHint && (
         <p className="mt-2 border-t border-border pt-2 text-xs leading-relaxed text-muted">

@@ -1,25 +1,21 @@
 "use client";
 
-import { CalendarCheck, MapPin, User } from "lucide-react";
+import { CalendarCheck, User } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
-import { PlaceStrip } from "@/components/place-strip";
-import { RegionCard } from "@/components/region-card";
+import { PlaceExpand } from "@/components/place-expand";
 import { ScheduleDay } from "@/components/schedule-day";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ZipForm } from "@/components/zip-form";
 import type { AppTab } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
 import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
 import { cn } from "@/lib/utils";
 
-const NAV: { id: AppTab; label: string; icon: typeof MapPin }[] = [
+const NAV: { id: AppTab; label: string; icon: typeof CalendarCheck }[] = [
   { id: "schedule", label: "Today", icon: CalendarCheck },
-  { id: "place", label: "Place", icon: MapPin },
   { id: "account", label: "Account", icon: User },
 ];
 
@@ -52,6 +48,10 @@ export type AppShellProps = {
   accountPanel: React.ReactNode;
 };
 
+/**
+ * Single home surface: Place (collapsed) · checklist · catalog expand.
+ * Account is the only other tab.
+ */
 export function AppShell({
   initialTab,
   dateLabel,
@@ -83,8 +83,9 @@ export function AppShell({
   const [catalogOpen, setCatalogOpen] = useState(
     initialAvailableIds.length === 0,
   );
+  // Auto-expand place when no location yet so ZIP is obvious
+  const [placeOpen, setPlaceOpen] = useState(!placeLabel && !region);
 
-  // Warm paint cache for next visit (checklist ids + points)
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -121,8 +122,6 @@ export function AppShell({
     const set = new Set(availableIds);
     return allProtocols.filter((p) => set.has(p.id));
   }, [allProtocols, availableIds]);
-
-  const missingPlace = !placeLabel && !region;
 
   return (
     <div className="min-h-screen pb-24 md:pb-16">
@@ -179,36 +178,23 @@ export function AppShell({
       <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-8">
         {tab === "schedule" && (
           <div className="space-y-5">
-            {missingPlace && (
-              <button
-                type="button"
-                onClick={() => setTab("place")}
-                className="w-full rounded-2xl border border-accent/25 bg-accent/5 px-3.5 py-3 text-left text-sm"
-              >
-                <p className="font-medium">Add your ZIP for local sun times</p>
-                <p className="mt-1 text-accent">Set location on Place →</p>
-              </button>
-            )}
-
-            {isTravel && (
-              <p className="rounded-2xl border border-accent/25 bg-accent/5 px-3.5 py-2 text-xs text-accent">
-                Travel mode through {travelUntil} — sun times from temporary ZIP
-              </p>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setTab("place")}
-              className="block w-full text-left"
-            >
-              <PlaceStrip
-                placeLabel={placeLabel}
-                region={region}
-                sun={sun}
-                timeZone={timeZone}
-                phaseHint={phaseHint}
-              />
-            </button>
+            <PlaceExpand
+              expanded={placeOpen}
+              onExpandedChange={setPlaceOpen}
+              placeLabel={placeLabel}
+              postalCode={postalCode}
+              region={region}
+              sun={sun}
+              timeZone={timeZone}
+              phaseHint={phaseHint}
+              placeFactors={placeFactors}
+              distanceKm={distanceKm}
+              isTravel={isTravel}
+              travelUntil={travelUntil}
+              homePostalCode={homePostalCode}
+              travelLabel={travelLabel}
+              dateLabel={dateLabel}
+            />
 
             <ScheduleDay
               protocols={availableProtocols}
@@ -230,71 +216,6 @@ export function AppShell({
               expanded={catalogOpen}
               onExpandedChange={setCatalogOpen}
             />
-          </div>
-        )}
-
-        {tab === "place" && (
-          <div className="space-y-6">
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-accent">
-                Your environment
-              </p>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-                Place
-              </h1>
-              <p className="mt-1.5 text-sm text-muted">
-                {dateLabel} · light, scores, and place factors.{" "}
-                <Link
-                  href="/region/scoring"
-                  className="text-accent hover:underline"
-                >
-                  How scoring works
-                </Link>
-              </p>
-            </div>
-
-            {(region || placeLabel) && sun ? (
-              <RegionCard
-                region={region}
-                sun={sun}
-                placeLabel={placeLabel}
-                postalCode={
-                  isTravel ? travelLabel || postalCode : postalCode
-                }
-                distanceKm={distanceKm}
-                timeZone={timeZone}
-                placeFactors={placeFactors}
-                phaseHint={phaseHint}
-              />
-            ) : (
-              <div className="glass rounded-3xl border border-dashed border-border p-5 text-sm text-muted">
-                <p className="font-medium text-foreground">No location yet</p>
-                <p className="mt-1">
-                  Enter your US ZIP below for sunrise/sunset and the nearest
-                  lifestyle score.
-                </p>
-              </div>
-            )}
-
-            <ZipForm
-              currentZip={homePostalCode ?? postalCode}
-              travelLabel={travelLabel}
-              travelUntil={travelUntil}
-            />
-
-            <button
-              type="button"
-              onClick={() => setTab("schedule")}
-              className="glass w-full rounded-2xl border border-border px-4 py-3 text-left text-sm font-medium hover:border-accent/40"
-            >
-              Today&apos;s checklist →
-            </button>
-            <p className="text-center text-xs text-muted">
-              Prefer a curated metro score?{" "}
-              <Link href="/region" className="text-accent hover:underline">
-                Browse rated regions
-              </Link>
-            </p>
           </div>
         )}
 
