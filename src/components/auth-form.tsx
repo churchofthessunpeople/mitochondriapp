@@ -104,11 +104,10 @@ export function AuthForm({
         {mode === "register" && (
           <p className="text-left text-xs text-muted">
             At least 8 characters with a letter and a number (e.g. Hoger42@).
-            Very common or breached passwords are still blocked.
           </p>
         )}
 
-        <StatusMessage state={state} />
+        <StatusPanel state={state} />
 
         <button
           type="submit"
@@ -123,10 +122,10 @@ export function AuthForm({
         </button>
       </form>
 
-      {(state.needsVerification || mode === "login") && (
-        <form action={resendAction} className="mt-4 space-y-2">
+      {(state.needsVerification || mode === "login" || mode === "register") && (
+        <form action={resendAction} className="mt-6 space-y-2 border-t border-border pt-6">
           <p className="text-center text-xs text-muted">
-            Need a verification email?
+            Didn&apos;t get the email? Resend verification
           </p>
           <input
             name="email"
@@ -135,7 +134,7 @@ export function AuthForm({
             placeholder="Email for resend"
             className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
           />
-          <StatusMessage state={resendState} />
+          <StatusPanel state={resendState} />
           <button
             type="submit"
             disabled={resendPending}
@@ -173,30 +172,96 @@ export function AuthForm({
   );
 }
 
-function StatusMessage({ state }: { state: AuthFormState }) {
-  if (state.error) {
-    return (
-      <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-        {state.error}
-      </p>
-    );
+function StatusPanel({ state }: { state: AuthFormState }) {
+  if (!state.error && !state.success && !state.verifyUrl && !state.emailDebug) {
+    return null;
   }
-  if (state.success) {
-    return (
-      <div className="space-y-2">
+
+  return (
+    <div className="space-y-3 text-left">
+      {state.error && (
+        <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {state.error}
+        </p>
+      )}
+      {state.success && (
         <p className="rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent">
           {state.success}
+          {state.messageId ? (
+            <span className="mt-1 block text-xs opacity-80">
+              Resend id: {state.messageId}
+            </span>
+          ) : null}
         </p>
-        {state.devVerifyUrl && (
-          <p className="break-all rounded-2xl border border-border bg-foreground/5 px-4 py-3 text-left text-xs text-muted">
-            Dev verify link:{" "}
-            <a href={state.devVerifyUrl} className="text-accent underline">
-              {state.devVerifyUrl}
-            </a>
-          </p>
-        )}
-      </div>
-    );
-  }
-  return null;
+      )}
+      {state.verifyUrl && (
+        <div className="rounded-2xl border border-border bg-foreground/5 px-4 py-3 text-sm">
+          <p className="font-medium text-foreground">Verify link (use this if email doesn&apos;t arrive)</p>
+          <a
+            href={state.verifyUrl}
+            className="mt-2 block break-all text-accent underline"
+          >
+            {state.verifyUrl}
+          </a>
+        </div>
+      )}
+      {state.emailDebug && (
+        <details className="rounded-2xl border border-border bg-foreground/[0.03] px-4 py-3 text-xs text-muted">
+          <summary className="cursor-pointer font-medium text-foreground">
+            Email debug details
+          </summary>
+          <dl className="mt-3 space-y-1.5 font-mono">
+            <div>
+              <dt className="inline text-muted">API key present: </dt>
+              <dd className="inline text-foreground">
+                {state.emailDebug.hasApiKey ? "yes" : "NO"}
+              </dd>
+            </div>
+            <div>
+              <dt className="inline text-muted">From: </dt>
+              <dd className="inline break-all text-foreground">
+                {state.emailDebug.from}
+              </dd>
+            </div>
+            <div>
+              <dt className="inline text-muted">To: </dt>
+              <dd className="inline break-all text-foreground">
+                {state.emailDebug.to}
+              </dd>
+            </div>
+            <div>
+              <dt className="inline text-muted">Base URL: </dt>
+              <dd className="inline break-all text-foreground">
+                {state.emailDebug.baseUrl}
+              </dd>
+            </div>
+            {state.emailDebug.resendStatus != null && (
+              <div>
+                <dt className="inline text-muted">Resend HTTP: </dt>
+                <dd className="inline text-foreground">
+                  {state.emailDebug.resendStatus}
+                </dd>
+              </div>
+            )}
+            {state.emailDebug.resendBody && (
+              <div>
+                <dt className="text-muted">Resend body:</dt>
+                <dd className="mt-1 whitespace-pre-wrap break-all text-foreground">
+                  {state.emailDebug.resendBody}
+                </dd>
+              </div>
+            )}
+            {state.emailDebug.note && (
+              <div>
+                <dt className="inline text-muted">Note: </dt>
+                <dd className="inline text-foreground">
+                  {state.emailDebug.note}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </details>
+      )}
+    </div>
+  );
 }

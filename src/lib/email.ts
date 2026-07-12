@@ -5,14 +5,45 @@ import { verificationTokens } from "@/db/schema";
 
 const VERIFY_TTL_MS = 24 * 60 * 60 * 1000;
 
+export type SendEmailResult =
+  | {
+      ok: true;
+      verifyUrl: string;
+      messageId?: string;
+      mode: "resend" | "dev-link";
+      debug: EmailDebug;
+    }
+  | {
+      ok: false;
+      message: string;
+      verifyUrl: string;
+      debug: EmailDebug;
+    };
+
+export type EmailDebug = {
+  hasApiKey: boolean;
+  from: string;
+  to: string;
+  baseUrl: string;
+  resendStatus?: number;
+  resendBody?: string;
+  note?: string;
+};
+
 export function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 
 export function getAppBaseUrl() {
-  if (process.env.AUTH_URL) return process.env.AUTH_URL.replace(/\/$/, "");
+  const authUrl = process.env.AUTH_URL?.trim();
+  if (authUrl) return authUrl.replace(/\/$/, "");
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return "http://localhost:3000";
+}
+
+function buildVerifyUrl(email: string, rawToken: string) {
+  const base = getAppBaseUrl();
+  return `${base}/verify-email?token=${encodeURIComponent(rawToken)}&email=${encodeURIComponent(email)}`;
 }
 
 export async function createEmailVerificationToken(email: string) {
@@ -21,7 +52,6 @@ export async function createEmailVerificationToken(email: string) {
   const identifier = `email-verify:${email.toLowerCase()}`;
   const expires = new Date(Date.now() + VERIFY_TTL_MS);
 
-  // Clear prior tokens for this identity
   await db
     .delete(verificationTokens)
     .where(eq(verificationTokens.identifier, identifier));
@@ -32,7 +62,7 @@ export async function createEmailVerificationToken(email: string) {
     expires,
   });
 
-  return { raw, expires };
+  return { raw, expires, verifyUrl: buildVerifyUrl(email, raw) };
 }
 
 export async function consumeEmailVerificationToken(
@@ -76,7 +106,6 @@ export async function consumeEmailVerificationToken(
       ),
     );
 
-  // Housekeeping: drop expired tokens
   await db
     .delete(verificationTokens)
     .where(lt(verificationTokens.expires, now));
@@ -84,18 +113,57 @@ export async function consumeEmailVerificationToken(
   return true;
 }
 
+function baseDebug(to: string): EmailDebug {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  return {
+    hasApiKey: Boolean(apiKey),
+    from: (process.env.EMAIL_FROM || "Mitochondriapp <onboarding@resend.dev>").trim(),
+    to,
+    baseUrl: getAppBaseUrl(),
+    note: apiKey
+      ? undefined
+      : "RESEND_API_KEY is missing in this environment",
+  };
+}
+
+/**
+ * Send verification email via Resend. Always returns a verifyUrl so the UI
+ * can offer a fallback if delivery fails or is restricted.
+ */
 export async function sendVerificationEmail(
   email: string,
   rawToken: string,
-): Promise<{ ok: true; devUrl?: string } | { ok: false; message: string }> {
-  const base = getAppBaseUrl();
-  const url = `${base}/verify-email?token=${encodeURIComponent(rawToken)}&email=${encodeURIComponent(email)}`;
+): Promise<SendEmailResult> {
+  const to = email.toLowerCase().trim();
+  const verifyUrl = buildVerifyUrl(to, rawToken);
+  const debug = baseDebug(to);
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = debug.from;
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const from =
-    process.env.EMAIL_FROM || "Mitochondriapp <onboarding@resend.dev>";
+  if (!apiKey) {
+    console.info("[email] RESEND_API_KEY missing. Verify URL:", verifyUrl);
+    const isProd = process.env.NODE_ENV === "production";
+    if (isProd && process.env.ALLOW_DEV_VERIFY_URL !== "true") {
+      return {
+        ok: false,
+        message:
+          "Email is not configured: RESEND_API_KEY is missing on the server. Add it in Vercel env vars and redeploy.",
+        verifyUrl,
+        debug,
+      };
+    }
+    return {
+      ok: true,
+      verifyUrl,
+      mode: "dev-link",
+      debug: {
+        ...debug,
+        note: "No API key — using on-screen verify link only",
+      },
+    };
+  }
 
-  if (apiKey) {
+  try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -104,40 +172,87 @@ export async function sendVerificationEmail(
       },
       body: JSON.stringify({
         from,
-        to: [email],
+        to: [to],
         subject: "Verify your Mitochondriapp email",
         html: `
           <p>Welcome to Mitochondriapp.</p>
-          <p><a href="${url}">Verify your email</a> to activate your account.</p>
+          <p><a href="${verifyUrl}">Verify your email</a> to activate your account.</p>
           <p>This link expires in 24 hours.</p>
           <p>If you did not sign up, you can ignore this message.</p>
         `,
-        text: `Verify your Mitochondriapp email: ${url}\n\nThis link expires in 24 hours.`,
+        text: `Verify your Mitochondriapp email: ${verifyUrl}\n\nThis link expires in 24 hours.`,
       }),
     });
 
+    const bodyText = await res.text().catch(() => "");
+    let parsed: { id?: string; message?: string; name?: string } = {};
+    try {
+      parsed = bodyText ? JSON.parse(bodyText) : {};
+    } catch {
+      parsed = {};
+    }
+
+    debug.resendStatus = res.status;
+    debug.resendBody = bodyText.slice(0, 500);
+
     if (!res.ok) {
-      const detail = await res.text().catch(() => "");
-      console.error("Resend error", res.status, detail);
+      const resendMessage =
+        parsed.message ||
+        bodyText.slice(0, 280) ||
+        `Resend HTTP ${res.status}`;
+
+      console.error("[email] Resend failed", {
+        status: res.status,
+        body: bodyText.slice(0, 500),
+        to,
+        from,
+      });
+
+      // Common Resend test-mode restriction — make it obvious
+      const hint = resendMessage.toLowerCase().includes("own email")
+        ? " With onboarding@resend.dev you can only send to the email on your Resend account."
+        : "";
+
       return {
         ok: false,
-        message: "Could not send verification email. Try again later.",
+        message: `Email failed: ${resendMessage}.${hint}`,
+        verifyUrl,
+        debug: {
+          ...debug,
+          note: "Resend rejected the send — use the fallback verify link below, or fix Resend config.",
+        },
       };
     }
 
-    return { ok: true };
-  }
+    console.info("[email] Resend accepted", {
+      id: parsed.id,
+      to,
+      from,
+    });
 
-  // Dev / unconfigured: expose link so local testing works
-  console.info("[email] Verification link (RESEND_API_KEY not set):", url);
-
-  if (process.env.NODE_ENV === "production" && !process.env.ALLOW_DEV_VERIFY_URL) {
+    return {
+      ok: true,
+      verifyUrl,
+      messageId: parsed.id,
+      mode: "resend",
+      debug: {
+        ...debug,
+        note: parsed.id
+          ? `Resend accepted message id ${parsed.id}`
+          : "Resend accepted (no id in response)",
+      },
+    };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "Unknown network error";
+    console.error("[email] Resend network error", msg);
     return {
       ok: false,
-      message:
-        "Email delivery is not configured (RESEND_API_KEY). Contact the site admin.",
+      message: `Email request failed: ${msg}`,
+      verifyUrl,
+      debug: {
+        ...debug,
+        note: "Network/exception calling Resend",
+      },
     };
   }
-
-  return { ok: true, devUrl: url };
 }
