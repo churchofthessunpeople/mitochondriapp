@@ -23,8 +23,10 @@ export type PlaceFactors = {
   elevationLabel: string | null;
   nearestVolcano: string;
   nearestVolcanoKm: number;
-  /** e.g. Mexico volcanic belt · 1,204 km */
+  /** Primary: system name */
   geologyLabel: string;
+  /** Secondary: distance + why we show it */
+  geologyDetail: string;
 };
 
 /** Latitude climate band (aligned with sun-score bands). */
@@ -153,7 +155,9 @@ export function buildPlaceFactors(opts: {
       elevationM != null ? formatElevation(elevationM) : null,
     nearestVolcano: mag.nearestName,
     nearestVolcanoKm: mag.nearestKm,
-    geologyLabel: `${mag.nearestName} · ${formatDistanceKm(mag.nearestKm)}`,
+    // Clearest for users: this is the closest catalog anchor, not "under your feet"
+    geologyLabel: mag.nearestName,
+    geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest free-flowing magma system in our model (drives magnetism score)`,
   };
 }
 

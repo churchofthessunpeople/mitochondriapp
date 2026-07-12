@@ -141,7 +141,11 @@ export function RegionCard({
                 value={placeFactors.elevationLabel}
               />
             )}
-            <FactorRow label="Geology" value={placeFactors.geologyLabel} />
+            <FactorRow
+              label="Nearest magma"
+              value={placeFactors.geologyLabel}
+              detail={placeFactors.geologyDetail}
+            />
           </ul>
         </div>
       )}
@@ -179,13 +183,26 @@ export function RegionCard({
   );
 }
 
-function FactorRow({ label, value }: { label: string; value: string }) {
+function FactorRow({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail?: string;
+}) {
   return (
     <li className="flex items-start justify-between gap-3 px-3 py-2.5 text-xs">
-      <span className="shrink-0 text-muted">{label}</span>
-      <span className="text-right font-medium leading-snug text-foreground">
-        {value}
-      </span>
+      <span className="shrink-0 pt-0.5 text-muted">{label}</span>
+      <div className="min-w-0 text-right">
+        <p className="font-medium leading-snug text-foreground">{value}</p>
+        {detail && (
+          <p className="mt-0.5 text-[11px] font-normal leading-snug text-muted">
+            {detail}
+          </p>
+        )}
+      </div>
     </li>
   );
 }

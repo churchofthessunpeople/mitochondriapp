@@ -188,8 +188,9 @@ export default async function RegionScoringPage() {
               (stronger UV per minute at altitude)
             </li>
             <li>
-              <strong>Geology</strong> — nearest active magma / volcanic system
-              + distance (same anchors as magnetism score)
+              <strong>Nearest magma</strong> — closest free-flowing magma /
+              volcanic system in our catalog (not under your house). Distance
+              drives the magnetism score; far away = lower magnetism.
             </li>
           </ul>
           <p className="text-xs text-muted">
