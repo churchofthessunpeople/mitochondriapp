@@ -118,6 +118,14 @@ export function AuthForm({
         </button>
       </form>
 
+      {mode === "login" && (
+        <p className="mt-4 text-center text-sm">
+          <Link href="/forgot-password" className="text-accent hover:underline">
+            Forgot password?
+          </Link>
+        </p>
+      )}
+
       <p className="mt-6 text-center text-sm text-muted">
         {mode === "login" ? (
           <>

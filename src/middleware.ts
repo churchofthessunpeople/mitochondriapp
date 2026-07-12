@@ -12,7 +12,10 @@ export default auth((req) => {
     pathname.startsWith("/schedule") ||
     pathname.startsWith("/history") ||
     pathname.startsWith("/leaderboard") ||
-    pathname.startsWith("/account");
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/friends") ||
+    pathname.startsWith("/reminders") ||
+    pathname.startsWith("/admin");
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
@@ -34,7 +37,12 @@ export const config = {
     "/history/:path*",
     "/leaderboard/:path*",
     "/account/:path*",
+    "/friends/:path*",
+    "/reminders/:path*",
+    "/admin/:path*",
     "/login",
     "/register",
+    "/forgot-password",
+    "/reset-password",
   ],
 };

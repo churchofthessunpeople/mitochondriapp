@@ -9,9 +9,7 @@ config({ path: ".env" });
 
 async function main() {
   const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error("DATABASE_URL is required to seed the database");
-  }
+  if (!url) throw new Error("DATABASE_URL is required");
 
   const db = drizzle(neon(url));
 
@@ -23,9 +21,14 @@ async function main() {
         name: protocol.name,
         description: protocol.description,
         points: protocol.points,
+        category: protocol.category,
         timeOfDay: protocol.timeOfDay,
         lockedTimeOfDay: protocol.lockedTimeOfDay,
         allowsMultiple: protocol.allowsMultiple,
+        maxPerDay: protocol.maxPerDay,
+        durationEnabled: protocol.durationEnabled,
+        referenceMinutes: protocol.referenceMinutes,
+        maxDurationMinutes: protocol.maxDurationMinutes,
         sortOrder: protocol.sortOrder,
         active: true,
       })
@@ -35,9 +38,14 @@ async function main() {
           name: protocol.name,
           description: protocol.description,
           points: protocol.points,
+          category: protocol.category,
           timeOfDay: protocol.timeOfDay,
           lockedTimeOfDay: protocol.lockedTimeOfDay,
           allowsMultiple: protocol.allowsMultiple,
+          maxPerDay: protocol.maxPerDay,
+          durationEnabled: protocol.durationEnabled,
+          referenceMinutes: protocol.referenceMinutes,
+          maxDurationMinutes: protocol.maxDurationMinutes,
           sortOrder: protocol.sortOrder,
           active: true,
         },
@@ -47,7 +55,7 @@ async function main() {
   console.log(`Seeded ${PROTOCOL_SEEDS.length} protocols.`);
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((e) => {
+  console.error(e);
   process.exit(1);
 });

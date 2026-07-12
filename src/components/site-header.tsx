@@ -54,13 +54,13 @@ export async function SiteHeader({
 
         <div className="flex items-center gap-1 sm:gap-2">
           {session ? (
-            <nav className="flex max-w-[min(100%,18rem)] items-center gap-0.5 overflow-x-auto sm:max-w-none sm:gap-1">
+            <nav className="hidden items-center gap-1 md:flex">
               {nav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "shrink-0 rounded-full px-2 py-1.5 text-xs transition sm:px-3 sm:text-sm",
+                    "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
                     active === item.key
                       ? "bg-foreground/10 text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground",
@@ -69,7 +69,7 @@ export async function SiteHeader({
                   {item.label}
                 </Link>
               ))}
-              <form action={logoutAction} className="hidden sm:block">
+              <form action={logoutAction}>
                 <button
                   type="submit"
                   className="ml-0.5 shrink-0 rounded-full border border-border px-3 py-1.5 text-sm text-muted transition hover:border-foreground/30 hover:text-foreground"

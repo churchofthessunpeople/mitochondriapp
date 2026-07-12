@@ -21,6 +21,23 @@ export const timeOfDayEnum = pgEnum("time_of_day", [
   "anytime",
 ]);
 
+export const categoryEnum = pgEnum("protocol_category", [
+  "light",
+  "grounding",
+  "water_food",
+  "cold",
+  "emf",
+  "sleep",
+  "movement",
+  "other",
+]);
+
+export const friendshipStatusEnum = pgEnum("friendship_status", [
+  "pending",
+  "accepted",
+  "rejected",
+]);
+
 export const users = pgTable("users", {
   id: text("id")
     .primaryKey()
@@ -33,6 +50,10 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   displayName: text("display_name"),
   sessionVersion: integer("session_version").notNull().default(0),
+  timezone: text("timezone").default("UTC"),
+  isAdmin: boolean("is_admin").notNull().default(false),
+  onboardingComplete: boolean("onboarding_complete").notNull().default(false),
+  showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
@@ -84,27 +105,27 @@ export const verificationTokens = pgTable(
   (vt) => [primaryKey({ columns: [vt.identifier, vt.token] })],
 );
 
-/**
- * Global activity catalog.
- * - defaultTimeOfDay: suggested slot when first added to a user's schedule
- * - lockedTimeOfDay: if set, may only appear in that slot (e.g. sunrise)
- * - allowsMultiple: can log more than once per day
- */
 export const protocols = pgTable("protocols", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description").notNull(),
   points: integer("points").notNull(),
-  /** Catalog default / suggestion */
+  category: categoryEnum("category").notNull().default("other"),
   timeOfDay: timeOfDayEnum("time_of_day").notNull().default("anytime"),
   lockedTimeOfDay: timeOfDayEnum("locked_time_of_day"),
   allowsMultiple: boolean("allows_multiple").notNull().default(false),
+  /** Cap logs per calendar day (multi). 1 for single-allow. */
+  maxPerDay: integer("max_per_day").notNull().default(1),
+  /** If true, user can enter duration; points scale with minutes */
+  durationEnabled: boolean("duration_enabled").notNull().default(false),
+  /** Minutes that earn base `points` when durationEnabled */
+  referenceMinutes: integer("reference_minutes").notNull().default(10),
+  maxDurationMinutes: integer("max_duration_minutes").notNull().default(60),
   sortOrder: integer("sort_order").notNull().default(0),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
-/** Per-user starred activities for quick log */
 export const userFavorites = pgTable(
   "user_favorites",
   {
@@ -119,7 +140,6 @@ export const userFavorites = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.protocolId] })],
 );
 
-/** Optional: pin activities to time-of-day sections (secondary UX) */
 export const userScheduleItems = pgTable(
   "user_schedule_items",
   {
@@ -145,10 +165,6 @@ export const userScheduleItems = pgTable(
   ],
 );
 
-/**
- * One row per log event. Multi-allow protocols may have many rows per day.
- * Single-allow protocols: app enforces at most one per user/protocol/day.
- */
 export const dailyCompletions = pgTable("daily_completions", {
   id: text("id")
     .primaryKey()
@@ -161,13 +177,56 @@ export const dailyCompletions = pgTable("daily_completions", {
     .references(() => protocols.id, { onDelete: "cascade" }),
   completedOn: date("completed_on", { mode: "string" }).notNull(),
   timeOfDay: timeOfDayEnum("time_of_day"),
+  durationMinutes: integer("duration_minutes"),
   pointsEarned: integer("points_earned").notNull(),
+  isStreakBonus: boolean("is_streak_bonus").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
+
+export const friendships = pgTable(
+  "friendships",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    requesterId: text("requester_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    addresseeId: text("addressee_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: friendshipStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("friendship_pair_uidx").on(table.requesterId, table.addresseeId),
+  ],
+);
+
+export const userReminders = pgTable(
+  "user_reminders",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    /** Local time HH:mm */
+    localTime: text("local_time").notNull(),
+    enabled: boolean("enabled").notNull().default(true),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [unique("user_reminder_time_uidx").on(table.userId, table.localTime)],
+);
 
 export type User = typeof users.$inferSelect;
 export type Protocol = typeof protocols.$inferSelect;
 export type UserFavorite = typeof userFavorites.$inferSelect;
 export type UserScheduleItem = typeof userScheduleItems.$inferSelect;
 export type DailyCompletion = typeof dailyCompletions.$inferSelect;
+export type Friendship = typeof friendships.$inferSelect;
+export type UserReminder = typeof userReminders.$inferSelect;
 export type TimeOfDay = (typeof timeOfDayEnum.enumValues)[number];
+export type ProtocolCategory = (typeof categoryEnum.enumValues)[number];

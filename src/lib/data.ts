@@ -1,8 +1,8 @@
-import { and, desc, eq, gte, sql, sum } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, sql, sum } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users } from "@/db/schema";
 import { PROTOCOL_SEEDS } from "@/db/seed-data";
-import type { Protocol, TimeOfDay } from "@/db/schema";
+import type { Protocol } from "@/db/schema";
 
 export async function getActiveProtocols(): Promise<Protocol[]> {
   try {
@@ -14,13 +14,11 @@ export async function getActiveProtocols(): Promise<Protocol[]> {
 
     if (rows.length > 0) return rows;
   } catch {
-    // Fall through to seed data when DB is not configured yet.
+    // fall through
   }
 
   return PROTOCOL_SEEDS.map((seed) => ({
     ...seed,
-    lockedTimeOfDay: seed.lockedTimeOfDay,
-    allowsMultiple: seed.allowsMultiple,
     active: true,
     createdAt: new Date(),
   }));
@@ -44,27 +42,33 @@ export async function getCompletionsForUserDay(userId: string, date: string) {
 
 export async function getUserDayStats(userId: string, date: string) {
   const completions = await getCompletionsForUserDay(userId, date);
+  const real = completions.filter((c) => !c.isStreakBonus);
+  const bonus = completions
+    .filter((c) => c.isStreakBonus)
+    .reduce((a, c) => a + c.pointsEarned, 0);
   const points = completions.reduce((acc, c) => acc + c.pointsEarned, 0);
   const counts = new Map<string, number>();
-  for (const c of completions) {
+  for (const c of real) {
     counts.set(c.protocolId, (counts.get(c.protocolId) ?? 0) + 1);
   }
   return {
     completions,
-    completedIds: new Set(completions.map((c) => c.protocolId)),
+    completedIds: new Set(real.map((c) => c.protocolId)),
     completionCounts: counts,
     points,
-    count: completions.length,
+    activityPoints: points - bonus,
+    streakBonus: bonus,
+    count: real.length,
   };
 }
 
-export async function getUserHistory(userId: string, days = 14) {
+export async function getUserHistory(userId: string, days = 30) {
   try {
     const rows = await db
       .select({
         completedOn: dailyCompletions.completedOn,
         points: sum(dailyCompletions.pointsEarned).mapWith(Number),
-        count: sql<number>`count(*)::int`,
+        count: sql<number>`count(*) filter (where ${dailyCompletions.isStreakBonus} = false)::int`,
       })
       .from(dailyCompletions)
       .where(eq(dailyCompletions.userId, userId))
@@ -82,23 +86,58 @@ export async function getUserHistory(userId: string, days = 14) {
   }
 }
 
-export async function getLeaderboard(limit = 20) {
+export async function getDayDetail(userId: string, date: string) {
   try {
+    const rows = await db
+      .select({
+        completion: dailyCompletions,
+        protocol: protocols,
+      })
+      .from(dailyCompletions)
+      .leftJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
+      .where(
+        and(
+          eq(dailyCompletions.userId, userId),
+          eq(dailyCompletions.completedOn, date),
+        ),
+      )
+      .orderBy(desc(dailyCompletions.createdAt));
+
+    return rows;
+  } catch {
+    return [];
+  }
+}
+
+type LeaderboardOpts = {
+  limit?: number;
+  fromDate?: string;
+  userIds?: string[];
+};
+
+export async function getLeaderboardPeriod(opts: LeaderboardOpts = {}) {
+  const limit = opts.limit ?? 25;
+  try {
+    const conditions = [eq(users.showOnLeaderboard, true)];
+    if (opts.fromDate) {
+      conditions.push(gte(dailyCompletions.completedOn, opts.fromDate));
+    }
+    if (opts.userIds && opts.userIds.length > 0) {
+      conditions.push(inArray(dailyCompletions.userId, opts.userIds));
+    }
+
     const rows = await db
       .select({
         userId: dailyCompletions.userId,
         name: users.displayName,
         username: users.username,
         totalPoints: sum(dailyCompletions.pointsEarned).mapWith(Number),
-        totalActions: sql<number>`count(*)::int`,
+        totalActions: sql<number>`count(*) filter (where ${dailyCompletions.isStreakBonus} = false)::int`,
       })
       .from(dailyCompletions)
       .innerJoin(users, eq(users.id, dailyCompletions.userId))
-      .groupBy(
-        dailyCompletions.userId,
-        users.displayName,
-        users.username,
-      )
+      .where(and(...conditions))
+      .groupBy(dailyCompletions.userId, users.displayName, users.username)
       .orderBy(desc(sum(dailyCompletions.pointsEarned)))
       .limit(limit);
 
@@ -106,59 +145,35 @@ export async function getLeaderboard(limit = 20) {
       rank: index + 1,
       userId: r.userId,
       name: r.name || r.username || "Mitochondriac",
+      username: r.username,
       totalPoints: r.totalPoints ?? 0,
       totalActions: r.totalActions ?? 0,
     }));
   } catch {
     return [];
   }
+}
+
+export async function getLeaderboard(limit = 20) {
+  return getLeaderboardPeriod({ limit });
 }
 
 export async function getWeeklyLeaderboard(limit = 20) {
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const from = weekAgo.toISOString().slice(0, 10);
-
-  try {
-    const rows = await db
-      .select({
-        userId: dailyCompletions.userId,
-        name: users.displayName,
-        username: users.username,
-        totalPoints: sum(dailyCompletions.pointsEarned).mapWith(Number),
-        totalActions: sql<number>`count(*)::int`,
-      })
-      .from(dailyCompletions)
-      .innerJoin(users, eq(users.id, dailyCompletions.userId))
-      .where(gte(dailyCompletions.completedOn, from))
-      .groupBy(
-        dailyCompletions.userId,
-        users.displayName,
-        users.username,
-      )
-      .orderBy(desc(sum(dailyCompletions.pointsEarned)))
-      .limit(limit);
-
-    return rows.map((r, index) => ({
-      rank: index + 1,
-      userId: r.userId,
-      name: r.name || r.username || "Mitochondriac",
-      totalPoints: r.totalPoints ?? 0,
-      totalActions: r.totalActions ?? 0,
-    }));
-  } catch {
-    return [];
-  }
+  const from = new Date();
+  from.setDate(from.getDate() - 7);
+  return getLeaderboardPeriod({
+    limit,
+    fromDate: from.toISOString().slice(0, 10),
+  });
 }
 
-export function groupProtocolsByTime(list: Protocol[]) {
-  const map = new Map<TimeOfDay, Protocol[]>();
-  for (const p of list) {
-    const bucket = map.get(p.timeOfDay) ?? [];
-    bucket.push(p);
-    map.set(p.timeOfDay, bucket);
-  }
-  return map;
+export async function getMonthlyLeaderboard(limit = 20) {
+  const from = new Date();
+  from.setDate(from.getDate() - 30);
+  return getLeaderboardPeriod({
+    limit,
+    fromDate: from.toISOString().slice(0, 10),
+  });
 }
 
 export async function getUserTotalPoints(userId: string) {

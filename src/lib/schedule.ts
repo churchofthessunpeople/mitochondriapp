@@ -35,16 +35,8 @@ export async function ensureDefaultSchedule(userId: string) {
     .orderBy(asc(protocols.sortOrder));
 
   if (catalog.length === 0) {
-    // Fallback: use seed list shapes if DB empty (shouldn't happen after seed)
     catalog = PROTOCOL_SEEDS.map((s) => ({
-      id: s.id,
-      name: s.name,
-      description: s.description,
-      points: s.points,
-      timeOfDay: s.timeOfDay,
-      lockedTimeOfDay: s.lockedTimeOfDay,
-      allowsMultiple: s.allowsMultiple,
-      sortOrder: s.sortOrder,
+      ...s,
       active: true,
       createdAt: new Date(),
     }));

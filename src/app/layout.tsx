@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { BottomNav } from "@/components/bottom-nav";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ToastProvider } from "@/components/toast";
 import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -56,7 +58,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            {children}
+            <BottomNav />
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

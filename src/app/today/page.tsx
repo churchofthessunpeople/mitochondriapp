@@ -1,12 +1,20 @@
+import { eq } from "drizzle-orm";
 import { format } from "date-fns";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ActivityLog } from "@/components/activity-log";
 import { SiteHeader } from "@/components/site-header";
-import { getActiveProtocols, getUserDayStats, getUserTotalPoints } from "@/lib/data";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import {
+  getActiveProtocols,
+  getUserDayStats,
+  getUserTotalPoints,
+} from "@/lib/data";
 import { getServerTodayIsoDate } from "@/lib/date-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
+import { getUserStreak } from "@/lib/streaks";
 import { formatPoints } from "@/lib/utils";
 
 export const metadata = { title: "Today" };
@@ -17,7 +25,21 @@ export default async function TodayPage() {
 
   const date = await getServerTodayIsoDate();
   const h = await headers();
-  const tz = h.get("x-vercel-ip-timezone") || "UTC";
+
+  const [userRow] = await db
+    .select({
+      onboardingComplete: users.onboardingComplete,
+      timezone: users.timezone,
+    })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  const tz =
+    userRow?.timezone ||
+    h.get("x-vercel-ip-timezone") ||
+    "UTC";
+
   let localHour = new Date().getUTCHours();
   try {
     localHour = Number(
@@ -32,12 +54,14 @@ export default async function TodayPage() {
     localHour = new Date().getHours();
   }
 
-  const [protocols, dayStats, lifetime, favoriteIds] = await Promise.all([
-    getActiveProtocols(),
-    getUserDayStats(session.user.id, date),
-    getUserTotalPoints(session.user.id),
-    getUserFavoriteIds(session.user.id),
-  ]);
+  const [protocols, dayStats, lifetime, favoriteIds, streak] =
+    await Promise.all([
+      getActiveProtocols(),
+      getUserDayStats(session.user.id, date),
+      getUserTotalPoints(session.user.id),
+      getUserFavoriteIds(session.user.id),
+      getUserStreak(session.user.id, date),
+    ]);
 
   return (
     <div className="min-h-screen">
@@ -52,16 +76,8 @@ export default async function TodayPage() {
               {format(new Date(`${date}T12:00:00`), "EEEE, MMM d")}
             </h1>
             <p className="mt-1.5 text-sm text-muted">
-              Search or star favorites, then tap to log. Multi items can be
-              logged more than once.
-            </p>
-          </div>
-          <div className="glass shrink-0 rounded-2xl px-3 py-2 text-right text-sm">
-            <p className="text-[10px] uppercase tracking-wider text-muted">
-              Lifetime
-            </p>
-            <p className="text-lg font-semibold tabular-nums text-accent">
-              {formatPoints(lifetime)}
+              Search, filter by group, star favorites, log with optional timers.
+              Lifetime {formatPoints(lifetime)} pts.
             </p>
           </div>
         </div>
@@ -71,7 +87,10 @@ export default async function TodayPage() {
           favoriteIds={[...favoriteIds]}
           completionCounts={Object.fromEntries(dayStats.completionCounts)}
           dayPoints={dayStats.points}
+          streak={streak}
+          streakBonusToday={dayStats.streakBonus}
           localHour={localHour}
+          showOnboarding={!userRow?.onboardingComplete}
         />
       </main>
     </div>
