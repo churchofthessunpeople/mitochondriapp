@@ -9,7 +9,6 @@ import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { revalidateApp } from "@/lib/revalidate-app";
 import {
   bestSunriseTier,
-  formatSunriseMultiplier,
   isSunriseKeystoneProtocol,
   maxLogsPerDay,
   pointsForLog,
@@ -311,11 +310,4 @@ export async function removeOneCompletionAction(
 
 export async function toggleCompletionAction(protocolId: string) {
   return logCompletionAction(protocolId);
-}
-
-/** Toast helper text after logging a keystone */
-export function sunriseBoostToast(mult: number, label: string | null): string {
-  if (mult <= 1) return "";
-  const who = label ? `${label} · ` : "";
-  return ` · ${who}${formatSunriseMultiplier(mult)} on other activities today`;
 }
