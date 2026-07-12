@@ -57,6 +57,9 @@ export default async function AccountPage() {
         </div>
 
         <div className="mb-5 flex flex-wrap gap-2 text-sm">
+          <Link href="/region" className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground">
+            Region
+          </Link>
           <Link href="/friends" className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground">
             Friends
           </Link>

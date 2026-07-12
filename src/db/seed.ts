@@ -1,8 +1,9 @@
 import { config } from "dotenv";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { protocols } from "./schema";
+import { protocols, regions } from "./schema";
 import { PROTOCOL_SEEDS } from "./seed-data";
+import { REGION_SEEDS } from "./region-seeds";
 
 config({ path: ".env.local" });
 config({ path: ".env" });
@@ -12,6 +13,34 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL is required");
 
   const db = drizzle(neon(url));
+
+  for (const region of REGION_SEEDS) {
+    await db
+      .insert(regions)
+      .values({ ...region, active: true })
+      .onConflictDoUpdate({
+        target: regions.id,
+        set: {
+          name: region.name,
+          country: region.country,
+          locality: region.locality,
+          latitude: region.latitude,
+          longitude: region.longitude,
+          timezone: region.timezone,
+          healthRating: region.healthRating,
+          sunScore: region.sunScore,
+          magnetismScore: region.magnetismScore,
+          policyScore: region.policyScore,
+          summary: region.summary,
+          magnetismNotes: region.magnetismNotes,
+          lightNotes: region.lightNotes,
+          policyNotes: region.policyNotes,
+          sortOrder: region.sortOrder,
+          active: true,
+        },
+      });
+  }
+  console.log(`Seeded ${REGION_SEEDS.length} regions.`);
 
   for (const protocol of PROTOCOL_SEEDS) {
     await db

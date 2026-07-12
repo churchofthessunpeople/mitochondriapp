@@ -15,7 +15,8 @@ export default auth((req) => {
     pathname.startsWith("/account") ||
     pathname.startsWith("/friends") ||
     pathname.startsWith("/reminders") ||
-    pathname.startsWith("/admin");
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/region");
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
@@ -40,6 +41,7 @@ export const config = {
     "/friends/:path*",
     "/reminders/:path*",
     "/admin/:path*",
+    "/region/:path*",
     "/login",
     "/register",
     "/forgot-password",

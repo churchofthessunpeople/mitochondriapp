@@ -39,6 +39,31 @@ await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_complete boolean
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS show_on_leaderboard boolean NOT NULL DEFAULT true`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS username text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version integer NOT NULL DEFAULT 0`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS region_id text`;
+
+// Regions (lifestyle environment scores)
+await sql`
+  CREATE TABLE IF NOT EXISTS regions (
+    id text PRIMARY KEY,
+    name text NOT NULL,
+    country text NOT NULL,
+    locality text,
+    latitude double precision NOT NULL,
+    longitude double precision NOT NULL,
+    timezone text NOT NULL DEFAULT 'UTC',
+    health_rating integer NOT NULL DEFAULT 3,
+    sun_score integer NOT NULL DEFAULT 3,
+    magnetism_score integer NOT NULL DEFAULT 3,
+    policy_score integer NOT NULL DEFAULT 3,
+    summary text NOT NULL DEFAULT '',
+    magnetism_notes text NOT NULL DEFAULT '',
+    light_notes text NOT NULL DEFAULT '',
+    policy_notes text NOT NULL DEFAULT '',
+    sort_order integer NOT NULL DEFAULT 0,
+    active boolean NOT NULL DEFAULT true,
+    created_at timestamp NOT NULL DEFAULT now()
+  )
+`;
 
 // Username backfill if needed
 await sql`

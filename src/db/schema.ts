@@ -1,6 +1,7 @@
 import {
   boolean,
   date,
+  doublePrecision,
   integer,
   pgEnum,
   pgTable,
@@ -38,6 +39,39 @@ export const friendshipStatusEnum = pgEnum("friendship_status", [
   "rejected",
 ]);
 
+/**
+ * Curated places for lifestyle context (sun path, magnetism notes, health rating).
+ * Ratings are educational / community-curated — not medical advice.
+ */
+export const regions = pgTable("regions", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  country: text("country").notNull(),
+  /** Optional sub-area e.g. "San Salvador" */
+  locality: text("locality"),
+  latitude: doublePrecision("latitude").notNull(),
+  longitude: doublePrecision("longitude").notNull(),
+  timezone: text("timezone").notNull().default("UTC"),
+  /**
+   * 1–5 composite "environment for mitochondrial lifestyle" score
+   * (light access, magnetic/geological context, policy environment, etc.)
+   */
+  healthRating: integer("health_rating").notNull().default(3),
+  /** 1–5 sunlight / latitude quality */
+  sunScore: integer("sun_score").notNull().default(3),
+  /** 1–5 magnetic / geological vitality (volcanism, crustal activity, etc.) */
+  magnetismScore: integer("magnetism_score").notNull().default(3),
+  /** 1–5 policy / culture fit (e.g. outdoors culture, bitcoin, regulation) */
+  policyScore: integer("policy_score").notNull().default(3),
+  summary: text("summary").notNull().default(""),
+  magnetismNotes: text("magnetism_notes").notNull().default(""),
+  lightNotes: text("light_notes").notNull().default(""),
+  policyNotes: text("policy_notes").notNull().default(""),
+  sortOrder: integer("sort_order").notNull().default(0),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});
+
 export const users = pgTable("users", {
   id: text("id")
     .primaryKey()
@@ -51,6 +85,9 @@ export const users = pgTable("users", {
   displayName: text("display_name"),
   sessionVersion: integer("session_version").notNull().default(0),
   timezone: text("timezone").default("UTC"),
+  regionId: text("region_id").references(() => regions.id, {
+    onDelete: "set null",
+  }),
   isAdmin: boolean("is_admin").notNull().default(false),
   onboardingComplete: boolean("onboarding_complete").notNull().default(false),
   showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),
@@ -222,6 +259,7 @@ export const userReminders = pgTable(
 );
 
 export type User = typeof users.$inferSelect;
+export type Region = typeof regions.$inferSelect;
 export type Protocol = typeof protocols.$inferSelect;
 export type UserFavorite = typeof userFavorites.$inferSelect;
 export type UserScheduleItem = typeof userScheduleItems.$inferSelect;
