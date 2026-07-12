@@ -11,6 +11,7 @@ import {
   createEmailVerificationToken,
   sendVerificationEmail,
 } from "@/lib/email";
+import { isEmailVerificationEnabled } from "@/lib/email-verification";
 import { DUMMY_PASSWORD_HASH } from "@/lib/dummy-password-hash";
 import { validateNewPassword } from "@/lib/password";
 import {
@@ -138,6 +139,19 @@ export async function updateEmailAction(
     return { error: "That email is already in use." };
   }
 
+  if (!isEmailVerificationEnabled()) {
+    await db
+      .update(users)
+      .set({
+        email,
+        emailVerified: new Date(),
+      })
+      .where(eq(users.id, userId));
+
+    revalidatePath("/account");
+    return { success: "Email updated." };
+  }
+
   // Require re-verification of the new address before it becomes active for login
   await db
     .update(users)
@@ -155,7 +169,6 @@ export async function updateEmailAction(
     return { error: sent.message };
   }
 
-  // Invalidate current session — must verify + sign in again
   await signOut({ redirectTo: "/login?verify=1" });
   return { success: "Email updated." };
 }

@@ -7,6 +7,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { accounts, sessions, users, verificationTokens } from "@/db/schema";
 import { DUMMY_PASSWORD_HASH } from "@/lib/dummy-password-hash";
+import { isEmailVerificationEnabled } from "@/lib/email-verification";
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -45,14 +46,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .where(eq(users.email, email))
           .limit(1);
 
-        // Always bcrypt.compare to reduce email-enumeration timing leaks
         const hash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
         const valid = await bcrypt.compare(parsed.data.password, hash);
 
         if (!user?.passwordHash || !valid) return null;
 
-        // Unverified accounts cannot obtain a session
-        if (!user.emailVerified) return null;
+        if (isEmailVerificationEnabled() && !user.emailVerified) {
+          return null;
+        }
 
         return {
           id: user.id,
@@ -76,7 +77,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.name = user.name;
       }
 
-      // Invalidate JWTs after password change (sessionVersion bump)
       if (token.sub) {
         try {
           const [row] = await db
@@ -97,11 +97,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return { ...token, sub: undefined, sv: -1 };
           }
 
-          if (!row.emailVerified) {
+          if (isEmailVerificationEnabled() && !row.emailVerified) {
             return { ...token, sub: undefined };
           }
         } catch {
-          // On DB errors keep existing token to avoid mass logouts
+          // keep token on DB blips
         }
       }
 
@@ -109,7 +109,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (!token.sub) {
-        // Force unauthenticated session shape
         session.user = undefined as unknown as typeof session.user;
         return session;
       }

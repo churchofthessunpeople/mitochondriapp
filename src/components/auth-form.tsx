@@ -122,7 +122,8 @@ export function AuthForm({
         </button>
       </form>
 
-      {(state.needsVerification || mode === "login" || mode === "register") && (
+      {/* Resend UI only when server returns needsVerification (feature enabled) */}
+      {state.needsVerification && (
         <form action={resendAction} className="mt-6 space-y-2 border-t border-border pt-6">
           <p className="text-center text-xs text-muted">
             Didn&apos;t get the email? Resend verification

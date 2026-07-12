@@ -12,6 +12,7 @@ import {
   sendVerificationEmail,
   type EmailDebug,
 } from "@/lib/email";
+import { isEmailVerificationEnabled } from "@/lib/email-verification";
 import { DUMMY_PASSWORD_HASH } from "@/lib/dummy-password-hash";
 import { validateNewPassword } from "@/lib/password";
 import {
@@ -34,7 +35,6 @@ const loginSchema = z.object({
 export type AuthFormState = {
   error?: string;
   success?: string;
-  /** Always prefer showing this after signup so testing isn't blocked */
   verifyUrl?: string;
   needsVerification?: boolean;
   emailDebug?: EmailDebug;
@@ -112,23 +112,24 @@ export async function registerAction(
       };
     }
 
+    const verifyEnabled = isEmailVerificationEnabled();
+    const displayName = parsed.data.name.trim();
+    const passwordHash = await bcrypt.hash(parsed.data.password, 12);
+
     const [existing] = await db
       .select({ id: users.id, emailVerified: users.emailVerified })
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
 
-    if (existing?.emailVerified) {
-      return {
-        error:
-          "An account with this email already exists and is verified. Sign in instead.",
-      };
-    }
+    if (existing) {
+      if (!verifyEnabled || existing.emailVerified) {
+        return {
+          error: "An account with this email already exists. Sign in instead.",
+        };
+      }
 
-    if (existing && !existing.emailVerified) {
-      // Update password if they re-register while unverified
-      const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-      const displayName = parsed.data.name.trim();
+      // Unverified + verification still required: refresh password and resend
       await db
         .update(users)
         .set({
@@ -140,14 +141,42 @@ export async function registerAction(
 
       const { raw } = await createEmailVerificationToken(email);
       const sent = await sendVerificationEmail(email, raw);
-      return emailResultToState(
-        sent,
-        "Account already pending verification.",
-      );
+      return emailResultToState(sent, "Account already pending verification.");
     }
 
-    const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-    const displayName = parsed.data.name.trim();
+    if (!verifyEnabled) {
+      await db.insert(users).values({
+        email,
+        name: displayName,
+        displayName,
+        passwordHash,
+        emailVerified: new Date(),
+        sessionVersion: 0,
+      });
+
+      try {
+        await signIn("credentials", {
+          email,
+          password: parsed.data.password,
+          redirectTo: "/today",
+        });
+      } catch (error) {
+        if (
+          error &&
+          typeof error === "object" &&
+          "digest" in error &&
+          typeof (error as { digest?: string }).digest === "string" &&
+          (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+        ) {
+          throw error;
+        }
+        return {
+          success: "Account created. You can sign in now.",
+        };
+      }
+
+      return { success: "Account created." };
+    }
 
     await db.insert(users).values({
       email,
@@ -162,6 +191,15 @@ export async function registerAction(
     const sent = await sendVerificationEmail(email, raw);
     return emailResultToState(sent, "Account created.");
   } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      typeof (error as { digest?: string }).digest === "string" &&
+      (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
     console.error("[registerAction]", error);
     return {
       error:
@@ -227,30 +265,32 @@ export async function loginAction(
       throw error;
     }
 
-    const [user] = await db
-      .select({
-        passwordHash: users.passwordHash,
-        emailVerified: users.emailVerified,
-      })
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+    if (isEmailVerificationEnabled()) {
+      const [user] = await db
+        .select({
+          passwordHash: users.passwordHash,
+          emailVerified: users.emailVerified,
+        })
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
 
-    const hash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
-    const passwordOk = await bcrypt.compare(parsed.data.password, hash);
+      const hash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
+      const passwordOk = await bcrypt.compare(parsed.data.password, hash);
 
-    if (user?.passwordHash && passwordOk && !user.emailVerified) {
-      const { raw } = await createEmailVerificationToken(email);
-      const sent = await sendVerificationEmail(email, raw);
-      return {
-        error: sent.ok
-          ? "Your email is not verified yet. We sent another link — check inbox or use the link below."
-          : `Your email is not verified. ${sent.message}`,
-        needsVerification: true,
-        verifyUrl: sent.verifyUrl,
-        emailDebug: sent.debug,
-        messageId: sent.ok ? sent.messageId : undefined,
-      };
+      if (user?.passwordHash && passwordOk && !user.emailVerified) {
+        const { raw } = await createEmailVerificationToken(email);
+        const sent = await sendVerificationEmail(email, raw);
+        return {
+          error: sent.ok
+            ? "Your email is not verified yet. We sent another link — check inbox or use the link below."
+            : `Your email is not verified. ${sent.message}`,
+          needsVerification: true,
+          verifyUrl: sent.verifyUrl,
+          emailDebug: sent.debug,
+          messageId: sent.ok ? sent.messageId : undefined,
+        };
+      }
     }
 
     if (
@@ -273,6 +313,12 @@ export async function resendVerificationAction(
   _prev: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
+  if (!isEmailVerificationEnabled()) {
+    return {
+      success: "Email verification is disabled. You can sign in directly.",
+    };
+  }
+
   try {
     const ip = await getClientIp();
     const ipLimit = await consumeRateLimit(
