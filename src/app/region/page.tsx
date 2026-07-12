@@ -83,7 +83,6 @@ export default async function RegionPage() {
               placeLabel={user?.placeLabel}
               postalCode={user?.postalCode}
               distanceKm={distanceKm}
-              sunFromZip={hasCoords}
               timeZone={tz}
             />
           ) : (

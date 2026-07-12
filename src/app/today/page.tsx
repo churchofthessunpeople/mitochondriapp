@@ -129,7 +129,6 @@ export default async function TodayPage() {
               placeLabel={userRow?.placeLabel}
               postalCode={userRow?.postalCode}
               distanceKm={distanceKm}
-              sunFromZip={hasZipCoords}
               timeZone={tz}
             />
           ) : (

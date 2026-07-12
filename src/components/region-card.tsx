@@ -12,7 +12,6 @@ export function RegionCard({
   placeLabel,
   postalCode,
   distanceKm,
-  sunFromZip,
   timeZone,
 }: {
   region: Region | null;
@@ -22,8 +21,6 @@ export function RegionCard({
   postalCode?: string | null;
   /** Distance from user ZIP to curated region centroid */
   distanceKm?: number | null;
-  /** True when sunrise/sunset used user lat/lng from ZIP */
-  sunFromZip?: boolean;
   timeZone?: string | null;
 }) {
   const tz = timeZone || region?.timezone || "UTC";
@@ -70,7 +67,7 @@ export function RegionCard({
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-3 gap-2">
         <SunStat
           label="Sunrise"
           value={formatTimeInZone(sun.sunrise, tz)}
@@ -85,14 +82,6 @@ export function RegionCard({
             sun.dayLengthHours != null
               ? `${sun.dayLengthHours.toFixed(1)} h`
               : "—"
-          }
-        />
-        <SunStat
-          label={sunFromZip ? "Sun source" : "Timezone"}
-          value={
-            sunFromZip
-              ? "Your ZIP"
-              : (region?.timezone.split("/").pop() ?? "—")
           }
         />
       </div>
