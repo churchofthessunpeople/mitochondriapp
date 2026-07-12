@@ -102,15 +102,23 @@ export async function registerAction(
       parsed.data.displayName?.trim() ||
       username;
 
-    await db.insert(users).values({
-      username,
-      email: null,
-      name: displayName,
-      displayName,
-      passwordHash,
-      emailVerified: new Date(),
-      sessionVersion: 0,
-    });
+    const [created] = await db
+      .insert(users)
+      .values({
+        username,
+        email: null,
+        name: displayName,
+        displayName,
+        passwordHash,
+        emailVerified: new Date(),
+        sessionVersion: 0,
+      })
+      .returning({ id: users.id });
+
+    if (created?.id) {
+      const { ensureDefaultSchedule } = await import("@/lib/schedule");
+      await ensureDefaultSchedule(created.id);
+    }
 
     try {
       await signIn("credentials", {

@@ -18,7 +18,17 @@ async function main() {
   for (const protocol of PROTOCOL_SEEDS) {
     await db
       .insert(protocols)
-      .values(protocol)
+      .values({
+        id: protocol.id,
+        name: protocol.name,
+        description: protocol.description,
+        points: protocol.points,
+        timeOfDay: protocol.timeOfDay,
+        lockedTimeOfDay: protocol.lockedTimeOfDay,
+        allowsMultiple: protocol.allowsMultiple,
+        sortOrder: protocol.sortOrder,
+        active: true,
+      })
       .onConflictDoUpdate({
         target: protocols.id,
         set: {
@@ -26,6 +36,8 @@ async function main() {
           description: protocol.description,
           points: protocol.points,
           timeOfDay: protocol.timeOfDay,
+          lockedTimeOfDay: protocol.lockedTimeOfDay,
+          allowsMultiple: protocol.allowsMultiple,
           sortOrder: protocol.sortOrder,
           active: true,
         },
@@ -33,7 +45,6 @@ async function main() {
   }
 
   console.log(`Seeded ${PROTOCOL_SEEDS.length} protocols.`);
-  // Do not auto-verify users here — that made test accounts look "already verified".
 }
 
 main().catch((err) => {

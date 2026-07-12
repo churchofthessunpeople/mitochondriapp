@@ -1,11 +1,13 @@
-import { auth } from "@/auth";
-import { ProtocolBoard } from "@/components/protocol-board";
-import { SiteHeader } from "@/components/site-header";
-import { getActiveProtocols, getUserDayStats, getUserTotalPoints } from "@/lib/data";
-import { getServerTodayIsoDate } from "@/lib/date-server";
-import { formatPoints } from "@/lib/utils";
 import { format } from "date-fns";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { DayBoard } from "@/components/day-board";
+import { SiteHeader } from "@/components/site-header";
+import { getUserDayStats, getUserTotalPoints } from "@/lib/data";
+import { getServerTodayIsoDate } from "@/lib/date-server";
+import { getUserSchedule } from "@/lib/schedule";
+import { formatPoints } from "@/lib/utils";
 
 export const metadata = { title: "Today" };
 
@@ -14,11 +16,13 @@ export default async function TodayPage() {
   if (!session?.user?.id) redirect("/login");
 
   const date = await getServerTodayIsoDate();
-  const [protocols, dayStats, lifetime] = await Promise.all([
-    getActiveProtocols(),
+  const [entries, dayStats, lifetime] = await Promise.all([
+    getUserSchedule(session.user.id),
     getUserDayStats(session.user.id, date),
     getUserTotalPoints(session.user.id),
   ]);
+
+  const completionCounts = Object.fromEntries(dayStats.completionCounts);
 
   return (
     <div className="min-h-screen pb-16">
@@ -33,9 +37,12 @@ export default async function TodayPage() {
               {format(new Date(`${date}T12:00:00`), "EEEE, MMMM d")}
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-muted">
-              Click a protocol to toggle it, or drag cards into{" "}
-              <span className="text-foreground">Done today</span>. Points bank
-              once per protocol per calendar day.
+              Log activities from{" "}
+              <Link href="/schedule" className="text-accent hover:underline">
+                your schedule
+              </Link>
+              . Multi items can be logged repeatedly; sunrise/sunset stay
+              locked to their window.
             </p>
           </div>
           <div className="glass rounded-2xl px-4 py-3 text-sm">
@@ -46,10 +53,9 @@ export default async function TodayPage() {
           </div>
         </div>
 
-        <ProtocolBoard
-          protocols={protocols}
-          completedIds={[...dayStats.completedIds]}
-          date={date}
+        <DayBoard
+          entries={entries}
+          completionCounts={completionCounts}
           dayPoints={dayStats.points}
         />
       </main>

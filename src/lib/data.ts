@@ -19,6 +19,8 @@ export async function getActiveProtocols(): Promise<Protocol[]> {
 
   return PROTOCOL_SEEDS.map((seed) => ({
     ...seed,
+    lockedTimeOfDay: seed.lockedTimeOfDay,
+    allowsMultiple: seed.allowsMultiple,
     active: true,
     createdAt: new Date(),
   }));
@@ -43,9 +45,14 @@ export async function getCompletionsForUserDay(userId: string, date: string) {
 export async function getUserDayStats(userId: string, date: string) {
   const completions = await getCompletionsForUserDay(userId, date);
   const points = completions.reduce((acc, c) => acc + c.pointsEarned, 0);
+  const counts = new Map<string, number>();
+  for (const c of completions) {
+    counts.set(c.protocolId, (counts.get(c.protocolId) ?? 0) + 1);
+  }
   return {
     completions,
     completedIds: new Set(completions.map((c) => c.protocolId)),
+    completionCounts: counts,
     points,
     count: completions.length,
   };
