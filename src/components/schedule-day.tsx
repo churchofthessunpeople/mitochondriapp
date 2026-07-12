@@ -1,7 +1,6 @@
 "use client";
 
-import { Check, Flame, ListChecks, Minus, Plus } from "lucide-react";
-import Link from "next/link";
+import { Check, Flame, Minus, Plus } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
 import {
@@ -19,8 +18,8 @@ type Props = {
   dayPoints: number;
   streak: { current: number; best: number };
   dateLabel: string;
-  /** When set, "Edit available" switches tab instead of routing */
-  onOpenActivities?: () => void;
+  /** Expand the catalog section below (add/remove available) */
+  onExpandCatalog?: () => void;
 };
 
 /**
@@ -32,7 +31,7 @@ export function ScheduleDay({
   dayPoints,
   streak,
   dateLabel,
-  onOpenActivities,
+  onExpandCatalog,
 }: Props) {
   const { push } = useToast();
   const [pending, start] = useTransition();
@@ -125,52 +124,24 @@ export function ScheduleDay({
         total={total}
       />
 
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-muted">
-          Tap to complete · multi uses + / −
-        </p>
-        {onOpenActivities ? (
-          <button
-            type="button"
-            onClick={onOpenActivities}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
-          >
-            <ListChecks className="h-3.5 w-3.5" />
-            Edit available
-          </button>
-        ) : (
-          <Link
-            href="/app?t=activities"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
-          >
-            <ListChecks className="h-3.5 w-3.5" />
-            Edit available
-          </Link>
-        )}
-      </div>
+      <p className="text-sm text-muted">
+        Your activities · tap to complete · multi uses + / −
+      </p>
 
       {protocols.length === 0 ? (
         <div className="glass rounded-3xl border border-dashed border-border p-6 text-center">
-          <p className="font-medium">No activities selected</p>
+          <p className="font-medium">No activities on your list yet</p>
           <p className="mt-2 text-sm text-muted">
-            Choose what you can actually do (equipment, access, preference).
-            Only those show up here as today&apos;s checklist.
+            Expand the catalog below and toggle what you can actually do.
           </p>
-          {onOpenActivities ? (
+          {onExpandCatalog && (
             <button
               type="button"
-              onClick={onOpenActivities}
+              onClick={onExpandCatalog}
               className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
             >
-              Pick available activities
+              Browse catalog
             </button>
-          ) : (
-            <Link
-              href="/app?t=activities"
-              className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
-            >
-              Pick available activities
-            </Link>
           )}
         </div>
       ) : (
@@ -283,27 +254,6 @@ export function ScheduleDay({
         </ul>
       )}
 
-      {protocols.length > 0 && (
-        <p className="text-center text-xs text-muted">
-          Missing something?{" "}
-          {onOpenActivities ? (
-            <button
-              type="button"
-              onClick={onOpenActivities}
-              className="text-accent hover:underline"
-            >
-              Update available activities
-            </button>
-          ) : (
-            <Link
-              href="/app?t=activities"
-              className="text-accent hover:underline"
-            >
-              Update available activities
-            </Link>
-          )}
-        </p>
-      )}
     </div>
   );
 }
