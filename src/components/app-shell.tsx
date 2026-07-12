@@ -7,6 +7,7 @@ import type { Protocol, Region } from "@/db/schema";
 import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
 import { PlaceExpand } from "@/components/place-expand";
 import { ScheduleDay } from "@/components/schedule-day";
+import { SunriseCheckIn } from "@/components/sunrise-check-in";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { AppTab } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
@@ -24,6 +25,8 @@ const CACHE_KEY = "mitochondriapp-shell-v1";
 export type AppShellProps = {
   initialTab: AppTab;
   dateLabel: string;
+  /** User calendar day YYYY-MM-DD (for daily sunrise prompt) */
+  todayIso: string;
   allProtocols: Protocol[];
   availableIds: string[];
   completionCounts: Record<string, number>;
@@ -56,6 +59,7 @@ export type AppShellProps = {
 export function AppShell({
   initialTab,
   dateLabel,
+  todayIso,
   allProtocols,
   availableIds: initialAvailableIds,
   completionCounts,
@@ -73,7 +77,7 @@ export function AppShell({
   localHour,
   seasonLine,
   weekly,
-  sunriseBuffActive = false,
+  sunriseBuffActive: initialSunriseBuff = false,
   isTravel,
   travelUntil,
   homePostalCode,
@@ -87,6 +91,12 @@ export function AppShell({
   );
   // Auto-expand place when no location yet so ZIP is obvious
   const [placeOpen, setPlaceOpen] = useState(!placeLabel && !region);
+  const [sunriseBuffActive, setSunriseBuffActive] =
+    useState(initialSunriseBuff);
+
+  useEffect(() => {
+    setSunriseBuffActive(initialSunriseBuff);
+  }, [initialSunriseBuff]);
 
   useEffect(() => {
     try {
@@ -127,6 +137,15 @@ export function AppShell({
 
   return (
     <div className="min-h-screen pb-24 md:pb-16">
+      <SunriseCheckIn
+        todayIso={todayIso}
+        sunriseBuffActive={sunriseBuffActive}
+        allProtocols={allProtocols}
+        sun={sun}
+        timeZone={timeZone}
+        onLogged={() => setSunriseBuffActive(true)}
+      />
+
       <header
         className="sticky top-0 z-40 border-b border-border backdrop-blur-xl"
         style={{ background: "var(--header-bg)" }}

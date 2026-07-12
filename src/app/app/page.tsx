@@ -145,6 +145,7 @@ export default async function AppPage({
     <AppShell
       initialTab={initialTab}
       dateLabel={dateLabel}
+      todayIso={date}
       allProtocols={allProtocols}
       availableIds={[...availableIds]}
       completionCounts={Object.fromEntries(dayStats.completionCounts)}
