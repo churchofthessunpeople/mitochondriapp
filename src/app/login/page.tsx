@@ -11,10 +11,7 @@ export default async function LoginPage({ searchParams }: Props) {
   const params = await searchParams;
   let banner: string | undefined;
   if (params.passwordUpdated) {
-    banner = "Password updated. Sign in with your new password.";
-  } else if (params.verify) {
-    banner =
-      "Check your email to verify your new address, then sign in here.";
+    banner = "Password updated. Sign in with your username and new password.";
   }
 
   return (

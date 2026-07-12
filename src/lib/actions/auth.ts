@@ -7,28 +7,22 @@ import { z } from "zod";
 import { signIn, signOut } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import {
-  createEmailVerificationToken,
-  sendVerificationEmail,
-  type EmailDebug,
-} from "@/lib/email";
-import { isEmailVerificationEnabled } from "@/lib/email-verification";
-import { DUMMY_PASSWORD_HASH } from "@/lib/dummy-password-hash";
 import { validateNewPassword } from "@/lib/password";
 import {
   AUTH_RATE,
   consumeRateLimit,
   getClientIp,
 } from "@/lib/rate-limit";
+import { usernameSchema } from "@/lib/username";
 
 const registerSchema = z.object({
-  name: z.string().min(2, "Display name must be at least 2 characters").max(40),
-  email: z.string().email("Enter a valid email"),
+  username: z.string().min(1),
+  displayName: z.string().max(40).optional(),
   password: z.string().min(1).max(128),
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  username: z.string().min(1),
   password: z.string().min(1).max(128),
 });
 
@@ -37,36 +31,8 @@ export type AuthFormState = {
   success?: string;
   verifyUrl?: string;
   needsVerification?: boolean;
-  emailDebug?: EmailDebug;
   messageId?: string;
 };
-
-function emailResultToState(
-  sent: Awaited<ReturnType<typeof sendVerificationEmail>>,
-  successMessage: string,
-): AuthFormState {
-  if (!sent.ok) {
-    return {
-      error: sent.message,
-      needsVerification: true,
-      verifyUrl: sent.verifyUrl,
-      emailDebug: sent.debug,
-    };
-  }
-
-  const via =
-    sent.mode === "resend"
-      ? "We attempted to email you a verification link."
-      : "Email provider is not configured — use the link below.";
-
-  return {
-    success: `${successMessage} ${via}`,
-    needsVerification: true,
-    verifyUrl: sent.verifyUrl,
-    emailDebug: sent.debug,
-    messageId: sent.messageId,
-  };
-}
 
 export async function registerAction(
   _prev: AuthFormState,
@@ -86,8 +52,8 @@ export async function registerAction(
     }
 
     const parsed = registerSchema.safeParse({
-      name: formData.get("name"),
-      email: formData.get("email"),
+      username: formData.get("username"),
+      displayName: formData.get("displayName") || undefined,
       password: formData.get("password"),
     });
 
@@ -95,101 +61,77 @@ export async function registerAction(
       return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
     }
 
+    const usernameParsed = usernameSchema.safeParse(parsed.data.username);
+    if (!usernameParsed.success) {
+      return {
+        error: usernameParsed.error.issues[0]?.message ?? "Invalid username",
+      };
+    }
+    const username = usernameParsed.data;
+
     const passwordCheck = await validateNewPassword(parsed.data.password);
     if (!passwordCheck.ok) {
       return { error: passwordCheck.message };
     }
 
-    const email = parsed.data.email.toLowerCase().trim();
-    const emailLimit = await consumeRateLimit(
-      `register:email:${email}`,
+    const userLimit = await consumeRateLimit(
+      `register:user:${username}`,
       AUTH_RATE.register.limit,
       AUTH_RATE.register.windowMs,
     );
-    if (!emailLimit.ok) {
+    if (!userLimit.ok) {
       return {
-        error: `Too many registration attempts. Try again in ${emailLimit.retryAfterSec}s.`,
+        error: `Too many registration attempts. Try again in ${userLimit.retryAfterSec}s.`,
       };
     }
 
-    const verifyEnabled = isEmailVerificationEnabled();
-    const displayName = parsed.data.name.trim();
-    const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-
     const [existing] = await db
-      .select({ id: users.id, emailVerified: users.emailVerified })
+      .select({ id: users.id })
       .from(users)
-      .where(eq(users.email, email))
+      .where(eq(users.username, username))
       .limit(1);
 
     if (existing) {
-      if (!verifyEnabled || existing.emailVerified) {
-        return {
-          error: "An account with this email already exists. Sign in instead.",
-        };
-      }
-
-      // Unverified + verification still required: refresh password and resend
-      await db
-        .update(users)
-        .set({
-          passwordHash,
-          name: displayName,
-          displayName,
-        })
-        .where(eq(users.id, existing.id));
-
-      const { raw } = await createEmailVerificationToken(email);
-      const sent = await sendVerificationEmail(email, raw);
-      return emailResultToState(sent, "Account already pending verification.");
+      return {
+        error: "That username is taken. Try another or sign in.",
+      };
     }
 
-    if (!verifyEnabled) {
-      await db.insert(users).values({
-        email,
-        name: displayName,
-        displayName,
-        passwordHash,
-        emailVerified: new Date(),
-        sessionVersion: 0,
-      });
-
-      try {
-        await signIn("credentials", {
-          email,
-          password: parsed.data.password,
-          redirectTo: "/today",
-        });
-      } catch (error) {
-        if (
-          error &&
-          typeof error === "object" &&
-          "digest" in error &&
-          typeof (error as { digest?: string }).digest === "string" &&
-          (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
-        ) {
-          throw error;
-        }
-        return {
-          success: "Account created. You can sign in now.",
-        };
-      }
-
-      return { success: "Account created." };
-    }
+    const passwordHash = await bcrypt.hash(parsed.data.password, 12);
+    const displayName =
+      parsed.data.displayName?.trim() ||
+      username;
 
     await db.insert(users).values({
-      email,
+      username,
+      email: null,
       name: displayName,
       displayName,
       passwordHash,
-      emailVerified: null,
+      emailVerified: new Date(),
       sessionVersion: 0,
     });
 
-    const { raw } = await createEmailVerificationToken(email);
-    const sent = await sendVerificationEmail(email, raw);
-    return emailResultToState(sent, "Account created.");
+    try {
+      await signIn("credentials", {
+        username,
+        password: parsed.data.password,
+        redirectTo: "/today",
+      });
+    } catch (error) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "digest" in error &&
+        typeof (error as { digest?: string }).digest === "string" &&
+        (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw error;
+      }
+      return { success: "Account created. You can sign in now." };
+    }
+
+    return { success: "Account created." };
   } catch (error) {
     if (
       error &&
@@ -216,15 +158,15 @@ export async function loginAction(
 ): Promise<AuthFormState> {
   const ip = await getClientIp();
   const parsed = loginSchema.safeParse({
-    email: formData.get("email"),
+    username: formData.get("username"),
     password: formData.get("password"),
   });
 
   if (!parsed.success) {
-    return { error: "Enter a valid email and password" };
+    return { error: "Enter a username and password" };
   }
 
-  const email = parsed.data.email.toLowerCase().trim();
+  const username = parsed.data.username.trim().toLowerCase();
 
   const ipLimit = await consumeRateLimit(
     `login:ip:${ip}`,
@@ -237,20 +179,20 @@ export async function loginAction(
     };
   }
 
-  const emailLimit = await consumeRateLimit(
-    `login:email:${email}`,
+  const userLimit = await consumeRateLimit(
+    `login:user:${username}`,
     AUTH_RATE.login.limit,
     AUTH_RATE.login.windowMs,
   );
-  if (!emailLimit.ok) {
+  if (!userLimit.ok) {
     return {
-      error: `Too many sign-in attempts. Try again in ${emailLimit.retryAfterSec}s.`,
+      error: `Too many sign-in attempts. Try again in ${userLimit.retryAfterSec}s.`,
     };
   }
 
   try {
     await signIn("credentials", {
-      email,
+      username,
       password: parsed.data.password,
       redirectTo: "/today",
     });
@@ -265,34 +207,6 @@ export async function loginAction(
       throw error;
     }
 
-    if (isEmailVerificationEnabled()) {
-      const [user] = await db
-        .select({
-          passwordHash: users.passwordHash,
-          emailVerified: users.emailVerified,
-        })
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
-
-      const hash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
-      const passwordOk = await bcrypt.compare(parsed.data.password, hash);
-
-      if (user?.passwordHash && passwordOk && !user.emailVerified) {
-        const { raw } = await createEmailVerificationToken(email);
-        const sent = await sendVerificationEmail(email, raw);
-        return {
-          error: sent.ok
-            ? "Your email is not verified yet. We sent another link — check inbox or use the link below."
-            : `Your email is not verified. ${sent.message}`,
-          needsVerification: true,
-          verifyUrl: sent.verifyUrl,
-          emailDebug: sent.debug,
-          messageId: sent.ok ? sent.messageId : undefined,
-        };
-      }
-    }
-
     if (
       error instanceof AuthError ||
       error instanceof CredentialsSignin ||
@@ -300,7 +214,7 @@ export async function loginAction(
         (error.name === "CredentialsSignin" ||
           error.message.includes("CredentialsSignin")))
     ) {
-      return { error: "Invalid email or password" };
+      return { error: "Invalid username or password" };
     }
 
     throw error;
@@ -309,77 +223,14 @@ export async function loginAction(
   return { success: "Signed in" };
 }
 
+/** Kept for old UI; no-ops while verification is off / username-only. */
 export async function resendVerificationAction(
   _prev: AuthFormState,
-  formData: FormData,
+  _formData: FormData,
 ): Promise<AuthFormState> {
-  if (!isEmailVerificationEnabled()) {
-    return {
-      success: "Email verification is disabled. You can sign in directly.",
-    };
-  }
-
-  try {
-    const ip = await getClientIp();
-    const ipLimit = await consumeRateLimit(
-      `verify-resend:ip:${ip}`,
-      AUTH_RATE.verifyResend.limit,
-      AUTH_RATE.verifyResend.windowMs,
-    );
-    if (!ipLimit.ok) {
-      return {
-        error: `Too many resend attempts. Try again in ${ipLimit.retryAfterSec}s.`,
-      };
-    }
-
-    const emailRaw = formData.get("email");
-    const emailParsed = z.string().email().safeParse(emailRaw);
-    if (!emailParsed.success) {
-      return { error: "Enter a valid email" };
-    }
-
-    const email = emailParsed.data.toLowerCase().trim();
-    const emailLimit = await consumeRateLimit(
-      `verify-resend:email:${email}`,
-      AUTH_RATE.verifyResend.limit,
-      AUTH_RATE.verifyResend.windowMs,
-    );
-    if (!emailLimit.ok) {
-      return {
-        error: `Too many resend attempts. Try again in ${emailLimit.retryAfterSec}s.`,
-      };
-    }
-
-    const [user] = await db
-      .select({ id: users.id, emailVerified: users.emailVerified })
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
-
-    if (!user) {
-      return {
-        error: "No account found for that email. Create an account first.",
-      };
-    }
-
-    if (user.emailVerified) {
-      return {
-        success: "This email is already verified. You can sign in.",
-      };
-    }
-
-    const { raw } = await createEmailVerificationToken(email);
-    const sent = await sendVerificationEmail(email, raw);
-    return emailResultToState(sent, "Verification email requested.");
-  } catch (error) {
-    console.error("[resendVerificationAction]", error);
-    return {
-      error:
-        error instanceof Error
-          ? `Resend failed: ${error.message}`
-          : "Could not resend verification email.",
-    };
-  }
+  return {
+    success: "Email verification is not required. Sign in with your username.",
+  };
 }
 
 export async function logoutAction() {

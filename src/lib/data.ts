@@ -81,20 +81,24 @@ export async function getLeaderboard(limit = 20) {
       .select({
         userId: dailyCompletions.userId,
         name: users.displayName,
-        email: users.email,
+        username: users.username,
         totalPoints: sum(dailyCompletions.pointsEarned).mapWith(Number),
         totalActions: sql<number>`count(*)::int`,
       })
       .from(dailyCompletions)
       .innerJoin(users, eq(users.id, dailyCompletions.userId))
-      .groupBy(dailyCompletions.userId, users.displayName, users.email)
+      .groupBy(
+        dailyCompletions.userId,
+        users.displayName,
+        users.username,
+      )
       .orderBy(desc(sum(dailyCompletions.pointsEarned)))
       .limit(limit);
 
     return rows.map((r, index) => ({
       rank: index + 1,
       userId: r.userId,
-      name: r.name || r.email.split("@")[0] || "Mitochondriac",
+      name: r.name || r.username || "Mitochondriac",
       totalPoints: r.totalPoints ?? 0,
       totalActions: r.totalActions ?? 0,
     }));
@@ -113,21 +117,25 @@ export async function getWeeklyLeaderboard(limit = 20) {
       .select({
         userId: dailyCompletions.userId,
         name: users.displayName,
-        email: users.email,
+        username: users.username,
         totalPoints: sum(dailyCompletions.pointsEarned).mapWith(Number),
         totalActions: sql<number>`count(*)::int`,
       })
       .from(dailyCompletions)
       .innerJoin(users, eq(users.id, dailyCompletions.userId))
       .where(gte(dailyCompletions.completedOn, from))
-      .groupBy(dailyCompletions.userId, users.displayName, users.email)
+      .groupBy(
+        dailyCompletions.userId,
+        users.displayName,
+        users.username,
+      )
       .orderBy(desc(sum(dailyCompletions.pointsEarned)))
       .limit(limit);
 
     return rows.map((r, index) => ({
       rank: index + 1,
       userId: r.userId,
-      name: r.name || r.email.split("@")[0] || "Mitochondriac",
+      name: r.name || r.username || "Mitochondriac",
       totalPoints: r.totalPoints ?? 0,
       totalActions: r.totalActions ?? 0,
     }));

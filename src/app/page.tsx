@@ -42,6 +42,7 @@ export default async function HomePage() {
           </h1>
           <p className="mt-3 max-w-xs text-[15px] leading-relaxed text-muted">
             Track light, grounding, and lifestyle protocols — one day at a time.
+            Sign up with a username (no email needed).
           </p>
         </div>
 

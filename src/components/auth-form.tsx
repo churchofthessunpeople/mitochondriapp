@@ -4,11 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useActionState } from "react";
 import type { AuthFormState } from "@/lib/actions/auth";
-import {
-  loginAction,
-  registerAction,
-  resendVerificationAction,
-} from "@/lib/actions/auth";
+import { loginAction, registerAction } from "@/lib/actions/auth";
 
 type Mode = "login" | "register";
 
@@ -21,10 +17,6 @@ export function AuthForm({
 }) {
   const action = mode === "login" ? loginAction : registerAction;
   const [state, formAction, pending] = useActionState(action, {});
-  const [resendState, resendAction, resendPending] = useActionState(
-    resendVerificationAction,
-    {},
-  );
 
   return (
     <div className="mx-auto w-full max-w-md">
@@ -45,8 +37,8 @@ export function AuthForm({
         </h1>
         <p className="mt-2 text-sm text-muted">
           {mode === "login"
-            ? "Sign in to log today’s protocols."
-            : "Start tracking your daily black swan stack."}
+            ? "Sign in with your username to log today’s protocols."
+            : "Pick a username and password — no email required."}
         </p>
       </div>
 
@@ -57,33 +49,36 @@ export function AuthForm({
       )}
 
       <form action={formAction} className="space-y-4">
+        <label className="block space-y-1.5 text-left">
+          <span className="text-sm font-medium text-foreground/80">Username</span>
+          <input
+            name="username"
+            required
+            minLength={3}
+            maxLength={24}
+            autoComplete="username"
+            placeholder="e.g. solarmike"
+            pattern="[A-Za-z][A-Za-z0-9_]*"
+            title="Start with a letter; letters, numbers, underscores only"
+            className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
+          />
+        </label>
+
         {mode === "register" && (
           <label className="block space-y-1.5 text-left">
             <span className="text-sm font-medium text-foreground/80">
-              Display name
+              Display name{" "}
+              <span className="font-normal text-muted">(optional)</span>
             </span>
             <input
-              name="name"
-              required
+              name="displayName"
               minLength={2}
               maxLength={40}
-              placeholder="e.g. Solar Mike"
+              placeholder="Shown on the leaderboard"
               className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
             />
           </label>
         )}
-
-        <label className="block space-y-1.5 text-left">
-          <span className="text-sm font-medium text-foreground/80">Email</span>
-          <input
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="you@example.com"
-            className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
-          />
-        </label>
 
         <label className="block space-y-1.5 text-left">
           <span className="text-sm font-medium text-foreground/80">Password</span>
@@ -103,7 +98,8 @@ export function AuthForm({
 
         {mode === "register" && (
           <p className="text-left text-xs text-muted">
-            At least 8 characters with a letter and a number (e.g. Hoger42@).
+            Username: 3–24 characters, start with a letter. Password: 8+ with a
+            letter and a number.
           </p>
         )}
 
@@ -121,30 +117,6 @@ export function AuthForm({
               : "Create account"}
         </button>
       </form>
-
-      {/* Resend UI only when server returns needsVerification (feature enabled) */}
-      {state.needsVerification && (
-        <form action={resendAction} className="mt-6 space-y-2 border-t border-border pt-6">
-          <p className="text-center text-xs text-muted">
-            Didn&apos;t get the email? Resend verification
-          </p>
-          <input
-            name="email"
-            type="email"
-            required
-            placeholder="Email for resend"
-            className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
-          />
-          <StatusPanel state={resendState} />
-          <button
-            type="submit"
-            disabled={resendPending}
-            className="btn-secondary flex h-11 w-full items-center justify-center rounded-2xl text-sm font-semibold disabled:opacity-60"
-          >
-            {resendPending ? "Sending..." : "Resend verification link"}
-          </button>
-        </form>
-      )}
 
       <p className="mt-6 text-center text-sm text-muted">
         {mode === "login" ? (
@@ -174,9 +146,7 @@ export function AuthForm({
 }
 
 function StatusPanel({ state }: { state: AuthFormState }) {
-  if (!state.error && !state.success && !state.verifyUrl && !state.emailDebug) {
-    return null;
-  }
+  if (!state.error && !state.success) return null;
 
   return (
     <div className="space-y-3 text-left">
@@ -188,80 +158,7 @@ function StatusPanel({ state }: { state: AuthFormState }) {
       {state.success && (
         <p className="rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent">
           {state.success}
-          {state.messageId ? (
-            <span className="mt-1 block text-xs opacity-80">
-              Resend id: {state.messageId}
-            </span>
-          ) : null}
         </p>
-      )}
-      {state.verifyUrl && (
-        <div className="rounded-2xl border border-border bg-foreground/5 px-4 py-3 text-sm">
-          <p className="font-medium text-foreground">Verify link (use this if email doesn&apos;t arrive)</p>
-          <a
-            href={state.verifyUrl}
-            className="mt-2 block break-all text-accent underline"
-          >
-            {state.verifyUrl}
-          </a>
-        </div>
-      )}
-      {state.emailDebug && (
-        <details className="rounded-2xl border border-border bg-foreground/[0.03] px-4 py-3 text-xs text-muted">
-          <summary className="cursor-pointer font-medium text-foreground">
-            Email debug details
-          </summary>
-          <dl className="mt-3 space-y-1.5 font-mono">
-            <div>
-              <dt className="inline text-muted">API key present: </dt>
-              <dd className="inline text-foreground">
-                {state.emailDebug.hasApiKey ? "yes" : "NO"}
-              </dd>
-            </div>
-            <div>
-              <dt className="inline text-muted">From: </dt>
-              <dd className="inline break-all text-foreground">
-                {state.emailDebug.from}
-              </dd>
-            </div>
-            <div>
-              <dt className="inline text-muted">To: </dt>
-              <dd className="inline break-all text-foreground">
-                {state.emailDebug.to}
-              </dd>
-            </div>
-            <div>
-              <dt className="inline text-muted">Base URL: </dt>
-              <dd className="inline break-all text-foreground">
-                {state.emailDebug.baseUrl}
-              </dd>
-            </div>
-            {state.emailDebug.resendStatus != null && (
-              <div>
-                <dt className="inline text-muted">Resend HTTP: </dt>
-                <dd className="inline text-foreground">
-                  {state.emailDebug.resendStatus}
-                </dd>
-              </div>
-            )}
-            {state.emailDebug.resendBody && (
-              <div>
-                <dt className="text-muted">Resend body:</dt>
-                <dd className="mt-1 whitespace-pre-wrap break-all text-foreground">
-                  {state.emailDebug.resendBody}
-                </dd>
-              </div>
-            )}
-            {state.emailDebug.note && (
-              <div>
-                <dt className="inline text-muted">Note: </dt>
-                <dd className="inline text-foreground">
-                  {state.emailDebug.note}
-                </dd>
-              </div>
-            )}
-          </dl>
-        </details>
       )}
     </div>
   );

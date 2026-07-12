@@ -4,8 +4,8 @@ import { useActionState, useEffect, useRef } from "react";
 import type { AccountFormState } from "@/lib/actions/account";
 import {
   updateDisplayNameAction,
-  updateEmailAction,
   updatePasswordAction,
+  updateUsernameAction,
 } from "@/lib/actions/account";
 
 function FormMessage({ state }: { state: AccountFormState }) {
@@ -86,37 +86,35 @@ export function DisplayNameForm({
   );
 }
 
-export function EmailForm({ initialEmail }: { initialEmail: string }) {
-  const [state, formAction, pending] = useActionState(updateEmailAction, {});
+export function UsernameForm({ initialUsername }: { initialUsername: string }) {
+  const [state, formAction, pending] = useActionState(updateUsernameAction, {});
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (state.success) {
-      formRef.current?.querySelector<HTMLInputElement>(
+      const el = formRef.current?.querySelector<HTMLInputElement>(
         'input[name="currentPassword"]',
-      ) &&
-        ((
-          formRef.current.querySelector(
-            'input[name="currentPassword"]',
-          ) as HTMLInputElement
-        ).value = "");
+      );
+      if (el) el.value = "";
     }
   }, [state.success]);
 
   return (
     <AccountSection
-      title="Email"
+      title="Username"
       description="Used to sign in. Confirm with your current password."
     >
       <form ref={formRef} action={formAction} className="space-y-4">
         <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground/80">Email</span>
+          <span className="text-sm font-medium text-foreground/80">Username</span>
           <input
-            name="email"
-            type="email"
+            name="username"
             required
-            defaultValue={initialEmail}
-            autoComplete="email"
+            minLength={3}
+            maxLength={24}
+            defaultValue={initialUsername}
+            autoComplete="username"
+            pattern="[A-Za-z][A-Za-z0-9_]*"
             className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
           />
         </label>
@@ -138,7 +136,7 @@ export function EmailForm({ initialEmail }: { initialEmail: string }) {
           disabled={pending}
           className="btn-primary flex h-11 w-full items-center justify-center rounded-2xl text-sm font-semibold transition hover:opacity-90 disabled:opacity-60 sm:w-auto sm:px-6"
         >
-          {pending ? "Saving..." : "Save email"}
+          {pending ? "Saving..." : "Save username"}
         </button>
       </form>
     </AccountSection>

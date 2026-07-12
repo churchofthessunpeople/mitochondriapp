@@ -7,11 +7,6 @@ import { z } from "zod";
 import { auth, signOut } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import {
-  createEmailVerificationToken,
-  sendVerificationEmail,
-} from "@/lib/email";
-import { isEmailVerificationEnabled } from "@/lib/email-verification";
 import { DUMMY_PASSWORD_HASH } from "@/lib/dummy-password-hash";
 import { validateNewPassword } from "@/lib/password";
 import {
@@ -19,11 +14,11 @@ import {
   consumeRateLimit,
   getClientIp,
 } from "@/lib/rate-limit";
+import { usernameSchema } from "@/lib/username";
 
 export type AccountFormState = {
   error?: string;
   success?: string;
-  devVerifyUrl?: string;
 };
 
 async function requireUserId() {
@@ -39,11 +34,6 @@ const profileSchema = z.object({
     .string()
     .min(2, "Display name must be at least 2 characters")
     .max(40, "Display name must be at most 40 characters"),
-});
-
-const emailSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  currentPassword: z.string().min(1, "Enter your current password").max(128),
 });
 
 const passwordChangeSchema = z.object({
@@ -83,7 +73,7 @@ export async function updateDisplayNameAction(
   return { success: "Display name updated." };
 }
 
-export async function updateEmailAction(
+export async function updateUsernameAction(
   _prev: AccountFormState,
   formData: FormData,
 ): Promise<AccountFormState> {
@@ -91,26 +81,28 @@ export async function updateEmailAction(
   const ip = await getClientIp();
 
   const limit = await consumeRateLimit(
-    `email-change:ip:${ip}`,
+    `username-change:ip:${ip}`,
     AUTH_RATE.emailChange.limit,
     AUTH_RATE.emailChange.windowMs,
   );
   if (!limit.ok) {
     return {
-      error: `Too many email change attempts. Try again in ${limit.retryAfterSec}s.`,
+      error: `Too many username change attempts. Try again in ${limit.retryAfterSec}s.`,
     };
   }
 
-  const parsed = emailSchema.safeParse({
-    email: formData.get("email"),
-    currentPassword: formData.get("currentPassword"),
-  });
-
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  const usernameParsed = usernameSchema.safeParse(formData.get("username"));
+  if (!usernameParsed.success) {
+    return {
+      error: usernameParsed.error.issues[0]?.message ?? "Invalid username",
+    };
   }
+  const username = usernameParsed.data;
 
-  const email = parsed.data.email.toLowerCase().trim();
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  if (!currentPassword) {
+    return { error: "Enter your current password" };
+  }
 
   const [user] = await db
     .select()
@@ -119,58 +111,35 @@ export async function updateEmailAction(
     .limit(1);
 
   const hash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
-  const valid = await bcrypt.compare(parsed.data.currentPassword, hash);
+  const valid = await bcrypt.compare(currentPassword, hash);
 
   if (!user?.passwordHash || !valid) {
     return { error: "Current password is incorrect." };
   }
 
-  if (email === user.email) {
-    return { error: "That is already your email." };
+  if (username === user.username) {
+    return { error: "That is already your username." };
   }
 
   const [taken] = await db
     .select({ id: users.id })
     .from(users)
-    .where(and(eq(users.email, email), ne(users.id, userId)))
+    .where(and(eq(users.username, username), ne(users.id, userId)))
     .limit(1);
 
   if (taken) {
-    return { error: "That email is already in use." };
+    return { error: "That username is already taken." };
   }
 
-  if (!isEmailVerificationEnabled()) {
-    await db
-      .update(users)
-      .set({
-        email,
-        emailVerified: new Date(),
-      })
-      .where(eq(users.id, userId));
-
-    revalidatePath("/account");
-    return { success: "Email updated." };
-  }
-
-  // Require re-verification of the new address before it becomes active for login
   await db
     .update(users)
-    .set({
-      email,
-      emailVerified: null,
-      sessionVersion: sql`${users.sessionVersion} + 1`,
-    })
+    .set({ username })
     .where(eq(users.id, userId));
 
-  const { raw } = await createEmailVerificationToken(email);
-  const sent = await sendVerificationEmail(email, raw);
+  revalidatePath("/account");
+  revalidatePath("/leaderboard");
 
-  if (!sent.ok) {
-    return { error: sent.message };
-  }
-
-  await signOut({ redirectTo: "/login?verify=1" });
-  return { success: "Email updated." };
+  return { success: "Username updated. Use it next time you sign in." };
 }
 
 export async function updatePasswordAction(
@@ -239,7 +208,6 @@ export async function updatePasswordAction(
 
   revalidatePath("/account");
 
-  // Force re-login so only the new password + fresh JWT is valid
   await signOut({ redirectTo: "/login?passwordUpdated=1" });
 
   return { success: "Password updated. Please sign in again." };

@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import {
   DisplayNameForm,
-  EmailForm,
   PasswordForm,
+  UsernameForm,
 } from "@/components/account-forms";
 import { SiteHeader } from "@/components/site-header";
 import { db } from "@/db";
@@ -19,7 +19,7 @@ export default async function AccountPage() {
 
   const [user] = await db
     .select({
-      email: users.email,
+      username: users.username,
       displayName: users.displayName,
       name: users.name,
       createdAt: users.createdAt,
@@ -30,7 +30,7 @@ export default async function AccountPage() {
 
   if (!user) redirect("/login");
 
-  const displayName = user.displayName || user.name || "";
+  const displayName = user.displayName || user.name || user.username || "";
   const memberSince = user.createdAt
     ? new Intl.DateTimeFormat("en-US", {
         month: "long",
@@ -57,7 +57,7 @@ export default async function AccountPage() {
 
         <div className="space-y-5">
           <DisplayNameForm initialDisplayName={displayName} />
-          <EmailForm initialEmail={user.email} />
+          <UsernameForm initialUsername={user.username} />
           <PasswordForm />
 
           <section className="glass rounded-3xl p-5 sm:p-6">
