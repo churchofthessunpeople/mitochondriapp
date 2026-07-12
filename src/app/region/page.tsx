@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/site-header";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { haversineKm } from "@/lib/geo";
+import { buildPlaceFactorsWithElevation } from "@/lib/place-factors";
 import { getRegionById, listRegions } from "@/lib/regions";
 import { getSunTimesForLocalDay } from "@/lib/sun";
 
@@ -42,6 +43,16 @@ export default async function RegionPage() {
   const sun =
     sunLat != null && sunLng != null
       ? getSunTimesForLocalDay(new Date(), sunLat, sunLng, tz)
+      : null;
+
+  const placeFactors =
+    sun && sunLat != null && sunLng != null
+      ? await buildPlaceFactorsWithElevation({
+          latitude: sunLat,
+          longitude: sunLng,
+          sun,
+          timeZone: tz,
+        })
       : null;
 
   const distanceKm =
@@ -84,6 +95,7 @@ export default async function RegionPage() {
               postalCode={user?.postalCode}
               distanceKm={distanceKm}
               timeZone={tz}
+              placeFactors={placeFactors}
             />
           ) : (
             <div className="glass rounded-3xl border border-dashed border-border p-5 text-sm text-muted">

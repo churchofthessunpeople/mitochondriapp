@@ -166,14 +166,46 @@ export default async function RegionScoringPage() {
           </p>
         </section>
 
+        <section className="glass space-y-3 rounded-3xl p-5">
+          <h2 className="text-lg font-semibold">5. Place factors (extra context)</h2>
+          <p className="text-sm text-muted">
+            Shown under your scores — facts and labels, not extra 1–5 ratings:
+          </p>
+          <ul className="space-y-1 text-sm">
+            <li>
+              <strong>Solar noon</strong> — local clock time of peak sun path
+            </li>
+            <li>
+              <strong>Latitude + band</strong> — tropics → high latitude (same
+              bands as sun score)
+            </li>
+            <li>
+              <strong>UV season</strong> — year-round vs seasonal window from
+              latitude
+            </li>
+            <li>
+              <strong>Elevation</strong> — meters/feet from a free elevation API
+              (stronger UV per minute at altitude)
+            </li>
+            <li>
+              <strong>Geology</strong> — nearest active magma / volcanic system
+              + distance (same anchors as magnetism score)
+            </li>
+          </ul>
+          <p className="text-xs text-muted">
+            Today also shows a short sun-phase hint (night / sunrise / day /
+            sunset) for light timing.
+          </p>
+        </section>
+
         <section className="glass space-y-2 rounded-3xl p-5 text-sm text-muted">
           <h2 className="text-lg font-semibold text-foreground">
             ZIP codes
           </h2>
           <p>
-            Your ZIP sets <em>exact</em> lat/lng for sunrise/sunset. The 1–5
-            lifestyle score still comes from the nearest curated region (so we
-            do not invent policy/volcano stories for every street).
+            Your ZIP sets <em>exact</em> lat/lng for sunrise/sunset and place
+            factors. The 1–5 lifestyle score still comes from the nearest
+            curated region (so we do not invent policy stories for every street).
           </p>
           <p>
             Over time we can auto-score any lat/lng with sun + volcano distance,

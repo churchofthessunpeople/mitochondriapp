@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Region } from "@/db/schema";
 import { formatDistanceKm } from "@/lib/geo";
+import type { PlaceFactors } from "@/lib/place-factors";
 import { ratingLabel } from "@/lib/regions";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,8 @@ export function RegionCard({
   postalCode,
   distanceKm,
   timeZone,
+  placeFactors,
+  phaseHint,
 }: {
   region: Region | null;
   sun: SunTimes;
@@ -22,6 +25,9 @@ export function RegionCard({
   /** Distance from user ZIP to curated region centroid */
   distanceKm?: number | null;
   timeZone?: string | null;
+  placeFactors?: PlaceFactors | null;
+  /** Optional sun-phase protocol line (Today) */
+  phaseHint?: string | null;
 }) {
   const tz = timeZone || region?.timezone || "UTC";
   if (!region && !placeLabel) {
@@ -48,7 +54,9 @@ export function RegionCard({
                     : ""
                 }`
               : null}
-            {!region && placeLabel ? " · sun times only (no nearby rated region)" : null}
+            {!region && placeLabel
+              ? " · sun times only (no nearby rated region)"
+              : null}
           </p>
         </div>
         {region && (
@@ -66,6 +74,12 @@ export function RegionCard({
           </div>
         )}
       </div>
+
+      {phaseHint && (
+        <p className="mt-3 rounded-2xl border border-accent/20 bg-accent/5 px-3 py-2 text-xs leading-relaxed text-foreground">
+          {phaseHint}
+        </p>
+      )}
 
       {/* One 3-col grid so sun + score columns share the same tracks */}
       <div className="mt-4 grid grid-cols-3 gap-2">
@@ -106,6 +120,32 @@ export function RegionCard({
         )}
       </div>
 
+      {placeFactors && (
+        <div className="mt-4">
+          <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
+            Place factors
+          </p>
+          <ul className="mt-2 divide-y divide-border rounded-2xl border border-border bg-foreground/[0.02]">
+            <FactorRow
+              label="Solar noon"
+              value={placeFactors.solarNoonLabel}
+            />
+            <FactorRow
+              label="Latitude"
+              value={`${placeFactors.latitudeLabel} · ${placeFactors.bandLabel}`}
+            />
+            <FactorRow label="UV season" value={placeFactors.uvSeasonLabel} />
+            {placeFactors.elevationLabel && (
+              <FactorRow
+                label="Elevation"
+                value={placeFactors.elevationLabel}
+              />
+            )}
+            <FactorRow label="Geology" value={placeFactors.geologyLabel} />
+          </ul>
+        </div>
+      )}
+
       {!compact && region && (
         <>
           <p className="mt-4 text-sm leading-relaxed text-muted">
@@ -129,13 +169,24 @@ export function RegionCard({
       )}
 
       <p className="mt-3 text-[10px] leading-relaxed text-muted">
-        Scores are lifestyle-framework ratings for the nearest curated place —
-        not a medical rating of your street.{" "}
+        Scores and place factors are a lifestyle framework for the nearest
+        curated place — not a medical rating of your street.{" "}
         <Link href="/region" className="text-accent hover:underline">
           Change ZIP or region
         </Link>
       </p>
     </section>
+  );
+}
+
+function FactorRow({ label, value }: { label: string; value: string }) {
+  return (
+    <li className="flex items-start justify-between gap-3 px-3 py-2.5 text-xs">
+      <span className="shrink-0 text-muted">{label}</span>
+      <span className="text-right font-medium leading-snug text-foreground">
+        {value}
+      </span>
+    </li>
   );
 }
 

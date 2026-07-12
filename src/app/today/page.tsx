@@ -17,9 +17,13 @@ import {
 import { getServerTodayIsoDate } from "@/lib/date-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
 import { haversineKm } from "@/lib/geo";
+import {
+  buildPlaceFactorsWithElevation,
+  sunPhaseHint,
+} from "@/lib/place-factors";
 import { getRegionById } from "@/lib/regions";
 import { getUserStreak } from "@/lib/streaks";
-import { getSunTimesForLocalDay } from "@/lib/sun";
+import { getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 import { formatPoints } from "@/lib/utils";
 
 export const metadata = { title: "Today" };
@@ -92,14 +96,30 @@ export default async function TodayPage() {
       ? getSunTimesForLocalDay(new Date(), sunLat, sunLng, tz)
       : null;
 
-  const [protocols, dayStats, lifetime, favoriteIds, streak] =
+  const placeFactorsPromise =
+    sun && sunLat != null && sunLng != null
+      ? buildPlaceFactorsWithElevation({
+          latitude: sunLat,
+          longitude: sunLng,
+          sun,
+          timeZone: tz,
+        })
+      : Promise.resolve(null);
+
+  const [protocols, dayStats, lifetime, favoriteIds, streak, placeFactors] =
     await Promise.all([
       getActiveProtocols(),
       getUserDayStats(session.user.id, date),
       getUserTotalPoints(session.user.id),
       getUserFavoriteIds(session.user.id),
       getUserStreak(session.user.id, date),
+      placeFactorsPromise,
     ]);
+
+  const phaseHint =
+    sun != null
+      ? sunPhaseHint(sunPhase(new Date(), sun.sunrise, sun.sunset))
+      : null;
 
   return (
     <div className="min-h-screen">
@@ -130,6 +150,8 @@ export default async function TodayPage() {
               postalCode={userRow?.postalCode}
               distanceKm={distanceKm}
               timeZone={tz}
+              placeFactors={placeFactors}
+              phaseHint={phaseHint}
             />
           ) : (
             <div className="glass rounded-3xl p-4 text-sm">
