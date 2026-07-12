@@ -3,6 +3,7 @@
 import { CalendarCheck, ListChecks, MapPin, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
 import { cn } from "@/lib/utils";
 
 /** Schedule first — daily habit is the primary job. */
@@ -15,6 +16,13 @@ const items = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const [, startTransition] = useTransition();
+  /** Optimistic highlight while the next tab's RSC loads */
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
 
   const hide =
     pathname === "/" ||
@@ -32,12 +40,27 @@ export function BottomNav() {
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">
         {items.map(({ href, label, icon: Icon }) => {
-          const active =
+          const routeActive =
             pathname === href || pathname.startsWith(`${href}/`);
+          const active =
+            pendingHref != null
+              ? pendingHref === href || pendingHref.startsWith(`${href}/`)
+              : routeActive;
           return (
             <li key={href} className="flex-1">
               <Link
                 href={href}
+                prefetch
+                onClick={(e) => {
+                  if (routeActive) {
+                    e.preventDefault();
+                    return;
+                  }
+                  // Instant tab paint; navigation still soft-navigates in background
+                  startTransition(() => {
+                    setPendingHref(href);
+                  });
+                }}
                 className={cn(
                   "flex flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
                   active ? "text-accent" : "text-muted hover:text-foreground",

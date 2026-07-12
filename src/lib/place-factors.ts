@@ -80,6 +80,7 @@ export function formatElevation(meters: number): string {
 /**
  * Elevation via free APIs (no key). Cached by rounded coords.
  * Fails soft — null if network/API unavailable.
+ * Short timeout so Place never waits long on tab switch.
  */
 export async function fetchElevationMeters(
   latitude: number,
@@ -96,7 +97,7 @@ export async function fetchElevationMeters(
       {
         ...cache,
         headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(4000),
+        signal: AbortSignal.timeout(900),
       },
     );
     if (res.ok) {
@@ -107,27 +108,10 @@ export async function fetchElevationMeters(
       if (typeof el === "number" && Number.isFinite(el)) return el;
     }
   } catch {
-    /* try fallback */
+    /* skip fallback on timeout — don't stack two slow APIs on tab open */
   }
 
-  try {
-    const res = await fetch(
-      `https://api.opentopodata.org/v1/srtm90m?locations=${lat},${lng}`,
-      {
-        ...cache,
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(4000),
-      },
-    );
-    if (!res.ok) return null;
-    const data = (await res.json()) as {
-      results?: Array<{ elevation?: number | null }>;
-    };
-    const el = data.results?.[0]?.elevation;
-    return typeof el === "number" && Number.isFinite(el) ? el : null;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export function buildPlaceFactors(opts: {
@@ -161,13 +145,20 @@ export function buildPlaceFactors(opts: {
   };
 }
 
+/**
+ * Prefer instant factors; elevation is best-effort and must not block navigation.
+ * Races a short elevation fetch against a timeout so Place paints quickly.
+ */
 export async function buildPlaceFactorsWithElevation(opts: {
   latitude: number;
   longitude: number;
   sun: SunTimes;
   timeZone: string;
 }): Promise<PlaceFactors> {
-  const elevationM = await fetchElevationMeters(opts.latitude, opts.longitude);
+  const elevationM = await Promise.race([
+    fetchElevationMeters(opts.latitude, opts.longitude),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 700)),
+  ]);
   return buildPlaceFactors({ ...opts, elevationM });
 }
 

@@ -1,10 +1,12 @@
 import { and, desc, eq, gte, inArray, sql, sum } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users } from "@/db/schema";
 import { PROTOCOL_SEEDS } from "@/db/seed-data";
 import type { Protocol } from "@/db/schema";
 
-export async function getActiveProtocols(): Promise<Protocol[]> {
+/** Request-deduped catalog (Activities + Schedule often load same list). */
+export const getActiveProtocols = cache(async (): Promise<Protocol[]> => {
   try {
     const rows = await db
       .select()
@@ -22,7 +24,7 @@ export async function getActiveProtocols(): Promise<Protocol[]> {
     active: true,
     createdAt: new Date(),
   }));
-}
+});
 
 export async function getCompletionsForUserDay(userId: string, date: string) {
   try {

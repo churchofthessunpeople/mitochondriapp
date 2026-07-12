@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import { format } from "date-fns";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -7,16 +6,17 @@ import { auth } from "@/auth";
 import { RegionCard } from "@/components/region-card";
 import { SiteHeader } from "@/components/site-header";
 import { ZipForm } from "@/components/zip-form";
-import { db } from "@/db";
-import { users } from "@/db/schema";
 import { getServerTodayIsoDate } from "@/lib/date-server";
 import { haversineKm } from "@/lib/geo";
 import {
-  buildPlaceFactorsWithElevation,
+  buildPlaceFactors,
   sunPhaseHint,
 } from "@/lib/place-factors";
 import { getRegionById } from "@/lib/regions";
-import { redirectIfNeedsOnboarding } from "@/lib/require-onboarding";
+import {
+  getUserAppFlags,
+  redirectIfNeedsOnboarding,
+} from "@/lib/require-onboarding";
 import { getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 
 export const metadata = { title: "Place" };
@@ -29,20 +29,10 @@ export default async function PlacePage() {
   const date = await getServerTodayIsoDate();
   const h = await headers();
 
-  const [user] = await db
-    .select({
-      regionId: users.regionId,
-      postalCode: users.postalCode,
-      placeLabel: users.placeLabel,
-      latitude: users.latitude,
-      longitude: users.longitude,
-      timezone: users.timezone,
-    })
-    .from(users)
-    .where(eq(users.id, session.user.id))
-    .limit(1);
-
+  // Cached with onboarding check — no second users query
+  const user = await getUserAppFlags(session.user.id);
   const region = await getRegionById(user?.regionId);
+
   const hasCoords = user?.latitude != null && user?.longitude != null;
   const sunLat = hasCoords ? user!.latitude! : (region?.latitude ?? null);
   const sunLng = hasCoords ? user!.longitude! : (region?.longitude ?? null);
@@ -57,13 +47,15 @@ export default async function PlacePage() {
       ? getSunTimesForLocalDay(new Date(), sunLat, sunLng, tz)
       : null;
 
+  // Sync place factors only — elevation API was adding ~0.5s+ to every Place open
   const placeFactors =
     sun && sunLat != null && sunLng != null
-      ? await buildPlaceFactorsWithElevation({
+      ? buildPlaceFactors({
           latitude: sunLat,
           longitude: sunLng,
           sun,
           timeZone: tz,
+          elevationM: null,
         })
       : null;
 

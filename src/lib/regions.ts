@@ -1,9 +1,10 @@
 import { asc, eq } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/db";
 import { regions, type Region } from "@/db/schema";
 import { REGION_SEEDS } from "@/db/region-seeds";
 
-export async function listRegions(): Promise<Region[]> {
+export const listRegions = cache(async (): Promise<Region[]> => {
   try {
     const rows = await db
       .select()
@@ -19,9 +20,9 @@ export async function listRegions(): Promise<Region[]> {
     active: true,
     createdAt: new Date(),
   }));
-}
+});
 
-export async function getRegionById(id: string | null | undefined) {
+export const getRegionById = cache(async (id: string | null | undefined) => {
   if (!id) return null;
   try {
     const [row] = await db
@@ -39,7 +40,7 @@ export async function getRegionById(id: string | null | undefined) {
         } as Region)
       : null;
   }
-}
+});
 
 export function ratingLabel(n: number): string {
   if (n >= 5) return "Exceptional";

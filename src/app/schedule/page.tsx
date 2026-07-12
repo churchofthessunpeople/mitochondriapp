@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import { format } from "date-fns";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -7,14 +6,15 @@ import { auth } from "@/auth";
 import { PlaceStrip } from "@/components/place-strip";
 import { ScheduleDay } from "@/components/schedule-day";
 import { SiteHeader } from "@/components/site-header";
-import { db } from "@/db";
-import { users } from "@/db/schema";
 import { getUserDayStats } from "@/lib/data";
 import { getServerTodayIsoDate } from "@/lib/date-server";
 import { getUserFavoriteProtocols } from "@/lib/favorites";
 import { sunPhaseHint } from "@/lib/place-factors";
 import { getRegionById } from "@/lib/regions";
-import { redirectIfNeedsOnboarding } from "@/lib/require-onboarding";
+import {
+  getUserAppFlags,
+  redirectIfNeedsOnboarding,
+} from "@/lib/require-onboarding";
 import { getUserStreak } from "@/lib/streaks";
 import { getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 
@@ -31,20 +31,9 @@ export default async function SchedulePage() {
   const date = await getServerTodayIsoDate();
   const h = await headers();
 
+  // getUserAppFlags is request-cached (same as onboarding check)
   const [userRow, availableRows, dayStats, streak] = await Promise.all([
-    db
-      .select({
-        regionId: users.regionId,
-        postalCode: users.postalCode,
-        placeLabel: users.placeLabel,
-        latitude: users.latitude,
-        longitude: users.longitude,
-        timezone: users.timezone,
-      })
-      .from(users)
-      .where(eq(users.id, session.user.id))
-      .limit(1)
-      .then((r) => r[0] ?? null),
+    getUserAppFlags(session.user.id),
     getUserFavoriteProtocols(session.user.id),
     getUserDayStats(session.user.id, date),
     getUserStreak(session.user.id, date),

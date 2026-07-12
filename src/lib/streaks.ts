@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { dailyCompletions } from "@/db/schema";
 
@@ -8,6 +8,10 @@ export async function getUserStreak(
   todayIso: string,
 ): Promise<{ current: number; best: number }> {
   try {
+    // Only last ~14 months — full history scan was slow on every Schedule open
+    const since = addDays(parseIso(todayIso), -400);
+    const sinceIso = formatIso(since);
+
     const rows = await db
       .select({
         day: dailyCompletions.completedOn,
@@ -17,6 +21,7 @@ export async function getUserStreak(
         and(
           eq(dailyCompletions.userId, userId),
           eq(dailyCompletions.isStreakBonus, false),
+          gte(dailyCompletions.completedOn, sinceIso),
         ),
       )
       .groupBy(dailyCompletions.completedOn)

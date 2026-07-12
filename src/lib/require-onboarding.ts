@@ -1,21 +1,30 @@
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { db } from "@/db";
 import { userFavorites, users } from "@/db/schema";
 
-/** Send incomplete users through setup before main app surfaces. */
-export async function redirectIfNeedsOnboarding(userId: string) {
+/** Request-scoped user flags (dedupes SiteHeader / pages / onboarding). */
+export const getUserAppFlags = cache(async (userId: string) => {
   const [row] = await db
     .select({
       onboardingComplete: users.onboardingComplete,
       postalCode: users.postalCode,
       placeLabel: users.placeLabel,
       regionId: users.regionId,
+      latitude: users.latitude,
+      longitude: users.longitude,
+      timezone: users.timezone,
     })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
+  return row ?? null;
+});
 
+/** Send incomplete users through setup before main app surfaces. */
+export async function redirectIfNeedsOnboarding(userId: string) {
+  const row = await getUserAppFlags(userId);
   if (!row) return;
   if (row.onboardingComplete) return;
 
@@ -42,18 +51,5 @@ export async function redirectIfNeedsOnboarding(userId: string) {
 }
 
 export async function getOnboardingStatus(userId: string) {
-  const [row] = await db
-    .select({
-      onboardingComplete: users.onboardingComplete,
-      postalCode: users.postalCode,
-      placeLabel: users.placeLabel,
-      regionId: users.regionId,
-      latitude: users.latitude,
-      longitude: users.longitude,
-      timezone: users.timezone,
-    })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  return row ?? null;
+  return getUserAppFlags(userId);
 }
