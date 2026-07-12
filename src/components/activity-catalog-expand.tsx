@@ -16,15 +16,16 @@ type Props = {
   protocols: Protocol[];
   availableIds: string[];
   onAvailableIdsChange?: (ids: string[]) => void;
-  /** Controlled expand (e.g. empty checklist CTA) */
+  /** Controlled expand (legacy collapsible chrome) */
   expanded?: boolean;
   onExpandedChange?: (open: boolean) => void;
   defaultExpanded?: boolean;
+  /** Always show body — used under Today tab row */
+  embedded?: boolean;
 };
 
 /**
- * Collapsed catalog (region-picker style): chosen activities live on the
- * checklist above; expand to add/remove from the full list.
+ * Activity catalog picker. Collapsible chrome optional; `embedded` shows body only.
  */
 export function ActivityCatalogExpand({
   protocols,
@@ -33,10 +34,11 @@ export function ActivityCatalogExpand({
   expanded: controlledExpanded,
   onExpandedChange,
   defaultExpanded = false,
+  embedded = false,
 }: Props) {
   const { push } = useToast();
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
-  const expanded = controlledExpanded ?? internalExpanded;
+  const expanded = embedded || (controlledExpanded ?? internalExpanded);
 
   function setExpanded(open: boolean) {
     if (controlledExpanded === undefined) setInternalExpanded(open);
@@ -98,35 +100,13 @@ export function ActivityCatalogExpand({
     });
   }
 
-  return (
-    <div className="glass rounded-3xl p-4 sm:p-5">
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between gap-3 text-left"
-        aria-expanded={expanded}
-      >
-        <div>
-          <p className="font-semibold">Browse all activities</p>
-          <p className="mt-0.5 text-xs text-muted">
-            {available.size === 0
-              ? `Pick what you can do (${protocols.length} in catalog)`
-              : `${available.size} on your list · ${remaining} more in catalog`}
-          </p>
-        </div>
-        <ChevronDown
-          className={cn(
-            "h-5 w-5 shrink-0 text-muted transition-transform",
-            expanded && "rotate-180",
-          )}
-        />
-      </button>
-
-      {expanded && (
-        <div className="mt-4 space-y-4 border-t border-border pt-4">
+  const body = (
+        <div className={cn("space-y-4", !embedded && "mt-4 border-t border-border pt-4")}>
           <p className="text-xs text-muted">
-            Toggle only what you can actually do (equipment, access). Chosen
-            items show on your daily checklist above.
+            {available.size === 0
+              ? `Pick what you can do (${protocols.length} in catalog).`
+              : `${available.size} on your checklist · ${remaining} more available.`}{" "}
+            Toggle only what you can actually do (equipment, access).
           </p>
 
           <div className="relative">
@@ -250,7 +230,36 @@ export function ActivityCatalogExpand({
             )}
           </div>
         </div>
-      )}
+  );
+
+  if (embedded) {
+    return <div className="space-y-4">{body}</div>;
+  }
+
+  return (
+    <div className="glass rounded-3xl p-4 sm:p-5">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full items-center justify-between gap-3 text-left"
+        aria-expanded={expanded}
+      >
+        <div>
+          <p className="font-semibold">Browse all activities</p>
+          <p className="mt-0.5 text-xs text-muted">
+            {available.size === 0
+              ? `Pick what you can do (${protocols.length} in catalog)`
+              : `${available.size} on your list · ${remaining} more in catalog`}
+          </p>
+        </div>
+        <ChevronDown
+          className={cn(
+            "h-5 w-5 shrink-0 text-muted transition-transform",
+            expanded && "rotate-180",
+          )}
+        />
+      </button>
+      {expanded && body}
     </div>
   );
 }

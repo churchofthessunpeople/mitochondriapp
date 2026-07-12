@@ -2,7 +2,7 @@
 
 import { CalendarCheck, User } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import {
   AccountHome,
@@ -11,12 +11,10 @@ import {
   type ReminderRow,
 } from "@/components/account-home";
 import type { AccountPanelUser } from "@/components/account-panel";
-import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
-import { PlaceExpand } from "@/components/place-expand";
-import { ScheduleDay } from "@/components/schedule-day";
 import { SunriseCheckIn } from "@/components/sunrise-check-in";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { TodayHome } from "@/components/today-home";
 import type { AccountSection, AppTab } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
 import type { SunTimes } from "@/lib/sun";
@@ -73,8 +71,7 @@ export type AppShellProps = {
 };
 
 /**
- * Today = place + checklist + catalog cards.
- * Account = expandable cards (history, board, friends, reminders, profile).
+ * Today & Account each use header + in-page tab rows (single-page cards).
  */
 export function AppShell({
   initialTab,
@@ -114,10 +111,6 @@ export function AppShell({
 }: AppShellProps) {
   const [tab, setTabState] = useState<AppTab>(initialTab);
   const [availableIds, setAvailableIds] = useState(initialAvailableIds);
-  const [catalogOpen, setCatalogOpen] = useState(
-    initialAvailableIds.length === 0,
-  );
-  const [placeOpen, setPlaceOpen] = useState(!placeLabel && !region);
   const [sunriseBuffActive, setSunriseBuffActive] =
     useState(initialSunriseBuff);
 
@@ -156,11 +149,6 @@ export function AppShell({
       window.scrollTo(0, 0);
     }
   }, []);
-
-  const availableProtocols = useMemo(() => {
-    const set = new Set(availableIds);
-    return allProtocols.filter((p) => set.has(p.id));
-  }, [allProtocols, availableIds]);
 
   return (
     <div className="min-h-screen pb-24 md:pb-16">
@@ -225,47 +213,32 @@ export function AppShell({
 
       <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-8">
         {tab === "schedule" && (
-          <div className="space-y-5">
-            <PlaceExpand
-              expanded={placeOpen}
-              onExpandedChange={setPlaceOpen}
-              placeLabel={placeLabel}
-              postalCode={postalCode}
-              region={region}
-              sun={sun}
-              timeZone={timeZone}
-              phaseHint={phaseHint}
-              placeFactors={placeFactors}
-              distanceKm={distanceKm}
-              isTravel={isTravel}
-              travelUntil={travelUntil}
-              homePostalCode={homePostalCode}
-              travelLabel={travelLabel}
-              dateLabel={dateLabel}
-            />
-
-            <ScheduleDay
-              protocols={availableProtocols}
-              completionCounts={completionCounts}
-              dayPoints={dayPoints}
-              streak={streak}
-              dateLabel={dateLabel}
-              onExpandCatalog={() => setCatalogOpen(true)}
-              phase={phase}
-              localHour={localHour}
-              seasonLine={seasonLine}
-              weekly={weekly}
-              sunriseBuffActive={sunriseBuffActive}
-            />
-
-            <ActivityCatalogExpand
-              protocols={allProtocols}
-              availableIds={availableIds}
-              onAvailableIdsChange={setAvailableIds}
-              expanded={catalogOpen}
-              onExpandedChange={setCatalogOpen}
-            />
-          </div>
+          <TodayHome
+            dateLabel={dateLabel}
+            allProtocols={allProtocols}
+            availableIds={availableIds}
+            onAvailableIdsChange={setAvailableIds}
+            completionCounts={completionCounts}
+            dayPoints={dayPoints}
+            streak={streak}
+            placeLabel={placeLabel}
+            postalCode={postalCode}
+            region={region}
+            sun={sun}
+            timeZone={timeZone}
+            phaseHint={phaseHint}
+            placeFactors={placeFactors}
+            distanceKm={distanceKm}
+            phase={phase}
+            localHour={localHour}
+            seasonLine={seasonLine}
+            weekly={weekly}
+            sunriseBuffActive={sunriseBuffActive}
+            isTravel={isTravel}
+            travelUntil={travelUntil}
+            homePostalCode={homePostalCode}
+            travelLabel={travelLabel}
+          />
         )}
 
         {tab === "account" && (

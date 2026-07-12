@@ -46,6 +46,7 @@ export function ScheduleDay({
   streak: initialStreak,
   dateLabel,
   onExpandCatalog,
+  hideTitle = false,
   phase = "day",
   localHour = 12,
   seasonLine,
@@ -328,6 +329,7 @@ export function ScheduleDay({
         streak={streak}
         done={done}
         total={total}
+        hideTitle={hideTitle}
       />
 
       {sunriseBuff ? (
@@ -505,22 +507,28 @@ function DayStats({
   streak,
   done,
   total,
+  hideTitle,
 }: {
   dateLabel: string;
   points: number;
   streak: { current: number; best: number };
   done: number;
   total: number;
+  hideTitle?: boolean;
 }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-[0.18em] text-accent">
-        Daily checklist
-      </p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-        {dateLabel}
-      </h1>
-      <div className="mt-4 grid grid-cols-3 gap-2">
+      {!hideTitle && (
+        <>
+          <p className="text-xs uppercase tracking-[0.18em] text-accent">
+            Daily checklist
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {dateLabel}
+          </h1>
+        </>
+      )}
+      <div className={cn("grid grid-cols-3 gap-2", !hideTitle && "mt-4")}>
         <div className="rounded-2xl border border-border bg-foreground/[0.03] px-3 py-2.5 text-center">
           <p className="text-[10px] uppercase tracking-wider text-muted">
             Points
