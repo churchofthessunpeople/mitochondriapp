@@ -14,7 +14,7 @@ export function suggestedTimeSlots(hour: number): TimeOfDay[] {
 export function idealTimeLabel(protocol: {
   lockedTimeOfDay: TimeOfDay | null;
   timeOfDay: TimeOfDay;
-}): string {
+}): TimeOfDay {
   return protocol.lockedTimeOfDay ?? protocol.timeOfDay;
 }
 
