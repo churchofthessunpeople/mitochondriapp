@@ -10,7 +10,7 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { haversineKm } from "@/lib/geo";
 import { getRegionById, listRegions } from "@/lib/regions";
-import { getSunTimes } from "@/lib/sun";
+import { getSunTimesForLocalDay } from "@/lib/sun";
 
 export const metadata = { title: "Region" };
 
@@ -41,7 +41,7 @@ export default async function RegionPage() {
 
   const sun =
     sunLat != null && sunLng != null
-      ? getSunTimes(new Date(), sunLat, sunLng)
+      ? getSunTimesForLocalDay(new Date(), sunLat, sunLng, tz)
       : null;
 
   const distanceKm =

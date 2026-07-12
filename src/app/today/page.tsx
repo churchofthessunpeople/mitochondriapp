@@ -19,7 +19,7 @@ import { getUserFavoriteIds } from "@/lib/favorites";
 import { haversineKm } from "@/lib/geo";
 import { getRegionById } from "@/lib/regions";
 import { getUserStreak } from "@/lib/streaks";
-import { getSunTimes } from "@/lib/sun";
+import { getSunTimesForLocalDay } from "@/lib/sun";
 import { formatPoints } from "@/lib/utils";
 
 export const metadata = { title: "Today" };
@@ -89,7 +89,7 @@ export default async function TodayPage() {
 
   const sun =
     sunLat != null && sunLng != null
-      ? getSunTimes(new Date(`${date}T12:00:00Z`), sunLat, sunLng)
+      ? getSunTimesForLocalDay(new Date(), sunLat, sunLng, tz)
       : null;
 
   const [protocols, dayStats, lifetime, favoriteIds, streak] =
