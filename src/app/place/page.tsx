@@ -132,7 +132,7 @@ export default async function PlacePage() {
             href="/schedule"
             className="glass rounded-2xl border border-border px-4 py-3 font-medium hover:border-accent/40"
           >
-            Today&apos;s schedule →
+            Today&apos;s checklist →
           </Link>
           <Link
             href="/activities"

@@ -85,8 +85,8 @@ export function AvailablePicker({
           {available.size > 0 && (
             <>
               {" · "}
-              <Link href="/schedule?edit=1" className="text-accent hover:underline">
-                Build schedule
+              <Link href="/schedule" className="text-accent hover:underline">
+                Today&apos;s checklist
               </Link>
             </>
           )}

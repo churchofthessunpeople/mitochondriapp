@@ -28,10 +28,10 @@ export default async function ActivitiesPage() {
           Available activities
         </h1>
         <p className="mt-1.5 text-sm text-muted">
-          Build your via list — only what you can realistically do. Then pin
-          those into a{" "}
-          <Link href="/schedule?edit=1" className="text-accent hover:underline">
-            daily schedule
+          Build your via list — only what you can realistically do. Those items
+          become your{" "}
+          <Link href="/schedule" className="text-accent hover:underline">
+            daily checklist
           </Link>
           .
         </p>
