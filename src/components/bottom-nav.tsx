@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 export function BottomNav() {
   const pathname = usePathname();
 
-  // Primary app is SPA shell — no second bottom bar
+  // Everything lives under /app shell; hide global bar almost everywhere
   if (
     pathname === "/" ||
     pathname.startsWith("/app") ||
@@ -21,12 +21,16 @@ export function BottomNav() {
     pathname.startsWith("/place") ||
     pathname.startsWith("/activities") ||
     pathname.startsWith("/account") ||
-    pathname.startsWith("/today")
+    pathname.startsWith("/today") ||
+    pathname.startsWith("/history") ||
+    pathname.startsWith("/leaderboard") ||
+    pathname.startsWith("/friends") ||
+    pathname.startsWith("/reminders")
   ) {
     return null;
   }
 
-  // Secondary pages: lightweight link home
+  // Admin / region only
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-[var(--header-bg)] pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"

@@ -1,4 +1,5 @@
-import Link from "next/link";
+"use client";
+
 import {
   DisplayNameForm,
   PasswordForm,
@@ -6,10 +7,12 @@ import {
 } from "@/components/account-forms";
 import { logoutAction } from "@/lib/actions/auth";
 import {
-  updateLeaderboardVisibilityAction,
-  updateRecoveryEmailAction,
-  updateTimezoneAction,
+  saveRecoveryEmailFormAction,
+  saveTimezoneFormAction,
+  toggleLeaderboardVisibilityFormAction,
 } from "@/lib/actions/profile";
+import type { AppTab } from "@/lib/app-tabs";
+import { cn } from "@/lib/utils";
 
 export type AccountPanelUser = {
   username: string;
@@ -21,24 +24,21 @@ export type AccountPanelUser = {
   memberSinceLabel: string | null;
 };
 
-async function saveEmail(formData: FormData) {
-  "use server";
-  await updateRecoveryEmailAction({}, formData);
-}
+const LINKS: { tab: AppTab; label: string; primary?: boolean }[] = [
+  { tab: "history", label: "History", primary: true },
+  { tab: "leaderboard", label: "Leaderboard" },
+  { tab: "friends", label: "Friends" },
+  { tab: "reminders", label: "Reminders" },
+];
 
-async function saveTimezone(formData: FormData) {
-  "use server";
-  await updateTimezoneAction({}, formData);
-}
-
-export function AccountPanel({ user }: { user: AccountPanelUser }) {
+export function AccountPanel({
+  user,
+  onNavigate,
+}: {
+  user: AccountPanelUser;
+  onNavigate?: (tab: AppTab) => void;
+}) {
   const displayName = user.displayName || user.name || user.username || "";
-  const show = user.showOnLeaderboard;
-
-  async function toggleLeaderboard() {
-    "use server";
-    await updateLeaderboardVisibilityAction(!show);
-  }
 
   return (
     <div className="space-y-5">
@@ -58,42 +58,48 @@ export function AccountPanel({ user }: { user: AccountPanelUser }) {
       </div>
 
       <div className="flex flex-wrap gap-2 text-sm">
-        <Link
-          href="/history"
-          className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-accent"
-        >
-          History
-        </Link>
-        <Link
-          href="/leaderboard"
-          className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
-        >
-          Leaderboard
-        </Link>
-        <Link
-          href="/friends"
-          className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
-        >
-          Friends
-        </Link>
-        <Link
-          href="/reminders"
-          className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
-        >
-          Reminders
-        </Link>
-        <Link
+        {LINKS.map((l) =>
+          onNavigate ? (
+            <button
+              key={l.tab}
+              type="button"
+              onClick={() => onNavigate(l.tab)}
+              className={cn(
+                "rounded-full border px-3 py-1.5",
+                l.primary
+                  ? "border-accent/40 bg-accent/10 text-accent"
+                  : "border-border text-muted hover:text-foreground",
+              )}
+            >
+              {l.label}
+            </button>
+          ) : (
+            <a
+              key={l.tab}
+              href={`/app?t=${l.tab}`}
+              className={cn(
+                "rounded-full border px-3 py-1.5",
+                l.primary
+                  ? "border-accent/40 bg-accent/10 text-accent"
+                  : "border-border text-muted hover:text-foreground",
+              )}
+            >
+              {l.label}
+            </a>
+          ),
+        )}
+        <a
           href="/admin"
           className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
         >
           Admin
-        </Link>
-        <Link
+        </a>
+        <a
           href="/api/export/csv"
           className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
         >
           Export CSV
-        </Link>
+        </a>
       </div>
 
       <DisplayNameForm initialDisplayName={displayName} />
@@ -105,7 +111,7 @@ export function AccountPanel({ user }: { user: AccountPanelUser }) {
         <p className="mt-1 text-sm text-muted">
           Optional. Used only for password reset (not for login).
         </p>
-        <form action={saveEmail} className="mt-4 space-y-3">
+        <form action={saveRecoveryEmailFormAction} className="mt-4 space-y-3">
           <input
             name="email"
             type="email"
@@ -127,7 +133,7 @@ export function AccountPanel({ user }: { user: AccountPanelUser }) {
         <p className="mt-1 text-sm text-muted">
           Used for “today” and streak calendar days (IANA name).
         </p>
-        <form action={saveTimezone} className="mt-4 space-y-3">
+        <form action={saveTimezoneFormAction} className="mt-4 space-y-3">
           <input
             name="timezone"
             defaultValue={user.timezone ?? "UTC"}
@@ -144,8 +150,8 @@ export function AccountPanel({ user }: { user: AccountPanelUser }) {
       </section>
 
       <section className="glass rounded-3xl p-5 sm:p-6">
-        <h2 className="text-lg font-semibold">Leaderboard</h2>
-        <form action={toggleLeaderboard} className="mt-3">
+        <h2 className="text-lg font-semibold">Leaderboard visibility</h2>
+        <form action={toggleLeaderboardVisibilityFormAction} className="mt-3">
           <button
             type="submit"
             className="btn-secondary h-11 rounded-2xl px-5 text-sm font-semibold"

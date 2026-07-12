@@ -24,7 +24,10 @@ export default async function HistoryDayPage({ params }: Props) {
     <div className="min-h-screen pb-24 md:pb-16">
       <SiteHeader active="history" />
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-        <Link href="/history" className="text-sm text-accent hover:underline">
+        <Link
+          href="/app?t=history"
+          className="text-sm text-accent hover:underline"
+        >
           ← History
         </Link>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">

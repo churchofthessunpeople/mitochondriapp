@@ -59,3 +59,22 @@ export async function updateLeaderboardVisibilityAction(show: boolean) {
   revalidatePath("/account");
   revalidatePath("/app");
 }
+
+/** Form-friendly: flip current visibility. */
+export async function toggleLeaderboardVisibilityFormAction() {
+  const userId = await uid();
+  const [row] = await db
+    .select({ show: users.showOnLeaderboard })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  await updateLeaderboardVisibilityAction(!(row?.show ?? true));
+}
+
+export async function saveRecoveryEmailFormAction(formData: FormData) {
+  await updateRecoveryEmailAction({}, formData);
+}
+
+export async function saveTimezoneFormAction(formData: FormData) {
+  await updateTimezoneAction({}, formData);
+}

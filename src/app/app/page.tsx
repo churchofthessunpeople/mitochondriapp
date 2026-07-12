@@ -3,14 +3,24 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { AccountPanel } from "@/components/account-panel";
 import { AppShell } from "@/components/app-shell";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { userReminders, users } from "@/db/schema";
 import { tabFromSearchParam } from "@/lib/app-tabs";
-import { getActiveProtocols, getUserDayStats } from "@/lib/data";
+import {
+  getActiveProtocols,
+  getLeaderboard,
+  getLeaderboardPeriod,
+  getMonthlyLeaderboard,
+  getUserDayStats,
+  getUserHistory,
+  getUserTotalPoints,
+  getWeeklyLeaderboard,
+  getWeeklyLightLeaderboard,
+} from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
+import { getFriendIds, getFriendships } from "@/lib/friends";
 import { haversineKm } from "@/lib/geo";
 import { effectiveLocation } from "@/lib/location-effective";
 import {
@@ -26,7 +36,8 @@ import {
 } from "@/lib/require-onboarding";
 import { hasSunriseBuffToday } from "@/lib/actions/completions";
 import { getUserStreak } from "@/lib/streaks";
-import { getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
+import { formatTimeInZone, getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
+import { displayTimeToHm, shiftHm } from "@/lib/time-hm";
 import { getWeeklySummary } from "@/lib/weekly";
 
 export const metadata = { title: "Home" };
@@ -43,15 +54,16 @@ export default async function AppPage({
   const params = await searchParams;
   const initialTab = tabFromSearchParam(params.t);
   const h = await headers();
+  const userId = session.user.id;
 
   const [userFlags, allProtocols, availableIds, fullUser] = await Promise.all([
-    getUserAppFlags(session.user.id),
+    getUserAppFlags(userId),
     getActiveProtocols(),
-    getUserFavoriteIds(session.user.id),
+    getUserFavoriteIds(userId),
     db
       .select()
       .from(users)
-      .where(eq(users.id, session.user.id))
+      .where(eq(users.id, userId))
       .limit(1)
       .then((r) => r[0] ?? null),
   ]);
@@ -64,20 +76,49 @@ export default async function AppPage({
   });
 
   const tz =
-    loc.timezone ||
-    h.get("x-vercel-ip-timezone") ||
-    "UTC";
-
+    loc.timezone || h.get("x-vercel-ip-timezone") || "UTC";
   const date = getTodayIsoForTimezone(tz);
 
-  const [dayStats, streak, weekly, region, sunriseBuffActive] =
-    await Promise.all([
-      getUserDayStats(session.user.id, date),
-      getUserStreak(session.user.id, date),
-      getWeeklySummary(session.user.id, date),
-      getRegionById(userFlags?.regionId),
-      hasSunriseBuffToday(session.user.id, date),
-    ]);
+  const friendIds = await getFriendIds(userId);
+  const friendScope = [...friendIds, userId];
+
+  const [
+    dayStats,
+    streak,
+    weekly,
+    region,
+    sunriseBuffActive,
+    history,
+    lifetimePoints,
+    lightWeek,
+    week,
+    month,
+    allTime,
+    friendsWeek,
+    friendships,
+    reminderRows,
+  ] = await Promise.all([
+    getUserDayStats(userId, date),
+    getUserStreak(userId, date),
+    getWeeklySummary(userId, date),
+    getRegionById(userFlags?.regionId),
+    hasSunriseBuffToday(userId, date),
+    getUserHistory(userId, 45),
+    getUserTotalPoints(userId),
+    getWeeklyLightLeaderboard(25),
+    getWeeklyLeaderboard(25),
+    getMonthlyLeaderboard(25),
+    getLeaderboard(25),
+    friendIds.length
+      ? getLeaderboardPeriod({
+          limit: 25,
+          fromDate: new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10),
+          userIds: friendScope,
+        })
+      : Promise.resolve([]),
+    getFriendships(userId),
+    db.select().from(userReminders).where(eq(userReminders.userId, userId)),
+  ]);
 
   const hasCoords = loc.latitude != null && loc.longitude != null;
   const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
@@ -115,8 +156,7 @@ export default async function AppPage({
       : ("day" as const);
 
   const phaseHint = sun != null ? sunPhaseHint(phase) : null;
-  const band =
-    sunLat != null ? latitudeBand(sunLat).uvSeasonLabel : null;
+  const band = sunLat != null ? latitudeBand(sunLat).uvSeasonLabel : null;
   const seasonLine = seasonCoachLine(band, phase);
 
   let localHour = new Date().getUTCHours();
@@ -131,6 +171,26 @@ export default async function AppPage({
     if (Number.isNaN(localHour)) localHour = new Date().getHours();
   } catch {
     localHour = new Date().getHours();
+  }
+
+  let reminderSunPresets:
+    | {
+        sunrise: string | null;
+        sunset: string | null;
+        beforeSunset: string | null;
+        afterSunrise: string | null;
+      }
+    | undefined;
+
+  if (sun && loc.latitude != null) {
+    const rise = displayTimeToHm(formatTimeInZone(sun.sunrise, tz));
+    const set = displayTimeToHm(formatTimeInZone(sun.sunset, tz));
+    reminderSunPresets = {
+      sunrise: rise,
+      sunset: set,
+      afterSunrise: rise ? shiftHm(rise, 20) : null,
+      beforeSunset: set ? shiftHm(set, -30) : null,
+    };
   }
 
   const dateLabel = format(new Date(`${date}T12:00:00`), "EEEE, MMM d");
@@ -168,19 +228,40 @@ export default async function AppPage({
       travelUntil={loc.travelUntil}
       homePostalCode={userFlags?.postalCode ?? null}
       travelLabel={userFlags?.travelPlaceLabel ?? null}
-      accountPanel={
-        <AccountPanel
-          user={{
-            username: fullUser.username,
-            displayName: fullUser.displayName,
-            name: fullUser.name,
-            email: fullUser.email,
-            timezone: fullUser.timezone,
-            showOnLeaderboard: fullUser.showOnLeaderboard,
-            memberSinceLabel,
-          }}
-        />
-      }
+      currentUserId={userId}
+      accountUser={{
+        username: fullUser.username,
+        displayName: fullUser.displayName,
+        name: fullUser.name,
+        email: fullUser.email,
+        timezone: fullUser.timezone,
+        showOnLeaderboard: fullUser.showOnLeaderboard,
+        memberSinceLabel,
+      }}
+      history={history}
+      lifetimePoints={lifetimePoints}
+      leaderboards={{
+        lightWeek,
+        week,
+        month,
+        allTime,
+        friendsWeek,
+      }}
+      friends={friendships.map((r) => ({
+        id: r.id,
+        status: r.status,
+        otherName: r.otherName,
+        otherUsername: r.otherUsername,
+        isIncoming: r.isIncoming,
+        isOutgoing: r.isOutgoing,
+      }))}
+      reminders={reminderRows.map((r) => ({
+        id: r.id,
+        label: r.label,
+        localTime: r.localTime,
+        enabled: r.enabled,
+      }))}
+      reminderSunPresets={reminderSunPresets}
     />
   );
 }

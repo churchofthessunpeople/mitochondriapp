@@ -36,7 +36,7 @@ export async function SiteHeader({
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
         <Link
-          href={session ? "/schedule" : "/"}
+          href={session ? "/app" : "/"}
           className="flex min-w-0 items-center gap-2"
         >
           <Image
