@@ -32,12 +32,15 @@ npm install
 
 ### 2. Environment
 
-Copy `.env.example` → `.env.local` and fill in:
+Create a `.env` file in the project root (gitignored — never commit it):
 
 | Variable | Notes |
 |---|---|
 | `DATABASE_URL` | Neon Postgres connection string |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
+| `AUTH_URL` | Local: `http://localhost:3000` · Prod: your Vercel URL |
+| `RESEND_API_KEY` | From resend.com (for verification emails) |
+| `EMAIL_FROM` | e.g. `Mitochondriapp <onboarding@resend.dev>` |
 
 ### 3. Database
 

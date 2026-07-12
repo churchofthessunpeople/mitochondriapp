@@ -91,7 +91,8 @@ export function ProtocolBoard({
   function toggle(protocolId: string) {
     startTransition(async () => {
       setOptimistic(protocolId);
-      await toggleCompletionAction(protocolId, date);
+      // Date is determined server-side (today only) — never trust the client
+      await toggleCompletionAction(protocolId);
     });
   }
 
@@ -263,7 +264,7 @@ function TimeSection({
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 rounded-xl bg-black/20 p-2">
+          <div className="mt-0.5 rounded-xl bg-foreground/5 p-2">
             <Icon className="h-5 w-5 text-accent" />
           </div>
           <div>
@@ -271,7 +272,7 @@ function TimeSection({
             <p className="text-sm text-muted">{meta.blurb}</p>
           </div>
         </div>
-        <div className="rounded-full bg-black/25 px-2.5 py-1 text-xs text-muted">
+        <div className="rounded-full bg-foreground/5 px-2.5 py-1 text-xs text-muted">
           {doneCount}/{protocols.length}
         </div>
       </div>
@@ -361,10 +362,10 @@ function ProtocolCard({
       ref={overlay ? undefined : setNodeRef}
       style={style}
       className={cn(
-        "protocol-card group rounded-2xl border border-border bg-black/25 p-3",
+        "protocol-card group rounded-2xl border border-border bg-foreground/[0.04] p-3",
         completed && "completed",
         isDragging && "dragging",
-        overlay && "shadow-2xl shadow-black/50",
+        overlay && "shadow-2xl shadow-black/30",
         compact && "p-2.5",
       )}
     >
@@ -372,7 +373,7 @@ function ProtocolCard({
         {!overlay && (
           <button
             type="button"
-            className="mt-0.5 cursor-grab touch-none rounded-md p-1 text-muted opacity-70 transition hover:bg-white/5 hover:opacity-100 active:cursor-grabbing"
+            className="mt-0.5 cursor-grab touch-none rounded-md p-1 text-muted opacity-70 transition hover:bg-foreground/5 hover:opacity-100 active:cursor-grabbing"
             aria-label="Drag protocol"
             {...listeners}
             {...attributes}

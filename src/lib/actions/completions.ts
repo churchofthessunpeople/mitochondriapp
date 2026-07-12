@@ -5,16 +5,27 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, protocols } from "@/db/schema";
-import { todayIsoDate } from "@/lib/utils";
+import { getServerTodayIsoDate } from "@/lib/date-server";
 
-export async function toggleCompletionAction(protocolId: string, date?: string) {
+/**
+ * Toggle a protocol for *today only*. Client-supplied dates are ignored.
+ */
+export async function toggleCompletionAction(protocolId: string) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 
-  const completedOn = date ?? todayIsoDate();
+  const completedOn = await getServerTodayIsoDate();
   const userId = session.user.id;
+
+  if (
+    typeof protocolId !== "string" ||
+    protocolId.length < 1 ||
+    protocolId.length > 80
+  ) {
+    throw new Error("Invalid protocol");
+  }
 
   const [protocol] = await db
     .select()
@@ -41,7 +52,12 @@ export async function toggleCompletionAction(protocolId: string, date?: string) 
   if (existing) {
     await db
       .delete(dailyCompletions)
-      .where(eq(dailyCompletions.id, existing.id));
+      .where(
+        and(
+          eq(dailyCompletions.id, existing.id),
+          eq(dailyCompletions.userId, userId),
+        ),
+      );
   } else {
     await db.insert(dailyCompletions).values({
       userId,
@@ -55,70 +71,4 @@ export async function toggleCompletionAction(protocolId: string, date?: string) 
   revalidatePath("/history");
   revalidatePath("/leaderboard");
   revalidatePath("/");
-}
-
-export async function completeProtocolAction(protocolId: string, date?: string) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const completedOn = date ?? todayIsoDate();
-  const userId = session.user.id;
-
-  const [protocol] = await db
-    .select()
-    .from(protocols)
-    .where(and(eq(protocols.id, protocolId), eq(protocols.active, true)))
-    .limit(1);
-
-  if (!protocol) {
-    throw new Error("Protocol not found");
-  }
-
-  await db
-    .insert(dailyCompletions)
-    .values({
-      userId,
-      protocolId,
-      completedOn,
-      pointsEarned: protocol.points,
-    })
-    .onConflictDoNothing({
-      target: [
-        dailyCompletions.userId,
-        dailyCompletions.protocolId,
-        dailyCompletions.completedOn,
-      ],
-    });
-
-  revalidatePath("/today");
-  revalidatePath("/history");
-  revalidatePath("/leaderboard");
-}
-
-export async function uncompleteProtocolAction(
-  protocolId: string,
-  date?: string,
-) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
-  }
-
-  const completedOn = date ?? todayIsoDate();
-
-  await db
-    .delete(dailyCompletions)
-    .where(
-      and(
-        eq(dailyCompletions.userId, session.user.id),
-        eq(dailyCompletions.protocolId, protocolId),
-        eq(dailyCompletions.completedOn, completedOn),
-      ),
-    );
-
-  revalidatePath("/today");
-  revalidatePath("/history");
-  revalidatePath("/leaderboard");
 }

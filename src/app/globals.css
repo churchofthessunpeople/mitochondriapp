@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-:root {
+/* Dark is default (also applied via html.dark) */
+:root,
+html.dark {
   --bg: #070b12;
   --bg-elevated: #0d1420;
   --fg: #e8eef7;
@@ -11,6 +13,39 @@
   --card: rgba(16, 24, 40, 0.72);
   --border: rgba(148, 163, 184, 0.18);
   --ring: rgba(61, 214, 198, 0.45);
+  --header-bg: rgba(7, 11, 18, 0.78);
+  --input-bg: rgba(0, 0, 0, 0.22);
+  --btn-primary-bg: #e8eef7;
+  --btn-primary-fg: #070b12;
+  --btn-secondary-bg: transparent;
+  --surface-glow: rgba(61, 214, 198, 0.12);
+  --surface-glow-2: rgba(240, 162, 2, 0.1);
+  --surface-glow-3: rgba(99, 102, 241, 0.12);
+  --shadow-icon: 0 12px 40px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+html.light {
+  --bg: #f7f8fa;
+  --bg-elevated: #ffffff;
+  --fg: #0f172a;
+  --muted: #64748b;
+  --accent: #0d9488;
+  --accent-2: #d97706;
+  --danger: #dc2626;
+  --card: rgba(255, 255, 255, 0.86);
+  --border: rgba(15, 23, 42, 0.1);
+  --ring: rgba(13, 148, 136, 0.35);
+  --header-bg: rgba(247, 248, 250, 0.86);
+  --input-bg: rgba(241, 245, 249, 0.95);
+  --btn-primary-bg: #0f172a;
+  --btn-primary-fg: #ffffff;
+  --btn-secondary-bg: #ffffff;
+  --surface-glow: rgba(13, 148, 136, 0.08);
+  --surface-glow-2: rgba(217, 119, 6, 0.07);
+  --surface-glow-3: rgba(99, 102, 241, 0.06);
+  --shadow-icon: 0 12px 40px rgba(15, 23, 42, 0.1);
+  color-scheme: light;
 }
 
 @theme inline {
@@ -33,26 +68,32 @@ html {
   color-scheme: dark;
 }
 
+html.light {
+  color-scheme: light;
+}
+
 body {
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0;
   color: var(--fg);
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(61, 214, 198, 0.12), transparent 55%),
-    radial-gradient(900px 500px at 90% 0%, rgba(240, 162, 2, 0.1), transparent 50%),
-    radial-gradient(800px 500px at 50% 100%, rgba(99, 102, 241, 0.12), transparent 55%),
+    radial-gradient(1200px 600px at 10% -10%, var(--surface-glow), transparent 55%),
+    radial-gradient(900px 500px at 90% 0%, var(--surface-glow-2), transparent 50%),
+    radial-gradient(800px 500px at 50% 100%, var(--surface-glow-3), transparent 55%),
     var(--bg);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
 }
 
-/* Pre-auth screens: clean white mobile shell */
+/* Pre-auth shell uses the same theme tokens */
 .welcome-screen {
-  color-scheme: light;
-  background: #ffffff !important;
+  background: var(--bg) !important;
+  color: var(--fg);
 }
-
 
 a {
   color: inherit;
@@ -61,6 +102,10 @@ a {
 
 ::selection {
   background: rgba(61, 214, 198, 0.35);
+}
+
+html.light ::selection {
+  background: rgba(13, 148, 136, 0.25);
 }
 
 .glass {
@@ -82,8 +127,10 @@ a {
 }
 
 .protocol-card.completed {
-  border-color: rgba(61, 214, 198, 0.55);
-  box-shadow: 0 0 0 1px rgba(61, 214, 198, 0.15), 0 8px 24px rgba(61, 214, 198, 0.08);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent),
+    0 8px 24px color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .protocol-card.dragging {
@@ -91,7 +138,34 @@ a {
 }
 
 .drop-highlight {
-  outline: 2px dashed rgba(61, 214, 198, 0.55);
+  outline: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent);
   outline-offset: 4px;
-  background: rgba(61, 214, 198, 0.06);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+}
+
+.btn-secondary {
+  background: var(--btn-secondary-bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+}
+
+.field-input {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+
+.field-input::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+}
+
+.field-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+  background: var(--bg-elevated);
 }

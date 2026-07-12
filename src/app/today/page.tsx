@@ -2,7 +2,8 @@ import { auth } from "@/auth";
 import { ProtocolBoard } from "@/components/protocol-board";
 import { SiteHeader } from "@/components/site-header";
 import { getActiveProtocols, getUserDayStats, getUserTotalPoints } from "@/lib/data";
-import { formatPoints, todayIsoDate } from "@/lib/utils";
+import { getServerTodayIsoDate } from "@/lib/date-server";
+import { formatPoints } from "@/lib/utils";
 import { format } from "date-fns";
 import { redirect } from "next/navigation";
 
@@ -12,7 +13,7 @@ export default async function TodayPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const date = todayIsoDate();
+  const date = await getServerTodayIsoDate();
   const [protocols, dayStats, lifetime] = await Promise.all([
     getActiveProtocols(),
     getUserDayStats(session.user.id, date),

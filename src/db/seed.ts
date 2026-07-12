@@ -1,7 +1,8 @@
 import { config } from "dotenv";
 import { neon } from "@neondatabase/serverless";
+import { isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
-import { protocols } from "./schema";
+import { protocols, users } from "./schema";
 import { PROTOCOL_SEEDS } from "./seed-data";
 
 config({ path: ".env.local" });
@@ -33,6 +34,19 @@ async function main() {
   }
 
   console.log(`Seeded ${PROTOCOL_SEEDS.length} protocols.`);
+
+  // Grandfather existing accounts created before email verification shipped
+  const verified = await db
+    .update(users)
+    .set({ emailVerified: sql`coalesce(${users.createdAt}, now())` })
+    .where(isNull(users.emailVerified))
+    .returning({ id: users.id });
+
+  if (verified.length > 0) {
+    console.log(
+      `Marked ${verified.length} existing user(s) as email-verified (migration).`,
+    );
+  }
 }
 
 main().catch((err) => {

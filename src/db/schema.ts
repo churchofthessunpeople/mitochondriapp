@@ -31,7 +31,16 @@ export const users = pgTable("users", {
   image: text("image"),
   passwordHash: text("password_hash"),
   displayName: text("display_name"),
+  /** Bumped on password change to invalidate existing JWTs */
+  sessionVersion: integer("session_version").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+});
+
+/** Sliding-window counters for auth / abuse rate limits */
+export const rateLimits = pgTable("rate_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull().default(0),
+  windowStart: timestamp("window_start", { mode: "date" }).notNull(),
 });
 
 export const accounts = pgTable(
