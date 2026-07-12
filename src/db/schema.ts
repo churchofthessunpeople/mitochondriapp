@@ -104,7 +104,22 @@ export const protocols = pgTable("protocols", {
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
-/** Per-user: which activities appear in which time-of-day section */
+/** Per-user starred activities for quick log */
+export const userFavorites = pgTable(
+  "user_favorites",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    protocolId: text("protocol_id")
+      .notNull()
+      .references(() => protocols.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.protocolId] })],
+);
+
+/** Optional: pin activities to time-of-day sections (secondary UX) */
 export const userScheduleItems = pgTable(
   "user_schedule_items",
   {
@@ -152,6 +167,7 @@ export const dailyCompletions = pgTable("daily_completions", {
 
 export type User = typeof users.$inferSelect;
 export type Protocol = typeof protocols.$inferSelect;
+export type UserFavorite = typeof userFavorites.$inferSelect;
 export type UserScheduleItem = typeof userScheduleItems.$inferSelect;
 export type DailyCompletion = typeof dailyCompletions.$inferSelect;
 export type TimeOfDay = (typeof timeOfDayEnum.enumValues)[number];

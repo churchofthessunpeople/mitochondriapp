@@ -15,6 +15,7 @@
     "db:clear-users": "node scripts/clear-users.mjs",
     "db:migrate-username": "node scripts/migrate-username.mjs",
     "db:migrate-schedule": "node scripts/migrate-schedule.mjs",
+    "db:migrate-favorites": "node scripts/migrate-favorites.mjs",
     "email:probe": "node scripts/probe-email.mjs"
   },
   "dependencies": {

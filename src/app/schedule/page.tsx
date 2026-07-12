@@ -35,12 +35,13 @@ export default async function SchedulePage() {
             Time-of-day schedule
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Choose which activities appear under sunrise, morning, afternoon,
-            and the rest. Locked items (sunrise / sunset / night) stay in their
-            window.{" "}
+            Optional power tool: pin activities into time-of-day buckets.
+            Everyday logging is on{" "}
             <Link href="/today" className="text-accent hover:underline">
-              Back to Today
-            </Link>
+              Today
+            </Link>{" "}
+            (search + favorites). Locked sunrise/sunset items can only pin to
+            those slots.
           </p>
         </div>
         <ScheduleEditor entries={entries} catalog={catalog} />

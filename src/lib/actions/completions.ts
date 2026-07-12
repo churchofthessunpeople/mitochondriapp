@@ -4,12 +4,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import {
-  dailyCompletions,
-  protocols,
-  userScheduleItems,
-  type TimeOfDay,
-} from "@/db/schema";
+import { dailyCompletions, protocols, type TimeOfDay } from "@/db/schema";
 import { getServerTodayIsoDate } from "@/lib/date-server";
 
 async function requireUser() {
@@ -25,8 +20,8 @@ function revalidateLogs() {
 }
 
 /**
- * Log once (single-allow) or add a log (multi-allow).
- * timeOfDay is the schedule slot the user logged from.
+ * Log from the full catalog (no schedule required).
+ * Single-allow: toggle. Multi-allow: always add one log.
  */
 export async function logCompletionAction(
   protocolId: string,
@@ -43,21 +38,8 @@ export async function logCompletionAction(
 
   if (!protocol) throw new Error("Activity not found");
 
-  // Must be on the user's schedule for this slot (if slot provided)
-  if (timeOfDay) {
-    const [onSchedule] = await db
-      .select({ id: userScheduleItems.id })
-      .from(userScheduleItems)
-      .where(
-        and(
-          eq(userScheduleItems.userId, userId),
-          eq(userScheduleItems.protocolId, protocolId),
-          eq(userScheduleItems.timeOfDay, timeOfDay),
-        ),
-      )
-      .limit(1);
-    if (!onSchedule) throw new Error("Activity is not on your schedule for that time");
-  }
+  const slot =
+    timeOfDay ?? protocol.lockedTimeOfDay ?? protocol.timeOfDay ?? null;
 
   if (!protocol.allowsMultiple) {
     const [existing] = await db
@@ -73,7 +55,6 @@ export async function logCompletionAction(
       .limit(1);
 
     if (existing) {
-      // Toggle off
       await db
         .delete(dailyCompletions)
         .where(
@@ -91,7 +72,7 @@ export async function logCompletionAction(
     userId,
     protocolId,
     completedOn,
-    timeOfDay: timeOfDay ?? null,
+    timeOfDay: slot,
     pointsEarned: protocol.points,
   });
 
@@ -99,7 +80,6 @@ export async function logCompletionAction(
   return { action: "added" as const };
 }
 
-/** Remove one log (latest) for multi-allow activities, or clear single. */
 export async function removeOneCompletionAction(protocolId: string) {
   const userId = await requireUser();
   const completedOn = await getServerTodayIsoDate();
@@ -131,7 +111,6 @@ export async function removeOneCompletionAction(protocolId: string) {
   revalidateLogs();
 }
 
-/** @deprecated use logCompletionAction */
 export async function toggleCompletionAction(protocolId: string) {
   return logCompletionAction(protocolId);
 }
