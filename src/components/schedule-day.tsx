@@ -19,6 +19,8 @@ type Props = {
   dayPoints: number;
   streak: { current: number; best: number };
   dateLabel: string;
+  /** When set, "Edit available" switches tab instead of routing */
+  onOpenActivities?: () => void;
 };
 
 /**
@@ -30,6 +32,7 @@ export function ScheduleDay({
   dayPoints,
   streak,
   dateLabel,
+  onOpenActivities,
 }: Props) {
   const { push } = useToast();
   const [pending, start] = useTransition();
@@ -126,13 +129,24 @@ export function ScheduleDay({
         <p className="text-sm text-muted">
           Tap to complete · multi uses + / −
         </p>
-        <Link
-          href="/activities"
-          className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
-        >
-          <ListChecks className="h-3.5 w-3.5" />
-          Edit available
-        </Link>
+        {onOpenActivities ? (
+          <button
+            type="button"
+            onClick={onOpenActivities}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
+          >
+            <ListChecks className="h-3.5 w-3.5" />
+            Edit available
+          </button>
+        ) : (
+          <Link
+            href="/app?t=activities"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground"
+          >
+            <ListChecks className="h-3.5 w-3.5" />
+            Edit available
+          </Link>
+        )}
       </div>
 
       {protocols.length === 0 ? (
@@ -142,12 +156,22 @@ export function ScheduleDay({
             Choose what you can actually do (equipment, access, preference).
             Only those show up here as today&apos;s checklist.
           </p>
-          <Link
-            href="/activities"
-            className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
-          >
-            Pick available activities
-          </Link>
+          {onOpenActivities ? (
+            <button
+              type="button"
+              onClick={onOpenActivities}
+              className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
+            >
+              Pick available activities
+            </button>
+          ) : (
+            <Link
+              href="/app?t=activities"
+              className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
+            >
+              Pick available activities
+            </Link>
+          )}
         </div>
       ) : (
         <ul className="space-y-2">
@@ -262,9 +286,22 @@ export function ScheduleDay({
       {protocols.length > 0 && (
         <p className="text-center text-xs text-muted">
           Missing something?{" "}
-          <Link href="/activities" className="text-accent hover:underline">
-            Update available activities
-          </Link>
+          {onOpenActivities ? (
+            <button
+              type="button"
+              onClick={onOpenActivities}
+              className="text-accent hover:underline"
+            >
+              Update available activities
+            </button>
+          ) : (
+            <Link
+              href="/app?t=activities"
+              className="text-accent hover:underline"
+            >
+              Update available activities
+            </Link>
+          )}
         </p>
       )}
     </div>

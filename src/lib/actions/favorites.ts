@@ -13,6 +13,7 @@ async function requireUserId() {
 }
 
 function revalidateAvailable() {
+  revalidatePath("/app");
   revalidatePath("/activities");
   revalidatePath("/schedule");
   revalidatePath("/place");

@@ -10,6 +10,7 @@ import { listRegions } from "@/lib/regions";
 import { AUTH_RATE, consumeRateLimit, getClientIp } from "@/lib/rate-limit";
 
 function revalidateLocation() {
+  revalidatePath("/app");
   revalidatePath("/place");
   revalidatePath("/today");
   revalidatePath("/account");

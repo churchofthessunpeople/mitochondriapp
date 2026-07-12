@@ -15,7 +15,7 @@ export default async function OnboardingPage() {
   if (!session?.user?.id) redirect("/login");
 
   const status = await getOnboardingStatus(session.user.id);
-  if (status?.onboardingComplete) redirect("/schedule");
+  if (status?.onboardingComplete) redirect("/app");
 
   const [protocols, availableIds] = await Promise.all([
     getActiveProtocols(),

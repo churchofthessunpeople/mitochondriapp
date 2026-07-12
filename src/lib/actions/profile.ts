@@ -43,6 +43,7 @@ export async function updateTimezoneAction(
   }
   await db.update(users).set({ timezone: tz }).where(eq(users.id, userId));
   revalidatePath("/account");
+  revalidatePath("/app");
   revalidatePath("/place");
   revalidatePath("/today");
   return { success: "Timezone updated." };
@@ -56,4 +57,5 @@ export async function updateLeaderboardVisibilityAction(show: boolean) {
     .where(eq(users.id, userId));
   revalidatePath("/leaderboard");
   revalidatePath("/account");
+  revalidatePath("/app");
 }

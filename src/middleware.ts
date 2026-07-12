@@ -8,6 +8,7 @@ export default auth((req) => {
   const isAuthPage =
     pathname.startsWith("/login") || pathname.startsWith("/register");
   const isProtected =
+    pathname.startsWith("/app") ||
     pathname.startsWith("/place") ||
     pathname.startsWith("/today") ||
     pathname.startsWith("/schedule") ||
@@ -28,7 +29,7 @@ export default auth((req) => {
   }
 
   if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL("/schedule", req.nextUrl.origin));
+    return NextResponse.redirect(new URL("/app", req.nextUrl.origin));
   }
 
   return NextResponse.next();
@@ -36,6 +37,7 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
+    "/app/:path*",
     "/place/:path*",
     "/today/:path*",
     "/schedule/:path*",

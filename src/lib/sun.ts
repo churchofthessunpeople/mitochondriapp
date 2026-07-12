@@ -9,9 +9,10 @@
  */
 
 export type SunTimes = {
-  sunrise: Date | null;
-  sunset: Date | null;
-  solarNoon: Date | null;
+  /** May arrive as ISO strings across the RSC → client boundary */
+  sunrise: Date | string | null;
+  sunset: Date | string | null;
+  solarNoon: Date | string | null;
   dayLengthHours: number | null;
 };
 
@@ -144,29 +145,42 @@ export function getSunTimesForLocalDay(
   return getSunTimes(anchor, latitude, longitude);
 }
 
-export function formatTimeInZone(date: Date | null, timeZone: string): string {
-  if (!date) return "—";
+function asDate(date: Date | string | null | undefined): Date | null {
+  if (date == null) return null;
+  if (date instanceof Date) return date;
+  const d = new Date(date);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+export function formatTimeInZone(
+  date: Date | string | null,
+  timeZone: string,
+): string {
+  const d = asDate(date);
+  if (!d) return "—";
   try {
     return new Intl.DateTimeFormat("en-US", {
       timeZone,
       hour: "numeric",
       minute: "2-digit",
-    }).format(date);
+    }).format(d);
   } catch {
-    return date.toISOString().slice(11, 16) + " UTC";
+    return d.toISOString().slice(11, 16) + " UTC";
   }
 }
 
 /** Rough phase of day for protocol suggestions using local sun times. */
 export function sunPhase(
   now: Date,
-  sunrise: Date | null,
-  sunset: Date | null,
+  sunrise: Date | string | null,
+  sunset: Date | string | null,
 ): "night" | "sunrise" | "day" | "sunset" {
-  if (!sunrise || !sunset) return "day";
+  const riseD = asDate(sunrise);
+  const setD = asDate(sunset);
+  if (!riseD || !setD) return "day";
   const t = now.getTime();
-  const rise = sunrise.getTime();
-  const set = sunset.getTime();
+  const rise = riseD.getTime();
+  const set = setD.getTime();
   const hourMs = 60 * 60 * 1000;
   if (t < rise - hourMs || t > set + hourMs) return "night";
   if (t >= rise - hourMs && t <= rise + 1.5 * hourMs) return "sunrise";

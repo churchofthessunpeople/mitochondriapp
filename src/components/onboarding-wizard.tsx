@@ -70,7 +70,7 @@ export function OnboardingWizard({
     start(async () => {
       try {
         await markOnboardingCompleteAction();
-        router.replace("/schedule");
+        router.replace("/app");
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not finish setup");

@@ -20,11 +20,12 @@ export async function completeOnboardingAction() {
     .set({ onboardingComplete: true })
     .where(eq(users.id, userId));
 
+  revalidatePath("/app");
   revalidatePath("/schedule");
   revalidatePath("/place");
   revalidatePath("/activities");
   revalidatePath("/onboarding");
-  redirect("/schedule");
+  redirect("/app");
 }
 
 /** Mark complete without redirect (client-driven). */
@@ -35,6 +36,7 @@ export async function markOnboardingCompleteAction() {
     .set({ onboardingComplete: true })
     .where(eq(users.id, userId));
 
+  revalidatePath("/app");
   revalidatePath("/schedule");
   revalidatePath("/place");
   revalidatePath("/activities");

@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { MapPin } from "lucide-react";
 import type { Region } from "@/db/schema";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 
 /**
  * Compact place context for Schedule home — not a full region card.
+ * Parent handles navigation / tab switch (no nested links).
  */
 export function PlaceStrip({
   placeLabel,
@@ -24,29 +24,23 @@ export function PlaceStrip({
 
   if (!label && !sun) {
     return (
-      <Link
-        href="/place"
-        className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-foreground/[0.02] px-3.5 py-3 text-sm transition hover:border-accent/30"
-      >
+      <div className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-foreground/[0.02] px-3.5 py-3 text-sm transition hover:border-accent/30">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border text-muted">
           <MapPin className="h-4 w-4" />
         </span>
-        <span className="min-w-0">
+        <span className="min-w-0 flex-1">
           <span className="font-medium text-foreground">Set your location</span>
           <span className="mt-0.5 block text-xs text-muted">
             ZIP unlocks sunrise/sunset for your day
           </span>
         </span>
         <span className="shrink-0 text-xs text-accent">Add →</span>
-      </Link>
+      </div>
     );
   }
 
   return (
-    <Link
-      href="/place"
-      className="block rounded-2xl border border-border bg-foreground/[0.03] px-3.5 py-3 transition hover:border-accent/30"
-    >
+    <div className="rounded-2xl border border-border bg-foreground/[0.03] px-3.5 py-3 transition hover:border-accent/30">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[10px] uppercase tracking-[0.14em] text-muted">
@@ -74,6 +68,6 @@ export function PlaceStrip({
           {phaseHint}
         </p>
       )}
-    </Link>
+    </div>
   );
 }

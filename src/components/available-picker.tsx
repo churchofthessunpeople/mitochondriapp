@@ -2,7 +2,7 @@
 
 import { Check, Search, X } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useOptimistic, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import type { Protocol, ProtocolCategory } from "@/db/schema";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
@@ -12,6 +12,10 @@ import { cn } from "@/lib/utils";
 type Props = {
   protocols: Protocol[];
   availableIds: string[];
+  /** When set, "Today's checklist" switches tab instead of routing */
+  onOpenSchedule?: () => void;
+  /** Notify parent shell so Schedule tab updates without full navigation */
+  onAvailableIdsChange?: (ids: string[]) => void;
 };
 
 /**
@@ -21,6 +25,8 @@ type Props = {
 export function AvailablePicker({
   protocols,
   availableIds: initialIds,
+  onOpenSchedule,
+  onAvailableIdsChange,
 }: Props) {
   const { push } = useToast();
   const [query, setQuery] = useState("");
@@ -28,15 +34,11 @@ export function AvailablePicker({
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [, start] = useTransition();
 
-  const [available, setAvailable] = useOptimistic(
-    new Set(initialIds),
-    (current: Set<string>, protocolId: string) => {
-      const next = new Set(current);
-      if (next.has(protocolId)) next.delete(protocolId);
-      else next.add(protocolId);
-      return next;
-    },
-  );
+  const [available, setAvailable] = useState(() => new Set(initialIds));
+
+  useEffect(() => {
+    setAvailable(new Set(initialIds));
+  }, [initialIds]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -62,10 +64,17 @@ export function AvailablePicker({
     start(async () => {
       try {
         const wasOn = available.has(protocolId);
-        setAvailable(protocolId);
+        const next = new Set(available);
+        if (wasOn) next.delete(protocolId);
+        else next.add(protocolId);
+        setAvailable(next);
+        onAvailableIdsChange?.([...next]);
         await toggleFavoriteAction(protocolId);
         push(wasOn ? `Removed “${name}”` : `Available: ${name}`);
       } catch (e) {
+        // Revert local state on failure
+        setAvailable(new Set(available));
+        onAvailableIdsChange?.([...available]);
         push(e instanceof Error ? e.message : "Could not update", "err");
       }
     });
@@ -85,9 +94,19 @@ export function AvailablePicker({
           {available.size > 0 && (
             <>
               {" · "}
-              <Link href="/schedule" className="text-accent hover:underline">
-                Today&apos;s checklist
-              </Link>
+              {onOpenSchedule ? (
+                <button
+                  type="button"
+                  onClick={onOpenSchedule}
+                  className="text-accent hover:underline"
+                >
+                  Today&apos;s checklist
+                </button>
+              ) : (
+                <Link href="/app" className="text-accent hover:underline">
+                  Today&apos;s checklist
+                </Link>
+              )}
             </>
           )}
         </p>
