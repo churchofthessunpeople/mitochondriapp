@@ -1,11 +1,12 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { revalidateApp } from "@/lib/revalidate-app";
+import { ROUTES } from "@/lib/routes";
 
 async function requireUserId() {
   const session = await auth();
@@ -20,12 +21,8 @@ export async function completeOnboardingAction() {
     .set({ onboardingComplete: true })
     .where(eq(users.id, userId));
 
-  revalidatePath("/app");
-  revalidatePath("/schedule");
-  revalidatePath("/place");
-  revalidatePath("/activities");
-  revalidatePath("/onboarding");
-  redirect("/app");
+  revalidateApp();
+  redirect(ROUTES.home);
 }
 
 /** Mark complete without redirect (client-driven). */
@@ -36,10 +33,6 @@ export async function markOnboardingCompleteAction() {
     .set({ onboardingComplete: true })
     .where(eq(users.id, userId));
 
-  revalidatePath("/app");
-  revalidatePath("/schedule");
-  revalidatePath("/place");
-  revalidatePath("/activities");
-  revalidatePath("/onboarding");
+  revalidateApp();
   return { ok: true as const };
 }

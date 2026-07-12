@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { db } from "@/db";
 import { userFavorites, users } from "@/db/schema";
+import { ROUTES } from "@/lib/routes";
 
 /** Request-scoped user flags (dedupes SiteHeader / pages / onboarding). */
 export const getUserAppFlags = cache(async (userId: string) => {
@@ -53,7 +54,7 @@ export async function redirectIfNeedsOnboarding(userId: string) {
     return;
   }
 
-  redirect("/onboarding");
+  redirect(ROUTES.onboarding);
 }
 
 export async function getOnboardingStatus(userId: string) {

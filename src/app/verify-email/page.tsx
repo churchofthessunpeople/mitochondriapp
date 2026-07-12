@@ -4,6 +4,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { consumeEmailVerificationToken } from "@/lib/email";
+import { ROUTES } from "@/lib/routes";
 
 export const metadata = { title: "Verify email" };
 
@@ -53,13 +54,13 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
         </p>
         <div className="mt-8 space-y-3">
           <Link
-            href="/login"
+            href={ROUTES.login}
             className="btn-primary flex h-12 w-full items-center justify-center rounded-2xl text-[15px] font-semibold"
           >
             Sign in
           </Link>
           <Link
-            href="/register"
+            href={ROUTES.register}
             className="btn-secondary flex h-12 w-full items-center justify-center rounded-2xl text-[15px] font-semibold"
           >
             Create account

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import type { AuthFormState } from "@/lib/actions/auth";
 import { loginAction, registerAction } from "@/lib/actions/auth";
+import { ROUTES } from "@/lib/routes";
 
 type Mode = "login" | "register";
 
@@ -131,7 +132,7 @@ export function AuthForm({
           <>
             No account yet?{" "}
             <Link
-              href="/register"
+              href={ROUTES.register}
               className="font-semibold text-foreground underline-offset-2 hover:underline"
             >
               Create one
@@ -141,7 +142,7 @@ export function AuthForm({
           <>
             Already have an account?{" "}
             <Link
-              href="/login"
+              href={ROUTES.login}
               className="font-semibold text-foreground underline-offset-2 hover:underline"
             >
               Sign in

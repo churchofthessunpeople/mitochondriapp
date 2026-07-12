@@ -1,10 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Main tabs live inside AppShell (/app) for instant client switching.
- * This global nav only shows on secondary pages (history, etc.).
+ * This global nav only shows on secondary pages (admin / region).
  */
 export function BottomNav() {
   const pathname = usePathname();
@@ -38,7 +39,7 @@ export function BottomNav() {
     >
       <div className="mx-auto flex max-w-lg justify-center px-3 py-2">
         <a
-          href="/app"
+          href={ROUTES.home}
           className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-on-accent"
         >
           Back to app

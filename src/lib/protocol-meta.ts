@@ -13,13 +13,17 @@ export type ProtocolMeta = {
 const DEFAULT: ProtocolMeta = { equipment: "none" };
 
 const META: Record<string, ProtocolMeta> = {
-  "sunrise-grounding": {
+  "sunrise-horizon": {
     equipment: "none",
-    how: "Bare feet on earth if possible; face the rising sun without glass.",
+    how: "Bare eyes on the solar disk as it clears the horizon — no glass, no sunglasses.",
   },
-  "no-sunglasses-sunrise": {
+  "sunrise-open-sky": {
     equipment: "none",
-    how: "Skip sunglasses for the first outdoor minutes at dawn.",
+    how: "Outside under a wide sky in the morning; full-spectrum light to the eyes.",
+  },
+  "sunrise-outside": {
+    equipment: "none",
+    how: "Any outdoor morning light, even with trees, buildings, or heavy overcast.",
   },
   "morning-natural-light": {
     equipment: "none",

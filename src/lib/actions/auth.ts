@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { AuthError, CredentialsSignin } from "next-auth";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { signIn, signOut } from "@/auth";
 import { db } from "@/db";
@@ -13,7 +14,23 @@ import {
   consumeRateLimit,
   getClientIp,
 } from "@/lib/rate-limit";
+import { ROUTES } from "@/lib/routes";
 import { usernameSchema } from "@/lib/username";
+
+/**
+ * Auth.js signIn/signOut with redirectTo can absolute-ize using AUTH_URL
+ * (often localhost from local .env). Prefer redirect:false + Next redirect()
+ * so the browser stays on the current host (prod domain).
+ */
+function isAuthRedirectError(error: unknown): boolean {
+  return (
+    !!error &&
+    typeof error === "object" &&
+    "digest" in error &&
+    typeof (error as { digest?: string }).digest === "string" &&
+    (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+  );
+}
 
 const registerSchema = z.object({
   username: z.string().min(1),
@@ -114,35 +131,24 @@ export async function registerAction(
     });
 
     try {
-      await signIn("credentials", {
+      const result = await signIn("credentials", {
         username,
         password: parsed.data.password,
-        redirectTo: "/app",
+        redirect: false,
       });
-    } catch (error) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "digest" in error &&
-        typeof (error as { digest?: string }).digest === "string" &&
-        (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
-      ) {
-        throw error;
+      if (result?.error) {
+        return {
+          success: "Account created. You can sign in now.",
+        };
       }
+    } catch (error) {
+      if (isAuthRedirectError(error)) throw error;
       return { success: "Account created. You can sign in now." };
     }
 
-    return { success: "Account created." };
+    redirect(ROUTES.home);
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "digest" in error &&
-      typeof (error as { digest?: string }).digest === "string" &&
-      (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
-    ) {
-      throw error;
-    }
+    if (isAuthRedirectError(error)) throw error;
     console.error("[registerAction]", error);
     return {
       error:
@@ -192,21 +198,17 @@ export async function loginAction(
   }
 
   try {
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       username,
       password: parsed.data.password,
-      redirectTo: "/app",
+      redirect: false,
     });
-  } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "digest" in error &&
-      typeof (error as { digest?: string }).digest === "string" &&
-      (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
-    ) {
-      throw error;
+
+    if (result?.error) {
+      return { error: "Invalid username or password" };
     }
+  } catch (error) {
+    if (isAuthRedirectError(error)) throw error;
 
     if (
       error instanceof AuthError ||
@@ -221,7 +223,7 @@ export async function loginAction(
     throw error;
   }
 
-  return { success: "Signed in" };
+  redirect(ROUTES.home);
 }
 
 /** Kept for old UI; no-ops while verification is off / username-only. */
@@ -235,5 +237,6 @@ export async function resendVerificationAction(
 }
 
 export async function logoutAction() {
-  await signOut({ redirectTo: "/" });
+  await signOut({ redirect: false });
+  redirect("/");
 }

@@ -16,6 +16,9 @@ const credentialsSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Use the request Host (prod domain). Without this, Auth.js can redirect
+  // to AUTH_URL / localhost when that env is set for local dev only.
+  trustHost: true,
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,

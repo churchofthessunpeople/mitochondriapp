@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
+import { ROUTES } from "@/lib/routes";
 
 export default function AccountRedirect() {
-  redirect("/app?t=account");
+  redirect(ROUTES.account);
 }

@@ -34,10 +34,38 @@ export function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 
+function isLocalhostUrl(url: string): boolean {
+  try {
+    const host = new URL(url).hostname;
+    return host === "localhost" || host === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Absolute origin for email / reset links.
+ * On Vercel, never prefer a localhost AUTH_URL left over from local .env.
+ */
 export function getAppBaseUrl() {
-  const authUrl = process.env.AUTH_URL?.trim();
-  if (authUrl) return authUrl.replace(/\/$/, "");
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  const authUrl = process.env.AUTH_URL?.trim().replace(/\/$/, "") || "";
+  const onVercel = Boolean(process.env.VERCEL);
+
+  if (authUrl && !(onVercel && isLocalhostUrl(authUrl))) {
+    return authUrl;
+  }
+
+  const prod = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (prod) {
+    const host = prod.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    return `https://${host}`;
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
+  }
+
+  if (authUrl) return authUrl;
   return "http://localhost:3000";
 }
 

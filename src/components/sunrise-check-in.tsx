@@ -2,10 +2,14 @@
 
 import { Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
 import { logCompletionAction } from "@/lib/actions/completions";
-import { isSunriseProtocol, SUNRISE_MULTIPLIER } from "@/lib/scoring";
+import {
+  formatSunriseMultiplier,
+  SUNRISE_TIERS,
+  type SunriseTier,
+} from "@/lib/scoring";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
@@ -14,25 +18,21 @@ const DAY_KEY = (date: string) => `mito-sunrise-missed:${date}`;
 const SESSION_KEY = (date: string) => `mito-sunrise-session:${date}`;
 
 type Props = {
-  /** User's calendar day YYYY-MM-DD */
   todayIso: string;
-  sunriseBuffActive: boolean;
+  /** Best multiplier today (1 = none) */
+  sunriseMultiplier: number;
   allProtocols: Protocol[];
   sun: SunTimes | null;
   timeZone: string;
-  /** Called after a successful Yes log so parent can refresh buff UI */
-  onLogged?: () => void;
+  onLogged?: (multiplier: number) => void;
 };
 
 /**
- * Daily sunrise accountability prompt.
- * - Resets each calendar day.
- * - Every app open until sunrise is logged, or user marks "missed today".
- * - "Not yet" only dismisses this browser session.
+ * Daily morning-light accountability: pick a quality tier (2× / 1.5× / 1.25×).
  */
 export function SunriseCheckIn({
   todayIso,
-  sunriseBuffActive,
+  sunriseMultiplier,
   allProtocols,
   sun,
   timeZone,
@@ -43,13 +43,19 @@ export function SunriseCheckIn({
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
 
-  const sunriseProtocol =
-    allProtocols.find((p) => p.id === "sunrise-grounding") ??
-    allProtocols.find((p) => isSunriseProtocol(p)) ??
-    null;
+  const tiersAvailable = useMemo(() => {
+    const byId = new Map(allProtocols.map((p) => [p.id, p]));
+    return SUNRISE_TIERS.map((tier) => ({
+      tier,
+      protocol: byId.get(tier.protocolId) ?? null,
+    })).filter((x) => x.protocol != null) as {
+      tier: SunriseTier;
+      protocol: Protocol;
+    }[];
+  }, [allProtocols]);
 
   useEffect(() => {
-    if (sunriseBuffActive || !sunriseProtocol) {
+    if (sunriseMultiplier > 1 || tiersAvailable.length === 0) {
       setOpen(false);
       return;
     }
@@ -66,7 +72,7 @@ export function SunriseCheckIn({
       /* private mode */
     }
     setOpen(true);
-  }, [todayIso, sunriseBuffActive, sunriseProtocol]);
+  }, [todayIso, sunriseMultiplier, tiersAvailable.length]);
 
   function dismissSession() {
     try {
@@ -87,11 +93,10 @@ export function SunriseCheckIn({
     setOpen(false);
   }
 
-  function logYes() {
-    if (!sunriseProtocol) return;
+  function logTier(protocol: Protocol, tier: SunriseTier) {
     start(async () => {
       try {
-        const res = await logCompletionAction(sunriseProtocol.id);
+        const res = await logCompletionAction(protocol.id);
         try {
           sessionStorage.setItem(SESSION_KEY(todayIso), "1");
           localStorage.removeItem(DAY_KEY(todayIso));
@@ -99,12 +104,12 @@ export function SunriseCheckIn({
           /* ignore */
         }
         setOpen(false);
-        const buff =
-          res.sunriseBuffActive
-            ? ` · ${SUNRISE_MULTIPLIER}× on other activities today`
+        const boost =
+          res.sunriseMultiplier > 1
+            ? ` · ${formatSunriseMultiplier(res.sunriseMultiplier)} day boost`
             : "";
-        push(`Sunrise logged · +${res.points} pts${buff}`);
-        onLogged?.();
+        push(`${tier.shortLabel} · +${res.points} pts${boost}`);
+        onLogged?.(res.sunriseMultiplier);
         router.refresh();
       } catch (e) {
         push(e instanceof Error ? e.message : "Could not log", "err");
@@ -112,7 +117,7 @@ export function SunriseCheckIn({
     });
   }
 
-  if (!open || !sunriseProtocol) return null;
+  if (!open || tiersAvailable.length === 0) return null;
 
   const riseLabel = sun?.sunrise
     ? formatTimeInZone(sun.sunrise, timeZone)
@@ -138,15 +143,12 @@ export function SunriseCheckIn({
               id="sunrise-check-title"
               className="mt-1 text-xl font-semibold tracking-tight"
             >
-              Did you see the sunrise today?
+              Morning light — how did you do?
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              First light is the highest-leverage signal of the day. Logging it
-              earns base points and unlocks{" "}
-              <strong className="text-foreground">
-                {SUNRISE_MULTIPLIER}×
-              </strong>{" "}
-              on everything else you log today.
+              First light sets the day. Pick the best description that fits —
+              higher quality unlocks a stronger points boost on everything else
+              you log today.
               {riseLabel ? (
                 <>
                   {" "}
@@ -159,21 +161,42 @@ export function SunriseCheckIn({
         </div>
 
         <div className="mt-5 flex flex-col gap-2">
-          <button
-            type="button"
-            disabled={pending}
-            onClick={logYes}
-            className="btn-primary h-12 rounded-2xl text-sm font-semibold disabled:opacity-60"
-          >
-            {pending
-              ? "Logging…"
-              : `Yes — log “${sunriseProtocol.name}” (+${sunriseProtocol.points})`}
-          </button>
+          {tiersAvailable.map(({ tier, protocol }) => (
+            <button
+              key={tier.id}
+              type="button"
+              disabled={pending}
+              onClick={() => logTier(protocol, tier)}
+              className={cn(
+                "rounded-2xl border px-4 py-3 text-left transition disabled:opacity-60",
+                tier.id === "horizon"
+                  ? "border-accent/40 bg-accent/10 hover:bg-accent/15"
+                  : "border-border bg-foreground/[0.02] hover:border-accent/30",
+              )}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-semibold text-foreground">
+                  {tier.shortLabel}
+                </span>
+                <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">
+                  {formatSunriseMultiplier(tier.multiplier)} day
+                </span>
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-muted">
+                {tier.description}
+                <span className="text-foreground/80">
+                  {" "}
+                  · +{protocol.points} pts
+                </span>
+              </p>
+            </button>
+          ))}
+
           <button
             type="button"
             disabled={pending}
             onClick={dismissSession}
-            className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
+            className="btn-secondary mt-1 h-11 rounded-2xl text-sm font-semibold"
           >
             Not yet — ask me later
           </button>
@@ -181,9 +204,7 @@ export function SunriseCheckIn({
             type="button"
             disabled={pending}
             onClick={dismissDay}
-            className={cn(
-              "h-10 rounded-2xl text-xs font-medium text-muted transition hover:text-foreground",
-            )}
+            className="h-10 rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
           >
             Missed it today — don&apos;t ask again until tomorrow
           </button>

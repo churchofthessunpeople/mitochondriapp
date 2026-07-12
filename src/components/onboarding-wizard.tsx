@@ -12,6 +12,7 @@ import {
   setLocationFromZipAction,
   type ZipFormState,
 } from "@/lib/actions/region";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 type Step = "welcome" | "location" | "activities" | "firstwin" | "done";
@@ -71,7 +72,7 @@ export function OnboardingWizard({
     start(async () => {
       try {
         await markOnboardingCompleteAction();
-        router.replace("/app");
+        router.replace(ROUTES.home);
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not finish setup");

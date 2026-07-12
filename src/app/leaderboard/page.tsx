@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
+import { ROUTES } from "@/lib/routes";
 
 export default function LeaderboardRedirect() {
-  redirect("/app?t=leaderboard");
+  redirect(ROUTES.leaderboard);
 }

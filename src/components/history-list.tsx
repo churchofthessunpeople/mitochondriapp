@@ -1,13 +1,15 @@
-import Link from "next/link";
+"use client";
+
 import { format, parseISO } from "date-fns";
 import { formatPoints } from "@/lib/utils";
 
 export function HistoryList({
   rows,
-  linkDays,
+  onSelectDay,
 }: {
   rows: { date: string; points: number; count: number }[];
-  linkDays?: boolean;
+  /** When set, day rows open an in-page card instead of navigating. */
+  onSelectDay?: (date: string) => void;
 }) {
   if (rows.length === 0) {
     return (
@@ -32,7 +34,7 @@ export function HistoryList({
                 </p>
                 <p className="text-xs text-muted">
                   {row.count} log{row.count === 1 ? "" : "s"}
-                  {linkDays ? " · tap for detail" : ""}
+                  {onSelectDay ? " · tap for detail" : ""}
                 </p>
               </div>
               <p className="text-lg font-semibold tabular-nums text-accent">
@@ -48,15 +50,16 @@ export function HistoryList({
           </>
         );
 
-        if (linkDays) {
+        if (onSelectDay) {
           return (
-            <Link
+            <button
               key={row.date}
-              href={`/history/${row.date}`}
-              className="glass block rounded-2xl p-4 transition hover:border-accent/30"
+              type="button"
+              onClick={() => onSelectDay(row.date)}
+              className="glass block w-full rounded-2xl p-4 text-left transition hover:border-accent/30"
             >
               {inner}
-            </Link>
+            </button>
           );
         }
 

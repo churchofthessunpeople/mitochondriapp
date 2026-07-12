@@ -1,7 +1,6 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import {
@@ -10,6 +9,7 @@ import {
   userScheduleItems,
   type TimeOfDay,
 } from "@/db/schema";
+import { revalidateApp } from "@/lib/revalidate-app";
 import { canAssignToSlot } from "@/lib/schedule-rules";
 import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 
@@ -70,9 +70,7 @@ export async function addToScheduleAction(
     })
     .onConflictDoNothing();
 
-  revalidatePath("/schedule");
-  revalidatePath("/activities");
-  revalidatePath("/place");
+  revalidateApp();
 }
 
 export async function removeFromScheduleAction(scheduleId: string) {
@@ -87,9 +85,7 @@ export async function removeFromScheduleAction(scheduleId: string) {
       ),
     );
 
-  revalidatePath("/schedule");
-  revalidatePath("/activities");
-  revalidatePath("/place");
+  revalidateApp();
 }
 
 export async function moveScheduleItemAction(
@@ -150,7 +146,5 @@ export async function moveScheduleItemAction(
       ),
     );
 
-  revalidatePath("/schedule");
-  revalidatePath("/activities");
-  revalidatePath("/place");
+  revalidateApp();
 }

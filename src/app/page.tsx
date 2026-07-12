@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ROUTES } from "@/lib/routes";
 import { redirect } from "next/navigation";
 
 export default async function HomePage() {
   const session = await auth();
   if (session?.user) {
-    redirect("/app");
+    redirect(ROUTES.home);
   }
 
   return (
@@ -56,13 +57,13 @@ export default async function HomePage() {
 
         <div className="mt-auto space-y-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <Link
-            href="/register"
+            href={ROUTES.register}
             className="btn-primary flex h-12 w-full items-center justify-center rounded-2xl text-[15px] font-semibold transition active:scale-[0.98] hover:opacity-90"
           >
             Create account
           </Link>
           <Link
-            href="/login"
+            href={ROUTES.login}
             className="btn-secondary flex h-12 w-full items-center justify-center rounded-2xl text-[15px] font-semibold transition active:scale-[0.98] hover:bg-foreground/5"
           >
             Sign in

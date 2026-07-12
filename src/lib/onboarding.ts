@@ -4,7 +4,7 @@
  */
 export const STARTER_PROTOCOL_IDS = [
   "morning-natural-light",
-  "sunrise-grounding",
+  "sunrise-horizon",
   "barefoot-earth",
   "mineralized-water",
   "midday-sun-skin",

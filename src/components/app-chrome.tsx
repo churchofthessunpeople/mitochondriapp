@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Minimal chrome for secondary routes (docs, region browse, admin, day detail).
@@ -8,7 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
  */
 export function AppChrome({
   children,
-  backHref = "/app",
+  backHref = ROUTES.home,
   backLabel = "← Back to app",
 }: {
   children: React.ReactNode;
@@ -22,7 +23,7 @@ export function AppChrome({
         style={{ background: "var(--header-bg)" }}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:px-6">
-          <Link href="/app" className="flex min-w-0 items-center gap-2">
+          <Link href={ROUTES.home} className="flex min-w-0 items-center gap-2">
             <Image
               src="/icons/app-icon.jpg"
               alt=""
@@ -36,13 +37,13 @@ export function AppChrome({
           </Link>
           <div className="flex items-center gap-2">
             <Link
-              href="/app"
+              href={ROUTES.home}
               className="hidden rounded-full px-3 py-1.5 text-sm text-muted transition hover:text-foreground sm:inline"
             >
               Today
             </Link>
             <Link
-              href="/app?t=account"
+              href={ROUTES.account}
               className="hidden rounded-full px-3 py-1.5 text-sm text-muted transition hover:text-foreground sm:inline"
             >
               Account

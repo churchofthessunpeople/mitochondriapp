@@ -6,10 +6,12 @@ Track Dr. Jack Kruse–inspired lifestyle protocols — light, magnetism, water,
 
 ## Product
 
+Full product intent and behavior (for editing / conforming the app): **[DESIGN.md](./DESIGN.md)**.
+
 | Surface | Role |
 |---------|------|
-| **Today** (`/app`) | One home: collapsed **Place** strip (expand for ZIP/scores) · checklist · expandable catalog |
-| **Account** | Profile · history · friends · leaderboard · sun-relative reminders |
+| **Today** (`/app`) | SPA shell: Checklist · Place · Catalog |
+| **Account** | History · boards · friends · reminders · profile (in-page tabs + sheets) |
 
 - **Available / via list** — only show protocols you can actually do (e.g. rebounding if you have a rebounder)
 - **Low-blue UI** — firelight night / parchment day (amber, not cyan)
@@ -35,7 +37,7 @@ Create `.env` / `.env.local`:
 |---|---|
 | `DATABASE_URL` | Neon Postgres |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
-| `AUTH_URL` | Local `http://localhost:3000` or prod URL |
+| `AUTH_URL` | **Local only:** `http://localhost:3000`. On Vercel leave unset (or set your real prod URL) — never point prod at localhost |
 | `RESEND_API_KEY` | Optional email |
 | `EMAIL_FROM` | Optional from address |
 
@@ -70,7 +72,7 @@ Optional UX metadata (equipment / how-to) lives in `src/lib/protocol-meta.ts`.
 ## Deploy
 
 1. Push to GitHub → import on Vercel  
-2. Set `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`  
+2. Set `DATABASE_URL`, `AUTH_SECRET`. Optionally set `AUTH_URL` to the **production** URL (not localhost). Auth uses `trustHost` so the request host is preferred.  
 3. Run `npm run db:setup` and `npm run db:seed` against prod DB  
 
 ## License

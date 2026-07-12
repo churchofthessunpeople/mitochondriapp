@@ -1,24 +1,18 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { regions, users } from "@/db/schema";
+import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { findNearestRegion, geocodeUsZip } from "@/lib/geo";
 import { fetchElevationMeters } from "@/lib/place-factors";
-import { listRegions } from "@/lib/regions";
 import { AUTH_RATE, consumeRateLimit, getClientIp } from "@/lib/rate-limit";
-import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { listRegions } from "@/lib/regions";
+import { revalidateApp } from "@/lib/revalidate-app";
 
 function revalidateLocation() {
-  revalidatePath("/app");
-  revalidatePath("/place");
-  revalidatePath("/today");
-  revalidatePath("/account");
-  revalidatePath("/region");
-  revalidatePath("/schedule");
-  revalidatePath("/onboarding");
+  revalidateApp();
 }
 
 export async function setUserRegionAction(regionId: string) {

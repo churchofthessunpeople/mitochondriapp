@@ -9,10 +9,10 @@ import {
 } from "@/lib/actions/completions";
 import { orderProtocolsForNow } from "@/lib/checklist-order";
 import {
-  isSunriseProtocol,
+  formatSunriseMultiplier,
+  isSunriseKeystoneProtocol,
   maxLogsPerDay,
   pointsForLog,
-  SUNRISE_MULTIPLIER,
 } from "@/lib/scoring";
 import type { WeeklySummary } from "@/lib/weekly";
 import { useToast } from "@/components/toast";
@@ -33,8 +33,9 @@ type Props = {
   localHour?: number;
   seasonLine?: string | null;
   weekly?: WeeklySummary | null;
-  /** Server: at least one sunrise protocol logged today */
-  sunriseBuffActive?: boolean;
+  /** Best morning-light multiplier for the day (1 = none) */
+  sunriseMultiplier?: number;
+  sunriseTierLabel?: string | null;
   onStatsChange?: (s: {
     dayPoints: number;
     streak: { current: number; best: number };
@@ -53,14 +54,16 @@ export function ScheduleDay({
   localHour = 12,
   seasonLine,
   weekly,
-  sunriseBuffActive: initialSunriseBuff = false,
+  sunriseMultiplier: initialMult = 1,
+  sunriseTierLabel: initialTierLabel = null,
   onStatsChange,
 }: Props) {
   const { push } = useToast();
   const [pending, start] = useTransition();
   const [dayPoints, setDayPoints] = useState(initialPoints);
   const [streak, setStreak] = useState(initialStreak);
-  const [sunriseBuff, setSunriseBuff] = useState(initialSunriseBuff);
+  const [sunriseMult, setSunriseMult] = useState(initialMult);
+  const [sunriseTierLabel, setSunriseTierLabel] = useState(initialTierLabel);
   const [durationFor, setDurationFor] = useState<Protocol | null>(null);
   const [durationMins, setDurationMins] = useState(15);
 
@@ -101,11 +104,15 @@ export function ScheduleDay({
     streak: { current: number; best: number };
     count?: number;
     protocolId?: string;
-    sunriseBuffActive?: boolean;
+    sunriseMultiplier?: number;
+    sunriseTierLabel?: string | null;
   }) {
     setDayPoints(snap.dayPoints);
     setStreak(snap.streak);
-    if (snap.sunriseBuffActive != null) setSunriseBuff(snap.sunriseBuffActive);
+    if (snap.sunriseMultiplier != null) setSunriseMult(snap.sunriseMultiplier);
+    if (snap.sunriseTierLabel !== undefined) {
+      setSunriseTierLabel(snap.sunriseTierLabel);
+    }
     onStatsChange?.({ dayPoints: snap.dayPoints, streak: snap.streak });
     if (snap.protocolId != null && snap.count != null) {
       setCounts({
@@ -118,17 +125,10 @@ export function ScheduleDay({
 
   function protocolHint(p: Protocol): string {
     const max = maxLogsPerDay(p);
-    const sunrise = isSunriseProtocol(p);
-    const base = sunrise
-      ? p.points
-      : pointsForLog(p, null, { sunriseBuffActive: sunriseBuff });
-    const parts: string[] = [
-      sunrise
-        ? `${p.points} pts · unlocks ${SUNRISE_MULTIPLIER}× day`
-        : sunriseBuff
-          ? `${base} pts (${SUNRISE_MULTIPLIER}×)`
-          : `${p.points} pts`,
-    ];
+    const keystone = isSunriseKeystoneProtocol(p);
+    // Base points only on tags — day boost is shown once at the top
+    const parts: string[] = [`${p.points} pts`];
+    if (keystone) parts.push("morning light");
     if (p.allowsMultiple) parts.push(`up to ${max}×`);
     if (p.durationEnabled) {
       parts.push(`scales ~${p.referenceMinutes} min`);
@@ -154,8 +154,8 @@ export function ScheduleDay({
               ? ` · +${res.streakBonus} streak`
               : "";
           const buff =
-            isSunriseProtocol(protocol) && res.sunriseBuffActive
-              ? ` · ${SUNRISE_MULTIPLIER}× on other activities today`
+            isSunriseKeystoneProtocol(protocol) && res.sunriseMultiplier > 1
+              ? ` · ${formatSunriseMultiplier(res.sunriseMultiplier)} day boost`
               : "";
           push(`Done · +${res.points} pts${extra}${buff}`);
         } else {
@@ -334,18 +334,26 @@ export function ScheduleDay({
         hideTitle={hideTitle}
       />
 
-      {sunriseBuff ? (
+      {sunriseMult > 1 ? (
         <p className="rounded-2xl border border-accent/30 bg-accent/10 px-3.5 py-2.5 text-xs leading-relaxed text-accent">
-          <span className="font-semibold">Sunrise buff active · </span>
-          Other activities earn {SUNRISE_MULTIPLIER}× points today. Sunrise
-          logs keep their base value.
+          <span className="font-semibold">
+            {formatSunriseMultiplier(sunriseMult)} day boost
+          </span>
+          {sunriseTierLabel ? (
+            <span className="text-accent/90"> · {sunriseTierLabel}</span>
+          ) : null}
+          <span className="text-accent/80">
+            {" "}
+            — other activities earn {formatSunriseMultiplier(sunriseMult)}{" "}
+            today
+          </span>
         </p>
       ) : (
-        protocols.some(isSunriseProtocol) && (
+        protocols.some(isSunriseKeystoneProtocol) && (
           <p className="rounded-2xl border border-border px-3.5 py-2.5 text-xs leading-relaxed text-muted">
             <span className="font-medium text-foreground">Tip · </span>
-            Complete a sunrise activity to unlock {SUNRISE_MULTIPLIER}× on
-            everything else today.
+            Morning light boosts the rest of today: horizon 2× · open sky 1.5×
+            · outside 1.25×
           </p>
         )
       )}
@@ -480,13 +488,11 @@ export function ScheduleDay({
             <p className="mt-2 text-xs text-accent">
               ≈{" "}
               {pointsForLog(durationFor, durationMins, {
-                sunriseBuffActive:
-                  sunriseBuff && !isSunriseProtocol(durationFor),
+                sunriseMultiplier: isSunriseKeystoneProtocol(durationFor)
+                  ? 1
+                  : sunriseMult,
               })}{" "}
               pts this log
-              {sunriseBuff && !isSunriseProtocol(durationFor)
-                ? ` (${SUNRISE_MULTIPLIER}× sunrise)`
-                : ""}
             </p>
             <button
               type="button"

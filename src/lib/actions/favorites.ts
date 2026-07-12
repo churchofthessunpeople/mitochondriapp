@@ -1,10 +1,10 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { protocols, userFavorites, userScheduleItems } from "@/db/schema";
+import { revalidateApp } from "@/lib/revalidate-app";
 
 async function requireUserId() {
   const session = await auth();
@@ -13,12 +13,7 @@ async function requireUserId() {
 }
 
 function revalidateAvailable() {
-  revalidatePath("/app");
-  revalidatePath("/activities");
-  revalidatePath("/schedule");
-  revalidatePath("/place");
-  revalidatePath("/onboarding");
-  revalidatePath("/today");
+  revalidateApp();
 }
 
 /**

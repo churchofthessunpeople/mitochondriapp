@@ -11,12 +11,19 @@ import {
   type ReminderRow,
 } from "@/components/account-home";
 import type { AccountPanelUser } from "@/components/account-panel";
+import { AdminPanel } from "@/components/admin-panel";
+import { AppSheet } from "@/components/app-sheet";
+import { HistoryDayPanel } from "@/components/history-day-panel";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
+import { RegionBrowsePanel } from "@/components/region-browse-panel";
+import { ScoringGuidePanel } from "@/components/scoring-guide-panel";
 import { SunriseCheckIn } from "@/components/sunrise-check-in";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TodayHome } from "@/components/today-home";
 import type { AccountSection, AppTab } from "@/lib/app-tabs";
+import type { AppSheet as AppSheetState } from "@/lib/app-sheets";
 import type { PlaceFactors } from "@/lib/place-factors";
+import { ROUTES } from "@/lib/routes";
 import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
 import { cn } from "@/lib/utils";
@@ -41,6 +48,7 @@ export type AppShellProps = {
   placeLabel: string | null;
   postalCode: string | null;
   region: Region | null;
+  regions: Region[];
   sun: SunTimes | null;
   timeZone: string;
   phaseHint: string | null;
@@ -50,13 +58,15 @@ export type AppShellProps = {
   localHour: number;
   seasonLine: string | null;
   weekly: WeeklySummary | null;
-  sunriseBuffActive?: boolean;
+  sunriseMultiplier?: number;
+  sunriseTierLabel?: string | null;
   isTravel?: boolean;
   travelUntil?: string | null;
   homePostalCode?: string | null;
   travelLabel?: string | null;
   accountUser: AccountPanelUser;
   currentUserId: string;
+  isAdmin?: boolean;
   history: HistoryRow[];
   lifetimePoints: number;
   leaderboards: LeaderboardBoards;
@@ -71,7 +81,8 @@ export type AppShellProps = {
 };
 
 /**
- * Today & Account each use header + in-page tab rows (single-page cards).
+ * Today & Account are the only top-level destinations.
+ * Scoring, regions, day detail, admin open as in-page cards.
  */
 export function AppShell({
   initialTab,
@@ -86,6 +97,7 @@ export function AppShell({
   placeLabel,
   postalCode,
   region,
+  regions,
   sun,
   timeZone,
   phaseHint,
@@ -95,13 +107,15 @@ export function AppShell({
   localHour,
   seasonLine,
   weekly,
-  sunriseBuffActive: initialSunriseBuff = false,
+  sunriseMultiplier: initialSunriseMult = 1,
+  sunriseTierLabel: initialSunriseTierLabel = null,
   isTravel,
   travelUntil,
   homePostalCode,
   travelLabel,
   accountUser,
   currentUserId,
+  isAdmin = false,
   history,
   lifetimePoints,
   leaderboards,
@@ -110,13 +124,21 @@ export function AppShell({
   reminderSunPresets,
 }: AppShellProps) {
   const [tab, setTabState] = useState<AppTab>(initialTab);
+  const [sheet, setSheet] = useState<AppSheetState | null>(null);
   const [availableIds, setAvailableIds] = useState(initialAvailableIds);
-  const [sunriseBuffActive, setSunriseBuffActive] =
-    useState(initialSunriseBuff);
+  const [sunriseMultiplier, setSunriseMultiplier] =
+    useState(initialSunriseMult);
+  const [sunriseTierLabel, setSunriseTierLabel] = useState(
+    initialSunriseTierLabel,
+  );
 
   useEffect(() => {
-    setSunriseBuffActive(initialSunriseBuff);
-  }, [initialSunriseBuff]);
+    setSunriseMultiplier(initialSunriseMult);
+  }, [initialSunriseMult]);
+
+  useEffect(() => {
+    setSunriseTierLabel(initialSunriseTierLabel);
+  }, [initialSunriseTierLabel]);
 
   useEffect(() => {
     try {
@@ -136,9 +158,10 @@ export function AppShell({
   }, [availableIds, dayPoints, streak, dateLabel]);
 
   const setTab = useCallback((next: AppTab) => {
+    setSheet(null);
     setTabState(next);
     try {
-      const url = next === "schedule" ? "/app" : "/app?t=account";
+      const url = next === "schedule" ? ROUTES.home : ROUTES.account;
       window.history.replaceState(null, "", url);
     } catch {
       /* ignore */
@@ -150,15 +173,26 @@ export function AppShell({
     }
   }, []);
 
+  const openSheet = useCallback((next: AppSheetState) => {
+    setSheet(next);
+    try {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  const closeSheet = useCallback(() => setSheet(null), []);
+
   return (
     <div className="min-h-screen pb-24 md:pb-16">
       <SunriseCheckIn
         todayIso={todayIso}
-        sunriseBuffActive={sunriseBuffActive}
+        sunriseMultiplier={sunriseMultiplier}
         allProtocols={allProtocols}
         sun={sun}
         timeZone={timeZone}
-        onLogged={() => setSunriseBuffActive(true)}
+        onLogged={(mult) => setSunriseMultiplier(mult)}
       />
 
       <header
@@ -197,7 +231,7 @@ export function AppShell({
                   onClick={() => setTab(item.id)}
                   className={cn(
                     "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
-                    tab === item.id
+                    tab === item.id && !sheet
                       ? "bg-foreground/10 text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground",
                   )}
@@ -212,7 +246,47 @@ export function AppShell({
       </header>
 
       <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-8">
-        {tab === "schedule" && (
+        {sheet?.id === "scoring" && (
+          <AppSheet
+            title="How scores are calculated"
+            subtitle="Transparent 1–5 model for curated regions and ZIP-mapped scores. Educational / lifestyle only — not medical advice."
+            onClose={closeSheet}
+          >
+            <ScoringGuidePanel />
+          </AppSheet>
+        )}
+
+        {sheet?.id === "regions" && (
+          <AppSheet
+            title="Browse rated regions"
+            subtitle="Optional override of the nearest-match score from your ZIP."
+            onClose={closeSheet}
+          >
+            <RegionBrowsePanel
+              regions={regions}
+              currentId={region?.id ?? null}
+              onOpenSheet={openSheet}
+            />
+          </AppSheet>
+        )}
+
+        {sheet?.id === "historyDay" && (
+          <AppSheet title="Day detail" onClose={closeSheet}>
+            <HistoryDayPanel date={sheet.date} />
+          </AppSheet>
+        )}
+
+        {sheet?.id === "admin" && (
+          <AppSheet
+            title="Admin · protocols"
+            subtitle="Catalog management"
+            onClose={closeSheet}
+          >
+            <AdminPanel allowed={isAdmin} />
+          </AppSheet>
+        )}
+
+        {!sheet && tab === "schedule" && (
           <TodayHome
             dateLabel={dateLabel}
             allProtocols={allProtocols}
@@ -233,15 +307,17 @@ export function AppShell({
             localHour={localHour}
             seasonLine={seasonLine}
             weekly={weekly}
-            sunriseBuffActive={sunriseBuffActive}
+            sunriseMultiplier={sunriseMultiplier}
+            sunriseTierLabel={sunriseTierLabel}
             isTravel={isTravel}
             travelUntil={travelUntil}
             homePostalCode={homePostalCode}
             travelLabel={travelLabel}
+            onOpenSheet={openSheet}
           />
         )}
 
-        {tab === "account" && (
+        {!sheet && tab === "account" && (
           <AccountHome
             user={accountUser}
             initialSection={initialAccountSection}
@@ -252,6 +328,7 @@ export function AppShell({
             friends={friends}
             reminders={reminders}
             reminderSunPresets={reminderSunPresets}
+            onOpenSheet={openSheet}
           />
         )}
       </main>
@@ -262,7 +339,7 @@ export function AppShell({
       >
         <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">
           {NAV.map(({ id, label, icon: Icon }) => {
-            const active = tab === id;
+            const active = tab === id && !sheet;
             return (
               <li key={id} className="flex-1">
                 <button

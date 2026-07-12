@@ -58,26 +58,37 @@ function p(
 
 export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
-    id: "sunrise-grounding",
-    name: "Sunrise + grounding",
+    id: "sunrise-horizon",
+    name: "Sun over the horizon",
     description:
-      "See the sunrise with as much skin exposed as practical while bare skin contacts the earth. Unlocks 1.5× points on all other activities today.",
-    points: 10,
+      "Watch the sun come up over the horizon with bare eyes (no glass). Best morning signal — unlocks 2× on other activities today.",
+    points: 12,
     category: "light",
     timeOfDay: "sunrise",
     lockedTimeOfDay: "sunrise",
     sortOrder: 1,
   }),
   p({
-    id: "no-sunglasses-sunrise",
-    name: "No sunglasses at sunrise",
+    id: "sunrise-open-sky",
+    name: "Open-sky morning light",
     description:
-      "Full-spectrum morning light to the eyes without sunglasses at sunrise. Also unlocks the 1.5× sunrise buff for the day.",
-    points: 4,
+      "Outside under decent open skies in the morning (full-spectrum light to the eyes). Unlocks 1.5× on other activities today.",
+    points: 8,
     category: "light",
     timeOfDay: "sunrise",
     lockedTimeOfDay: "sunrise",
     sortOrder: 2,
+  }),
+  p({
+    id: "sunrise-outside",
+    name: "Outside morning light",
+    description:
+      "Got outside in the morning with limited sky view (trees, streets, heavy overcast). Unlocks 1.25× on other activities today.",
+    points: 5,
+    category: "light",
+    timeOfDay: "sunrise",
+    lockedTimeOfDay: "sunrise",
+    sortOrder: 3,
   }),
   p({
     id: "morning-natural-light",
@@ -134,13 +145,13 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     description: "Barefoot time on soil, grass, sand, or stone.",
     points: 6,
     category: "grounding",
-    timeOfDay: "sunrise",
+    timeOfDay: "morning",
     allowsMultiple: true,
     maxPerDay: 5,
     durationEnabled: true,
     referenceMinutes: 15,
     maxDurationMinutes: 60,
-    sortOrder: 3,
+    sortOrder: 12,
   }),
   p({
     id: "sunset-grounding",

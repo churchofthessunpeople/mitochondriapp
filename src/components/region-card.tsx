@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Region } from "@/db/schema";
 import { formatDistanceKm } from "@/lib/geo";
 import type { PlaceFactors } from "@/lib/place-factors";
@@ -174,10 +173,7 @@ export function RegionCard({
 
       <p className="mt-3 text-[10px] leading-relaxed text-muted">
         Scores and place factors are a lifestyle framework for the nearest
-        curated place — not a medical rating of your street.{" "}
-        <Link href="/app" className="text-accent hover:underline">
-          Back to app
-        </Link>
+        curated place — not a medical rating of your street.
       </p>
     </section>
   );

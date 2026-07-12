@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
 import { RegionCard } from "@/components/region-card";
 import { ScheduleDay } from "@/components/schedule-day";
 import { ZipForm } from "@/components/zip-form";
+import type { OpenAppSheet } from "@/lib/app-sheets";
 import type { PlaceFactors } from "@/lib/place-factors";
 import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
@@ -35,11 +35,13 @@ type Props = {
   localHour: number;
   seasonLine: string | null;
   weekly: WeeklySummary | null;
-  sunriseBuffActive: boolean;
+  sunriseMultiplier: number;
+  sunriseTierLabel?: string | null;
   isTravel?: boolean;
   travelUntil?: string | null;
   homePostalCode?: string | null;
   travelLabel?: string | null;
+  onOpenSheet?: OpenAppSheet;
 };
 
 const TABS: { id: TodaySection; label: string }[] = [
@@ -71,11 +73,13 @@ export function TodayHome({
   localHour,
   seasonLine,
   weekly,
-  sunriseBuffActive,
+  sunriseMultiplier,
+  sunriseTierLabel,
   isTravel,
   travelUntil,
   homePostalCode,
   travelLabel,
+  onOpenSheet,
 }: Props) {
   const hasPlace = Boolean(placeLabel || region);
   const [section, setSection] = useState<TodaySection>(
@@ -153,7 +157,8 @@ export function TodayHome({
             localHour={localHour}
             seasonLine={seasonLine}
             weekly={weekly}
-            sunriseBuffActive={sunriseBuffActive}
+            sunriseMultiplier={sunriseMultiplier}
+            sunriseTierLabel={sunriseTierLabel}
           />
         )}
 
@@ -161,12 +166,15 @@ export function TodayHome({
           <div className="space-y-4">
             <p className="text-sm text-muted">
               Sun times, lifestyle scores, and ZIP.{" "}
-              <Link
-                href="/region/scoring"
-                className="text-accent hover:underline"
-              >
-                How scoring works
-              </Link>
+              {onOpenSheet ? (
+                <button
+                  type="button"
+                  onClick={() => onOpenSheet({ id: "scoring" })}
+                  className="text-accent hover:underline"
+                >
+                  How scoring works
+                </button>
+              ) : null}
             </p>
 
             {(region || placeLabel) && sun ? (
@@ -198,12 +206,18 @@ export function TodayHome({
               travelUntil={travelUntil}
             />
 
-            <p className="text-center text-xs text-muted">
-              Override metro score?{" "}
-              <Link href="/region" className="text-accent hover:underline">
-                Browse rated regions
-              </Link>
-            </p>
+            {onOpenSheet ? (
+              <p className="text-center text-xs text-muted">
+                Override metro score?{" "}
+                <button
+                  type="button"
+                  onClick={() => onOpenSheet({ id: "regions" })}
+                  className="text-accent hover:underline"
+                >
+                  Browse rated regions
+                </button>
+              </p>
+            ) : null}
           </div>
         )}
 

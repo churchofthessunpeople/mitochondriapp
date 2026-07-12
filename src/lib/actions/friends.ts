@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq, or } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate-app";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { friendships, users } from "@/db/schema";
@@ -49,8 +49,7 @@ export async function sendFriendRequestAction(username: string) {
     status: "pending",
   });
 
-  revalidatePath("/friends");
-  revalidatePath("/leaderboard");
+  revalidateApp();
 }
 
 export async function respondFriendRequestAction(
@@ -84,6 +83,5 @@ export async function respondFriendRequestAction(
       .where(eq(friendships.id, friendshipId));
   }
 
-  revalidatePath("/friends");
-  revalidatePath("/leaderboard");
+  revalidateApp();
 }

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useActionState, Suspense } from "react";
 import { resetPasswordAction } from "@/lib/actions/password-reset";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ROUTES } from "@/lib/routes";
 
 function Form() {
   const sp = useSearchParams();
@@ -28,7 +29,7 @@ function Form() {
       {state.success && (
         <p className="text-sm text-accent">
           {state.success}{" "}
-          <Link href="/login" className="underline">
+          <Link href={ROUTES.login} className="underline">
             Sign in
           </Link>
         </p>

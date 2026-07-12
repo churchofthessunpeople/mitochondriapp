@@ -1,17 +1,20 @@
 "use server";
 
 import { and, desc, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { revalidateApp } from "@/lib/revalidate-app";
 import {
-  isSunriseProtocol,
+  bestSunriseTier,
+  formatSunriseMultiplier,
+  isSunriseKeystoneProtocol,
   maxLogsPerDay,
   pointsForLog,
   streakBonusPoints,
+  type SunriseTier,
 } from "@/lib/scoring";
 import { getUserStreak, hasStreakBonusToday } from "@/lib/streaks";
 
@@ -31,13 +34,7 @@ async function userToday(userId: string) {
 }
 
 function revalidateLogs() {
-  revalidatePath("/app");
-  revalidatePath("/schedule");
-  revalidatePath("/place");
-  revalidatePath("/today");
-  revalidatePath("/history");
-  revalidatePath("/leaderboard");
-  revalidatePath("/friends");
+  revalidateApp();
 }
 
 export type CompletionResult = {
@@ -47,6 +44,10 @@ export type CompletionResult = {
   dayPoints: number;
   streak: { current: number; best: number };
   count: number;
+  /** Best morning-light multiplier for the day (1 = none) */
+  sunriseMultiplier: number;
+  sunriseTierLabel: string | null;
+  /** @deprecated use sunriseMultiplier > 1 */
   sunriseBuffActive: boolean;
 };
 
@@ -57,36 +58,43 @@ async function daySnapshot(
 ): Promise<
   Pick<
     CompletionResult,
-    "dayPoints" | "streak" | "count" | "sunriseBuffActive"
+    | "dayPoints"
+    | "streak"
+    | "count"
+    | "sunriseMultiplier"
+    | "sunriseTierLabel"
+    | "sunriseBuffActive"
   >
 > {
-  const [stats, streak, sunriseBuffActive] = await Promise.all([
+  const [stats, streak, buff] = await Promise.all([
     getUserDayStats(userId, completedOn),
     getUserStreak(userId, completedOn),
-    hasSunriseBuffToday(userId, completedOn),
+    getSunriseBuffToday(userId, completedOn),
   ]);
   return {
     dayPoints: stats.points,
     streak,
     count: stats.completionCounts.get(protocolId) ?? 0,
-    sunriseBuffActive,
+    sunriseMultiplier: buff.multiplier,
+    sunriseTierLabel: buff.tier?.shortLabel ?? null,
+    sunriseBuffActive: buff.multiplier > 1,
   };
 }
 
-/** True if any sunrise-slot protocol was logged today (non-streak). */
-export async function hasSunriseBuffToday(
+export type SunriseBuffState = {
+  multiplier: number;
+  tier: SunriseTier | null;
+};
+
+/** Best morning-light tier logged today (non-streak). */
+export async function getSunriseBuffToday(
   userId: string,
   completedOn: string,
-): Promise<boolean> {
+): Promise<SunriseBuffState> {
   try {
     const rows = await db
-      .select({
-        protocolId: dailyCompletions.protocolId,
-        timeOfDay: protocols.timeOfDay,
-        lockedTimeOfDay: protocols.lockedTimeOfDay,
-      })
+      .select({ protocolId: dailyCompletions.protocolId })
       .from(dailyCompletions)
-      .innerJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
       .where(
         and(
           eq(dailyCompletions.userId, userId),
@@ -95,25 +103,33 @@ export async function hasSunriseBuffToday(
         ),
       );
 
-    return rows.some((r) =>
-      isSunriseProtocol({
-        timeOfDay: r.timeOfDay,
-        lockedTimeOfDay: r.lockedTimeOfDay,
-      }),
-    );
+    const tier = bestSunriseTier(rows.map((r) => r.protocolId));
+    return {
+      multiplier: tier?.multiplier ?? 1,
+      tier,
+    };
   } catch {
-    return false;
+    return { multiplier: 1, tier: null };
   }
 }
 
+/** @deprecated use getSunriseBuffToday */
+export async function hasSunriseBuffToday(
+  userId: string,
+  completedOn: string,
+): Promise<boolean> {
+  const b = await getSunriseBuffToday(userId, completedOn);
+  return b.multiplier > 1;
+}
+
 /**
- * Recompute pointsEarned for all real logs today with current sunrise buff state.
- * Sunrise protocols keep base; others get 1.5× when buff is active.
+ * Recompute pointsEarned for all real logs today with current sunrise buff.
+ * Keystone morning-light protocols keep base; others get the best tier mult.
  */
 async function recomputeDayPoints(
   userId: string,
   completedOn: string,
-  sunriseBuffActive: boolean,
+  sunriseMultiplier: number,
 ) {
   const rows = await db
     .select({
@@ -135,7 +151,7 @@ async function recomputeDayPoints(
 
   for (const row of rows) {
     const next = pointsForLog(row.protocol, row.durationMinutes, {
-      sunriseBuffActive,
+      sunriseMultiplier,
     });
     if (next !== row.pointsEarned) {
       await db
@@ -186,7 +202,7 @@ export async function logCompletionAction(
 
   const count = existing.length;
   const max = maxLogsPerDay(protocol);
-  const wasSunrise = isSunriseProtocol(protocol);
+  const wasKeystone = isSunriseKeystoneProtocol(protocol);
 
   if (!protocol.allowsMultiple) {
     if (count > 0) {
@@ -198,9 +214,8 @@ export async function logCompletionAction(
             eq(dailyCompletions.userId, userId),
           ),
         );
-      // If we removed a sunrise, drop 1.5× from other logs; if not, recompute is no-op-ish
-      const buff = await hasSunriseBuffToday(userId, completedOn);
-      await recomputeDayPoints(userId, completedOn, buff);
+      const buff = await getSunriseBuffToday(userId, completedOn);
+      await recomputeDayPoints(userId, completedOn, buff.multiplier);
       revalidateLogs();
       const snap = await daySnapshot(userId, completedOn, protocolId);
       return { action: "removed", points: 0, ...snap };
@@ -209,13 +224,12 @@ export async function logCompletionAction(
     throw new Error(`Daily limit reached (${max}× for this activity).`);
   }
 
-  // Buff from *existing* sunrise logs (this new log isn't counted yet)
-  const buffBefore = await hasSunriseBuffToday(userId, completedOn);
-  // If logging sunrise, other activities will get buff after this insert
-  const buffForThisLog = wasSunrise ? false : buffBefore;
+  const buffBefore = await getSunriseBuffToday(userId, completedOn);
+  // Keystones never receive the mult; other logs use best tier so far
+  const multForThisLog = wasKeystone ? 1 : buffBefore.multiplier;
 
   const points = pointsForLog(protocol, options?.durationMinutes, {
-    sunriseBuffActive: buffForThisLog,
+    sunriseMultiplier: multForThisLog,
   });
 
   await db.insert(dailyCompletions).values({
@@ -228,9 +242,10 @@ export async function logCompletionAction(
     isStreakBonus: false,
   });
 
-  // First sunrise of the day: retroactively apply 1.5× to earlier non-sunrise logs
-  if (wasSunrise) {
-    await recomputeDayPoints(userId, completedOn, true);
+  // New/better keystone: retroactively apply best mult to non-keystone logs
+  if (wasKeystone) {
+    const buffAfter = await getSunriseBuffToday(userId, completedOn);
+    await recomputeDayPoints(userId, completedOn, buffAfter.multiplier);
   }
 
   let streakBonus = 0;
@@ -262,11 +277,8 @@ export async function removeOneCompletionAction(
   const userId = await requireUser();
   const completedOn = await userToday(userId);
 
-  const [latest] = await db
-    .select({
-      id: dailyCompletions.id,
-      protocolId: dailyCompletions.protocolId,
-    })
+  const [row] = await db
+    .select()
     .from(dailyCompletions)
     .where(
       and(
@@ -279,20 +291,19 @@ export async function removeOneCompletionAction(
     .orderBy(desc(dailyCompletions.createdAt))
     .limit(1);
 
-  if (latest) {
-    await db
-      .delete(dailyCompletions)
-      .where(
-        and(
-          eq(dailyCompletions.id, latest.id),
-          eq(dailyCompletions.userId, userId),
-        ),
-      );
-
-    const buff = await hasSunriseBuffToday(userId, completedOn);
-    await recomputeDayPoints(userId, completedOn, buff);
+  if (!row) {
+    const snap = await daySnapshot(userId, completedOn, protocolId);
+    return { action: "removed", points: 0, ...snap };
   }
 
+  await db
+    .delete(dailyCompletions)
+    .where(
+      and(eq(dailyCompletions.id, row.id), eq(dailyCompletions.userId, userId)),
+    );
+
+  const buff = await getSunriseBuffToday(userId, completedOn);
+  await recomputeDayPoints(userId, completedOn, buff.multiplier);
   revalidateLogs();
   const snap = await daySnapshot(userId, completedOn, protocolId);
   return { action: "removed", points: 0, ...snap };
@@ -300,4 +311,11 @@ export async function removeOneCompletionAction(
 
 export async function toggleCompletionAction(protocolId: string) {
   return logCompletionAction(protocolId);
+}
+
+/** Toast helper text after logging a keystone */
+export function sunriseBoostToast(mult: number, label: string | null): string {
+  if (mult <= 1) return "";
+  const who = label ? `${label} · ` : "";
+  return ` · ${who}${formatSunriseMultiplier(mult)} on other activities today`;
 }

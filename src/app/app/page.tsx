@@ -32,15 +32,16 @@ import {
   sunPhaseHint,
 } from "@/lib/place-factors";
 import { seasonCoachLine } from "@/lib/checklist-order";
-import { getRegionById } from "@/lib/regions";
+import { getRegionById, listRegions } from "@/lib/regions";
 import {
   getUserAppFlags,
   redirectIfNeedsOnboarding,
 } from "@/lib/require-onboarding";
-import { hasSunriseBuffToday } from "@/lib/actions/completions";
+import { getSunriseBuffToday } from "@/lib/actions/completions";
 import { getUserStreak } from "@/lib/streaks";
 import { formatTimeInZone, getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 import { displayTimeToHm, shiftHm } from "@/lib/time-hm";
+import { ROUTES } from "@/lib/routes";
 import { getWeeklySummary } from "@/lib/weekly";
 
 export const metadata = { title: "Home" };
@@ -51,7 +52,7 @@ export default async function AppPage({
   searchParams: Promise<{ t?: string }>;
 }) {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect(ROUTES.login);
   await redirectIfNeedsOnboarding(session.user.id);
 
   const params = await searchParams;
@@ -72,7 +73,7 @@ export default async function AppPage({
       .then((r) => r[0] ?? null),
   ]);
 
-  if (!fullUser) redirect("/login");
+  if (!fullUser) redirect(ROUTES.login);
 
   const loc = effectiveLocation({
     ...userFlags!,
@@ -91,7 +92,7 @@ export default async function AppPage({
     streak,
     weekly,
     region,
-    sunriseBuffActive,
+    sunriseBuff,
     history,
     lifetimePoints,
     lightWeek,
@@ -101,12 +102,13 @@ export default async function AppPage({
     friendsWeek,
     friendships,
     reminderRows,
+    regions,
   ] = await Promise.all([
     getUserDayStats(userId, date),
     getUserStreak(userId, date),
     getWeeklySummary(userId, date),
     getRegionById(userFlags?.regionId),
-    hasSunriseBuffToday(userId, date),
+    getSunriseBuffToday(userId, date),
     getUserHistory(userId, 45),
     getUserTotalPoints(userId),
     getWeeklyLightLeaderboard(25),
@@ -122,7 +124,15 @@ export default async function AppPage({
       : Promise.resolve([]),
     getFriendships(userId),
     db.select().from(userReminders).where(eq(userReminders.userId, userId)),
+    listRegions(),
   ]);
+
+  const isAdmin =
+    Boolean(fullUser.isAdmin) ||
+    (process.env.ADMIN_USERNAMES?.split(",")
+      .map((s) => s.trim().toLowerCase())
+      .includes(fullUser.username ?? "") ??
+      false);
 
   const hasCoords = loc.latitude != null && loc.longitude != null;
   const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
@@ -219,8 +229,10 @@ export default async function AppPage({
       placeLabel={loc.placeLabel ?? null}
       postalCode={userFlags?.postalCode ?? null}
       region={region}
+      regions={regions}
       sun={sun}
       timeZone={tz}
+      isAdmin={isAdmin}
       phaseHint={phaseHint}
       placeFactors={placeFactors}
       distanceKm={distanceKm}
@@ -228,7 +240,8 @@ export default async function AppPage({
       localHour={localHour}
       seasonLine={seasonLine}
       weekly={weekly}
-      sunriseBuffActive={sunriseBuffActive}
+      sunriseMultiplier={sunriseBuff.multiplier}
+      sunriseTierLabel={sunriseBuff.tier?.shortLabel ?? null}
       isTravel={loc.isTravel}
       travelUntil={loc.travelUntil}
       homePostalCode={userFlags?.postalCode ?? null}

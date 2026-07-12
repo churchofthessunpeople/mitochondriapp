@@ -1,11 +1,11 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { revalidateApp } from "@/lib/revalidate-app";
 
 async function uid() {
   const s = await auth();
@@ -26,7 +26,7 @@ export async function updateRecoveryEmailAction(
     .update(users)
     .set({ email: raw || null })
     .where(eq(users.id, userId));
-  revalidatePath("/account");
+  revalidateApp();
   return { success: raw ? "Recovery email saved." : "Recovery email cleared." };
 }
 
@@ -42,10 +42,7 @@ export async function updateTimezoneAction(
     return { error: "Invalid timezone" };
   }
   await db.update(users).set({ timezone: tz }).where(eq(users.id, userId));
-  revalidatePath("/account");
-  revalidatePath("/app");
-  revalidatePath("/place");
-  revalidatePath("/today");
+  revalidateApp();
   return { success: "Timezone updated." };
 }
 
@@ -55,9 +52,7 @@ export async function updateLeaderboardVisibilityAction(show: boolean) {
     .update(users)
     .set({ showOnLeaderboard: show })
     .where(eq(users.id, userId));
-  revalidatePath("/leaderboard");
-  revalidatePath("/account");
-  revalidatePath("/app");
+  revalidateApp();
 }
 
 /** Form-friendly: flip current visibility. */

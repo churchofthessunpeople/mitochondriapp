@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate-app";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { userReminders } from "@/db/schema";
@@ -21,8 +21,7 @@ export async function saveReminderAction(label: string, localTime: string) {
     localTime,
     enabled: true,
   });
-  revalidatePath("/account");
-  revalidatePath("/reminders");
+  revalidateApp();
 }
 
 export async function deleteReminderAction(id: string) {
@@ -30,5 +29,5 @@ export async function deleteReminderAction(id: string) {
   await db
     .delete(userReminders)
     .where(and(eq(userReminders.id, id), eq(userReminders.userId, userId)));
-  revalidatePath("/reminders");
+  revalidateApp();
 }

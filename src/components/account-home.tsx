@@ -21,6 +21,8 @@ import {
   toggleLeaderboardVisibilityFormAction,
 } from "@/lib/actions/profile";
 import type { AccountSection } from "@/lib/app-tabs";
+import type { OpenAppSheet } from "@/lib/app-sheets";
+import { ROUTES } from "@/lib/routes";
 import { cn, formatPoints } from "@/lib/utils";
 
 export type FriendRow = {
@@ -66,6 +68,7 @@ type Props = {
     beforeSunset?: string | null;
     afterSunrise?: string | null;
   };
+  onOpenSheet?: OpenAppSheet;
 };
 
 /**
@@ -81,6 +84,7 @@ export function AccountHome({
   friends,
   reminders,
   reminderSunPresets,
+  onOpenSheet,
 }: Props) {
   const [section, setSection] = useState<Section>(
     initialSection && initialSection !== null ? initialSection : "history",
@@ -96,7 +100,7 @@ export function AccountHome({
       window.history.replaceState(
         null,
         "",
-        next === "history" ? "/app?t=account" : `/app?t=${next}`,
+        next === "history" ? ROUTES.account : `/app?t=${next}`,
       );
     } catch {
       /* ignore */
@@ -159,9 +163,16 @@ export function AccountHome({
               </span>{" "}
               · last 45 days
             </p>
-            <HistoryList rows={history} linkDays={false} />
+            <HistoryList
+              rows={history}
+              onSelectDay={
+                onOpenSheet
+                  ? (date) => onOpenSheet({ id: "historyDay", date })
+                  : undefined
+              }
+            />
             <p className="text-center text-sm">
-              <a href="/api/export/csv" className="text-accent hover:underline">
+              <a href={ROUTES.exportCsv} className="text-accent hover:underline">
                 Export all logs (CSV)
               </a>
             </p>
@@ -268,14 +279,17 @@ export function AccountHome({
             </section>
 
             <div className="flex flex-wrap gap-2 text-sm">
+              {onOpenSheet ? (
+                <button
+                  type="button"
+                  onClick={() => onOpenSheet({ id: "admin" })}
+                  className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
+                >
+                  Admin
+                </button>
+              ) : null}
               <a
-                href="/admin"
-                className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
-              >
-                Admin
-              </a>
-              <a
-                href="/api/export/csv"
+                href={ROUTES.exportCsv}
                 className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
               >
                 Export CSV

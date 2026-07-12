@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { requestPasswordResetAction } from "@/lib/actions/password-reset";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ROUTES } from "@/lib/routes";
 
 export default function ForgotPasswordPage() {
   const [state, action, pending] = useActionState(requestPasswordResetAction, {});
@@ -47,7 +48,7 @@ export default function ForgotPasswordPage() {
           </button>
         </form>
         <p className="mt-6 text-center text-sm">
-          <Link href="/login" className="text-accent hover:underline">
+          <Link href={ROUTES.login} className="text-accent hover:underline">
             Back to sign in
           </Link>
         </p>

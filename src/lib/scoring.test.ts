@@ -1,14 +1,18 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  bestSunriseTier,
+  formatSunriseMultiplier,
+  isSunriseKeystoneProtocol,
   isSunriseProtocol,
   maxLogsPerDay,
   pointsForLog,
   streakBonusPoints,
-  SUNRISE_MULTIPLIER,
+  sunriseTierForProtocolId,
 } from "./scoring";
 
 const morning = {
+  id: "morning-natural-light",
   points: 10,
   durationEnabled: true,
   referenceMinutes: 10,
@@ -17,8 +21,9 @@ const morning = {
   lockedTimeOfDay: null as null,
 };
 
-const sunrise = {
-  points: 10,
+const sunriseHorizon = {
+  id: "sunrise-horizon",
+  points: 12,
   durationEnabled: false,
   referenceMinutes: 10,
   maxDurationMinutes: 60,
@@ -39,24 +44,63 @@ describe("pointsForLog", () => {
     assert.equal(pointsForLog(morning, 120), 60);
   });
 
-  it("applies 1.5× to non-sunrise when buff active", () => {
+  it("applies tier multiplier to non-keystone when set", () => {
     assert.equal(
-      pointsForLog(morning, null, { sunriseBuffActive: true }),
-      Math.round(10 * SUNRISE_MULTIPLIER),
+      pointsForLog(morning, null, { sunriseMultiplier: 2 }),
+      20,
+    );
+    assert.equal(
+      pointsForLog(morning, null, { sunriseMultiplier: 1.25 }),
+      Math.round(10 * 1.25),
     );
   });
 
-  it("does not multiply sunrise itself", () => {
+  it("does not multiply keystone sunrise itself", () => {
     assert.equal(
-      pointsForLog(sunrise, null, { sunriseBuffActive: true }),
-      10,
+      pointsForLog(sunriseHorizon, null, { sunriseMultiplier: 2 }),
+      12,
+    );
+  });
+});
+
+describe("sunrise tiers", () => {
+  it("maps protocols to tiers", () => {
+    assert.equal(sunriseTierForProtocolId("sunrise-horizon")?.multiplier, 2);
+    assert.equal(sunriseTierForProtocolId("sunrise-open-sky")?.multiplier, 1.5);
+    assert.equal(sunriseTierForProtocolId("sunrise-outside")?.multiplier, 1.25);
+    assert.equal(sunriseTierForProtocolId("sunrise-grounding")?.multiplier, 2);
+  });
+
+  it("picks best of day", () => {
+    const best = bestSunriseTier([
+      "sunrise-outside",
+      "sunrise-horizon",
+      "sunrise-open-sky",
+    ]);
+    assert.equal(best?.id, "horizon");
+    assert.equal(best?.multiplier, 2);
+  });
+
+  it("formats multipliers", () => {
+    assert.equal(formatSunriseMultiplier(2), "2×");
+    assert.equal(formatSunriseMultiplier(1.5), "1.5×");
+  });
+});
+
+describe("isSunriseKeystoneProtocol", () => {
+  it("only named keystones", () => {
+    assert.equal(isSunriseKeystoneProtocol(sunriseHorizon), true);
+    assert.equal(isSunriseKeystoneProtocol(morning), false);
+    assert.equal(
+      isSunriseKeystoneProtocol({ id: "barefoot-earth" }),
+      false,
     );
   });
 });
 
 describe("isSunriseProtocol", () => {
   it("detects locked sunrise", () => {
-    assert.equal(isSunriseProtocol(sunrise), true);
+    assert.equal(isSunriseProtocol(sunriseHorizon), true);
     assert.equal(isSunriseProtocol(morning), false);
   });
 });

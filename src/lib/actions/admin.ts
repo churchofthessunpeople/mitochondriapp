@@ -1,7 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate-app";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/db";
@@ -88,13 +88,26 @@ export async function upsertProtocolAction(formData: FormData) {
       },
     });
 
-  revalidatePath("/today");
-  revalidatePath("/admin");
+  revalidateApp();
 }
 
 export async function deleteProtocolAction(id: string) {
   await requireAdmin();
   await db.update(protocols).set({ active: false }).where(eq(protocols.id, id));
-  revalidatePath("/admin");
-  revalidatePath("/today");
+  revalidateApp();
+}
+
+export async function listAdminProtocolsAction() {
+  await requireAdmin();
+  const rows = await db
+    .select({
+      id: protocols.id,
+      name: protocols.name,
+      category: protocols.category,
+      points: protocols.points,
+      active: protocols.active,
+    })
+    .from(protocols)
+    .orderBy(protocols.sortOrder);
+  return rows;
 }

@@ -7,15 +7,16 @@ import { getUserFavoriteIds } from "@/lib/favorites";
 import { STARTER_PROTOCOL_IDS } from "@/lib/onboarding";
 import { getOnboardingStatus } from "@/lib/require-onboarding";
 import { logoutAction } from "@/lib/actions/auth";
+import { ROUTES } from "@/lib/routes";
 
 export const metadata = { title: "Get started" };
 
 export default async function OnboardingPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect(ROUTES.login);
 
   const status = await getOnboardingStatus(session.user.id);
-  if (status?.onboardingComplete) redirect("/app");
+  if (status?.onboardingComplete) redirect(ROUTES.home);
 
   const [protocols, availableIds] = await Promise.all([
     getActiveProtocols(),

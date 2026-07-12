@@ -7,6 +7,7 @@ import { PlaceStrip } from "@/components/place-strip";
 import { RegionCard } from "@/components/region-card";
 import { ZipForm } from "@/components/zip-form";
 import type { PlaceFactors } from "@/lib/place-factors";
+import { ROUTES } from "@/lib/routes";
 import type { SunTimes } from "@/lib/sun";
 import { cn } from "@/lib/utils";
 
@@ -91,7 +92,7 @@ export function PlaceExpand({
                 {dateLabel ? `${dateLabel} · ` : null}
                 Full place context — scores, factors, ZIP / travel.{" "}
                 <Link
-                  href="/region/scoring"
+                  href={ROUTES.regionScoring}
                   className="text-accent hover:underline"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -131,7 +132,7 @@ export function PlaceExpand({
               <p className="text-center text-xs text-muted">
                 Override metro score?{" "}
                 <Link
-                  href="/region"
+                  href={ROUTES.regionBrowse}
                   className="text-accent hover:underline"
                 >
                   Browse rated regions

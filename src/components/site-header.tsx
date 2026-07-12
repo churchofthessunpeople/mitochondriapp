@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { logoutAction } from "@/lib/actions/auth";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 /**
@@ -10,8 +11,8 @@ import { cn } from "@/lib/utils";
  * Nav only points at the SPA shell — never old multi-page routes.
  */
 const nav = [
-  { href: "/app", label: "Today", key: "today" },
-  { href: "/app?t=account", label: "Account", key: "account" },
+  { href: ROUTES.home, label: "Today", key: "today" },
+  { href: ROUTES.account, label: "Account", key: "account" },
 ] as const;
 
 export async function SiteHeader({
@@ -40,7 +41,7 @@ export async function SiteHeader({
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
         <Link
-          href={session ? "/app" : "/"}
+          href={session ? ROUTES.home : "/"}
           className="flex min-w-0 items-center gap-2"
         >
           <Image
@@ -89,13 +90,13 @@ export async function SiteHeader({
           ) : (
             <nav className="flex items-center gap-1 sm:gap-2">
               <Link
-                href="/login"
+                href={ROUTES.login}
                 className="rounded-full px-3 py-1.5 text-sm text-muted transition hover:text-foreground"
               >
                 Log in
               </Link>
               <Link
-                href="/register"
+                href={ROUTES.register}
                 className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-on-accent transition hover:brightness-110"
               >
                 Get started

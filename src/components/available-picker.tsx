@@ -7,6 +7,7 @@ import type { Protocol, ProtocolCategory } from "@/db/schema";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import { useToast } from "@/components/toast";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -103,7 +104,7 @@ export function AvailablePicker({
                   Today&apos;s checklist
                 </button>
               ) : (
-                <Link href="/app" className="text-accent hover:underline">
+                <Link href={ROUTES.home} className="text-accent hover:underline">
                   Today&apos;s checklist
                 </Link>
               )}

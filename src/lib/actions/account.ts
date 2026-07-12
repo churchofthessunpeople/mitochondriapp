@@ -2,8 +2,9 @@
 
 import bcrypt from "bcryptjs";
 import { and, eq, ne, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidateApp } from "@/lib/revalidate-app";
 import { z } from "zod";
+import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -14,6 +15,7 @@ import {
   consumeRateLimit,
   getClientIp,
 } from "@/lib/rate-limit";
+import { ROUTES } from "@/lib/routes";
 import { usernameSchema } from "@/lib/username";
 
 export type AccountFormState = {
@@ -66,9 +68,7 @@ export async function updateDisplayNameAction(
     })
     .where(eq(users.id, userId));
 
-  revalidatePath("/account");
-  revalidatePath("/leaderboard");
-  revalidatePath("/today");
+  revalidateApp();
 
   return { success: "Display name updated." };
 }
@@ -136,8 +136,7 @@ export async function updateUsernameAction(
     .set({ username })
     .where(eq(users.id, userId));
 
-  revalidatePath("/account");
-  revalidatePath("/leaderboard");
+  revalidateApp();
 
   return { success: "Username updated. Use it next time you sign in." };
 }
@@ -206,9 +205,8 @@ export async function updatePasswordAction(
     })
     .where(eq(users.id, userId));
 
-  revalidatePath("/account");
+  revalidateApp();
 
-  await signOut({ redirectTo: "/login?passwordUpdated=1" });
-
-  return { success: "Password updated. Please sign in again." };
+  await signOut({ redirect: false });
+  redirect(`${ROUTES.login}?passwordUpdated=1`);
 }
