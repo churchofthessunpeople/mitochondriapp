@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { SiteHeader } from "@/components/site-header";
+import { AppChrome } from "@/components/app-chrome";
 import {
   VOLCANIC_HOTSPOTS,
   compositeHealthRating,
@@ -16,7 +15,6 @@ export default async function RegionScoringPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  // Demo numbers for the docs
   const demoLat = 13.7;
   const demoLon = -89.2;
   const sun = sunScoreFromLatitude(demoLat);
@@ -27,14 +25,10 @@ export default async function RegionScoringPage() {
   });
 
   return (
-    <div className="min-h-screen pb-24 md:pb-16">
-      <SiteHeader active="account" />
-      <main className="mx-auto max-w-2xl space-y-8 px-4 py-8 sm:px-6">
+    <AppChrome backHref="/app" backLabel="← Back to app">
+      <div className="space-y-8">
         <div>
-          <Link href="/region" className="text-sm text-accent hover:underline">
-            ← Region
-          </Link>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">
+          <h1 className="text-3xl font-semibold tracking-tight">
             How scores are calculated
           </h1>
           <p className="mt-2 text-sm text-muted">
@@ -147,8 +141,7 @@ export default async function RegionScoringPage() {
           </ul>
           <p className="text-xs text-muted">
             Clamped to 1–5. Example El Salvador (BTC legal tender + outdoor) →
-            policy {pol}. Example UK factors (CBDC pressure + surveillance +
-            border stress, low crypto friendliness) → low policy band.
+            policy {pol}.
           </p>
         </section>
 
@@ -167,53 +160,22 @@ export default async function RegionScoringPage() {
         </section>
 
         <section className="glass space-y-3 rounded-3xl p-5">
-          <h2 className="text-lg font-semibold">5. Place factors (extra context)</h2>
+          <h2 className="text-lg font-semibold">5. Place factors</h2>
           <p className="text-sm text-muted">
-            Shown under your scores — facts and labels, not extra 1–5 ratings:
-          </p>
-          <ul className="space-y-1 text-sm">
-            <li>
-              <strong>Solar noon</strong> — local clock time of peak sun path
-            </li>
-            <li>
-              <strong>Latitude + band</strong> — tropics → high latitude (same
-              bands as sun score)
-            </li>
-            <li>
-              <strong>UV season</strong> — year-round vs seasonal window from
-              latitude
-            </li>
-            <li>
-              <strong>Elevation</strong> — meters/feet from a free elevation API
-              (stronger UV per minute at altitude)
-            </li>
-            <li>
-              <strong>Nearest magma</strong> — closest free-flowing magma /
-              volcanic system in our catalog (not under your house). Distance
-              drives the magnetism score; far away = lower magnetism.
-            </li>
-          </ul>
-          <p className="text-xs text-muted">
-            Today also shows a short sun-phase hint (night / sunrise / day /
-            sunset) for light timing.
+            Extra context on Place (not extra 1–5 scores): solar noon, latitude
+            band, UV season, elevation, nearest magma system.
           </p>
         </section>
 
         <section className="glass space-y-2 rounded-3xl p-5 text-sm text-muted">
-          <h2 className="text-lg font-semibold text-foreground">
-            ZIP codes
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">ZIP codes</h2>
           <p>
-            Your ZIP sets <em>exact</em> lat/lng for sunrise/sunset and place
-            factors. The 1–5 lifestyle score still comes from the nearest
-            curated region (so we do not invent policy stories for every street).
-          </p>
-          <p>
-            Over time we can auto-score any lat/lng with sun + volcano distance,
-            and only hand-tune policy flags for places people care about.
+            Your ZIP sets exact lat/lng for sunrise/sunset and place factors.
+            The 1–5 lifestyle score still comes from the nearest curated
+            region.
           </p>
         </section>
-      </main>
-    </div>
+      </div>
+    </AppChrome>
   );
 }

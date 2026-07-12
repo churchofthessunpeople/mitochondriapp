@@ -5,29 +5,33 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { logoutAction } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 
+/**
+ * Legacy header for pages not yet fully folded into /app.
+ * Nav only points at the SPA shell — never old multi-page routes.
+ */
 const nav = [
-  { href: "/schedule", label: "Schedule", key: "schedule" },
-  { href: "/place", label: "Place", key: "place" },
-  { href: "/activities", label: "Activities", key: "activities" },
-  { href: "/account", label: "Account", key: "account" },
+  { href: "/app", label: "Today", key: "today" },
+  { href: "/app?t=account", label: "Account", key: "account" },
 ] as const;
 
 export async function SiteHeader({
   active,
 }: {
-  active?:
-    | "place"
-    | "schedule"
-    | "activities"
-    | "today"
-    | "history"
-    | "leaderboard"
-    | "account"
-    | "home";
+  active?: string;
 }) {
   const session = await auth();
-  // Legacy "today" maps to schedule (daily home)
-  const activeKey = active === "today" ? "schedule" : active;
+  const activeKey =
+    active === "schedule" ||
+    active === "place" ||
+    active === "activities" ||
+    active === "today" ||
+    active === "home"
+      ? "today"
+      : active === "history" ||
+          active === "leaderboard" ||
+          active === "account"
+        ? "account"
+        : active;
 
   return (
     <header
@@ -51,7 +55,7 @@ export async function SiteHeader({
               Mitochondriapp
             </div>
             <div className="hidden text-[11px] text-muted sm:block">
-              Light · Magnetism · Protocol
+              Light · Place · Protocol
             </div>
           </div>
         </Link>
@@ -63,7 +67,6 @@ export async function SiteHeader({
                 <Link
                   key={item.href}
                   href={item.href}
-                  prefetch
                   className={cn(
                     "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
                     activeKey === item.key

@@ -176,7 +176,7 @@ export function RegionCard({
         Scores and place factors are a lifestyle framework for the nearest
         curated place — not a medical rating of your street.{" "}
         <Link href="/app" className="text-accent hover:underline">
-          Change ZIP or region
+          Back to app
         </Link>
       </p>
     </section>

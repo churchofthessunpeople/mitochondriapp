@@ -2,19 +2,19 @@ import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { AppChrome } from "@/components/app-chrome";
 import { RegionCard } from "@/components/region-card";
 import { RegionPicker } from "@/components/region-picker";
 import { ZipForm } from "@/components/zip-form";
-import { SiteHeader } from "@/components/site-header";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { haversineKm } from "@/lib/geo";
-import { buildPlaceFactorsWithElevation } from "@/lib/place-factors";
+import { buildPlaceFactors } from "@/lib/place-factors";
 import { getRegionById, listRegions } from "@/lib/regions";
 import { redirectIfNeedsOnboarding } from "@/lib/require-onboarding";
 import { getSunTimesForLocalDay } from "@/lib/sun";
 
-export const metadata = { title: "Region" };
+export const metadata = { title: "Browse regions" };
 
 export default async function RegionPage() {
   const session = await auth();
@@ -29,6 +29,7 @@ export default async function RegionPage() {
       latitude: users.latitude,
       longitude: users.longitude,
       timezone: users.timezone,
+      elevationM: users.elevationM,
     })
     .from(users)
     .where(eq(users.id, session.user.id))
@@ -49,11 +50,12 @@ export default async function RegionPage() {
 
   const placeFactors =
     sun && sunLat != null && sunLng != null
-      ? await buildPlaceFactorsWithElevation({
+      ? buildPlaceFactors({
           latitude: sunLat,
           longitude: sunLng,
           sun,
           timeZone: tz,
+          elevationM: user?.elevationM ?? null,
         })
       : null;
 
@@ -70,56 +72,46 @@ export default async function RegionPage() {
   const hasAssignment = Boolean(region || user?.placeLabel);
 
   return (
-    <div className="min-h-screen pb-24 md:pb-16">
-      <SiteHeader active="account" />
-      <main className="mx-auto max-w-lg px-4 py-8 sm:px-6">
-        <Link href="/place" className="text-sm text-accent hover:underline">
-          ← Place
+    <AppChrome backHref="/app" backLabel="← Back to app">
+      <h1 className="text-3xl font-semibold tracking-tight">
+        Browse rated regions
+      </h1>
+      <p className="mt-2 text-sm text-muted">
+        Optional override of the nearest-match score from your ZIP.{" "}
+        <Link href="/region/scoring" className="text-accent hover:underline">
+          How scoring works
         </Link>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-          Location & region
-        </h1>
-        <p className="mt-2 text-sm text-muted">
-          Enter a US ZIP for sunrise/sunset at your coordinates. We assign the
-          nearest lifestyle score automatically.{" "}
-          <Link href="/region/scoring" className="text-accent hover:underline">
-            How scoring works
-          </Link>
-        </p>
+      </p>
 
-        {/* Primary: assigned region after ZIP */}
-        <div className="mt-6">
-          {hasAssignment && sun ? (
-            <RegionCard
-              region={region}
-              sun={sun}
-              placeLabel={user?.placeLabel}
-              postalCode={user?.postalCode}
-              distanceKm={distanceKm}
-              timeZone={tz}
-              placeFactors={placeFactors}
-            />
-          ) : (
-            <div className="glass rounded-3xl border border-dashed border-border p-5 text-sm text-muted">
-              No location yet. Enter your ZIP below — your assigned region and
-              sun times will show here.
-            </div>
-          )}
-        </div>
-
-        <div className="mt-6">
-          <ZipForm currentZip={user?.postalCode} />
-        </div>
-
-        {/* Full catalog collapsed */}
-        <div className="mt-8">
-          <RegionPicker
-            regions={regions}
-            currentId={user?.regionId ?? null}
-            defaultExpanded={false}
+      <div className="mt-6">
+        {hasAssignment && sun ? (
+          <RegionCard
+            region={region}
+            sun={sun}
+            placeLabel={user?.placeLabel}
+            postalCode={user?.postalCode}
+            distanceKm={distanceKm}
+            timeZone={tz}
+            placeFactors={placeFactors}
           />
-        </div>
-      </main>
-    </div>
+        ) : (
+          <div className="glass rounded-3xl border border-dashed border-border p-5 text-sm text-muted">
+            No location yet. Set a ZIP on Today → Place, or pick a region below.
+          </div>
+        )}
+      </div>
+
+      <div className="mt-6">
+        <ZipForm currentZip={user?.postalCode} />
+      </div>
+
+      <div className="mt-8">
+        <RegionPicker
+          regions={regions}
+          currentId={user?.regionId ?? null}
+          defaultExpanded
+        />
+      </div>
+    </AppChrome>
   );
 }

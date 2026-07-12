@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { SiteHeader } from "@/components/site-header";
+import { AppChrome } from "@/components/app-chrome";
 import { db } from "@/db";
 import { protocols, users } from "@/db/schema";
 import {
@@ -31,25 +31,24 @@ export default async function AdminPage() {
 
   if (!allow) {
     return (
-      <div className="min-h-screen pb-24">
-        <SiteHeader active="account" />
-        <main className="mx-auto max-w-lg px-4 py-12 text-center">
+      <AppChrome backHref="/app?t=account" backLabel="← Account">
+        <div className="py-8 text-center">
           <h1 className="text-xl font-semibold">Admin only</h1>
           <p className="mt-2 text-sm text-muted">
             Set <code className="text-accent">is_admin</code> on your user or
-            add your username to <code className="text-accent">ADMIN_USERNAMES</code>.
+            add your username to{" "}
+            <code className="text-accent">ADMIN_USERNAMES</code>.
           </p>
-        </main>
-      </div>
+        </div>
+      </AppChrome>
     );
   }
 
   const catalog = await db.select().from(protocols).orderBy(protocols.sortOrder);
 
   return (
-    <div className="min-h-screen pb-24 md:pb-16">
-      <SiteHeader active="account" />
-      <main className="mx-auto max-w-2xl space-y-8 px-4 py-8 sm:px-6">
+    <AppChrome backHref="/app?t=account" backLabel="← Account">
+      <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-semibold">Admin · protocols</h1>
           <p className="mt-2 text-sm text-muted">
@@ -125,7 +124,7 @@ export default async function AdminPage() {
             </li>
           ))}
         </ul>
-      </main>
-    </div>
+      </div>
+    </AppChrome>
   );
 }
