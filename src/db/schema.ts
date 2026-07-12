@@ -88,6 +88,11 @@ export const users = pgTable("users", {
   regionId: text("region_id").references(() => regions.id, {
     onDelete: "set null",
   }),
+  /** Exact location from ZIP/postal geocode (for sunrise/sunset) */
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  postalCode: text("postal_code"),
+  placeLabel: text("place_label"),
   isAdmin: boolean("is_admin").notNull().default(false),
   onboardingComplete: boolean("onboarding_complete").notNull().default(false),
   showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),

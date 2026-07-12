@@ -40,6 +40,10 @@ await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS show_on_leaderboard boolean
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS username text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version integer NOT NULL DEFAULT 0`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS region_id text`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS latitude double precision`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS longitude double precision`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS postal_code text`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS place_label text`;
 
 // Regions (lifestyle environment scores)
 await sql`

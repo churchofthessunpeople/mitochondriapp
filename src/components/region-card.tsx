@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Region } from "@/db/schema";
+import { formatDistanceKm } from "@/lib/geo";
 import { ratingLabel } from "@/lib/regions";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 import { cn } from "@/lib/utils";
@@ -8,48 +9,75 @@ export function RegionCard({
   region,
   sun,
   compact,
+  placeLabel,
+  postalCode,
+  distanceKm,
+  sunFromZip,
+  timeZone,
 }: {
-  region: Region;
+  region: Region | null;
   sun: SunTimes;
   compact?: boolean;
+  placeLabel?: string | null;
+  postalCode?: string | null;
+  /** Distance from user ZIP to curated region centroid */
+  distanceKm?: number | null;
+  /** True when sunrise/sunset used user lat/lng from ZIP */
+  sunFromZip?: boolean;
+  timeZone?: string | null;
 }) {
+  const tz = timeZone || region?.timezone || "UTC";
+  if (!region && !placeLabel) {
+    return null;
+  }
+
   return (
     <section className="glass rounded-3xl p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
-            Your region
+            Your location
           </p>
           <h2 className="mt-1 text-lg font-semibold tracking-tight">
-            {region.name}
+            {placeLabel || region?.name || "Location"}
           </h2>
           <p className="text-xs text-muted">
-            {region.locality ? `${region.locality} · ` : ""}
-            {region.country}
+            {postalCode ? `ZIP ${postalCode}` : null}
+            {postalCode && region ? " · " : null}
+            {region
+              ? `Score from ${region.name}${
+                  distanceKm != null && distanceKm > 25
+                    ? ` (${formatDistanceKm(distanceKm)} away)`
+                    : ""
+                }`
+              : null}
+            {!region && placeLabel ? " · sun times only (no nearby rated region)" : null}
           </p>
         </div>
-        <div className="text-right">
-          <p className="text-[10px] uppercase tracking-wider text-muted">
-            Health score
-          </p>
-          <p className="text-2xl font-semibold tabular-nums text-accent">
-            {region.healthRating}
-            <span className="text-sm text-muted">/5</span>
-          </p>
-          <p className="text-[11px] text-accent-2">
-            {ratingLabel(region.healthRating)}
-          </p>
-        </div>
+        {region && (
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-wider text-muted">
+              Health score
+            </p>
+            <p className="text-2xl font-semibold tabular-nums text-accent">
+              {region.healthRating}
+              <span className="text-sm text-muted">/5</span>
+            </p>
+            <p className="text-[11px] text-accent-2">
+              {ratingLabel(region.healthRating)}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <SunStat
           label="Sunrise"
-          value={formatTimeInZone(sun.sunrise, region.timezone)}
+          value={formatTimeInZone(sun.sunrise, tz)}
         />
         <SunStat
           label="Sunset"
-          value={formatTimeInZone(sun.sunset, region.timezone)}
+          value={formatTimeInZone(sun.sunset, tz)}
         />
         <SunStat
           label="Day length"
@@ -59,16 +87,25 @@ export function RegionCard({
               : "—"
           }
         />
-        <SunStat label="Timezone" value={region.timezone.split("/").pop() ?? region.timezone} />
+        <SunStat
+          label={sunFromZip ? "Sun source" : "Timezone"}
+          value={
+            sunFromZip
+              ? "Your ZIP"
+              : (region?.timezone.split("/").pop() ?? "—")
+          }
+        />
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <ScorePill label="Sun" score={region.sunScore} />
-        <ScorePill label="Magnetism" score={region.magnetismScore} />
-        <ScorePill label="Policy" score={region.policyScore} />
-      </div>
+      {region && (
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <ScorePill label="Sun" score={region.sunScore} />
+          <ScorePill label="Magnetism" score={region.magnetismScore} />
+          <ScorePill label="Policy" score={region.policyScore} />
+        </div>
+      )}
 
-      {!compact && (
+      {!compact && region && (
         <>
           <p className="mt-4 text-sm leading-relaxed text-muted">
             {region.summary}
@@ -91,10 +128,10 @@ export function RegionCard({
       )}
 
       <p className="mt-3 text-[10px] leading-relaxed text-muted">
-        Scores are lifestyle-framework ratings (light, magnetism, environment,
-        policy), not medical advice.{" "}
+        Scores are lifestyle-framework ratings for the nearest curated place —
+        not a medical rating of your street.{" "}
         <Link href="/region" className="text-accent hover:underline">
-          Change region
+          Change ZIP or region
         </Link>
       </p>
     </section>
@@ -117,7 +154,11 @@ function ScorePill({ label, score }: { label: string; score: number }) {
       <p
         className={cn(
           "text-lg font-semibold tabular-nums",
-          score >= 4 ? "text-accent" : score <= 2 ? "text-accent-2" : "text-foreground",
+          score >= 4
+            ? "text-accent"
+            : score <= 2
+              ? "text-accent-2"
+              : "text-foreground",
         )}
       >
         {score}

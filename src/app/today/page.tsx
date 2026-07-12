@@ -16,6 +16,7 @@ import {
 } from "@/lib/data";
 import { getServerTodayIsoDate } from "@/lib/date-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
+import { haversineKm } from "@/lib/geo";
 import { getRegionById } from "@/lib/regions";
 import { getUserStreak } from "@/lib/streaks";
 import { getSunTimes } from "@/lib/sun";
@@ -35,6 +36,10 @@ export default async function TodayPage() {
       onboardingComplete: users.onboardingComplete,
       timezone: users.timezone,
       regionId: users.regionId,
+      latitude: users.latitude,
+      longitude: users.longitude,
+      postalCode: users.postalCode,
+      placeLabel: users.placeLabel,
     })
     .from(users)
     .where(eq(users.id, session.user.id))
@@ -42,9 +47,19 @@ export default async function TodayPage() {
 
   const region = await getRegionById(userRow?.regionId);
 
+  const hasZipCoords =
+    userRow?.latitude != null && userRow?.longitude != null;
+
+  const sunLat = hasZipCoords
+    ? userRow!.latitude!
+    : (region?.latitude ?? null);
+  const sunLng = hasZipCoords
+    ? userRow!.longitude!
+    : (region?.longitude ?? null);
+
   const tz =
-    region?.timezone ||
     userRow?.timezone ||
+    region?.timezone ||
     h.get("x-vercel-ip-timezone") ||
     "UTC";
 
@@ -61,6 +76,21 @@ export default async function TodayPage() {
   } catch {
     localHour = new Date().getHours();
   }
+
+  const distanceKm =
+    hasZipCoords && region
+      ? haversineKm(
+          userRow!.latitude!,
+          userRow!.longitude!,
+          region.latitude,
+          region.longitude,
+        )
+      : null;
+
+  const sun =
+    sunLat != null && sunLng != null
+      ? getSunTimes(new Date(`${date}T12:00:00Z`), sunLat, sunLng)
+      : null;
 
   const [protocols, dayStats, lifetime, favoriteIds, streak] =
     await Promise.all([
@@ -91,28 +121,29 @@ export default async function TodayPage() {
         </div>
 
         <div className="mb-6">
-          {region ? (
+          {sun && (region || userRow?.placeLabel) ? (
             <RegionCard
               region={region}
-              sun={getSunTimes(
-                new Date(`${date}T12:00:00Z`),
-                region.latitude,
-                region.longitude,
-              )}
+              sun={sun}
               compact
+              placeLabel={userRow?.placeLabel}
+              postalCode={userRow?.postalCode}
+              distanceKm={distanceKm}
+              sunFromZip={hasZipCoords}
+              timeZone={tz}
             />
           ) : (
             <div className="glass rounded-3xl p-4 text-sm">
-              <p className="font-medium">Set your region</p>
+              <p className="font-medium">Set your location</p>
               <p className="mt-1 text-muted">
-                Get sunrise/sunset times and a 1–5 lifestyle environment score
-                (light, magnetism, policy).
+                Enter a US ZIP for sunrise/sunset at your coordinates, plus the
+                nearest curated lifestyle score.
               </p>
               <Link
                 href="/region"
                 className="btn-primary mt-3 inline-flex h-10 items-center rounded-2xl px-4 text-sm font-semibold"
               >
-                Choose region
+                Enter ZIP code
               </Link>
             </div>
           )}
