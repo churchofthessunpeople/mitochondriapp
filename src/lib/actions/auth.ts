@@ -117,7 +117,7 @@ export async function registerAction(
       await signIn("credentials", {
         username,
         password: parsed.data.password,
-        redirectTo: "/place",
+        redirectTo: "/schedule",
       });
     } catch (error) {
       if (
@@ -195,7 +195,7 @@ export async function loginAction(
     await signIn("credentials", {
       username,
       password: parsed.data.password,
-      redirectTo: "/place",
+      redirectTo: "/schedule",
     });
   } catch (error) {
     if (

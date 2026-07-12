@@ -15,6 +15,7 @@ function revalidateLocation() {
   revalidatePath("/account");
   revalidatePath("/region");
   revalidatePath("/schedule");
+  revalidatePath("/onboarding");
 }
 
 export async function setUserRegionAction(regionId: string) {

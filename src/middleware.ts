@@ -12,6 +12,7 @@ export default auth((req) => {
     pathname.startsWith("/today") ||
     pathname.startsWith("/schedule") ||
     pathname.startsWith("/activities") ||
+    pathname.startsWith("/onboarding") ||
     pathname.startsWith("/history") ||
     pathname.startsWith("/leaderboard") ||
     pathname.startsWith("/account") ||
@@ -27,7 +28,7 @@ export default auth((req) => {
   }
 
   if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL("/place", req.nextUrl.origin));
+    return NextResponse.redirect(new URL("/schedule", req.nextUrl.origin));
   }
 
   return NextResponse.next();
@@ -39,6 +40,7 @@ export const config = {
     "/today/:path*",
     "/schedule/:path*",
     "/activities/:path*",
+    "/onboarding/:path*",
     "/history/:path*",
     "/leaderboard/:path*",
     "/account/:path*",

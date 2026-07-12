@@ -16,6 +16,7 @@ import {
   sunPhaseHint,
 } from "@/lib/place-factors";
 import { getRegionById } from "@/lib/regions";
+import { redirectIfNeedsOnboarding } from "@/lib/require-onboarding";
 import { getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 
 export const metadata = { title: "Place" };
@@ -23,6 +24,7 @@ export const metadata = { title: "Place" };
 export default async function PlacePage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  await redirectIfNeedsOnboarding(session.user.id);
 
   const date = await getServerTodayIsoDate();
   const h = await headers();

@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+/** Schedule first — daily habit is the primary job. */
 const items = [
-  { href: "/place", label: "Place", icon: MapPin },
   { href: "/schedule", label: "Schedule", icon: CalendarCheck },
+  { href: "/place", label: "Place", icon: MapPin },
   { href: "/activities", label: "Activities", icon: ListChecks },
   { href: "/account", label: "Account", icon: User },
 ] as const;
@@ -19,7 +20,8 @@ export function BottomNav() {
     pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||
-    pathname.startsWith("/verify-email");
+    pathname.startsWith("/verify-email") ||
+    pathname.startsWith("/onboarding");
 
   if (hide) return null;
 

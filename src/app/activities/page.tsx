@@ -5,12 +5,14 @@ import { AvailablePicker } from "@/components/available-picker";
 import { SiteHeader } from "@/components/site-header";
 import { getActiveProtocols } from "@/lib/data";
 import { getUserFavoriteIds } from "@/lib/favorites";
+import { redirectIfNeedsOnboarding } from "@/lib/require-onboarding";
 
 export const metadata = { title: "My activities" };
 
 export default async function ActivitiesPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  await redirectIfNeedsOnboarding(session.user.id);
 
   const [protocols, availableIds] = await Promise.all([
     getActiveProtocols(),

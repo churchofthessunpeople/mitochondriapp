@@ -11,6 +11,7 @@ import { users } from "@/db/schema";
 import { haversineKm } from "@/lib/geo";
 import { buildPlaceFactorsWithElevation } from "@/lib/place-factors";
 import { getRegionById, listRegions } from "@/lib/regions";
+import { redirectIfNeedsOnboarding } from "@/lib/require-onboarding";
 import { getSunTimesForLocalDay } from "@/lib/sun";
 
 export const metadata = { title: "Region" };
@@ -18,6 +19,7 @@ export const metadata = { title: "Region" };
 export default async function RegionPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  await redirectIfNeedsOnboarding(session.user.id);
 
   const [user] = await db
     .select({

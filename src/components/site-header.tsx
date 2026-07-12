@@ -6,8 +6,8 @@ import { logoutAction } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/place", label: "Place", key: "place" },
   { href: "/schedule", label: "Schedule", key: "schedule" },
+  { href: "/place", label: "Place", key: "place" },
   { href: "/activities", label: "Activities", key: "activities" },
   { href: "/account", label: "Account", key: "account" },
 ] as const;
@@ -26,8 +26,8 @@ export async function SiteHeader({
     | "home";
 }) {
   const session = await auth();
-  // Legacy "today" maps to place for active highlight
-  const activeKey = active === "today" ? "place" : active;
+  // Legacy "today" maps to schedule (daily home)
+  const activeKey = active === "today" ? "schedule" : active;
 
   return (
     <header
@@ -36,7 +36,7 @@ export async function SiteHeader({
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
         <Link
-          href={session ? "/place" : "/"}
+          href={session ? "/schedule" : "/"}
           className="flex min-w-0 items-center gap-2"
         >
           <Image

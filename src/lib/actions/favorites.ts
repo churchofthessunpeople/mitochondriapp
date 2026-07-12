@@ -16,6 +16,7 @@ function revalidateAvailable() {
   revalidatePath("/activities");
   revalidatePath("/schedule");
   revalidatePath("/place");
+  revalidatePath("/onboarding");
   revalidatePath("/today");
 }
 
