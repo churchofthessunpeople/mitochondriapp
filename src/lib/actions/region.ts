@@ -83,10 +83,15 @@ export async function setLocationFromZipAction(
   try {
     const place = await geocodeUsZip(zip);
     const catalog = await listRegions();
+    // Prefer US metros for US ZIPs so Dallas never snaps to Miami/El Salvador
     const nearest = findNearestRegion(
       place.latitude,
       place.longitude,
       catalog,
+      {
+        preferCountry: "United States",
+        maxDistanceKm: 600,
+      },
     );
 
     const placeLabel = [place.placeName, place.stateAbbr || place.state]

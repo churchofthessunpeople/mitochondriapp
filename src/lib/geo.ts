@@ -161,21 +161,52 @@ export async function geocodeUsZip(rawZip: string): Promise<GeocodedPlace> {
 }
 
 export function findNearestRegion<
-  T extends { id: string; latitude: number; longitude: number },
+  T extends { id: string; latitude: number; longitude: number; country?: string },
 >(
   lat: number,
   lng: number,
   regions: T[],
+  opts?: {
+    /** Prefer regions in this country (e.g. "United States" for US ZIPs) */
+    preferCountry?: string;
+    /** If set, only accept a match within this radius (km) after country filter */
+    maxDistanceKm?: number;
+  },
 ): { region: T; distanceKm: number } | null {
   if (regions.length === 0) return null;
-  let best: T | null = null;
-  let bestKm = Infinity;
-  for (const r of regions) {
-    const km = haversineKm(lat, lng, r.latitude, r.longitude);
-    if (km < bestKm) {
-      bestKm = km;
-      best = r;
+
+  const prefer = opts?.preferCountry?.toLowerCase();
+  const pool =
+    prefer != null && prefer.length > 0
+      ? regions.filter((r) => r.country?.toLowerCase() === prefer)
+      : regions;
+
+  const search = (list: T[]) => {
+    let best: T | null = null;
+    let bestKm = Infinity;
+    for (const r of list) {
+      const km = haversineKm(lat, lng, r.latitude, r.longitude);
+      if (km < bestKm) {
+        bestKm = km;
+        best = r;
+      }
     }
+    return best ? { region: best, distanceKm: bestKm } : null;
+  };
+
+  // 1) Same-country nearest (stops Dallas → Miami if Texas metros exist)
+  let hit = pool.length > 0 ? search(pool) : null;
+
+  // 2) If nothing in country or absurdly far, fall back to global nearest
+  const maxKm = opts?.maxDistanceKm ?? 750;
+  if (!hit || hit.distanceKm > maxKm) {
+    const global = search(regions);
+    if (!hit) return global;
+    // Prefer country match if within maxKm; else if global is much closer use global
+    if (global && global.distanceKm + 50 < hit.distanceKm) return global;
+    if (hit.distanceKm <= maxKm) return hit;
+    return hit; // still return country match even if far — better than wrong country
   }
-  return best ? { region: best, distanceKm: bestKm } : null;
+
+  return hit;
 }
