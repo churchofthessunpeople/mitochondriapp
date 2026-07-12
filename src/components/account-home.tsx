@@ -6,7 +6,6 @@ import {
   PasswordForm,
   UsernameForm,
 } from "@/components/account-forms";
-import { AccountExpandCard } from "@/components/account-expand-card";
 import type { AccountPanelUser } from "@/components/account-panel";
 import { FriendsClient } from "@/components/friends-client";
 import { HistoryList } from "@/components/history-list";
@@ -22,7 +21,7 @@ import {
   toggleLeaderboardVisibilityFormAction,
 } from "@/lib/actions/profile";
 import type { AccountSection } from "@/lib/app-tabs";
-import { formatPoints } from "@/lib/utils";
+import { cn, formatPoints } from "@/lib/utils";
 
 export type FriendRow = {
   id: string;
@@ -42,6 +41,16 @@ export type ReminderRow = {
 
 export type HistoryRow = { date: string; points: number; count: number };
 
+type Section = NonNullable<AccountSection>;
+
+const TABS: { id: Section; label: string }[] = [
+  { id: "history", label: "History" },
+  { id: "leaderboard", label: "Board" },
+  { id: "friends", label: "Friends" },
+  { id: "reminders", label: "Reminders" },
+  { id: "profile", label: "Profile" },
+];
+
 type Props = {
   user: AccountPanelUser;
   initialSection?: AccountSection;
@@ -60,7 +69,7 @@ type Props = {
 };
 
 /**
- * Single Account surface: expandable cards (no sub-page navigation).
+ * Account: header + tab row + one content panel (no expand cards / stray links).
  */
 export function AccountHome({
   user,
@@ -73,32 +82,31 @@ export function AccountHome({
   reminders,
   reminderSunPresets,
 }: Props) {
-  const [open, setOpen] = useState<AccountSection>(initialSection ?? null);
+  const [section, setSection] = useState<Section>(
+    initialSection && initialSection !== null ? initialSection : "history",
+  );
 
   useEffect(() => {
-    if (initialSection) setOpen(initialSection);
+    if (initialSection) setSection(initialSection);
   }, [initialSection]);
 
-  function toggle(section: NonNullable<AccountSection>) {
-    setOpen((cur) => {
-      const next = cur === section ? null : section;
-      try {
-        const url =
-          next == null || next === "profile"
-            ? "/app?t=account"
-            : `/app?t=${next}`;
-        window.history.replaceState(null, "", url);
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+  function select(next: Section) {
+    setSection(next);
+    try {
+      window.history.replaceState(
+        null,
+        "",
+        next === "history" ? "/app?t=account" : `/app?t=${next}`,
+      );
+    } catch {
+      /* ignore */
+    }
   }
 
   const displayName = user.displayName || user.name || user.username || "";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div>
         <p className="text-xs uppercase tracking-[0.18em] text-accent">
           Profile
@@ -107,175 +115,187 @@ export function AccountHome({
           Account
         </h1>
         <p className="mt-1.5 text-sm text-muted">
-          Expand a card for history, ranks, friends, or settings.
           {user.memberSinceLabel
-            ? ` Member since ${user.memberSinceLabel}.`
-            : null}
+            ? `Member since ${user.memberSinceLabel}.`
+            : "History, ranks, friends, and settings."}
         </p>
       </div>
 
-      <AccountExpandCard
-        id="history"
-        title="History"
-        subtitle={`Lifetime ${formatPoints(lifetimePoints)} pts · last 45 days`}
-        expanded={open === "history"}
-        onToggle={() => toggle("history")}
+      {/* Tab row under header */}
+      <div
+        className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-foreground/[0.03] p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="tablist"
+        aria-label="Account sections"
       >
-        <HistoryList rows={history} linkDays={false} />
-        <p className="text-center text-sm">
-          <a href="/api/export/csv" className="text-accent hover:underline">
-            Export all logs (CSV)
-          </a>
-        </p>
-      </AccountExpandCard>
-
-      <AccountExpandCard
-        id="leaderboard"
-        title="Leaderboard"
-        subtitle="Week light · week · month · all time · friends"
-        expanded={open === "leaderboard"}
-        onToggle={() => toggle("leaderboard")}
-      >
-        <LeaderboardPanel
-          boards={leaderboards}
-          currentUserId={currentUserId}
-          onOpenFriends={() => {
-            setOpen("friends");
-            try {
-              window.history.replaceState(null, "", "/app?t=friends");
-            } catch {
-              /* ignore */
-            }
-          }}
-        />
-      </AccountExpandCard>
-
-      <AccountExpandCard
-        id="friends"
-        title="Friends"
-        subtitle="Requests and private board"
-        expanded={open === "friends"}
-        onToggle={() => toggle("friends")}
-      >
-        <FriendsClient rows={friends} />
-      </AccountExpandCard>
-
-      <AccountExpandCard
-        id="reminders"
-        title="Reminders"
-        subtitle="Browser notifications · sun-relative presets"
-        expanded={open === "reminders"}
-        onToggle={() => toggle("reminders")}
-      >
-        <RemindersClient
-          initial={reminders}
-          sunPresets={reminderSunPresets}
-        />
-      </AccountExpandCard>
-
-      <AccountExpandCard
-        id="profile"
-        title="Profile & security"
-        subtitle="Username, password, email, timezone"
-        expanded={open === "profile"}
-        onToggle={() => toggle("profile")}
-      >
-        <div className="space-y-5">
-          <DisplayNameForm initialDisplayName={displayName} />
-          <UsernameForm initialUsername={user.username} />
-          <PasswordForm />
-
-          <section className="rounded-2xl border border-border p-4">
-            <h2 className="font-semibold">Recovery email</h2>
-            <p className="mt-1 text-xs text-muted">
-              Optional. Password reset only.
-            </p>
-            <form
-              action={saveRecoveryEmailFormAction}
-              className="mt-3 space-y-3"
+        {TABS.map((t) => {
+          const active = section === t.id;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => select(t.id)}
+              className={cn(
+                "min-w-0 flex-1 shrink-0 rounded-xl px-2.5 py-2.5 text-center text-xs font-semibold transition sm:px-3 sm:text-sm",
+                active
+                  ? "bg-accent text-on-accent shadow-sm"
+                  : "text-muted hover:text-foreground",
+              )}
             >
-              <input
-                name="email"
-                type="email"
-                defaultValue={user.email ?? ""}
-                placeholder="you@example.com"
-                className="field-input w-full rounded-2xl px-4 py-3 text-sm"
-              />
-              <button
-                type="submit"
-                className="btn-primary h-11 rounded-2xl px-5 text-sm font-semibold"
-              >
-                Save email
-              </button>
-            </form>
-          </section>
-
-          <section className="rounded-2xl border border-border p-4">
-            <h2 className="font-semibold">Timezone</h2>
-            <p className="mt-1 text-xs text-muted">
-              Calendar day for streaks (IANA name).
-            </p>
-            <form action={saveTimezoneFormAction} className="mt-3 space-y-3">
-              <input
-                name="timezone"
-                defaultValue={user.timezone ?? "UTC"}
-                placeholder="America/New_York"
-                className="field-input w-full rounded-2xl px-4 py-3 text-sm"
-              />
-              <button
-                type="submit"
-                className="btn-primary h-11 rounded-2xl px-5 text-sm font-semibold"
-              >
-                Save timezone
-              </button>
-            </form>
-          </section>
-
-          <section className="rounded-2xl border border-border p-4">
-            <h2 className="font-semibold">Leaderboard visibility</h2>
-            <form
-              action={toggleLeaderboardVisibilityFormAction}
-              className="mt-3"
-            >
-              <button
-                type="submit"
-                className="btn-secondary h-11 rounded-2xl px-5 text-sm font-semibold"
-              >
-                {user.showOnLeaderboard
-                  ? "Hide me from public boards"
-                  : "Show me on public boards"}
-              </button>
-            </form>
-          </section>
-        </div>
-      </AccountExpandCard>
-
-      <div className="flex flex-wrap gap-2 pt-1 text-sm">
-        <a
-          href="/admin"
-          className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
-        >
-          Admin
-        </a>
-        <a
-          href="/api/export/csv"
-          className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
-        >
-          Export CSV
-        </a>
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
-      <section className="glass rounded-3xl p-5">
-        <h2 className="text-lg font-semibold tracking-tight">Session</h2>
-        <form action={logoutAction} className="mt-4">
-          <button
-            type="submit"
-            className="btn-secondary flex h-11 w-full items-center justify-center rounded-2xl text-sm font-semibold sm:w-auto sm:px-6"
-          >
-            Log out
-          </button>
-        </form>
-      </section>
+      <div role="tabpanel" className="min-h-[12rem]">
+        {section === "history" && (
+          <div className="space-y-4">
+            <p className="text-sm text-muted">
+              Lifetime{" "}
+              <span className="font-medium text-foreground">
+                {formatPoints(lifetimePoints)} pts
+              </span>{" "}
+              · last 45 days
+            </p>
+            <HistoryList rows={history} linkDays={false} />
+            <p className="text-center text-sm">
+              <a href="/api/export/csv" className="text-accent hover:underline">
+                Export all logs (CSV)
+              </a>
+            </p>
+          </div>
+        )}
+
+        {section === "leaderboard" && (
+          <LeaderboardPanel
+            compact
+            boards={leaderboards}
+            currentUserId={currentUserId}
+            onOpenFriends={() => select("friends")}
+          />
+        )}
+
+        {section === "friends" && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted">
+              Private board among people you accept.
+            </p>
+            <FriendsClient rows={friends} />
+          </div>
+        )}
+
+        {section === "reminders" && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted">
+              Browser notifications · sun-relative presets when ZIP is set.
+            </p>
+            <RemindersClient
+              initial={reminders}
+              sunPresets={reminderSunPresets}
+            />
+          </div>
+        )}
+
+        {section === "profile" && (
+          <div className="space-y-5">
+            <DisplayNameForm initialDisplayName={displayName} />
+            <UsernameForm initialUsername={user.username} />
+            <PasswordForm />
+
+            <section className="glass rounded-3xl p-5">
+              <h2 className="font-semibold">Recovery email</h2>
+              <p className="mt-1 text-xs text-muted">
+                Optional. Password reset only.
+              </p>
+              <form
+                action={saveRecoveryEmailFormAction}
+                className="mt-3 space-y-3"
+              >
+                <input
+                  name="email"
+                  type="email"
+                  defaultValue={user.email ?? ""}
+                  placeholder="you@example.com"
+                  className="field-input w-full rounded-2xl px-4 py-3 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="btn-primary h-11 rounded-2xl px-5 text-sm font-semibold"
+                >
+                  Save email
+                </button>
+              </form>
+            </section>
+
+            <section className="glass rounded-3xl p-5">
+              <h2 className="font-semibold">Timezone</h2>
+              <p className="mt-1 text-xs text-muted">
+                Calendar day for streaks (IANA name).
+              </p>
+              <form action={saveTimezoneFormAction} className="mt-3 space-y-3">
+                <input
+                  name="timezone"
+                  defaultValue={user.timezone ?? "UTC"}
+                  placeholder="America/New_York"
+                  className="field-input w-full rounded-2xl px-4 py-3 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="btn-primary h-11 rounded-2xl px-5 text-sm font-semibold"
+                >
+                  Save timezone
+                </button>
+              </form>
+            </section>
+
+            <section className="glass rounded-3xl p-5">
+              <h2 className="font-semibold">Leaderboard visibility</h2>
+              <form
+                action={toggleLeaderboardVisibilityFormAction}
+                className="mt-3"
+              >
+                <button
+                  type="submit"
+                  className="btn-secondary h-11 rounded-2xl px-5 text-sm font-semibold"
+                >
+                  {user.showOnLeaderboard
+                    ? "Hide me from public boards"
+                    : "Show me on public boards"}
+                </button>
+              </form>
+            </section>
+
+            <div className="flex flex-wrap gap-2 text-sm">
+              <a
+                href="/admin"
+                className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
+              >
+                Admin
+              </a>
+              <a
+                href="/api/export/csv"
+                className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
+              >
+                Export CSV
+              </a>
+            </div>
+
+            <section className="glass rounded-3xl p-5">
+              <h2 className="text-lg font-semibold tracking-tight">Session</h2>
+              <form action={logoutAction} className="mt-4">
+                <button
+                  type="submit"
+                  className="btn-secondary flex h-11 w-full items-center justify-center rounded-2xl text-sm font-semibold sm:w-auto sm:px-6"
+                >
+                  Log out
+                </button>
+              </form>
+            </section>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

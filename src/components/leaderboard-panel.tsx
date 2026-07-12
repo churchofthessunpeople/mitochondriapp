@@ -60,25 +60,32 @@ export function LeaderboardPanel({
   boards,
   currentUserId,
   onOpenFriends,
+  compact,
 }: {
   boards: LeaderboardBoards;
   currentUserId: string;
   onOpenFriends?: () => void;
+  /** Hide page title when nested under Account tabs */
+  compact?: boolean;
 }) {
   const [tab, setTab] = useState<BoardKey>("lightWeek");
   const meta = TABS.find((t) => t.key === tab)!;
 
   return (
     <div className="space-y-4">
-      <div>
-        <p className="text-xs uppercase tracking-[0.18em] text-accent">Ranks</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-          Leaderboard
-        </h1>
-        <p className="mt-1.5 text-sm text-muted">
-          One timeframe at a time · multi-logs are capped
-        </p>
-      </div>
+      {!compact && (
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-accent">
+            Ranks
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+            Leaderboard
+          </h1>
+          <p className="mt-1.5 text-sm text-muted">
+            One timeframe at a time · multi-logs are capped
+          </p>
+        </div>
+      )}
 
       <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {TABS.map((t) => (
