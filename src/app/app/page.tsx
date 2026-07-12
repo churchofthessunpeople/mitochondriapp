@@ -6,7 +6,10 @@ import { auth } from "@/auth";
 import { AppShell } from "@/components/app-shell";
 import { db } from "@/db";
 import { userReminders, users } from "@/db/schema";
-import { tabFromSearchParam } from "@/lib/app-tabs";
+import {
+  accountSectionFromSearchParam,
+  tabFromSearchParam,
+} from "@/lib/app-tabs";
 import {
   getActiveProtocols,
   getLeaderboard,
@@ -53,6 +56,7 @@ export default async function AppPage({
 
   const params = await searchParams;
   const initialTab = tabFromSearchParam(params.t);
+  const initialAccountSection = accountSectionFromSearchParam(params.t);
   const h = await headers();
   const userId = session.user.id;
 
@@ -204,6 +208,7 @@ export default async function AppPage({
   return (
     <AppShell
       initialTab={initialTab}
+      initialAccountSection={initialAccountSection}
       dateLabel={dateLabel}
       todayIso={date}
       allProtocols={allProtocols}

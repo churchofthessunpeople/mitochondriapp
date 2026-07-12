@@ -1,30 +1,32 @@
 /**
- * All in-app surfaces live under /app?t=…
- * Bottom nav only shows Today + Account; other tabs open from Account chips.
+ * Bottom nav: Today + Account only.
+ * Deep links like ?t=leaderboard open Account with that card expanded.
  */
-export const APP_TABS = [
-  "schedule",
-  "account",
-  "history",
-  "leaderboard",
-  "friends",
-  "reminders",
-] as const;
+export const APP_TABS = ["schedule", "account"] as const;
 
 export type AppTab = (typeof APP_TABS)[number];
 
+export type AccountSection =
+  | "history"
+  | "leaderboard"
+  | "friends"
+  | "reminders"
+  | "profile"
+  | null;
+
 export function isAppTab(value: string | null | undefined): value is AppTab {
-  return (APP_TABS as readonly string[]).includes(value ?? "");
+  return value === "schedule" || value === "account";
 }
 
-/** Tabs that highlight “Account” in the bottom nav */
-export function isAccountArea(tab: AppTab): boolean {
+export function isAccountSection(
+  value: string | null | undefined,
+): value is NonNullable<AccountSection> {
   return (
-    tab === "account" ||
-    tab === "history" ||
-    tab === "leaderboard" ||
-    tab === "friends" ||
-    tab === "reminders"
+    value === "history" ||
+    value === "leaderboard" ||
+    value === "friends" ||
+    value === "reminders" ||
+    value === "profile"
   );
 }
 
@@ -33,5 +35,15 @@ export function tabFromSearchParam(
 ): AppTab {
   const v = Array.isArray(raw) ? raw[0] : raw;
   if (v === "place" || v === "activities") return "schedule";
+  if (isAccountSection(v)) return "account";
   return isAppTab(v) ? v : "schedule";
+}
+
+/** Which Account card to open when landing via deep link */
+export function accountSectionFromSearchParam(
+  raw: string | string[] | undefined,
+): AccountSection {
+  const v = Array.isArray(raw) ? raw[0] : raw;
+  if (isAccountSection(v) && v !== "profile") return v;
+  return null;
 }

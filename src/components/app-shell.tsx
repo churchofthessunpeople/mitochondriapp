@@ -2,30 +2,26 @@
 
 import { CalendarCheck, User } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import {
-  AccountPanel,
-  type AccountPanelUser,
-} from "@/components/account-panel";
+  AccountHome,
+  type FriendRow,
+  type HistoryRow,
+  type ReminderRow,
+} from "@/components/account-home";
+import type { AccountPanelUser } from "@/components/account-panel";
 import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
-import { FriendsClient } from "@/components/friends-client";
-import { HistoryList } from "@/components/history-list";
-import {
-  LeaderboardPanel,
-  type LeaderboardBoards,
-} from "@/components/leaderboard-panel";
+import type { LeaderboardBoards } from "@/components/leaderboard-panel";
 import { PlaceExpand } from "@/components/place-expand";
-import { RemindersClient } from "@/components/reminders-client";
 import { ScheduleDay } from "@/components/schedule-day";
 import { SunriseCheckIn } from "@/components/sunrise-check-in";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { isAccountArea, type AppTab } from "@/lib/app-tabs";
+import type { AccountSection, AppTab } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
 import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
-import { cn, formatPoints } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const NAV: { id: AppTab; label: string; icon: typeof CalendarCheck }[] = [
   { id: "schedule", label: "Today", icon: CalendarCheck },
@@ -34,26 +30,9 @@ const NAV: { id: AppTab; label: string; icon: typeof CalendarCheck }[] = [
 
 const CACHE_KEY = "mitochondriapp-shell-v1";
 
-export type FriendRow = {
-  id: string;
-  status: string;
-  otherName: string;
-  otherUsername: string;
-  isIncoming: boolean;
-  isOutgoing: boolean;
-};
-
-export type ReminderRow = {
-  id: string;
-  label: string;
-  localTime: string;
-  enabled: boolean;
-};
-
-export type HistoryRow = { date: string; points: number; count: number };
-
 export type AppShellProps = {
   initialTab: AppTab;
+  initialAccountSection?: AccountSection;
   dateLabel: string;
   todayIso: string;
   allProtocols: Protocol[];
@@ -93,8 +72,13 @@ export type AppShellProps = {
   };
 };
 
+/**
+ * Today = place + checklist + catalog cards.
+ * Account = expandable cards (history, board, friends, reminders, profile).
+ */
 export function AppShell({
   initialTab,
+  initialAccountSection = null,
   dateLabel,
   todayIso,
   allProtocols,
@@ -161,7 +145,7 @@ export function AppShell({
   const setTab = useCallback((next: AppTab) => {
     setTabState(next);
     try {
-      const url = next === "schedule" ? "/app" : `/app?t=${next}`;
+      const url = next === "schedule" ? "/app" : "/app?t=account";
       window.history.replaceState(null, "", url);
     } catch {
       /* ignore */
@@ -225,9 +209,7 @@ export function AppShell({
                   onClick={() => setTab(item.id)}
                   className={cn(
                     "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
-                    (item.id === "account"
-                      ? isAccountArea(tab)
-                      : tab === item.id)
+                    tab === item.id
                       ? "bg-foreground/10 text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground",
                   )}
@@ -287,99 +269,17 @@ export function AppShell({
         )}
 
         {tab === "account" && (
-          <AccountPanel user={accountUser} onNavigate={setTab} />
-        )}
-
-        {tab === "history" && (
-          <div className="space-y-4">
-            <button
-              type="button"
-              onClick={() => setTab("account")}
-              className="text-sm text-accent hover:underline"
-            >
-              ← Account
-            </button>
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-accent">
-                Your trail
-              </p>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-                History
-              </h1>
-              <p className="mt-1.5 text-sm text-muted">
-                Lifetime{" "}
-                <span className="font-medium text-foreground">
-                  {formatPoints(lifetimePoints)} pts
-                </span>
-              </p>
-            </div>
-            <HistoryList rows={history} linkDays={false} />
-            <p className="text-center text-sm">
-              <a href="/api/export/csv" className="text-accent hover:underline">
-                Export all logs (CSV)
-              </a>
-            </p>
-          </div>
-        )}
-
-        {tab === "leaderboard" && (
-          <div className="space-y-4">
-            <button
-              type="button"
-              onClick={() => setTab("account")}
-              className="text-sm text-accent hover:underline"
-            >
-              ← Account
-            </button>
-            <LeaderboardPanel
-              boards={leaderboards}
-              currentUserId={currentUserId}
-              onOpenFriends={() => setTab("friends")}
-            />
-          </div>
-        )}
-
-        {tab === "friends" && (
-          <div className="space-y-4">
-            <button
-              type="button"
-              onClick={() => setTab("account")}
-              className="text-sm text-accent hover:underline"
-            >
-              ← Account
-            </button>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Friends</h1>
-              <p className="mt-1.5 text-sm text-muted">
-                Private leaderboard among people you accept.
-              </p>
-            </div>
-            <FriendsClient rows={friends} />
-          </div>
-        )}
-
-        {tab === "reminders" && (
-          <div className="space-y-4">
-            <button
-              type="button"
-              onClick={() => setTab("account")}
-              className="text-sm text-accent hover:underline"
-            >
-              ← Account
-            </button>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">
-                Reminders
-              </h1>
-              <p className="mt-1.5 text-sm text-muted">
-                Browser notifications · sun-relative presets when ZIP is set
-              </p>
-            </div>
-            <RemindersClient
-              initial={reminders}
-              sunPresets={reminderSunPresets}
-            />
-          </div>
+          <AccountHome
+            user={accountUser}
+            initialSection={initialAccountSection}
+            history={history}
+            lifetimePoints={lifetimePoints}
+            leaderboards={leaderboards}
+            currentUserId={currentUserId}
+            friends={friends}
+            reminders={reminders}
+            reminderSunPresets={reminderSunPresets}
+          />
         )}
       </main>
 
@@ -389,8 +289,7 @@ export function AppShell({
       >
         <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">
           {NAV.map(({ id, label, icon: Icon }) => {
-            const active =
-              id === "account" ? isAccountArea(tab) : tab === id;
+            const active = tab === id;
             return (
               <li key={id} className="flex-1">
                 <button
