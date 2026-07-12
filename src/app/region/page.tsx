@@ -2,12 +2,15 @@ import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { RegionCard } from "@/components/region-card";
 import { RegionPicker } from "@/components/region-picker";
 import { ZipForm } from "@/components/zip-form";
 import { SiteHeader } from "@/components/site-header";
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { listRegions } from "@/lib/regions";
+import { haversineKm } from "@/lib/geo";
+import { getRegionById, listRegions } from "@/lib/regions";
+import { getSunTimes } from "@/lib/sun";
 
 export const metadata = { title: "Region" };
 
@@ -22,12 +25,36 @@ export default async function RegionPage() {
       placeLabel: users.placeLabel,
       latitude: users.latitude,
       longitude: users.longitude,
+      timezone: users.timezone,
     })
     .from(users)
     .where(eq(users.id, session.user.id))
     .limit(1);
 
   const regions = await listRegions();
+  const region = await getRegionById(user?.regionId);
+
+  const hasCoords = user?.latitude != null && user?.longitude != null;
+  const sunLat = hasCoords ? user!.latitude! : region?.latitude;
+  const sunLng = hasCoords ? user!.longitude! : region?.longitude;
+  const tz = user?.timezone || region?.timezone || "UTC";
+
+  const sun =
+    sunLat != null && sunLng != null
+      ? getSunTimes(new Date(), sunLat, sunLng)
+      : null;
+
+  const distanceKm =
+    hasCoords && region
+      ? haversineKm(
+          user!.latitude!,
+          user!.longitude!,
+          region.latitude,
+          region.longitude,
+        )
+      : null;
+
+  const hasAssignment = Boolean(region || user?.placeLabel);
 
   return (
     <div className="min-h-screen pb-24 md:pb-16">
@@ -40,41 +67,45 @@ export default async function RegionPage() {
           Location & region
         </h1>
         <p className="mt-2 text-sm text-muted">
-          Enter a US ZIP for local sunrise/sunset. We map you to the nearest
-          curated lifestyle score (sun from latitude, magnetism from active
-          volcanoes/magma, politics from freedom/Bitcoin/CBDC factors).{" "}
+          Enter a US ZIP for sunrise/sunset at your coordinates. We assign the
+          nearest lifestyle score automatically.{" "}
           <Link href="/region/scoring" className="text-accent hover:underline">
             How scoring works
           </Link>
         </p>
 
-        {user?.placeLabel && (
-          <p className="mt-4 rounded-2xl border border-border bg-foreground/[0.03] px-3 py-2 text-sm">
-            Current:{" "}
-            <span className="font-medium text-foreground">
-              {user.placeLabel}
-            </span>
-            {user.postalCode ? ` · ZIP ${user.postalCode}` : ""}
-            {user.latitude != null && user.longitude != null
-              ? ` · ${user.latitude.toFixed(2)}°, ${user.longitude.toFixed(2)}°`
-              : ""}
-          </p>
-        )}
+        {/* Primary: assigned region after ZIP */}
+        <div className="mt-6">
+          {hasAssignment && sun ? (
+            <RegionCard
+              region={region}
+              sun={sun}
+              placeLabel={user?.placeLabel}
+              postalCode={user?.postalCode}
+              distanceKm={distanceKm}
+              sunFromZip={hasCoords}
+              timeZone={tz}
+            />
+          ) : (
+            <div className="glass rounded-3xl border border-dashed border-border p-5 text-sm text-muted">
+              No location yet. Enter your ZIP below — your assigned region and
+              sun times will show here.
+            </div>
+          )}
+        </div>
 
         <div className="mt-6">
           <ZipForm currentZip={user?.postalCode} />
         </div>
 
-        <div className="my-8 flex items-center gap-3 text-xs text-muted">
-          <div className="h-px flex-1 bg-border" />
-          or pick a curated region
-          <div className="h-px flex-1 bg-border" />
+        {/* Full catalog collapsed */}
+        <div className="mt-8">
+          <RegionPicker
+            regions={regions}
+            currentId={user?.regionId ?? null}
+            defaultExpanded={false}
+          />
         </div>
-
-        <RegionPicker
-          regions={regions}
-          currentId={user?.regionId ?? null}
-        />
       </main>
     </div>
   );
