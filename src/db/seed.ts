@@ -5,6 +5,7 @@ import { protocols } from "./schema";
 import { PROTOCOL_SEEDS } from "./seed-data";
 
 config({ path: ".env.local" });
+config({ path: ".env" });
 
 async function main() {
   const url = process.env.DATABASE_URL;

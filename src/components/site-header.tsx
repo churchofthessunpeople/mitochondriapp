@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { logoutAction } from "@/lib/actions/auth";
@@ -18,13 +19,19 @@ export async function SiteHeader({
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-[#070b12]/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href={session ? "/today" : "/"} className="flex items-center gap-2">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent-2 text-sm font-bold text-[#041016]">
-            M
-          </span>
-          <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-wide">Mitochondriapp</div>
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
+        <Link href={session ? "/today" : "/"} className="flex min-w-0 items-center gap-2">
+          <Image
+            src="/icons/app-icon.jpg"
+            alt=""
+            width={32}
+            height={32}
+            className="h-8 w-8 rounded-lg object-cover ring-1 ring-white/10"
+          />
+          <div className="min-w-0 leading-tight">
+            <div className="truncate text-sm font-semibold tracking-wide">
+              Mitochondriapp
+            </div>
             <div className="hidden text-[11px] text-muted sm:block">
               Light · Magnetism · Protocol
             </div>

@@ -1,121 +1,58 @@
+import Image from "next/image";
 import Link from "next/link";
-import { SiteHeader } from "@/components/site-header";
-import { PROTOCOL_SEEDS } from "@/db/seed-data";
-import { formatPoints } from "@/lib/utils";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
-export default function HomePage() {
-  const sample = PROTOCOL_SEEDS.slice(0, 4);
-  const maxPoints = PROTOCOL_SEEDS.reduce((s, p) => s + p.points, 0);
+export default async function HomePage() {
+  const session = await auth();
+  if (session?.user) {
+    redirect("/today");
+  }
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader active="home" />
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <section className="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-accent">
-              Lifestyle protocols · daily score
-            </p>
-            <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
-              Combat environmental stress with{" "}
-              <span className="bg-gradient-to-r from-accent to-accent-2 bg-clip-text text-transparent">
-                light-timed rituals
-              </span>
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
-              Mitochondriapp helps you log Dr. Jack Kruse-inspired protocols —
-              sunrise grounding, circadian light, cold, water, and nnEMF hygiene —
-              organized by time of day. Earn points. See your history. Climb the
-              leaderboard with other mitochondriacs.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/register"
-                className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-[#041016] transition hover:brightness-110"
-              >
-                Start tracking free
-              </Link>
-              <Link
-                href="/login"
-                className="rounded-full border border-border px-5 py-2.5 text-sm text-muted transition hover:border-white/30 hover:text-white"
-              >
-                I already have an account
-              </Link>
-            </div>
-            <dl className="mt-10 grid max-w-lg grid-cols-3 gap-4">
-              <div>
-                <dt className="text-xs text-muted">Seed protocols</dt>
-                <dd className="mt-1 text-2xl font-semibold">
-                  {PROTOCOL_SEEDS.length}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted">Max day score</dt>
-                <dd className="mt-1 text-2xl font-semibold">
-                  {formatPoints(maxPoints)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted">Time blocks</dt>
-                <dd className="mt-1 text-2xl font-semibold">7</dd>
-              </div>
-            </dl>
+    <div className="welcome-screen flex min-h-dvh flex-col bg-white text-zinc-900">
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-6 pb-10 pt-[max(2.5rem,env(safe-area-inset-top))]">
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
+          <div className="relative mb-8">
+            <div className="absolute inset-0 scale-110 rounded-[2rem] bg-zinc-100/80 blur-2xl" />
+            <Image
+              src="/icons/app-icon.jpg"
+              alt="Mitochondriapp"
+              width={128}
+              height={128}
+              priority
+              className="relative h-28 w-28 rounded-[1.75rem] object-cover shadow-[0_12px_40px_rgba(15,23,42,0.12)] ring-1 ring-zinc-200/80 sm:h-32 sm:w-32"
+            />
           </div>
 
-          <div className="glass rounded-3xl p-5 sm:p-6">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">
-              Example sunrise block
-            </p>
-            <h2 className="mt-2 text-xl font-semibold">Click or drag to log</h2>
-            <p className="mt-1 text-sm text-muted">
-              Each protocol has a point value. Complete it once per day.
-            </p>
-            <ul className="mt-5 space-y-3">
-              {sample.map((p) => (
-                <li
-                  key={p.id}
-                  className="rounded-2xl border border-border bg-black/20 p-3"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-medium">{p.name}</p>
-                      <p className="mt-1 text-xs leading-relaxed text-muted">
-                        {p.description}
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-full bg-accent-2/15 px-2 py-0.5 text-xs font-semibold text-accent-2">
-                      +{p.points}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+          <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-zinc-400">
+            Black swan protocols
+          </p>
+          <h1 className="mt-3 text-[2rem] font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+            Mitochondriapp
+          </h1>
+          <p className="mt-3 max-w-xs text-[15px] leading-relaxed text-zinc-500">
+            Track light, grounding, and lifestyle protocols — one day at a time.
+          </p>
+        </div>
 
-        <section className="mt-16 grid gap-4 md:grid-cols-3">
-          {[
-            {
-              title: "Time-of-day board",
-              body: "Sunrise, morning, afternoon, evening, sunset, night, and anytime — protocols where they belong in the solar day.",
-            },
-            {
-              title: "Points & leaderboard",
-              body: "Bank points for each completed action. Compete on all-time and weekly boards without turning health into junk gamification.",
-            },
-            {
-              title: "Built for Vercel",
-              body: "Next.js App Router, Auth.js credentials, Neon Postgres, and Drizzle — ready for a free-tier deploy.",
-            },
-          ].map((card) => (
-            <div key={card.title} className="glass rounded-3xl p-5">
-              <h3 className="font-semibold">{card.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                {card.body}
-              </p>
-            </div>
-          ))}
-        </section>
+        <div className="mt-auto space-y-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <Link
+            href="/register"
+            className="flex h-12 w-full items-center justify-center rounded-2xl bg-zinc-900 text-[15px] font-semibold text-white transition active:scale-[0.98] hover:bg-zinc-800"
+          >
+            Create account
+          </Link>
+          <Link
+            href="/login"
+            className="flex h-12 w-full items-center justify-center rounded-2xl border border-zinc-200 bg-white text-[15px] font-semibold text-zinc-900 transition active:scale-[0.98] hover:bg-zinc-50"
+          >
+            Sign in
+          </Link>
+          <p className="pt-2 text-center text-xs text-zinc-400">
+            Daily logs · points · leaderboard
+          </p>
+        </div>
       </main>
     </div>
   );

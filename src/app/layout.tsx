@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -19,6 +19,23 @@ export const metadata: Metadata = {
   },
   description:
     "Track Dr. Jack Kruse-inspired lifestyle protocols for light, magnetism, water, and circadian health. Log daily actions, earn points, climb the leaderboard.",
+  icons: {
+    icon: "/icons/app-icon.jpg",
+    apple: "/icons/app-icon.jpg",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Mitochondriapp",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
