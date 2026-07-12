@@ -275,7 +275,7 @@ export function ActivityLog({
             className={cn(
               "shrink-0 rounded-full px-3 py-1.5 text-xs transition sm:text-sm",
               filter === f.key
-                ? "bg-accent font-medium text-[#041016]"
+                ? "bg-accent font-medium text-on-accent"
                 : "border border-border text-muted hover:text-foreground",
             )}
           >
@@ -692,7 +692,7 @@ function ActivityRow({
                   type="button"
                   onClick={onLog}
                   disabled={count >= max}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-[#041016] disabled:opacity-40"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-on-accent disabled:opacity-40"
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -712,7 +712,7 @@ function ActivityRow({
                   className={cn(
                     "inline-flex h-5 w-5 items-center justify-center rounded-full border",
                     done
-                      ? "border-accent bg-accent text-[#041016]"
+                      ? "border-accent bg-accent text-on-accent"
                       : "border-border text-transparent",
                   )}
                 >

@@ -10,6 +10,7 @@ export const TIME_OF_DAY_ORDER: TimeOfDay[] = [
   "anytime",
 ];
 
+/** Warm / low-blue accents only (no sky cyan / indigo / teal). */
 export const TIME_OF_DAY_META: Record<
   TimeOfDay,
   { label: string; blurb: string; accent: string; icon: string }
@@ -23,19 +24,19 @@ export const TIME_OF_DAY_META: Record<
   morning: {
     label: "Morning",
     blurb: "Build the day's mitochondrial baseline.",
-    accent: "from-sky-400/20 to-cyan-500/10 border-sky-400/30",
+    accent: "from-amber-300/20 to-yellow-600/10 border-amber-300/30",
     icon: "Sun",
   },
   afternoon: {
     label: "Afternoon",
     blurb: "Protect redox and keep light timing tight.",
-    accent: "from-yellow-400/15 to-lime-500/10 border-yellow-400/30",
+    accent: "from-yellow-500/15 to-orange-400/10 border-yellow-500/30",
     icon: "CloudSun",
   },
   evening: {
     label: "Evening",
     blurb: "Wind down blue light and artificial stress.",
-    accent: "from-violet-400/20 to-purple-500/10 border-violet-400/30",
+    accent: "from-orange-500/20 to-rose-700/10 border-orange-500/30",
     icon: "Sunset",
   },
   sunset: {
@@ -47,13 +48,13 @@ export const TIME_OF_DAY_META: Record<
   night: {
     label: "Night",
     blurb: "Darkness, sleep architecture, and recovery.",
-    accent: "from-indigo-500/20 to-slate-800/40 border-indigo-400/30",
+    accent: "from-stone-600/25 to-amber-950/40 border-stone-500/30",
     icon: "Moon",
   },
   anytime: {
     label: "Anytime",
     blurb: "Protocols that fit whenever you can do them.",
-    accent: "from-emerald-400/15 to-teal-500/10 border-emerald-400/30",
+    accent: "from-amber-600/15 to-orange-800/10 border-amber-600/30",
     icon: "Sparkles",
   },
 };

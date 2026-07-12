@@ -93,7 +93,7 @@ export async function SiteHeader({
               </Link>
               <Link
                 href="/register"
-                className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-[#041016] transition hover:brightness-110"
+                className="rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-on-accent transition hover:brightness-110"
               >
                 Get started
               </Link>

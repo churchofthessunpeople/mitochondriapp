@@ -35,7 +35,7 @@ export function BottomNav() {
       <div className="mx-auto flex max-w-lg justify-center px-3 py-2">
         <a
           href="/app"
-          className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-[#041016]"
+          className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-on-accent"
         >
           Back to app
         </a>

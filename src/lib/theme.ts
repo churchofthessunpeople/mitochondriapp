@@ -1,6 +1,8 @@
+/** dark = warm firelight night; light = warm parchment day — both low-blue. */
 export type Theme = "dark" | "light";
 
 export const THEME_STORAGE_KEY = "mitochondriapp-theme";
+/** Night / firelight by default (lowest blue for evening use). */
 export const DEFAULT_THEME: Theme = "dark";
 
 export function isTheme(value: unknown): value is Theme {

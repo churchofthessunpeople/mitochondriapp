@@ -167,7 +167,7 @@ export function ScheduleDay({
                     className={cn(
                       "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border tabular-nums text-sm font-semibold",
                       isDone
-                        ? "border-accent/50 bg-accent text-[#041016]"
+                        ? "border-accent/50 bg-accent text-on-accent"
                         : "border-border text-muted",
                     )}
                   >
@@ -227,7 +227,7 @@ export function ScheduleDay({
                     className={cn(
                       "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
                       isDone
-                        ? "border-accent/50 bg-accent text-[#041016]"
+                        ? "border-accent/50 bg-accent text-on-accent"
                         : "border-border text-muted",
                     )}
                   >

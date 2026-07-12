@@ -91,7 +91,7 @@ export function FriendsClient({ rows }: { rows: Row[] }) {
                   <button
                     type="button"
                     onClick={() => respond(r.id, true)}
-                    className="rounded-xl bg-accent px-3 py-1 text-xs font-semibold text-[#041016]"
+                    className="rounded-xl bg-accent px-3 py-1 text-xs font-semibold text-on-accent"
                   >
                     Accept
                   </button>

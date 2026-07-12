@@ -82,7 +82,7 @@ export function ScheduleEditor({ entries, catalog, availableCount }: Props) {
               className={cn(
                 "rounded-full px-3 py-1.5 text-sm transition",
                 slot === tod
-                  ? "bg-accent text-[#041016]"
+                  ? "bg-accent text-on-accent"
                   : "border border-border text-muted hover:text-foreground",
               )}
             >
@@ -128,7 +128,7 @@ export function ScheduleEditor({ entries, catalog, availableCount }: Props) {
                   type="button"
                   disabled={pending}
                   onClick={() => add(p.id)}
-                  className="inline-flex h-9 shrink-0 items-center gap-1 rounded-xl bg-accent px-3 text-sm font-semibold text-[#041016] disabled:opacity-50"
+                  className="inline-flex h-9 shrink-0 items-center gap-1 rounded-xl bg-accent px-3 text-sm font-semibold text-on-accent disabled:opacity-50"
                 >
                   <Plus className="h-4 w-4" />
                   Add

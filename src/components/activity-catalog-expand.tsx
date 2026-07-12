@@ -184,7 +184,7 @@ export function ActivityCatalogExpand({
                               className={cn(
                                 "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border",
                                 on
-                                  ? "border-accent/50 bg-accent text-[#041016]"
+                                  ? "border-accent/50 bg-accent text-on-accent"
                                   : "border-border text-muted",
                               )}
                             >
@@ -238,7 +238,7 @@ function Chip({
       className={cn(
         "shrink-0 rounded-full px-3 py-1.5 text-xs transition",
         active
-          ? "bg-accent font-medium text-[#041016]"
+          ? "bg-accent font-medium text-on-accent"
           : "border border-border text-muted hover:text-foreground",
       )}
     >
