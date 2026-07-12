@@ -41,8 +41,11 @@ export default async function RegionPage() {
         </h1>
         <p className="mt-2 text-sm text-muted">
           Enter a US ZIP for local sunrise/sunset. We map you to the nearest
-          curated lifestyle score (light · magnetism · policy). You can also
-          pick a named region directly.
+          curated lifestyle score (sun from latitude, magnetism from active
+          volcanoes/magma, politics from freedom/Bitcoin/CBDC factors).{" "}
+          <Link href="/region/scoring" className="text-accent hover:underline">
+            How scoring works
+          </Link>
         </p>
 
         {user?.placeLabel && (

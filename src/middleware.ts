@@ -17,6 +17,7 @@ export default auth((req) => {
     pathname.startsWith("/reminders") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/region");
+  // note: /region/scoring is under /region
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
