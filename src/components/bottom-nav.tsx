@@ -1,14 +1,14 @@
 "use client";
 
-import { History, LayoutList, Trophy, User } from "lucide-react";
+import { CalendarCheck, ListChecks, MapPin, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { href: "/today", label: "Today", icon: LayoutList },
-  { href: "/history", label: "History", icon: History },
-  { href: "/leaderboard", label: "Board", icon: Trophy },
+  { href: "/place", label: "Place", icon: MapPin },
+  { href: "/schedule", label: "Schedule", icon: CalendarCheck },
+  { href: "/activities", label: "Activities", icon: ListChecks },
   { href: "/account", label: "Account", icon: User },
 ] as const;
 

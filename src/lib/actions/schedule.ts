@@ -4,7 +4,12 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { protocols, userScheduleItems, type TimeOfDay } from "@/db/schema";
+import {
+  protocols,
+  userFavorites,
+  userScheduleItems,
+  type TimeOfDay,
+} from "@/db/schema";
 import { canAssignToSlot } from "@/lib/schedule-rules";
 import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 
@@ -38,6 +43,23 @@ export async function addToScheduleAction(
     );
   }
 
+  // Must be on the user's available (via) list first
+  const [available] = await db
+    .select({ protocolId: userFavorites.protocolId })
+    .from(userFavorites)
+    .where(
+      and(
+        eq(userFavorites.userId, userId),
+        eq(userFavorites.protocolId, protocolId),
+      ),
+    )
+    .limit(1);
+  if (!available) {
+    throw new Error(
+      "Mark this activity as available on My activities before scheduling it.",
+    );
+  }
+
   await db
     .insert(userScheduleItems)
     .values({
@@ -48,8 +70,9 @@ export async function addToScheduleAction(
     })
     .onConflictDoNothing();
 
-  revalidatePath("/today");
   revalidatePath("/schedule");
+  revalidatePath("/activities");
+  revalidatePath("/place");
 }
 
 export async function removeFromScheduleAction(scheduleId: string) {
@@ -64,8 +87,9 @@ export async function removeFromScheduleAction(scheduleId: string) {
       ),
     );
 
-  revalidatePath("/today");
   revalidatePath("/schedule");
+  revalidatePath("/activities");
+  revalidatePath("/place");
 }
 
 export async function moveScheduleItemAction(
@@ -126,6 +150,7 @@ export async function moveScheduleItemAction(
       ),
     );
 
-  revalidatePath("/today");
   revalidatePath("/schedule");
+  revalidatePath("/activities");
+  revalidatePath("/place");
 }

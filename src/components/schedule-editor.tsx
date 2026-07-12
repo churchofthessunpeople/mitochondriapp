@@ -15,10 +15,12 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   entries: ScheduleEntry[];
+  /** Only activities marked available for this user */
   catalog: Protocol[];
+  availableCount?: number;
 };
 
-export function ScheduleEditor({ entries, catalog }: Props) {
+export function ScheduleEditor({ entries, catalog, availableCount }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -66,8 +68,9 @@ export function ScheduleEditor({ entries, catalog }: Props) {
       <div className="glass rounded-3xl p-5">
         <h2 className="text-lg font-semibold">Add activity to a time of day</h2>
         <p className="mt-1 text-sm text-muted">
-          Sunrise/sunset-locked items can only go in those slots. Multi-log
-          activities (sun, water, mastic gum, etc.) can sit in several slots.
+          Showing your available list
+          {availableCount != null ? ` (${availableCount})` : ""}. Sunrise/sunset
+          locked items only go in those slots.
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">

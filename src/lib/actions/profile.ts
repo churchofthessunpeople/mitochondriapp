@@ -43,6 +43,7 @@ export async function updateTimezoneAction(
   }
   await db.update(users).set({ timezone: tz }).where(eq(users.id, userId));
   revalidatePath("/account");
+  revalidatePath("/place");
   revalidatePath("/today");
   return { success: "Timezone updated." };
 }

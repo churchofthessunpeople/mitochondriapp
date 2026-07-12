@@ -71,8 +71,8 @@ export default async function RegionPage() {
     <div className="min-h-screen pb-24 md:pb-16">
       <SiteHeader active="account" />
       <main className="mx-auto max-w-lg px-4 py-8 sm:px-6">
-        <Link href="/today" className="text-sm text-accent hover:underline">
-          ← Today
+        <Link href="/place" className="text-sm text-accent hover:underline">
+          ← Place
         </Link>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight">
           Location & region

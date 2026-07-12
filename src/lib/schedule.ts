@@ -6,7 +6,6 @@ import {
   type Protocol,
   type TimeOfDay,
 } from "@/db/schema";
-import { PROTOCOL_SEEDS } from "@/db/seed-data";
 import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 
 export { canAssignToSlot } from "@/lib/schedule-rules";
@@ -18,45 +17,15 @@ export type ScheduleEntry = {
   protocol: Protocol;
 };
 
-/** Seed a new user's schedule from catalog defaults. */
-export async function ensureDefaultSchedule(userId: string) {
-  const existing = await db
-    .select({ id: userScheduleItems.id })
-    .from(userScheduleItems)
-    .where(eq(userScheduleItems.userId, userId))
-    .limit(1);
-
-  if (existing.length > 0) return;
-
-  let catalog = await db
-    .select()
-    .from(protocols)
-    .where(eq(protocols.active, true))
-    .orderBy(asc(protocols.sortOrder));
-
-  if (catalog.length === 0) {
-    catalog = PROTOCOL_SEEDS.map((s) => ({
-      ...s,
-      active: true,
-      createdAt: new Date(),
-    }));
-  }
-
-  const rows = catalog.map((p, index) => ({
-    userId,
-    protocolId: p.id,
-    timeOfDay: (p.lockedTimeOfDay ?? p.timeOfDay) as TimeOfDay,
-    sortOrder: p.sortOrder ?? index,
-  }));
-
-  if (rows.length > 0) {
-    await db.insert(userScheduleItems).values(rows).onConflictDoNothing();
-  }
+/**
+ * Previously auto-seeded every catalog item into a new user's schedule.
+ * Users now pick an available list, then build the schedule themselves.
+ */
+export async function ensureDefaultSchedule(_userId: string) {
+  return;
 }
 
 export async function getUserSchedule(userId: string): Promise<ScheduleEntry[]> {
-  await ensureDefaultSchedule(userId);
-
   const rows = await db
     .select({
       scheduleId: userScheduleItems.id,

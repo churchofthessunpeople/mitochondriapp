@@ -10,9 +10,11 @@ import { listRegions } from "@/lib/regions";
 import { AUTH_RATE, consumeRateLimit, getClientIp } from "@/lib/rate-limit";
 
 function revalidateLocation() {
+  revalidatePath("/place");
   revalidatePath("/today");
   revalidatePath("/account");
   revalidatePath("/region");
+  revalidatePath("/schedule");
 }
 
 export async function setUserRegionAction(regionId: string) {

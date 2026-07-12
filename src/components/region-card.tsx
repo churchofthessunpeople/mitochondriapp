@@ -175,7 +175,7 @@ export function RegionCard({
       <p className="mt-3 text-[10px] leading-relaxed text-muted">
         Scores and place factors are a lifestyle framework for the nearest
         curated place — not a medical rating of your street.{" "}
-        <Link href="/region" className="text-accent hover:underline">
+        <Link href="/place" className="text-accent hover:underline">
           Change ZIP or region
         </Link>
       </p>

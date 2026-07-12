@@ -16,6 +16,8 @@ async function requireUser() {
 }
 
 function revalidateLogs() {
+  revalidatePath("/schedule");
+  revalidatePath("/place");
   revalidatePath("/today");
   revalidatePath("/history");
   revalidatePath("/leaderboard");

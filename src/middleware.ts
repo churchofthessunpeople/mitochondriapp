@@ -8,8 +8,10 @@ export default auth((req) => {
   const isAuthPage =
     pathname.startsWith("/login") || pathname.startsWith("/register");
   const isProtected =
+    pathname.startsWith("/place") ||
     pathname.startsWith("/today") ||
     pathname.startsWith("/schedule") ||
+    pathname.startsWith("/activities") ||
     pathname.startsWith("/history") ||
     pathname.startsWith("/leaderboard") ||
     pathname.startsWith("/account") ||
@@ -17,7 +19,6 @@ export default auth((req) => {
     pathname.startsWith("/reminders") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/region");
-  // note: /region/scoring is under /region
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
@@ -26,7 +27,7 @@ export default auth((req) => {
   }
 
   if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL("/today", req.nextUrl.origin));
+    return NextResponse.redirect(new URL("/place", req.nextUrl.origin));
   }
 
   return NextResponse.next();
@@ -34,8 +35,10 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
+    "/place/:path*",
     "/today/:path*",
     "/schedule/:path*",
+    "/activities/:path*",
     "/history/:path*",
     "/leaderboard/:path*",
     "/account/:path*",

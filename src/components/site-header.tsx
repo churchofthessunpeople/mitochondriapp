@@ -6,9 +6,9 @@ import { logoutAction } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/today", label: "Today", key: "today" },
-  { href: "/history", label: "History", key: "history" },
-  { href: "/leaderboard", label: "Board", key: "leaderboard" },
+  { href: "/place", label: "Place", key: "place" },
+  { href: "/schedule", label: "Schedule", key: "schedule" },
+  { href: "/activities", label: "Activities", key: "activities" },
   { href: "/account", label: "Account", key: "account" },
 ] as const;
 
@@ -16,14 +16,18 @@ export async function SiteHeader({
   active,
 }: {
   active?:
-    | "today"
+    | "place"
     | "schedule"
+    | "activities"
+    | "today"
     | "history"
     | "leaderboard"
     | "account"
     | "home";
 }) {
   const session = await auth();
+  // Legacy "today" maps to place for active highlight
+  const activeKey = active === "today" ? "place" : active;
 
   return (
     <header
@@ -32,7 +36,7 @@ export async function SiteHeader({
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
         <Link
-          href={session ? "/today" : "/"}
+          href={session ? "/place" : "/"}
           className="flex min-w-0 items-center gap-2"
         >
           <Image
@@ -61,7 +65,7 @@ export async function SiteHeader({
                   href={item.href}
                   className={cn(
                     "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
-                    active === item.key
+                    activeKey === item.key
                       ? "bg-foreground/10 text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground",
                   )}
