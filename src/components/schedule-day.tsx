@@ -8,7 +8,12 @@ import {
   removeOneCompletionAction,
 } from "@/lib/actions/completions";
 import { orderProtocolsForNow } from "@/lib/checklist-order";
-import { maxLogsPerDay, pointsForLog } from "@/lib/scoring";
+import {
+  isSunriseProtocol,
+  maxLogsPerDay,
+  pointsForLog,
+  SUNRISE_MULTIPLIER,
+} from "@/lib/scoring";
 import type { WeeklySummary } from "@/lib/weekly";
 import { useToast } from "@/components/toast";
 import { cn, formatPoints } from "@/lib/utils";
@@ -26,6 +31,8 @@ type Props = {
   localHour?: number;
   seasonLine?: string | null;
   weekly?: WeeklySummary | null;
+  /** Server: at least one sunrise protocol logged today */
+  sunriseBuffActive?: boolean;
   onStatsChange?: (s: {
     dayPoints: number;
     streak: { current: number; best: number };
@@ -43,12 +50,14 @@ export function ScheduleDay({
   localHour = 12,
   seasonLine,
   weekly,
+  sunriseBuffActive: initialSunriseBuff = false,
   onStatsChange,
 }: Props) {
   const { push } = useToast();
   const [pending, start] = useTransition();
   const [dayPoints, setDayPoints] = useState(initialPoints);
   const [streak, setStreak] = useState(initialStreak);
+  const [sunriseBuff, setSunriseBuff] = useState(initialSunriseBuff);
   const [durationFor, setDurationFor] = useState<Protocol | null>(null);
   const [durationMins, setDurationMins] = useState(15);
 
@@ -89,9 +98,11 @@ export function ScheduleDay({
     streak: { current: number; best: number };
     count?: number;
     protocolId?: string;
+    sunriseBuffActive?: boolean;
   }) {
     setDayPoints(snap.dayPoints);
     setStreak(snap.streak);
+    if (snap.sunriseBuffActive != null) setSunriseBuff(snap.sunriseBuffActive);
     onStatsChange?.({ dayPoints: snap.dayPoints, streak: snap.streak });
     if (snap.protocolId != null && snap.count != null) {
       setCounts({
@@ -104,7 +115,17 @@ export function ScheduleDay({
 
   function protocolHint(p: Protocol): string {
     const max = maxLogsPerDay(p);
-    const parts: string[] = [`${p.points} pts`];
+    const sunrise = isSunriseProtocol(p);
+    const base = sunrise
+      ? p.points
+      : pointsForLog(p, null, { sunriseBuffActive: sunriseBuff });
+    const parts: string[] = [
+      sunrise
+        ? `${p.points} pts · unlocks ${SUNRISE_MULTIPLIER}× day`
+        : sunriseBuff
+          ? `${base} pts (${SUNRISE_MULTIPLIER}×)`
+          : `${p.points} pts`,
+    ];
     if (p.allowsMultiple) parts.push(`up to ${max}×`);
     if (p.durationEnabled) {
       parts.push(`scales ~${p.referenceMinutes} min`);
@@ -129,7 +150,11 @@ export function ScheduleDay({
             res.streakBonus && res.streakBonus > 0
               ? ` · +${res.streakBonus} streak`
               : "";
-          push(`Done · +${res.points} pts${extra}`);
+          const buff =
+            isSunriseProtocol(protocol) && res.sunriseBuffActive
+              ? ` · ${SUNRISE_MULTIPLIER}× on other activities today`
+              : "";
+          push(`Done · +${res.points} pts${extra}${buff}`);
         } else {
           push("Unchecked");
         }
@@ -305,6 +330,22 @@ export function ScheduleDay({
         total={total}
       />
 
+      {sunriseBuff ? (
+        <p className="rounded-2xl border border-accent/30 bg-accent/10 px-3.5 py-2.5 text-xs leading-relaxed text-accent">
+          <span className="font-semibold">Sunrise buff active · </span>
+          Other activities earn {SUNRISE_MULTIPLIER}× points today. Sunrise
+          logs keep their base value.
+        </p>
+      ) : (
+        protocols.some(isSunriseProtocol) && (
+          <p className="rounded-2xl border border-border px-3.5 py-2.5 text-xs leading-relaxed text-muted">
+            <span className="font-medium text-foreground">Tip · </span>
+            Complete a sunrise activity to unlock {SUNRISE_MULTIPLIER}× on
+            everything else today.
+          </p>
+        )
+      )}
+
       {seasonLine && (
         <p className="rounded-2xl border border-accent/20 bg-accent/5 px-3.5 py-2.5 text-xs leading-relaxed text-muted">
           <span className="font-medium text-foreground">Season · </span>
@@ -433,7 +474,15 @@ export function ScheduleDay({
               />
             </label>
             <p className="mt-2 text-xs text-accent">
-              ≈ {pointsForLog(durationFor, durationMins)} pts this log
+              ≈{" "}
+              {pointsForLog(durationFor, durationMins, {
+                sunriseBuffActive:
+                  sunriseBuff && !isSunriseProtocol(durationFor),
+              })}{" "}
+              pts this log
+              {sunriseBuff && !isSunriseProtocol(durationFor)
+                ? ` (${SUNRISE_MULTIPLIER}× sunrise)`
+                : ""}
             </p>
             <button
               type="button"

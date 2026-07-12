@@ -61,7 +61,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "sunrise-grounding",
     name: "Sunrise + grounding",
     description:
-      "See the sunrise with as much skin exposed as practical while bare skin contacts the earth.",
+      "See the sunrise with as much skin exposed as practical while bare skin contacts the earth. Unlocks 1.5× points on all other activities today.",
     points: 10,
     category: "light",
     timeOfDay: "sunrise",
@@ -72,7 +72,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "no-sunglasses-sunrise",
     name: "No sunglasses at sunrise",
     description:
-      "Full-spectrum morning light to the eyes without sunglasses at sunrise.",
+      "Full-spectrum morning light to the eyes without sunglasses at sunrise. Also unlocks the 1.5× sunrise buff for the day.",
     points: 4,
     category: "light",
     timeOfDay: "sunrise",

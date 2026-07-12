@@ -7,7 +7,12 @@ import { db } from "@/db";
 import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
-import { maxLogsPerDay, pointsForLog, streakBonusPoints } from "@/lib/scoring";
+import {
+  isSunriseProtocol,
+  maxLogsPerDay,
+  pointsForLog,
+  streakBonusPoints,
+} from "@/lib/scoring";
 import { getUserStreak, hasStreakBonusToday } from "@/lib/streaks";
 
 async function requireUser() {
@@ -42,22 +47,108 @@ export type CompletionResult = {
   dayPoints: number;
   streak: { current: number; best: number };
   count: number;
+  sunriseBuffActive: boolean;
 };
 
 async function daySnapshot(
   userId: string,
   completedOn: string,
   protocolId: string,
-): Promise<Pick<CompletionResult, "dayPoints" | "streak" | "count">> {
-  const [stats, streak] = await Promise.all([
+): Promise<
+  Pick<
+    CompletionResult,
+    "dayPoints" | "streak" | "count" | "sunriseBuffActive"
+  >
+> {
+  const [stats, streak, sunriseBuffActive] = await Promise.all([
     getUserDayStats(userId, completedOn),
     getUserStreak(userId, completedOn),
+    hasSunriseBuffToday(userId, completedOn),
   ]);
   return {
     dayPoints: stats.points,
     streak,
     count: stats.completionCounts.get(protocolId) ?? 0,
+    sunriseBuffActive,
   };
+}
+
+/** True if any sunrise-slot protocol was logged today (non-streak). */
+export async function hasSunriseBuffToday(
+  userId: string,
+  completedOn: string,
+): Promise<boolean> {
+  try {
+    const rows = await db
+      .select({
+        protocolId: dailyCompletions.protocolId,
+        timeOfDay: protocols.timeOfDay,
+        lockedTimeOfDay: protocols.lockedTimeOfDay,
+      })
+      .from(dailyCompletions)
+      .innerJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
+      .where(
+        and(
+          eq(dailyCompletions.userId, userId),
+          eq(dailyCompletions.completedOn, completedOn),
+          eq(dailyCompletions.isStreakBonus, false),
+        ),
+      );
+
+    return rows.some((r) =>
+      isSunriseProtocol({
+        timeOfDay: r.timeOfDay,
+        lockedTimeOfDay: r.lockedTimeOfDay,
+      }),
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Recompute pointsEarned for all real logs today with current sunrise buff state.
+ * Sunrise protocols keep base; others get 1.5× when buff is active.
+ */
+async function recomputeDayPoints(
+  userId: string,
+  completedOn: string,
+  sunriseBuffActive: boolean,
+) {
+  const rows = await db
+    .select({
+      id: dailyCompletions.id,
+      protocolId: dailyCompletions.protocolId,
+      durationMinutes: dailyCompletions.durationMinutes,
+      pointsEarned: dailyCompletions.pointsEarned,
+      protocol: protocols,
+    })
+    .from(dailyCompletions)
+    .innerJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
+    .where(
+      and(
+        eq(dailyCompletions.userId, userId),
+        eq(dailyCompletions.completedOn, completedOn),
+        eq(dailyCompletions.isStreakBonus, false),
+      ),
+    );
+
+  for (const row of rows) {
+    const next = pointsForLog(row.protocol, row.durationMinutes, {
+      sunriseBuffActive,
+    });
+    if (next !== row.pointsEarned) {
+      await db
+        .update(dailyCompletions)
+        .set({ pointsEarned: next })
+        .where(
+          and(
+            eq(dailyCompletions.id, row.id),
+            eq(dailyCompletions.userId, userId),
+          ),
+        );
+    }
+  }
 }
 
 export async function logCompletionAction(
@@ -95,6 +186,7 @@ export async function logCompletionAction(
 
   const count = existing.length;
   const max = maxLogsPerDay(protocol);
+  const wasSunrise = isSunriseProtocol(protocol);
 
   if (!protocol.allowsMultiple) {
     if (count > 0) {
@@ -106,6 +198,9 @@ export async function logCompletionAction(
             eq(dailyCompletions.userId, userId),
           ),
         );
+      // If we removed a sunrise, drop 1.5× from other logs; if not, recompute is no-op-ish
+      const buff = await hasSunriseBuffToday(userId, completedOn);
+      await recomputeDayPoints(userId, completedOn, buff);
       revalidateLogs();
       const snap = await daySnapshot(userId, completedOn, protocolId);
       return { action: "removed", points: 0, ...snap };
@@ -114,7 +209,15 @@ export async function logCompletionAction(
     throw new Error(`Daily limit reached (${max}× for this activity).`);
   }
 
-  const points = pointsForLog(protocol, options?.durationMinutes);
+  // Buff from *existing* sunrise logs (this new log isn't counted yet)
+  const buffBefore = await hasSunriseBuffToday(userId, completedOn);
+  // If logging sunrise, other activities will get buff after this insert
+  const buffForThisLog = wasSunrise ? false : buffBefore;
+
+  const points = pointsForLog(protocol, options?.durationMinutes, {
+    sunriseBuffActive: buffForThisLog,
+  });
+
   await db.insert(dailyCompletions).values({
     userId,
     protocolId,
@@ -124,6 +227,11 @@ export async function logCompletionAction(
     pointsEarned: points,
     isStreakBonus: false,
   });
+
+  // First sunrise of the day: retroactively apply 1.5× to earlier non-sunrise logs
+  if (wasSunrise) {
+    await recomputeDayPoints(userId, completedOn, true);
+  }
 
   let streakBonus = 0;
   if (count === 0 && !(await hasStreakBonusToday(userId, completedOn))) {
@@ -155,7 +263,10 @@ export async function removeOneCompletionAction(
   const completedOn = await userToday(userId);
 
   const [latest] = await db
-    .select()
+    .select({
+      id: dailyCompletions.id,
+      protocolId: dailyCompletions.protocolId,
+    })
     .from(dailyCompletions)
     .where(
       and(
@@ -177,6 +288,9 @@ export async function removeOneCompletionAction(
           eq(dailyCompletions.userId, userId),
         ),
       );
+
+    const buff = await hasSunriseBuffToday(userId, completedOn);
+    await recomputeDayPoints(userId, completedOn, buff);
   }
 
   revalidateLogs();

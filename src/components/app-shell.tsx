@@ -41,6 +41,7 @@ export type AppShellProps = {
   localHour: number;
   seasonLine: string | null;
   weekly: WeeklySummary | null;
+  sunriseBuffActive?: boolean;
   isTravel?: boolean;
   travelUntil?: string | null;
   homePostalCode?: string | null;
@@ -72,6 +73,7 @@ export function AppShell({
   localHour,
   seasonLine,
   weekly,
+  sunriseBuffActive = false,
   isTravel,
   travelUntil,
   homePostalCode,
@@ -207,6 +209,7 @@ export function AppShell({
               localHour={localHour}
               seasonLine={seasonLine}
               weekly={weekly}
+              sunriseBuffActive={sunriseBuffActive}
             />
 
             <ActivityCatalogExpand

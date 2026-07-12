@@ -24,6 +24,7 @@ import {
   getUserAppFlags,
   redirectIfNeedsOnboarding,
 } from "@/lib/require-onboarding";
+import { hasSunriseBuffToday } from "@/lib/actions/completions";
 import { getUserStreak } from "@/lib/streaks";
 import { getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 import { getWeeklySummary } from "@/lib/weekly";
@@ -69,12 +70,14 @@ export default async function AppPage({
 
   const date = getTodayIsoForTimezone(tz);
 
-  const [dayStats, streak, weekly, region] = await Promise.all([
-    getUserDayStats(session.user.id, date),
-    getUserStreak(session.user.id, date),
-    getWeeklySummary(session.user.id, date),
-    getRegionById(userFlags?.regionId),
-  ]);
+  const [dayStats, streak, weekly, region, sunriseBuffActive] =
+    await Promise.all([
+      getUserDayStats(session.user.id, date),
+      getUserStreak(session.user.id, date),
+      getWeeklySummary(session.user.id, date),
+      getRegionById(userFlags?.regionId),
+      hasSunriseBuffToday(session.user.id, date),
+    ]);
 
   const hasCoords = loc.latitude != null && loc.longitude != null;
   const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
@@ -159,6 +162,7 @@ export default async function AppPage({
       localHour={localHour}
       seasonLine={seasonLine}
       weekly={weekly}
+      sunriseBuffActive={sunriseBuffActive}
       isTravel={loc.isTravel}
       travelUntil={loc.travelUntil}
       homePostalCode={userFlags?.postalCode ?? null}
