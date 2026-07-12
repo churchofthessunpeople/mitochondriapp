@@ -27,6 +27,8 @@ type Props = {
   streak: { current: number; best: number };
   dateLabel: string;
   onExpandCatalog?: () => void;
+  /** Hide duplicate date title when parent already shows it */
+  hideTitle?: boolean;
   phase?: Phase;
   localHour?: number;
   seasonLine?: string | null;
