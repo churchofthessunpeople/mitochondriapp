@@ -67,16 +67,17 @@ export function RegionCard({
         )}
       </div>
 
+      {/* One 3-col grid so sun + score columns share the same tracks */}
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <SunStat
+        <StatCell
           label="Sunrise"
           value={formatTimeInZone(sun.sunrise, tz)}
         />
-        <SunStat
+        <StatCell
           label="Sunset"
           value={formatTimeInZone(sun.sunset, tz)}
         />
-        <SunStat
+        <StatCell
           label="Day length"
           value={
             sun.dayLengthHours != null
@@ -84,15 +85,26 @@ export function RegionCard({
               : "—"
           }
         />
+        {region && (
+          <>
+            <StatCell
+              label="Sun"
+              value={String(region.sunScore)}
+              valueClassName={scoreColor(region.sunScore)}
+            />
+            <StatCell
+              label="Magnetism"
+              value={String(region.magnetismScore)}
+              valueClassName={scoreColor(region.magnetismScore)}
+            />
+            <StatCell
+              label="Policy"
+              value={String(region.policyScore)}
+              valueClassName={scoreColor(region.policyScore)}
+            />
+          </>
+        )}
       </div>
-
-      {region && (
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          <ScorePill label="Sun" score={region.sunScore} />
-          <ScorePill label="Magnetism" score={region.magnetismScore} />
-          <ScorePill label="Policy" score={region.policyScore} />
-        </div>
-      )}
 
       {!compact && region && (
         <>
@@ -127,30 +139,31 @@ export function RegionCard({
   );
 }
 
-function SunStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-foreground/[0.03] px-2.5 py-2">
-      <p className="text-[10px] uppercase tracking-wider text-muted">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold tabular-nums">{value}</p>
-    </div>
-  );
+function scoreColor(score: number): string {
+  if (score >= 4) return "text-accent";
+  if (score <= 2) return "text-accent-2";
+  return "text-foreground";
 }
 
-function ScorePill({ label, score }: { label: string; score: number }) {
+function StatCell({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: string;
+  valueClassName?: string;
+}) {
   return (
-    <div className="rounded-2xl border border-border px-2 py-2 text-center">
-      <p className="text-[10px] text-muted">{label}</p>
+    <div className="flex min-w-0 flex-col items-center justify-center rounded-2xl border border-border bg-foreground/[0.03] px-2 py-2.5 text-center">
+      <p className="text-[10px] uppercase tracking-wider text-muted">{label}</p>
       <p
         className={cn(
-          "text-lg font-semibold tabular-nums",
-          score >= 4
-            ? "text-accent"
-            : score <= 2
-              ? "text-accent-2"
-              : "text-foreground",
+          "mt-0.5 text-sm font-semibold tabular-nums leading-tight",
+          valueClassName ?? "text-foreground",
         )}
       >
-        {score}
+        {value}
       </p>
     </div>
   );
