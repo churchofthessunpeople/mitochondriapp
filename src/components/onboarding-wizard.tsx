@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useOptimistic, useState, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
+import { logCompletionAction } from "@/lib/actions/completions";
 import { markOnboardingCompleteAction } from "@/lib/actions/onboarding";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import {
@@ -13,7 +14,7 @@ import {
 } from "@/lib/actions/region";
 import { cn } from "@/lib/utils";
 
-type Step = "welcome" | "location" | "activities" | "done";
+type Step = "welcome" | "location" | "activities" | "firstwin" | "done";
 
 type Props = {
   starterProtocols: Protocol[];
@@ -78,8 +79,16 @@ export function OnboardingWizard({
     });
   }
 
-  const steps: Step[] = ["welcome", "location", "activities", "done"];
+  const steps: Step[] = [
+    "welcome",
+    "location",
+    "activities",
+    "firstwin",
+    "done",
+  ];
   const stepIndex = steps.indexOf(step);
+
+  const winCandidates = starterProtocols.filter((p) => available.has(p.id)).slice(0, 4);
 
   return (
     <div className="mx-auto max-w-lg px-4 py-8 sm:px-6">
@@ -271,7 +280,9 @@ export function OnboardingWizard({
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
-              onClick={() => setStep("done")}
+              onClick={() =>
+                setStep(available.size > 0 ? "firstwin" : "done")
+              }
               className="btn-primary inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-sm font-semibold"
             >
               {available.size > 0
@@ -290,6 +301,54 @@ export function OnboardingWizard({
         </section>
       )}
 
+      {step === "firstwin" && (
+        <section>
+          <p className="text-xs uppercase tracking-[0.2em] text-accent">
+            Step 3 of 4
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight">
+            Log one thing now
+          </h1>
+          <p className="mt-2 text-sm text-muted">
+            First points unlock the habit. Pick anything you already did today
+            (or skip).
+          </p>
+          <ul className="mt-5 space-y-2">
+            {winCandidates.map((p) => (
+              <li key={p.id}>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => {
+                    start(async () => {
+                      try {
+                        await logCompletionAction(p.id);
+                        setStep("done");
+                      } catch (e) {
+                        setError(
+                          e instanceof Error ? e.message : "Could not log",
+                        );
+                      }
+                    });
+                  }}
+                  className="flex w-full items-center justify-between rounded-2xl border border-border px-4 py-3 text-left hover:border-accent/40"
+                >
+                  <span className="font-medium">{p.name}</span>
+                  <span className="text-xs text-accent">+{p.points} pts</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={() => setStep("done")}
+            className="btn-secondary mt-6 h-12 w-full rounded-2xl text-sm font-semibold"
+          >
+            Skip for now
+          </button>
+        </section>
+      )}
+
       {step === "done" && (
         <section className="text-center">
           <p className="text-xs uppercase tracking-[0.2em] text-accent">
@@ -299,13 +358,13 @@ export function OnboardingWizard({
             You&apos;re set
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Your daily checklist shows only what you marked available. Tap items
-            when you complete them. Open Place anytime for sun and scores.
+            Your checklist shows only what you can do. Suggested-now items float
+            to the top with sunrise and sunset. Place holds your ZIP and scores.
           </p>
           <div className="glass mx-auto mt-6 max-w-sm rounded-3xl p-4 text-left text-sm text-muted">
             <p>
-              <span className="text-foreground">Tip:</span> come back around
-              sunrise and evening — light timing is the whole game.
+              <span className="text-foreground">Tip:</span> protect darkness at
+              night — this app stays warm/low-blue by default.
             </p>
           </div>
           <button

@@ -15,6 +15,13 @@ export const getUserAppFlags = cache(async (userId: string) => {
       latitude: users.latitude,
       longitude: users.longitude,
       timezone: users.timezone,
+      elevationM: users.elevationM,
+      travelPostalCode: users.travelPostalCode,
+      travelPlaceLabel: users.travelPlaceLabel,
+      travelLatitude: users.travelLatitude,
+      travelLongitude: users.travelLongitude,
+      travelTimezone: users.travelTimezone,
+      travelUntil: users.travelUntil,
     })
     .from(users)
     .where(eq(users.id, userId))
@@ -28,7 +35,6 @@ export async function redirectIfNeedsOnboarding(userId: string) {
   if (!row) return;
   if (row.onboardingComplete) return;
 
-  // Legacy accounts already using the app — don't force the wizard
   const [fav] = await db
     .select({ protocolId: userFavorites.protocolId })
     .from(userFavorites)

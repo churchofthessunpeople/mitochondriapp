@@ -60,7 +60,7 @@ export function AccountPanel({ user }: { user: AccountPanelUser }) {
       <div className="flex flex-wrap gap-2 text-sm">
         <Link
           href="/history"
-          className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
+          className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-accent"
         >
           History
         </Link>

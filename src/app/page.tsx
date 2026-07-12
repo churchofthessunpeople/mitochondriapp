@@ -21,7 +21,10 @@ export default async function HomePage() {
           <div className="relative mb-8">
             <div
               className="absolute inset-0 scale-110 rounded-[2rem] blur-2xl"
-              style={{ background: "color-mix(in srgb, var(--muted) 18%, transparent)" }}
+              style={{
+                background:
+                  "color-mix(in srgb, var(--accent) 18%, transparent)",
+              }}
             />
             <Image
               src="/icons/app-icon.jpg"
@@ -35,15 +38,20 @@ export default async function HomePage() {
           </div>
 
           <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-muted">
-            Black swan protocols
+            Light · place · protocol
           </p>
           <h1 className="mt-3 text-[2rem] font-semibold tracking-tight text-foreground sm:text-4xl">
             Mitochondriapp
           </h1>
           <p className="mt-3 max-w-xs text-[15px] leading-relaxed text-muted">
-            Track light, grounding, and lifestyle protocols — one day at a time.
-            Sign up with a username (no email needed).
+            What light-and-life actions matter for you, today, where you are —
+            and a warm low-blue checklist to log them.
           </p>
+          <ul className="mx-auto mt-6 max-w-xs space-y-2 text-left text-sm text-muted">
+            <li>· US ZIP → sunrise/sunset at your coordinates</li>
+            <li>· Pick only activities you can actually do</li>
+            <li>· Suggested-now follows the sun phase</li>
+          </ul>
         </div>
 
         <div className="mt-auto space-y-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
@@ -60,7 +68,7 @@ export default async function HomePage() {
             Sign in
           </Link>
           <p className="pt-2 text-center text-xs text-muted">
-            Daily logs · points · leaderboard
+            Username signup · firelight theme · points & streaks
           </p>
         </div>
       </main>

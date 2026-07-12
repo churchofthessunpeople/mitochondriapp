@@ -5,6 +5,10 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import type { Protocol, ProtocolCategory } from "@/db/schema";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
+import {
+  equipmentLabel,
+  getProtocolMeta,
+} from "@/lib/protocol-meta";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/utils";
 
@@ -41,6 +45,10 @@ export function ActivityCatalogExpand({
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ProtocolCategory | "all">("all");
+  /** Default: show items not yet on the checklist (add more) */
+  const [listFilter, setListFilter] = useState<"not_on" | "on" | "all">(
+    "not_on",
+  );
   const [, start] = useTransition();
   const [available, setAvailable] = useState(() => new Set(initialIds));
 
@@ -53,6 +61,8 @@ export function ActivityCatalogExpand({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return protocols.filter((p) => {
+      if (listFilter === "not_on" && available.has(p.id)) return false;
+      if (listFilter === "on" && !available.has(p.id)) return false;
       if (category !== "all" && p.category !== category) return false;
       if (q) {
         const hay = `${p.name} ${p.description}`.toLowerCase();
@@ -60,7 +70,7 @@ export function ActivityCatalogExpand({
       }
       return true;
     });
-  }, [protocols, query, category]);
+  }, [protocols, query, category, listFilter, available]);
 
   const grouped = useMemo(() => {
     const map = new Map<ProtocolCategory, Protocol[]>();
@@ -142,9 +152,26 @@ export function ActivityCatalogExpand({
 
           <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <Chip
+              active={listFilter === "not_on"}
+              onClick={() => setListFilter("not_on")}
+              label="Not on list"
+            />
+            <Chip
+              active={listFilter === "on"}
+              onClick={() => setListFilter("on")}
+              label="On list"
+            />
+            <Chip
+              active={listFilter === "all"}
+              onClick={() => setListFilter("all")}
+              label="All"
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <Chip
               active={category === "all"}
               onClick={() => setCategory("all")}
-              label="All"
+              label="Any group"
             />
             {CATEGORY_ORDER.map((c) => (
               <Chip
@@ -168,6 +195,7 @@ export function ActivityCatalogExpand({
                   <ul className="space-y-2">
                     {list.map((p) => {
                       const on = available.has(p.id);
+                      const meta = getProtocolMeta(p.id);
                       return (
                         <li key={p.id}>
                           <button
@@ -197,9 +225,14 @@ export function ActivityCatalogExpand({
                               <span className="mt-0.5 block text-[11px] leading-relaxed text-muted">
                                 {p.description}
                               </span>
+                              {meta.how && (
+                                <span className="mt-0.5 block text-[11px] leading-relaxed text-foreground/80">
+                                  How: {meta.how}
+                                </span>
+                              )}
                               <span className="mt-1 block text-[10px] text-muted">
-                                {p.points} pts
-                                {on ? " · on your checklist" : ""}
+                                {p.points} pts · {equipmentLabel(meta.equipment)}
+                                {on ? " · on checklist" : ""}
                               </span>
                             </span>
                           </button>

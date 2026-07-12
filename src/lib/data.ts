@@ -169,6 +169,48 @@ export async function getWeeklyLeaderboard(limit = 20) {
   });
 }
 
+/** Weekly ranking by light-category protocol points (not total points). */
+export async function getWeeklyLightLeaderboard(limit = 20) {
+  const from = new Date();
+  from.setDate(from.getDate() - 7);
+  const fromDate = from.toISOString().slice(0, 10);
+  try {
+    const rows = await db
+      .select({
+        userId: dailyCompletions.userId,
+        name: users.displayName,
+        username: users.username,
+        totalPoints: sum(dailyCompletions.pointsEarned).mapWith(Number),
+        totalActions: sql<number>`count(*) filter (where ${dailyCompletions.isStreakBonus} = false)::int`,
+      })
+      .from(dailyCompletions)
+      .innerJoin(users, eq(users.id, dailyCompletions.userId))
+      .innerJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
+      .where(
+        and(
+          eq(users.showOnLeaderboard, true),
+          gte(dailyCompletions.completedOn, fromDate),
+          eq(protocols.category, "light"),
+          eq(dailyCompletions.isStreakBonus, false),
+        ),
+      )
+      .groupBy(dailyCompletions.userId, users.displayName, users.username)
+      .orderBy(desc(sum(dailyCompletions.pointsEarned)))
+      .limit(limit);
+
+    return rows.map((r, index) => ({
+      rank: index + 1,
+      userId: r.userId,
+      name: r.name || r.username || "Mitochondriac",
+      username: r.username,
+      totalPoints: r.totalPoints ?? 0,
+      totalActions: r.totalActions ?? 0,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export async function getMonthlyLeaderboard(limit = 20) {
   const from = new Date();
   from.setDate(from.getDate() - 30);

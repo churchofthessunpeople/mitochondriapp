@@ -44,6 +44,13 @@ await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS latitude double precision`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS longitude double precision`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS postal_code text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS place_label text`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS elevation_m double precision`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_postal_code text`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_place_label text`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_latitude double precision`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_longitude double precision`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_timezone text`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_until text`;
 
 // Regions (lifestyle environment scores)
 await sql`

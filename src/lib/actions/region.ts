@@ -6,8 +6,10 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { regions, users } from "@/db/schema";
 import { findNearestRegion, geocodeUsZip } from "@/lib/geo";
+import { fetchElevationMeters } from "@/lib/place-factors";
 import { listRegions } from "@/lib/regions";
 import { AUTH_RATE, consumeRateLimit, getClientIp } from "@/lib/rate-limit";
+import { getTodayIsoForTimezone } from "@/lib/date-server";
 
 function revalidateLocation() {
   revalidatePath("/app");
@@ -102,6 +104,45 @@ export async function setLocationFromZipAction(
       .filter(Boolean)
       .join(", ");
 
+    const elevationM = await fetchElevationMeters(
+      place.latitude,
+      place.longitude,
+    );
+
+    const travel = String(formData.get("travel") ?? "") === "1";
+    const days = Math.min(
+      30,
+      Math.max(1, Number(formData.get("travelDays") ?? 7) || 7),
+    );
+
+    if (travel) {
+      const until = (() => {
+        const base = getTodayIsoForTimezone(place.timezone);
+        const [y, m, d] = base.split("-").map(Number);
+        const dt = new Date(Date.UTC(y!, m! - 1, d!));
+        dt.setUTCDate(dt.getUTCDate() + days - 1);
+        return dt.toISOString().slice(0, 10);
+      })();
+
+      await db
+        .update(users)
+        .set({
+          travelPostalCode: place.postalCode,
+          travelPlaceLabel: placeLabel,
+          travelLatitude: place.latitude,
+          travelLongitude: place.longitude,
+          travelTimezone: place.timezone,
+          travelUntil: until,
+        })
+        .where(eq(users.id, session.user.id));
+
+      revalidateLocation();
+      return {
+        success: `Travel mode: ${placeLabel} through ${until}. Home ZIP kept.`,
+        placeLabel,
+      };
+    }
+
     await db
       .update(users)
       .set({
@@ -110,6 +151,7 @@ export async function setLocationFromZipAction(
         longitude: place.longitude,
         timezone: place.timezone,
         placeLabel,
+        elevationM,
         regionId: nearest?.region.id ?? null,
       })
       .where(eq(users.id, session.user.id));
@@ -145,7 +187,27 @@ export async function clearUserLocationAction() {
       latitude: null,
       longitude: null,
       placeLabel: null,
+      elevationM: null,
       regionId: null,
+    })
+    .where(eq(users.id, session.user.id));
+
+  revalidateLocation();
+}
+
+export async function clearTravelModeAction() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  await db
+    .update(users)
+    .set({
+      travelPostalCode: null,
+      travelPlaceLabel: null,
+      travelLatitude: null,
+      travelLongitude: null,
+      travelTimezone: null,
+      travelUntil: null,
     })
     .where(eq(users.id, session.user.id));
 

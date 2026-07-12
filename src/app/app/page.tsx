@@ -9,10 +9,16 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { tabFromSearchParam } from "@/lib/app-tabs";
 import { getActiveProtocols, getUserDayStats } from "@/lib/data";
-import { getServerTodayIsoDate } from "@/lib/date-server";
+import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
 import { haversineKm } from "@/lib/geo";
-import { buildPlaceFactors, sunPhaseHint } from "@/lib/place-factors";
+import { effectiveLocation } from "@/lib/location-effective";
+import {
+  buildPlaceFactors,
+  latitudeBand,
+  sunPhaseHint,
+} from "@/lib/place-factors";
+import { seasonCoachLine } from "@/lib/checklist-order";
 import { getRegionById } from "@/lib/regions";
 import {
   getUserAppFlags,
@@ -20,13 +26,10 @@ import {
 } from "@/lib/require-onboarding";
 import { getUserStreak } from "@/lib/streaks";
 import { getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
+import { getWeeklySummary } from "@/lib/weekly";
 
 export const metadata = { title: "Home" };
 
-/**
- * Single-page app shell: Schedule / Place / Activities / Account
- * switch client-side without full navigations.
- */
 export default async function AppPage({
   searchParams,
 }: {
@@ -38,41 +41,44 @@ export default async function AppPage({
 
   const params = await searchParams;
   const initialTab = tabFromSearchParam(params.t);
-
-  const date = await getServerTodayIsoDate();
   const h = await headers();
 
-  const [userFlags, allProtocols, availableIds, dayStats, streak, fullUser] =
-    await Promise.all([
-      getUserAppFlags(session.user.id),
-      getActiveProtocols(),
-      getUserFavoriteIds(session.user.id),
-      getUserDayStats(session.user.id, date),
-      getUserStreak(session.user.id, date),
-      db
-        .select()
-        .from(users)
-        .where(eq(users.id, session.user.id))
-        .limit(1)
-        .then((r) => r[0] ?? null),
-    ]);
+  const [userFlags, allProtocols, availableIds, fullUser] = await Promise.all([
+    getUserAppFlags(session.user.id),
+    getActiveProtocols(),
+    getUserFavoriteIds(session.user.id),
+    db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1)
+      .then((r) => r[0] ?? null),
+  ]);
 
   if (!fullUser) redirect("/login");
 
-  const region = await getRegionById(userFlags?.regionId);
-  const hasCoords =
-    userFlags?.latitude != null && userFlags?.longitude != null;
-  const sunLat = hasCoords
-    ? userFlags!.latitude!
-    : (region?.latitude ?? null);
-  const sunLng = hasCoords
-    ? userFlags!.longitude!
-    : (region?.longitude ?? null);
+  const loc = effectiveLocation({
+    ...userFlags!,
+    elevationM: userFlags?.elevationM ?? null,
+  });
+
   const tz =
-    userFlags?.timezone ||
-    region?.timezone ||
+    loc.timezone ||
     h.get("x-vercel-ip-timezone") ||
     "UTC";
+
+  const date = getTodayIsoForTimezone(tz);
+
+  const [dayStats, streak, weekly, region] = await Promise.all([
+    getUserDayStats(session.user.id, date),
+    getUserStreak(session.user.id, date),
+    getWeeklySummary(session.user.id, date),
+    getRegionById(userFlags?.regionId),
+  ]);
+
+  const hasCoords = loc.latitude != null && loc.longitude != null;
+  const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
+  const sunLng = hasCoords ? loc.longitude! : (region?.longitude ?? null);
 
   const sun =
     sunLat != null && sunLng != null
@@ -86,24 +92,43 @@ export default async function AppPage({
           longitude: sunLng,
           sun,
           timeZone: tz,
-          elevationM: null,
+          elevationM: loc.elevationM,
         })
       : null;
 
   const distanceKm =
-    hasCoords && region
+    hasCoords && region && !loc.isTravel
       ? haversineKm(
-          userFlags!.latitude!,
-          userFlags!.longitude!,
+          loc.latitude!,
+          loc.longitude!,
           region.latitude,
           region.longitude,
         )
       : null;
 
-  const phaseHint =
+  const phase =
     sun != null
-      ? sunPhaseHint(sunPhase(new Date(), sun.sunrise, sun.sunset))
-      : null;
+      ? sunPhase(new Date(), sun.sunrise, sun.sunset)
+      : ("day" as const);
+
+  const phaseHint = sun != null ? sunPhaseHint(phase) : null;
+  const band =
+    sunLat != null ? latitudeBand(sunLat).uvSeasonLabel : null;
+  const seasonLine = seasonCoachLine(band, phase);
+
+  let localHour = new Date().getUTCHours();
+  try {
+    localHour = Number(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: tz,
+        hour: "numeric",
+        hour12: false,
+      }).format(new Date()),
+    );
+    if (Number.isNaN(localHour)) localHour = new Date().getHours();
+  } catch {
+    localHour = new Date().getHours();
+  }
 
   const dateLabel = format(new Date(`${date}T12:00:00`), "EEEE, MMM d");
   const memberSinceLabel = fullUser.createdAt
@@ -122,7 +147,7 @@ export default async function AppPage({
       completionCounts={Object.fromEntries(dayStats.completionCounts)}
       dayPoints={dayStats.points}
       streak={streak}
-      placeLabel={userFlags?.placeLabel ?? null}
+      placeLabel={loc.placeLabel ?? null}
       postalCode={userFlags?.postalCode ?? null}
       region={region}
       sun={sun}
@@ -130,6 +155,14 @@ export default async function AppPage({
       phaseHint={phaseHint}
       placeFactors={placeFactors}
       distanceKm={distanceKm}
+      phase={phase}
+      localHour={localHour}
+      seasonLine={seasonLine}
+      weekly={weekly}
+      isTravel={loc.isTravel}
+      travelUntil={loc.travelUntil}
+      homePostalCode={userFlags?.postalCode ?? null}
+      travelLabel={userFlags?.travelPlaceLabel ?? null}
       accountPanel={
         <AccountPanel
           user={{

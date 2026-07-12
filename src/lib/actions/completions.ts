@@ -4,8 +4,9 @@ import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { dailyCompletions, protocols, type TimeOfDay } from "@/db/schema";
-import { getServerTodayIsoDate } from "@/lib/date-server";
+import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
+import { getUserDayStats } from "@/lib/data";
+import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { maxLogsPerDay, pointsForLog, streakBonusPoints } from "@/lib/scoring";
 import { getUserStreak, hasStreakBonusToday } from "@/lib/streaks";
 
@@ -13,6 +14,15 @@ async function requireUser() {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
   return session.user.id;
+}
+
+async function userToday(userId: string) {
+  const [u] = await db
+    .select({ timezone: users.timezone })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return getTodayIsoForTimezone(u?.timezone || "UTC");
 }
 
 function revalidateLogs() {
@@ -25,12 +35,37 @@ function revalidateLogs() {
   revalidatePath("/friends");
 }
 
+export type CompletionResult = {
+  action: "added" | "removed";
+  points: number;
+  streakBonus?: number;
+  dayPoints: number;
+  streak: { current: number; best: number };
+  count: number;
+};
+
+async function daySnapshot(
+  userId: string,
+  completedOn: string,
+  protocolId: string,
+): Promise<Pick<CompletionResult, "dayPoints" | "streak" | "count">> {
+  const [stats, streak] = await Promise.all([
+    getUserDayStats(userId, completedOn),
+    getUserStreak(userId, completedOn),
+  ]);
+  return {
+    dayPoints: stats.points,
+    streak,
+    count: stats.completionCounts.get(protocolId) ?? 0,
+  };
+}
+
 export async function logCompletionAction(
   protocolId: string,
   options?: { timeOfDay?: TimeOfDay | null; durationMinutes?: number | null },
-) {
+): Promise<CompletionResult> {
   const userId = await requireUser();
-  const completedOn = await getServerTodayIsoDate();
+  const completedOn = await userToday(userId);
 
   const [protocol] = await db
     .select()
@@ -72,7 +107,8 @@ export async function logCompletionAction(
           ),
         );
       revalidateLogs();
-      return { action: "removed" as const, points: 0 };
+      const snap = await daySnapshot(userId, completedOn, protocolId);
+      return { action: "removed", points: 0, ...snap };
     }
   } else if (count >= max) {
     throw new Error(`Daily limit reached (${max}× for this activity).`);
@@ -89,17 +125,15 @@ export async function logCompletionAction(
     isStreakBonus: false,
   });
 
-  // First real log of the day: award streak bonus if streak ≥ 2
   let streakBonus = 0;
   if (count === 0 && !(await hasStreakBonusToday(userId, completedOn))) {
     const { current } = await getUserStreak(userId, completedOn);
-    // current includes today after this log when we recompute — use current after insert
-    const streak = Math.max(current, 1);
-    streakBonus = streakBonusPoints(streak);
+    const streakDays = Math.max(current, 1);
+    streakBonus = streakBonusPoints(streakDays);
     if (streakBonus > 0) {
       await db.insert(dailyCompletions).values({
         userId,
-        protocolId: protocolId,
+        protocolId,
         completedOn,
         pointsEarned: streakBonus,
         isStreakBonus: true,
@@ -110,12 +144,15 @@ export async function logCompletionAction(
   }
 
   revalidateLogs();
-  return { action: "added" as const, points, streakBonus };
+  const snap = await daySnapshot(userId, completedOn, protocolId);
+  return { action: "added", points, streakBonus, ...snap };
 }
 
-export async function removeOneCompletionAction(protocolId: string) {
+export async function removeOneCompletionAction(
+  protocolId: string,
+): Promise<CompletionResult> {
   const userId = await requireUser();
-  const completedOn = await getServerTodayIsoDate();
+  const completedOn = await userToday(userId);
 
   const [latest] = await db
     .select()
@@ -143,6 +180,8 @@ export async function removeOneCompletionAction(protocolId: string) {
   }
 
   revalidateLogs();
+  const snap = await daySnapshot(userId, completedOn, protocolId);
+  return { action: "removed", points: 0, ...snap };
 }
 
 export async function toggleCompletionAction(protocolId: string) {

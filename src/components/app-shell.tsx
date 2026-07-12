@@ -3,7 +3,7 @@
 import { CalendarCheck, MapPin, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
 import { PlaceStrip } from "@/components/place-strip";
@@ -14,6 +14,7 @@ import { ZipForm } from "@/components/zip-form";
 import type { AppTab } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
 import type { SunTimes } from "@/lib/sun";
+import type { WeeklySummary } from "@/lib/weekly";
 import { cn } from "@/lib/utils";
 
 const NAV: { id: AppTab; label: string; icon: typeof MapPin }[] = [
@@ -21,6 +22,8 @@ const NAV: { id: AppTab; label: string; icon: typeof MapPin }[] = [
   { id: "place", label: "Place", icon: MapPin },
   { id: "account", label: "Account", icon: User },
 ];
+
+const CACHE_KEY = "mitochondriapp-shell-v1";
 
 export type AppShellProps = {
   initialTab: AppTab;
@@ -38,12 +41,17 @@ export type AppShellProps = {
   phaseHint: string | null;
   placeFactors: PlaceFactors | null;
   distanceKm: number | null;
+  phase: "night" | "sunrise" | "day" | "sunset";
+  localHour: number;
+  seasonLine: string | null;
+  weekly: WeeklySummary | null;
+  isTravel?: boolean;
+  travelUntil?: string | null;
+  homePostalCode?: string | null;
+  travelLabel?: string | null;
   accountPanel: React.ReactNode;
 };
 
-/**
- * Single-URL app: Today (checklist + expandable catalog) · Place · Account
- */
 export function AppShell({
   initialTab,
   dateLabel,
@@ -60,6 +68,14 @@ export function AppShell({
   phaseHint,
   placeFactors,
   distanceKm,
+  phase,
+  localHour,
+  seasonLine,
+  weekly,
+  isTravel,
+  travelUntil,
+  homePostalCode,
+  travelLabel,
   accountPanel,
 }: AppShellProps) {
   const [tab, setTabState] = useState<AppTab>(initialTab);
@@ -67,6 +83,24 @@ export function AppShell({
   const [catalogOpen, setCatalogOpen] = useState(
     initialAvailableIds.length === 0,
   );
+
+  // Warm paint cache for next visit (checklist ids + points)
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          availableIds,
+          dayPoints,
+          streak,
+          dateLabel,
+          at: Date.now(),
+        }),
+      );
+    } catch {
+      /* ignore */
+    }
+  }, [availableIds, dayPoints, streak, dateLabel]);
 
   const setTab = useCallback((next: AppTab) => {
     setTabState(next);
@@ -114,7 +148,7 @@ export function AppShell({
                 Mitochondriapp
               </div>
               <div className="hidden text-[11px] text-muted sm:block">
-                Light · Magnetism · Protocol
+                Light · Place · Protocol
               </div>
             </div>
           </button>
@@ -156,6 +190,12 @@ export function AppShell({
               </button>
             )}
 
+            {isTravel && (
+              <p className="rounded-2xl border border-accent/25 bg-accent/5 px-3.5 py-2 text-xs text-accent">
+                Travel mode through {travelUntil} — sun times from temporary ZIP
+              </p>
+            )}
+
             <button
               type="button"
               onClick={() => setTab("place")}
@@ -177,6 +217,10 @@ export function AppShell({
               streak={streak}
               dateLabel={dateLabel}
               onExpandCatalog={() => setCatalogOpen(true)}
+              phase={phase}
+              localHour={localHour}
+              seasonLine={seasonLine}
+              weekly={weekly}
             />
 
             <ActivityCatalogExpand
@@ -214,7 +258,9 @@ export function AppShell({
                 region={region}
                 sun={sun}
                 placeLabel={placeLabel}
-                postalCode={postalCode}
+                postalCode={
+                  isTravel ? travelLabel || postalCode : postalCode
+                }
                 distanceKm={distanceKm}
                 timeZone={timeZone}
                 placeFactors={placeFactors}
@@ -230,7 +276,11 @@ export function AppShell({
               </div>
             )}
 
-            <ZipForm currentZip={postalCode} />
+            <ZipForm
+              currentZip={homePostalCode ?? postalCode}
+              travelLabel={travelLabel}
+              travelUntil={travelUntil}
+            />
 
             <button
               type="button"

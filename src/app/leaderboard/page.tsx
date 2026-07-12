@@ -5,9 +5,10 @@ import {
   getLeaderboard,
   getMonthlyLeaderboard,
   getWeeklyLeaderboard,
+  getWeeklyLightLeaderboard,
+  getLeaderboardPeriod,
 } from "@/lib/data";
 import { getFriendIds } from "@/lib/friends";
-import { getLeaderboardPeriod } from "@/lib/data";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -20,7 +21,7 @@ export default async function LeaderboardPage() {
   const friendIds = await getFriendIds(session.user.id);
   const friendScope = [...friendIds, session.user.id];
 
-  const [weekly, monthly, allTime, friendsWeek] = await Promise.all([
+  const [weekly, monthly, allTime, friendsWeek, lightWeek] = await Promise.all([
     getWeeklyLeaderboard(25),
     getMonthlyLeaderboard(25),
     getLeaderboard(25),
@@ -31,6 +32,7 @@ export default async function LeaderboardPage() {
           userIds: friendScope,
         })
       : Promise.resolve([]),
+    getWeeklyLightLeaderboard(25),
   ]);
 
   return (
@@ -59,7 +61,19 @@ export default async function LeaderboardPage() {
 
         <div className="space-y-10">
           <section>
-            <h2 className="mb-3 text-lg font-semibold">This week</h2>
+            <h2 className="mb-3 text-lg font-semibold">This week · light</h2>
+            <p className="mb-3 text-xs text-muted">
+              Points from light-category protocols only (morning outdoor light,
+              sun, sunset…) — rewards practice, not gum spam.
+            </p>
+            <LeaderboardTable
+              rows={lightWeek}
+              currentUserId={session.user.id}
+              emptyMessage="No light logs this week yet."
+            />
+          </section>
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">This week · all pts</h2>
             <LeaderboardTable
               rows={weekly}
               currentUserId={session.user.id}

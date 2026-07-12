@@ -1,99 +1,79 @@
 # Mitochondriapp
 
-Track Dr. Jack Kruse–inspired lifestyle protocols (light, magnetism, water, cold, circadian timing) to counter modern environmental stress — including deuterium load and disrupted magnetic / light environments.
+Track Dr. Jack Kruse–inspired lifestyle protocols — light, magnetism, water, cold, circadian timing — personalized to **what you can do** and **where you are**.
 
-Users register, log what they did each day, earn points, review history, and climb a leaderboard. Protocols are organized by **time of day** (sunrise → night) and can be completed by **click** or **drag-and-drop**.
+> What light-and-life actions matter for you, today, where you are — and a warm low-blue checklist to log them.
+
+## Product
+
+| Surface | Role |
+|---------|------|
+| **Today** (`/app`) | Daily checklist of *your* activities · suggested-now by sun phase · expandable full catalog |
+| **Place** | US ZIP sun times · lifestyle scores · place factors · optional travel ZIP |
+| **Account** | Profile · history · friends · leaderboard · sun-relative reminders |
+
+- **Available / via list** — only show protocols you can actually do (e.g. rebounding if you have a rebounder)
+- **Low-blue UI** — firelight night / parchment day (amber, not cyan)
+- **Onboarding** — ZIP → starter activities → first log win
+- Points, streaks, weekly light leaderboard, CSV export
 
 ## Stack
 
 - **Next.js** (App Router) + TypeScript + Tailwind CSS
-- **Auth.js** (NextAuth v5) credentials auth
+- **Auth.js** (NextAuth v5) username/password
 - **Neon** Postgres + **Drizzle ORM**
-- **@dnd-kit** for drag-and-drop
-- Deploy target: **Vercel**
-
-## Features (MVP)
-
-- Register / log in
-- Daily protocol board by time of day
-- Click toggle or drag cards into **Done today**
-- Point values per protocol (once per day)
-- Personal history
-- Weekly + all-time leaderboard
-- Seed catalog of ~24 provisional protocols (easy to edit)
+- Deploy: **Vercel**
 
 ## Setup
-
-### 1. Install
 
 ```bash
 npm install
 ```
 
-### 2. Environment
-
-Create a `.env` file in the project root (gitignored — never commit it):
+Create `.env` / `.env.local`:
 
 | Variable | Notes |
 |---|---|
-| `DATABASE_URL` | Neon Postgres connection string |
+| `DATABASE_URL` | Neon Postgres |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
-| `AUTH_URL` | Local: `http://localhost:3000` · Prod: your Vercel URL |
-| `RESEND_API_KEY` | From resend.com (for verification emails) |
-| `EMAIL_FROM` | e.g. `Mitochondriapp <onboarding@resend.dev>` |
-
-### 3. Database
+| `AUTH_URL` | Local `http://localhost:3000` or prod URL |
+| `RESEND_API_KEY` | Optional email |
+| `EMAIL_FROM` | Optional from address |
 
 ```bash
-npm run db:push
-npm run db:seed
-```
-
-### 4. Dev server
-
-```bash
+npm run db:setup   # schema migrations (safe to re-run)
+npm run db:seed    # protocols + regions
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Deploy on Vercel
+## Scripts
 
-1. Push this repo to GitHub.
-2. Import the project in [Vercel](https://vercel.com).
-3. Add env vars: `DATABASE_URL`, `AUTH_SECRET`.
-4. Deploy.
-5. From your machine (or a one-off script), run `npm run db:push` and `npm run db:seed` against the production `DATABASE_URL`.
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm run test` | Unit tests (sun times, scoring) |
+| `npm run db:setup` | Apply SQL migrations |
+| `npm run db:seed` | Seed catalog |
 
-Optional: set `AUTH_URL` to your production URL if Auth.js needs an explicit base URL.
+## Health
+
+`GET /api/health` — DB ping for deploys/canaries.
 
 ## Customizing protocols
 
-Edit `src/db/seed-data.ts`, then re-run:
+Edit `src/db/seed-data.ts`, then `npm run db:seed`.
 
-```bash
-npm run db:seed
-```
+Optional UX metadata (equipment / how-to) lives in `src/lib/protocol-meta.ts`.
 
-Each protocol has:
+## Deploy
 
-- `id` — stable string key
-- `name` / `description`
-- `points` — game score (tune freely)
-- `timeOfDay` — `sunrise` \| `morning` \| `afternoon` \| `evening` \| `sunset` \| `night` \| `anytime`
-- `sortOrder` — display order within a section
+1. Push to GitHub → import on Vercel  
+2. Set `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL`  
+3. Run `npm run db:setup` and `npm run db:seed` against prod DB  
 
-## Project map
+## License
 
-```
-src/
-  app/                 # routes: /, /login, /register, /today, /history, /leaderboard
-  components/          # UI (protocol board, auth, leaderboard, history)
-  db/                  # schema, seed, drizzle client
-  lib/actions/         # server actions (auth, completions)
-  auth.ts              # Auth.js config
-```
-
-## Disclaimer
-
-Protocol descriptions are lifestyle education / tracking inspiration only — not medical advice. Point values are provisional for engagement and should be refined to match your preferred weighting of Dr. Kruse’s guidance.
+Private / project use.

@@ -93,6 +93,16 @@ export const users = pgTable("users", {
   longitude: doublePrecision("longitude"),
   postalCode: text("postal_code"),
   placeLabel: text("place_label"),
+  /** Meters above sea level (cached from elevation API on ZIP set) */
+  elevationM: doublePrecision("elevation_m"),
+  /** Temporary travel override (sun times) */
+  travelPostalCode: text("travel_postal_code"),
+  travelPlaceLabel: text("travel_place_label"),
+  travelLatitude: doublePrecision("travel_latitude"),
+  travelLongitude: doublePrecision("travel_longitude"),
+  travelTimezone: text("travel_timezone"),
+  /** ISO date YYYY-MM-DD when travel mode expires (inclusive) */
+  travelUntil: text("travel_until"),
   isAdmin: boolean("is_admin").notNull().default(false),
   onboardingComplete: boolean("onboarding_complete").notNull().default(false),
   showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),
