@@ -57,9 +57,10 @@ Register / log in
 | Destination | URL | Role |
 |-------------|-----|------|
 | **Today** | `/app` | Daily log, place, catalog |
+| **Kruseiversity** | `/app?t=kruseiversity` | Why actions matter (Kruse-style teaching); expandable lessons |
 | **Account** | `/app?t=account` (and deep links) | Profile, social, history |
 
-Bottom nav (mobile) and header nav only switch **Today ↔ Account**.
+Bottom nav: **Today · Learn · Account**. Lessons live in `src/lib/kruseiversity.ts` (add entries over time).
 
 ### 3.2 Today sections (in-page tabs, not routes)
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, User } from "lucide-react";
+import { CalendarCheck, GraduationCap, User } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
@@ -17,6 +17,7 @@ import { GuideLightPanel } from "@/components/guide-light-panel";
 import { GuideMagnetismPanel } from "@/components/guide-magnetism-panel";
 import { GuideWaterPanel } from "@/components/guide-water-panel";
 import { HistoryDayPanel } from "@/components/history-day-panel";
+import { KruseiversityHome } from "@/components/kruseiversity-home";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
 import { RegionBrowsePanel } from "@/components/region-browse-panel";
 import { ScoringGuidePanel } from "@/components/scoring-guide-panel";
@@ -31,8 +32,20 @@ import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
 import { cn } from "@/lib/utils";
 
-const NAV: { id: AppTab; label: string; icon: typeof CalendarCheck }[] = [
+const NAV: {
+  id: AppTab;
+  label: string;
+  /** Shorter label for bottom nav */
+  shortLabel?: string;
+  icon: typeof CalendarCheck;
+}[] = [
   { id: "schedule", label: "Today", icon: CalendarCheck },
+  {
+    id: "kruseiversity",
+    label: "Kruseiversity",
+    shortLabel: "Learn",
+    icon: GraduationCap,
+  },
   { id: "account", label: "Account", icon: User },
 ];
 
@@ -41,6 +54,8 @@ const CACHE_KEY = "mitochondriapp-shell-v1";
 export type AppShellProps = {
   initialTab: AppTab;
   initialAccountSection?: AccountSection;
+  /** Deep-link lesson id for Kruseiversity (?lesson=) */
+  initialKruseLesson?: string | null;
   dateLabel: string;
   todayIso: string;
   allProtocols: Protocol[];
@@ -84,12 +99,13 @@ export type AppShellProps = {
 };
 
 /**
- * Today & Account are the only top-level destinations.
- * Scoring, regions, day detail, admin open as in-page cards.
+ * Today · Kruseiversity · Account.
+ * Scoring, regions, day detail, admin, guides open as in-page cards.
  */
 export function AppShell({
   initialTab,
   initialAccountSection = null,
+  initialKruseLesson = null,
   dateLabel,
   todayIso,
   allProtocols,
@@ -164,7 +180,12 @@ export function AppShell({
     setSheet(null);
     setTabState(next);
     try {
-      const url = next === "schedule" ? ROUTES.home : ROUTES.account;
+      const url =
+        next === "schedule"
+          ? ROUTES.home
+          : next === "kruseiversity"
+            ? ROUTES.kruseiversity
+            : ROUTES.account;
       window.history.replaceState(null, "", url);
     } catch {
       /* ignore */
@@ -343,6 +364,10 @@ export function AppShell({
           />
         )}
 
+        {!sheet && tab === "kruseiversity" && (
+          <KruseiversityHome initialEntryId={initialKruseLesson} />
+        )}
+
         {!sheet && tab === "account" && (
           <AccountHome
             user={accountUser}
@@ -364,7 +389,7 @@ export function AppShell({
         aria-label="Main"
       >
         <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">
-          {NAV.map(({ id, label, icon: Icon }) => {
+          {NAV.map(({ id, label, shortLabel, icon: Icon }) => {
             const active = tab === id && !sheet;
             return (
               <li key={id} className="flex-1">
@@ -375,9 +400,10 @@ export function AppShell({
                     "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
                     active ? "text-accent" : "text-muted hover:text-foreground",
                   )}
+                  aria-label={label}
                 >
                   <Icon className="h-5 w-5" />
-                  {label}
+                  {shortLabel ?? label}
                 </button>
               </li>
             );

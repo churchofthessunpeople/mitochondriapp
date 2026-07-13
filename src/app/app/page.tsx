@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { userReminders, users } from "@/db/schema";
 import {
   accountSectionFromSearchParam,
+  kruseLessonFromSearchParam,
   tabFromSearchParam,
 } from "@/lib/app-tabs";
 import {
@@ -49,7 +50,7 @@ export const metadata = { title: "Home" };
 export default async function AppPage({
   searchParams,
 }: {
-  searchParams: Promise<{ t?: string }>;
+  searchParams: Promise<{ t?: string; lesson?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) redirect(ROUTES.login);
@@ -58,6 +59,7 @@ export default async function AppPage({
   const params = await searchParams;
   const initialTab = tabFromSearchParam(params.t);
   const initialAccountSection = accountSectionFromSearchParam(params.t);
+  const initialKruseLesson = kruseLessonFromSearchParam(params.lesson);
   const h = await headers();
   const userId = session.user.id;
 
@@ -219,6 +221,7 @@ export default async function AppPage({
     <AppShell
       initialTab={initialTab}
       initialAccountSection={initialAccountSection}
+      initialKruseLesson={initialKruseLesson}
       dateLabel={dateLabel}
       todayIso={date}
       allProtocols={allProtocols}
