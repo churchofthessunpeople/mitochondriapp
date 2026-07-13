@@ -12,6 +12,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts",
+    "volcanoes:build": "node scripts/build-volcanic-anchors.mjs",
     "db:setup": "node scripts/migrate-all.mjs",
     "db:clear-users": "node scripts/clear-users.mjs",
     "db:migrate-username": "node scripts/migrate-username.mjs",

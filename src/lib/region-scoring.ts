@@ -3,6 +3,12 @@
  * Educational framework only — not medical, legal, or investment advice.
  */
 
+import {
+  VOLCANIC_ANCHOR_COUNT,
+  VOLCANIC_ANCHORS,
+  type VolcanicAnchor,
+} from "@/lib/volcanic-anchors.data";
+
 export type PolicyFactors = {
   /** BTC is legal tender or officially strategic */
   bitcoinLegalTender?: boolean;
@@ -20,33 +26,12 @@ export type PolicyFactors = {
   authoritarianEconomy?: boolean;
 };
 
-/** Active magma / volcanic arc anchors (major living-area relevant systems). */
-export const VOLCANIC_HOTSPOTS: { name: string; lat: number; lng: number }[] = [
-  // Central America
-  { name: "El Salvador volcanic arc", lat: 13.7, lng: -89.2 },
-  { name: "Guatemala arc", lat: 14.5, lng: -90.8 },
-  { name: "Costa Rica / Nicaragua arc", lat: 10.5, lng: -85.0 },
-  // Andes
-  { name: "Northern Andes", lat: 0.0, lng: -78.0 },
-  { name: "Central Andes Chile", lat: -33.4, lng: -70.6 },
-  { name: "Southern Andes", lat: -41.0, lng: -72.5 },
-  // Pacific / Ring of Fire
-  { name: "Hawaii hotspot", lat: 19.4, lng: -155.3 },
-  { name: "Cascades / NW US", lat: 46.2, lng: -122.2 },
-  { name: "Mexico volcanic belt", lat: 19.0, lng: -99.0 },
-  { name: "Japan arc", lat: 35.4, lng: 138.7 },
-  { name: "Philippines arc", lat: 14.6, lng: 121.0 },
-  { name: "Indonesia arc", lat: -7.5, lng: 110.0 },
-  { name: "New Zealand Taupo", lat: -38.7, lng: 176.1 },
-  { name: "Kamchatka", lat: 53.0, lng: 159.0 },
-  { name: "Aleutians", lat: 54.0, lng: -166.0 },
-  // Atlantic / other
-  { name: "Iceland hotspot", lat: 64.1, lng: -21.9 },
-  { name: "Italy / Campanian arc", lat: 40.8, lng: 14.4 },
-  { name: "Canary Islands", lat: 28.3, lng: -16.6 },
-  { name: "East African Rift", lat: -1.3, lng: 36.8 },
-  { name: "Azores", lat: 38.7, lng: -27.2 },
-];
+/**
+ * Global volcanic / flowing-magma anchors (GVP Holocene + USGS US + system midpoints).
+ * @see src/lib/volcanic-anchors.data.ts — regenerate with scripts/build-volcanic-anchors.mjs
+ */
+export const VOLCANIC_HOTSPOTS: readonly VolcanicAnchor[] = VOLCANIC_ANCHORS;
+export { VOLCANIC_ANCHOR_COUNT };
 
 function haversineKm(
   lat1: number,
@@ -87,8 +72,9 @@ export function sunScoreFromLatitude(latitude: number): number {
 }
 
 /**
- * Magnetism / geological vitality from distance to active magma / volcanic systems.
- * Closer to free-flowing magma arcs / hotspots → higher.
+ * Magnetism / geological vitality from distance to Holocene volcanoes,
+ * US monitored systems, and major arc/hotspot/rift midpoints.
+ * Closer to free-flowing magma systems → higher (lifestyle framework, not hazard).
  */
 export function magnetismScoreFromLocation(
   latitude: number,
@@ -97,7 +83,7 @@ export function magnetismScoreFromLocation(
   let nearestKm = Infinity;
   let nearestName = "none";
 
-  for (const h of VOLCANIC_HOTSPOTS) {
+  for (const h of VOLCANIC_ANCHORS) {
     const km = haversineKm(latitude, longitude, h.lat, h.lng);
     if (km < nearestKm) {
       nearestKm = km;

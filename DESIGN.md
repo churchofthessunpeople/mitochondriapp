@@ -288,7 +288,8 @@ Curated places in `regions` table / `region-seeds.ts`.
 **Composite health rating** ≈ average of:
 
 1. **Sun score** — from absolute latitude (equator better for year-round solar signal)  
-2. **Magnetism score** — distance to volcanic / active-magma anchors (framework narrative)  
+2. **Magnetism score** — distance to nearest Holocene volcano / magma system from expanded anchors (~1k points: Smithsonian GVP Holocene catalog + USGS US volcanoes + arc/hotspot/rift midpoints). Lifestyle framework, not real-time hazard alerts. Regenerate: `node scripts/build-volcanic-anchors.mjs`  
+
 3. **Policy score** — starts mid, adjusts for BTC tender, outdoor culture, CBDC pressure, surveillance, etc.
 
 ZIP maps to **nearest curated region** for the 1–5 scores; ZIP itself sets **precision sun times**.  

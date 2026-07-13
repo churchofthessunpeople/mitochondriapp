@@ -69,6 +69,20 @@ Edit `src/db/seed-data.ts`, then `npm run db:seed`.
 
 Optional UX metadata (equipment / how-to) lives in `src/lib/protocol-meta.ts`.
 
+### Volcanic anchors (magnetism score)
+
+Magnetism uses ~1k Holocene volcanoes + USGS US systems + arc/hotspot midpoints (`src/lib/volcanic-anchors.data.ts`).
+
+To regenerate after refreshing source CSV/JSON under `data/volcano/`:
+
+```bash
+# GVP-derived Holocene list (TidyTuesday extract)
+curl.exe -sL -o data/volcano/github_volcanoes.csv "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/volcano.csv"
+# USGS US volcanoes
+curl.exe -sL -o data/volcano/usgs_us.json "https://volcanoes.usgs.gov/hans-public/api/volcano/getUSVolcanoes"
+npm run volcanoes:build
+```
+
 ## Deploy
 
 1. Push to GitHub → import on Vercel  

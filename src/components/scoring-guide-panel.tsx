@@ -54,8 +54,10 @@ export function ScoringGuidePanel() {
           2. Magnetism score (active magma / volcanoes)
         </h2>
         <p className="text-sm text-muted">
-          Distance from major active volcanic arcs and hotspots (proxy for
-          free-flowing magma / dynamic geological field narrative).
+          Distance to the nearest Holocene volcano or major magma system
+          (Smithsonian GVP catalog + USGS US volcanoes + arc/hotspot midpoints).
+          Proxy for free-flowing magma / dynamic geological context — not a
+          real-time eruption alert.
         </p>
         <ul className="space-y-1 text-sm">
           <li>
@@ -80,10 +82,14 @@ export function ScoringGuidePanel() {
         </p>
         <details className="text-xs text-muted">
           <summary className="cursor-pointer text-foreground">
-            Volcanic anchors used ({VOLCANIC_HOTSPOTS.length})
+            Volcanic anchors used ({VOLCANIC_HOTSPOTS.length.toLocaleString()})
           </summary>
+          <p className="mt-2">
+            Full list is large (global Holocene + US systems). Nearest name is
+            shown on Place for your coordinates. Cite GVP / USGS.
+          </p>
           <ul className="mt-2 max-h-40 list-inside list-disc overflow-y-auto">
-            {VOLCANIC_HOTSPOTS.map((h) => (
+            {VOLCANIC_HOTSPOTS.filter((h) => h.source === "system").map((h) => (
               <li key={h.name}>
                 {h.name} ({h.lat.toFixed(1)}, {h.lng.toFixed(1)})
               </li>
