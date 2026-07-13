@@ -23,17 +23,18 @@ export function AppChrome({
         style={{ background: "var(--header-bg)" }}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:px-6">
-          <Link href={ROUTES.home} className="flex min-w-0 items-center gap-2">
+          <Link
+            href={ROUTES.home}
+            className="flex shrink-0 items-center"
+            aria-label="Mitochondriapp home"
+          >
             <Image
               src="/icons/app-icon.jpg"
-              alt=""
+              alt="Mitochondriapp"
               width={32}
               height={32}
               className="h-8 w-8 rounded-lg object-cover ring-1 ring-border"
             />
-            <span className="truncate text-sm font-semibold tracking-wide">
-              Mitochondriapp
-            </span>
           </Link>
           <div className="flex items-center gap-2">
             <Link

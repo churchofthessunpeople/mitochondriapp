@@ -42,23 +42,16 @@ export async function SiteHeader({
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
         <Link
           href={session ? ROUTES.home : "/"}
-          className="flex min-w-0 items-center gap-2"
+          className="flex shrink-0 items-center"
+          aria-label="Mitochondriapp home"
         >
           <Image
             src="/icons/app-icon.jpg"
-            alt=""
+            alt="Mitochondriapp"
             width={32}
             height={32}
             className="h-8 w-8 rounded-lg object-cover ring-1 ring-border"
           />
-          <div className="min-w-0 leading-tight">
-            <div className="truncate text-sm font-semibold tracking-wide text-foreground">
-              Mitochondriapp
-            </div>
-            <div className="hidden text-[11px] text-muted sm:block">
-              Light · Place · Protocol
-            </div>
-          </div>
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">

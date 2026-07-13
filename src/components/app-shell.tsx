@@ -206,23 +206,16 @@ export function AppShell({
           <button
             type="button"
             onClick={() => setTab("schedule")}
-            className="flex min-w-0 items-center gap-2 text-left"
+            className="flex shrink-0 items-center text-left"
+            aria-label="Today"
           >
             <Image
               src="/icons/app-icon.jpg"
-              alt=""
+              alt="Mitochondriapp"
               width={32}
               height={32}
               className="h-8 w-8 rounded-lg object-cover ring-1 ring-border"
             />
-            <div className="min-w-0 leading-tight">
-              <div className="truncate text-sm font-semibold tracking-wide text-foreground">
-                Mitochondriapp
-              </div>
-              <div className="hidden text-[11px] text-muted sm:block">
-                Light · Place · Protocol
-              </div>
-            </div>
           </button>
 
           <div className="flex items-center gap-1 sm:gap-2">
