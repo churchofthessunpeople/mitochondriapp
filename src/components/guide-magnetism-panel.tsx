@@ -32,6 +32,11 @@ export function GuideMagnetismPanel() {
             Holocene magma systems (GVP/USGS). Lifestyle proxy, not a field
             meter or hazard alert.
           </li>
+          <li>
+            <strong className="text-foreground">Artificial EM load</strong> —
+            open-map proxy for cells/masts and nearby power plants (1–5). Not a
+            personal RF/ELF reading.
+          </li>
         </ul>
       </section>
 

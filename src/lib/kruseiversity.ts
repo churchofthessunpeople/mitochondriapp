@@ -94,8 +94,8 @@ export const KRUSEIVERSITY_ENTRIES: readonly KruseEntry[] = [
         body: "Separately, this app scores “geological vitality” as distance to Holocene volcanic and magma-system anchors (Smithsonian GVP + USGS catalogs). That is a lifestyle proxy for living crustal systems in a Kruse-style place narrative. It is not the same number as total field F from WMM. A place can have a strong main field and still be far from volcanoes (or the reverse).",
       },
       {
-        heading: "nnEMF and daily habits",
-        body: "Phones, Wi‑Fi, and power infrastructure are artificial electromagnetic environments. They do not appear in WMM or the volcano catalog. In the app they show up as protocols: low-RF hours, airplane mode, phone away from bed, outdoor grounding. Behavioral hygiene—not a nT reading from NOAA.",
+        heading: "nnEMF, infrastructure proxy, and daily habits",
+        body: "Phones, Wi‑Fi, towers, and power plants form artificial electromagnetic environments. They do not appear in WMM. The app’s Artificial EM load score is an open-map proxy (mapped cells when OpenCelliD returns data, OSM communication masts, nearby power plants)—not a body exposure meter. Daily protocols (low-RF hours, airplane mode, phone away from bed, grounding) remain the habit layer you control.",
       },
       {
         heading: "How Kruse-style teaching uses “magnetism”",

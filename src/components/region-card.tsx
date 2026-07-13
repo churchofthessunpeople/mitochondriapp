@@ -149,7 +149,7 @@ export function RegionCard({
 
           <div>
             <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
-              Magnetism · two layers
+              Magnetism · three layers
             </p>
             <ul className="mt-2 divide-y divide-border rounded-2xl border border-border bg-foreground/[0.02]">
               {placeFactors.geomag && (
@@ -176,10 +176,18 @@ export function RegionCard({
                 value={placeFactors.geologyLabel}
                 detail={placeFactors.geologyDetail}
               />
+              {placeFactors.artificialEm && (
+                <FactorRow
+                  label="Artificial EM load"
+                  value={placeFactors.artificialEm.summaryLine}
+                  detail={placeFactors.artificialEm.detailLine}
+                />
+              )}
             </ul>
             <p className="mt-2 text-[10px] leading-relaxed text-muted">
-              Main field = WMM planetary model. Geology = distance to Holocene
-              magma systems (separate score). Neither measures household EMF.
+              Main field = WMM planetary model. Geology = magma systems.
+              Artificial EM = open-map infrastructure proxy (cells/masts/plants)
+              — not a personal exposure meter.
             </p>
           </div>
         </div>

@@ -40,6 +40,7 @@ Create `.env` / `.env.local`:
 | `DATABASE_URL` | Neon Postgres |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `AUTH_URL` | **Local only:** `http://localhost:3000`. On Vercel leave unset (or set your real prod URL) — never point prod at localhost |
+| `OPENCELLID_API_KEY` | Optional. OpenCelliD token for cell density; OSM masts/plants still work without it |
 | `RESEND_API_KEY` | Optional email |
 | `EMAIL_FROM` | Optional from address |
 

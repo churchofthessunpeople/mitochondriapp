@@ -5,6 +5,10 @@
 
 import { formatDistanceKm } from "@/lib/geo";
 import {
+  fetchArtificialEmQuick,
+  type ArtificialEmSnapshot,
+} from "@/lib/artificial-em";
+import {
   fetchGeomagFieldQuick,
   formatGeomagDisplay,
   type GeomagDisplay,
@@ -37,6 +41,8 @@ export type PlaceFactors = {
    * Null only if never requested.
    */
   geomag: GeomagDisplay | null;
+  /** Infrastructure / artificial EM load proxy (cells, masts, plants). */
+  artificialEm: ArtificialEmSnapshot | null;
 };
 
 /** Latitude climate band (aligned with sun-score bands). */
@@ -131,6 +137,7 @@ export function buildPlaceFactors(opts: {
   timeZone: string;
   elevationM?: number | null;
   geomag?: GeomagDisplay | null;
+  artificialEm?: ArtificialEmSnapshot | null;
 }): PlaceFactors {
   const { latitude, longitude, sun, timeZone } = opts;
   const { bandLabel, uvSeasonLabel } = latitudeBand(latitude);
@@ -154,11 +161,12 @@ export function buildPlaceFactors(opts: {
     geologyLabel: mag.nearestName,
     geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest magma / volcanic system (geology score · GVP/USGS catalog)`,
     geomag: opts.geomag ?? null,
+    artificialEm: opts.artificialEm ?? null,
   };
 }
 
 /**
- * Elevation + main-field geomag (best-effort, must not block navigation long).
+ * Elevation + main-field geomag + artificial EM proxy (best-effort).
  */
 export async function buildPlaceFactorsWithElevation(opts: {
   latitude: number;
@@ -175,13 +183,21 @@ export async function buildPlaceFactorsWithElevation(opts: {
           new Promise<null>((resolve) => setTimeout(() => resolve(null), 700)),
         ]);
 
-  const geomag = formatGeomagDisplay(
-    await fetchGeomagFieldQuick(opts.latitude, opts.longitude, {
+  const [geomagRaw, artificialEm] = await Promise.all([
+    fetchGeomagFieldQuick(opts.latitude, opts.longitude, {
       elevationM,
     }),
-  );
+    fetchArtificialEmQuick(opts.latitude, opts.longitude),
+  ]);
 
-  return buildPlaceFactors({ ...opts, elevationM, geomag });
+  const geomag = formatGeomagDisplay(geomagRaw);
+
+  return buildPlaceFactors({
+    ...opts,
+    elevationM,
+    geomag,
+    artificialEm,
+  });
 }
 
 /** Short copy for the current sun phase (Today protocol hint). */
