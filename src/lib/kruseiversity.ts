@@ -107,6 +107,50 @@ export const KRUSEIVERSITY_ENTRIES: readonly KruseEntry[] = [
       },
     ],
   },
+  {
+    id: "deuterium-atp-synthase",
+    title: "Deuterium and ATP synthase (Kruse-style water story)",
+    pillar: "water",
+    summary:
+      "In Dr. Kruse’s teaching, “heavy hydrogen” (deuterium) in body water and food is framed as a drag on mitochondrial ATP synthase—the rotary enzyme that makes ATP.",
+    relatedProtocolIds: [
+      "low-d-hydration",
+      "deuterium-aware-meal",
+      "mineralized-water",
+      "seafood-meal",
+      "hydration-timing",
+    ],
+    sections: [
+      {
+        heading: "What deuterium is (plain language)",
+        body: "Ordinary hydrogen is mostly protium (one proton). Deuterium is a rarer, heavier isotope of hydrogen (proton + neutron). Water that contains more deuterium is sometimes called “heavy” water in chemistry. Natural water and food always carry some deuterium; the amount varies by source, latitude, altitude, and diet. Kruse-style lifestyle teaching treats that load as an environmental input you can partly influence—not as a lab diagnosis you must measure daily.",
+      },
+      {
+        heading: "Where ATP synthase fits",
+        body: "Mitochondria make most of the cell’s ATP. In the textbook picture, the electron transport chain pumps protons (H⁺) across the inner mitochondrial membrane, building a proton-motive force. ATP synthase is the nanomotor that lets protons flow back and uses that flow to assemble ATP from ADP and phosphate. Kruse’s water narrative focuses on that proton flow and on the water matrix around the enzyme—not on inventing a different textbook of biochemistry, but on arguing that the *quality* of the hydrogen/water environment matters for how cleanly that motor runs.",
+      },
+      {
+        heading: "The Kruse claim: deuterium as “grit in the motor”",
+        body: "In Dr. Kruse’s public teaching, deuterium is framed as heavier and “stickier” in hydrogen-bonding and proton-transfer chemistry than ordinary protium. When deuterium participates in the proton circuits and hydration shells around ATP synthase (and related mitochondrial water structures), the story is that the rotary mechanism is less efficient—more like grit in a precision motor. The educational takeaway he pushes is: lowering the body’s deuterium *load over time* supports cleaner mitochondrial ATP production. That is a lifestyle framework claim, not a home blood test the app performs.",
+      },
+      {
+        heading: "Light–water–magnetism linkage",
+        body: "Kruse does not treat deuterium in isolation. Light (especially circadian and UV/IR outdoor signals), water (what you drink and eat), and magnetism/place (latitude, field, geology) are one stack. Morning light and redox timing are said to set how cells handle energy; water deuterium load is said to affect the hydrogen chemistry of ATP; place and non-native EMF are said to shape the broader environment mitochondria “see.” In the app, sunrise keystones, water keystones, and magnetism habits are separate checkboxes that reflect that three-lever story.",
+      },
+      {
+        heading: "Where deuterium is said to come from (lifestyle inputs)",
+        body: "Teaching-oriented lists usually emphasize: (1) drinking water source and processing; (2) plant type and growing conditions (often C3 vs C4 crops, greenhouse vs outdoor narratives); (3) animal products and feed; (4) ultra-processed foods and sugars as higher-load patterns in popular summaries; (5) marine foods and certain fats as relatively friendlier choices in the same discourse. The app turns a few of these into habits—mineralized / low-D morning hydration, deuterium-aware meals, seafood-forward plates—not a complete nutritional system.",
+      },
+      {
+        heading: "What the app asks you to log",
+        body: "Water keystones (low-D morning hydration, deuterium-aware meal, mineralized water) count toward the day’s Water pillar. They are behavioral proxies for “pay attention to hydrogen/water quality,” not proof your cellular D/H ratio changed. Seafood meals and daylight-aligned hydration support the same pillar. Pair them with light (sunrise) and magnetism (ground / low-RF) for the full stack the teaching describes.",
+      },
+      {
+        heading: "What this is not",
+        body: "This is an educational summary of Kruse-style ideas about deuterium and ATP synthase for lifestyle tracking. It is not medical advice, not a claim that a single meal or glass of water “fixes” mitochondria, and not a substitute for clinical care. Mainstream biochemistry describes ATP synthase in great detail; isotope effects of deuterium are real in chemistry, but applying them to human disease or daily “optimization” is contested and personal. Do not use deuterium depletion as treatment for illness. If you have a medical condition, work with a qualified clinician.",
+      },
+    ],
+  },
 ];
 
 export function getKruseEntry(id: string): KruseEntry | undefined {
