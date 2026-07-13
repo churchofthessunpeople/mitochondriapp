@@ -33,8 +33,7 @@ export function GuideWaterPanel() {
           </li>
         </ul>
         <p className="text-xs">
-          Logging any water keystone counts as Water done on your L · W · M
-          strip.
+          Logging any water keystone counts toward today&apos;s water progress.
         </p>
       </section>
 

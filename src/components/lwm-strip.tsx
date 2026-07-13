@@ -15,7 +15,7 @@ type Props = {
 const CORE = ["light", "water", "magnetism"] as const;
 
 /**
- * Daily Light · Water · Magnetism progress strip.
+ * Daily progress: what you've done to support mitochondrial function today.
  */
 export function LwmStrip({
   completionCounts,
@@ -43,12 +43,15 @@ export function LwmStrip({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs uppercase tracking-[0.16em] text-accent">
-          Mitochondrial day · L · W · M
+          Mitochondria today
         </p>
         <p className="text-xs tabular-nums text-muted">
-          {progress.doneCount}/3 pillars
+          {progress.doneCount}/3 done
         </p>
       </div>
+      <p className="text-[11px] leading-snug text-muted">
+        What you&apos;ve done to optimize mitochondrial function today
+      </p>
 
       <div className="grid grid-cols-3 gap-2">
         {CORE.map((id) => {
@@ -74,17 +77,17 @@ export function LwmStrip({
               title={labels[id]}
             >
               <div className="flex items-center justify-between gap-1">
-                <span
+                <p
                   className={cn(
-                    "text-[11px] font-semibold uppercase tracking-wide",
-                    done ? "text-accent" : "text-muted",
+                    "text-xs font-semibold leading-snug",
+                    done ? "text-accent" : "text-foreground",
                   )}
                 >
-                  {meta.shortLabel}
-                </span>
+                  {meta.label}
+                </p>
                 <span
                   className={cn(
-                    "flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold",
+                    "flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold",
                     done
                       ? "bg-accent text-on-accent"
                       : "border border-border text-muted",
@@ -94,15 +97,7 @@ export function LwmStrip({
                   {done ? "✓" : ""}
                 </span>
               </div>
-              <p
-                className={cn(
-                  "mt-1 text-xs font-medium leading-snug",
-                  done ? "text-foreground" : "text-muted",
-                )}
-              >
-                {meta.label}
-              </p>
-              <p className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-muted">
+              <p className="mt-1 line-clamp-3 text-[10px] leading-snug text-muted">
                 {done ? labels[id] : meta.blurb}
               </p>
             </button>
@@ -112,11 +107,11 @@ export function LwmStrip({
 
       {progress.allThree ? (
         <p className="text-center text-xs font-medium text-accent">
-          Full L · W · M day — environment stack logged
+          Strong day — light, water, and magnetism habits logged
         </p>
       ) : (
         <p className="text-center text-[11px] text-muted">
-          Tap a pillar to learn why · log keystones on the checklist
+          Tap a card to learn more · log habits on the checklist
         </p>
       )}
     </div>

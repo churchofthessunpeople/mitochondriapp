@@ -122,16 +122,16 @@ export function OnboardingWizard({
             className="mx-auto h-20 w-20 rounded-2xl object-cover ring-1 ring-border"
           />
           <p className="mt-6 text-xs uppercase tracking-[0.2em] text-accent">
-            Welcome · L · W · M
+            Welcome
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Mitochondrial environment
+            Optimize mitochondria daily
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Stay on track with{" "}
-            <strong className="text-foreground">Light</strong>,{" "}
-            <strong className="text-foreground">Water</strong>, and{" "}
-            <strong className="text-foreground">Magnetism</strong> — plus
+            Track the habits that support mitochondrial function —{" "}
+            <strong className="text-foreground">light</strong>,{" "}
+            <strong className="text-foreground">water</strong>, and{" "}
+            <strong className="text-foreground">magnetism</strong> — using
             protocols you can actually do. Setup takes about a minute.
           </p>
           <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left text-sm text-muted">
@@ -370,10 +370,9 @@ export function OnboardingWizard({
             You&apos;re set
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Aim for <strong className="text-foreground">L · W · M</strong> each
-            day: morning light, a water keystone, and ground or low-RF time.
-            Place shows sun times and geology. Checklist only shows what you can
-            do.
+            Each day, cover morning light, a water habit, and ground or low-RF
+            time. Place shows sun times and geology. Checklist only shows what
+            you can do.
           </p>
           <div className="glass mx-auto mt-6 max-w-sm rounded-3xl p-4 text-left text-sm text-muted">
             <p>

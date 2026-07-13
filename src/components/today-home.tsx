@@ -115,14 +115,14 @@ export function TodayHome({
     <div className="space-y-5">
       <div>
         <p className="text-xs uppercase tracking-[0.18em] text-accent">
-          Light · Water · Magnetism
+          Today
         </p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
           {dateLabel}
         </h1>
         <p className="mt-1.5 text-sm text-muted">
-          Mitochondrial environment day — optimize light, water, and magnetism
-          where you are.
+          Support mitochondrial function with light, water, and magnetism where
+          you are.
         </p>
         <p className="mt-1 truncate text-xs text-muted">{placeSummary}</p>
       </div>
