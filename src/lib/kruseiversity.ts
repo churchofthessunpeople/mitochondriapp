@@ -73,6 +73,40 @@ export const KRUSEIVERSITY_ENTRIES: readonly KruseEntry[] = [
       },
     ],
   },
+  {
+    id: "earth-field-vs-geology",
+    title: "Earth’s main field vs geology vs nnEMF",
+    pillar: "magnetism",
+    summary:
+      "Three different “magnetism” layers: planetary main field (WMM), crustal/volcanic place context, and artificial RF habits.",
+    relatedProtocolIds: [
+      "barefoot-earth",
+      "magnetic-awareness",
+      "reduce-nnemf-block",
+    ],
+    sections: [
+      {
+        heading: "Main field (what Place shows as µT / dip)",
+        body: "The World Magnetic Model (WMM), as used by NOAA calculators and services like the BGS WMM API, estimates Earth’s core-generated magnetic field at your latitude, longitude, and elevation. You see total intensity (often ~25–65 µT at the surface), inclination (how steeply field lines dip), and declination (compass vs true north). This changes slowly over years. It is real geophysics—not a wearable body reading.",
+      },
+      {
+        heading: "Geology score (magma / volcano distance)",
+        body: "Separately, this app scores “geological vitality” as distance to Holocene volcanic and magma-system anchors (Smithsonian GVP + USGS catalogs). That is a lifestyle proxy for living crustal systems in a Kruse-style place narrative. It is not the same number as total field F from WMM. A place can have a strong main field and still be far from volcanoes (or the reverse).",
+      },
+      {
+        heading: "nnEMF and daily habits",
+        body: "Phones, Wi‑Fi, and power infrastructure are artificial electromagnetic environments. They do not appear in WMM or the volcano catalog. In the app they show up as protocols: low-RF hours, airplane mode, phone away from bed, outdoor grounding. Behavioral hygiene—not a nT reading from NOAA.",
+      },
+      {
+        heading: "How Kruse-style teaching uses “magnetism”",
+        body: "Public Kruse teaching often bundles latitude, field, geology, and non-native EMF as environmental inputs for mitochondria. This app keeps the layers honest: main field = planetary model; geology = magma proximity framework; nnEMF = what you do. Van Allen belts and deep space radiation are educational context for “where you live on Earth,” not something we measure at your ZIP.",
+      },
+      {
+        heading: "What this is not",
+        body: "Higher total field is not automatically “healthier”—field strength tends to rise toward the poles, where winter light is weaker. We do not diagnose disease from µT or dip. Educational lifestyle framing only.",
+      },
+    ],
+  },
 ];
 
 export function getKruseEntry(id: string): KruseEntry | undefined {

@@ -28,7 +28,7 @@ import { getFriendIds, getFriendships } from "@/lib/friends";
 import { haversineKm } from "@/lib/geo";
 import { effectiveLocation } from "@/lib/location-effective";
 import {
-  buildPlaceFactors,
+  buildPlaceFactorsWithElevation,
   latitudeBand,
   sunPhaseHint,
 } from "@/lib/place-factors";
@@ -147,7 +147,7 @@ export default async function AppPage({
 
   const placeFactors =
     sun && sunLat != null && sunLng != null
-      ? buildPlaceFactors({
+      ? await buildPlaceFactorsWithElevation({
           latitude: sunLat,
           longitude: sunLng,
           sun,

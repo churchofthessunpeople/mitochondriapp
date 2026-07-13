@@ -18,7 +18,7 @@ When code and this doc disagree, treat this doc as the *intent* you want — the
 |--------|----------------|------------------|
 | **Light** | Sunrise quality tiers → day boost (2× / 1.5× / 1.25×) | Sun times, latitude · guide sheet |
 | **Water** | Low-D hydration, deuterium-aware meal, or mineralized water | Deuterium / ATP synthase *lifestyle frame* · guide sheet |
-| **Magnetism** | Barefoot, low-field hour, nnEMF block, nature | Geology score (GVP/USGS) · guide sheet |
+| **Magnetism** | Barefoot, low-field hour, nnEMF block, nature | **Main field** (WMM µT/dip/declination) + **geology** (GVP/USGS) · guide sheet |
 
 Supporting catalog: cold, sleep architecture, daylight movement.
 

@@ -19,15 +19,20 @@ export function GuideMagnetismPanel() {
 
       <section className="glass space-y-2 rounded-3xl p-5">
         <h2 className="text-base font-semibold text-foreground">
-          Place score · Geology
+          Place · two magnetism layers
         </h2>
-        <p>
-          Magnetism on Place is distance to Holocene volcanoes and major magma
-          systems (GVP + USGS catalogs). Closer to free-flowing magma arcs →
-          higher score in this framework. It is{" "}
-          <strong className="text-foreground">not</strong> a geomagnetic field
-          meter or hazard alert.
-        </p>
+        <ul className="list-inside list-disc space-y-1.5">
+          <li>
+            <strong className="text-foreground">Main field (WMM)</strong> —
+            total intensity (µT), inclination (dip), declination at your ZIP.
+            Planetary core field from models like NOAA/BGS WMM—not phones.
+          </li>
+          <li>
+            <strong className="text-foreground">Geology</strong> — distance to
+            Holocene magma systems (GVP/USGS). Lifestyle proxy, not a field
+            meter or hazard alert.
+          </li>
+        </ul>
       </section>
 
       <section className="glass space-y-2 rounded-3xl p-5">

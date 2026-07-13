@@ -4,6 +4,11 @@
  */
 
 import { formatDistanceKm } from "@/lib/geo";
+import {
+  fetchGeomagFieldQuick,
+  formatGeomagDisplay,
+  type GeomagDisplay,
+} from "@/lib/geomag";
 import { magnetismScoreFromLocation } from "@/lib/region-scoring";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 
@@ -27,6 +32,11 @@ export type PlaceFactors = {
   geologyLabel: string;
   /** Secondary: distance + why we show it */
   geologyDetail: string;
+  /**
+   * Earth's main magnetic field (WMM) at this lat/lng — separate from geology score.
+   * Null only if never requested.
+   */
+  geomag: GeomagDisplay | null;
 };
 
 /** Latitude climate band (aligned with sun-score bands). */
@@ -120,6 +130,7 @@ export function buildPlaceFactors(opts: {
   sun: SunTimes;
   timeZone: string;
   elevationM?: number | null;
+  geomag?: GeomagDisplay | null;
 }): PlaceFactors {
   const { latitude, longitude, sun, timeZone } = opts;
   const { bandLabel, uvSeasonLabel } = latitudeBand(latitude);
@@ -141,25 +152,36 @@ export function buildPlaceFactors(opts: {
     nearestVolcanoKm: mag.nearestKm,
     // Clearest for users: this is the closest catalog anchor, not "under your feet"
     geologyLabel: mag.nearestName,
-    geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest magma / volcanic system (Magnetism place score · GVP/USGS catalog)`,
+    geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest magma / volcanic system (geology score · GVP/USGS catalog)`,
+    geomag: opts.geomag ?? null,
   };
 }
 
 /**
- * Prefer instant factors; elevation is best-effort and must not block navigation.
- * Races a short elevation fetch against a timeout so Place paints quickly.
+ * Elevation + main-field geomag (best-effort, must not block navigation long).
  */
 export async function buildPlaceFactorsWithElevation(opts: {
   latitude: number;
   longitude: number;
   sun: SunTimes;
   timeZone: string;
+  elevationM?: number | null;
 }): Promise<PlaceFactors> {
-  const elevationM = await Promise.race([
-    fetchElevationMeters(opts.latitude, opts.longitude),
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), 700)),
-  ]);
-  return buildPlaceFactors({ ...opts, elevationM });
+  const elevationM =
+    opts.elevationM !== undefined
+      ? opts.elevationM
+      : await Promise.race([
+          fetchElevationMeters(opts.latitude, opts.longitude),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 700)),
+        ]);
+
+  const geomag = formatGeomagDisplay(
+    await fetchGeomagFieldQuick(opts.latitude, opts.longitude, {
+      elevationM,
+    }),
+  );
+
+  return buildPlaceFactors({ ...opts, elevationM, geomag });
 }
 
 /** Short copy for the current sun phase (Today protocol hint). */

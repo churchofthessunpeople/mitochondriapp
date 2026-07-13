@@ -19,7 +19,7 @@
     "db:migrate-schedule": "node scripts/migrate-schedule.mjs",
     "db:migrate-favorites": "node scripts/migrate-favorites.mjs",
     "email:probe": "node scripts/probe-email.mjs",
-    "test": "tsx --test src/lib/sun.test.ts src/lib/scoring.test.ts"
+    "test": "tsx --test src/lib/sun.test.ts src/lib/scoring.test.ts src/lib/geomag.test.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",

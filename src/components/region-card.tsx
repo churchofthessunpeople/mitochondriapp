@@ -120,32 +120,68 @@ export function RegionCard({
       </div>
 
       {placeFactors && (
-        <div className="mt-4">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
-            Place factors
-          </p>
-          <ul className="mt-2 divide-y divide-border rounded-2xl border border-border bg-foreground/[0.02]">
-            <FactorRow
-              label="Solar noon"
-              value={placeFactors.solarNoonLabel}
-            />
-            <FactorRow
-              label="Latitude"
-              value={`${placeFactors.latitudeLabel} · ${placeFactors.bandLabel}`}
-            />
-            <FactorRow label="UV season" value={placeFactors.uvSeasonLabel} />
-            {placeFactors.elevationLabel && (
+        <div className="mt-4 space-y-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
+              Light environment
+            </p>
+            <ul className="mt-2 divide-y divide-border rounded-2xl border border-border bg-foreground/[0.02]">
               <FactorRow
-                label="Elevation"
-                value={placeFactors.elevationLabel}
+                label="Solar noon"
+                value={placeFactors.solarNoonLabel}
               />
-            )}
-            <FactorRow
-              label="Nearest magma"
-              value={placeFactors.geologyLabel}
-              detail={placeFactors.geologyDetail}
-            />
-          </ul>
+              <FactorRow
+                label="Latitude"
+                value={`${placeFactors.latitudeLabel} · ${placeFactors.bandLabel}`}
+              />
+              <FactorRow
+                label="UV season"
+                value={placeFactors.uvSeasonLabel}
+              />
+              {placeFactors.elevationLabel && (
+                <FactorRow
+                  label="Elevation"
+                  value={placeFactors.elevationLabel}
+                />
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
+              Magnetism · two layers
+            </p>
+            <ul className="mt-2 divide-y divide-border rounded-2xl border border-border bg-foreground/[0.02]">
+              {placeFactors.geomag && (
+                <>
+                  <FactorRow
+                    label="Main field"
+                    value={placeFactors.geomag.totalUtLabel}
+                    detail={`${placeFactors.geomag.model} · Earth core field only (not phones/Wi‑Fi)`}
+                  />
+                  <FactorRow
+                    label="Inclination"
+                    value={placeFactors.geomag.inclinationLabel}
+                    detail="How steeply field lines dip into the Earth at your place"
+                  />
+                  <FactorRow
+                    label="Declination"
+                    value={placeFactors.geomag.declinationLabel}
+                    detail="Compass vs true north"
+                  />
+                </>
+              )}
+              <FactorRow
+                label="Geology"
+                value={placeFactors.geologyLabel}
+                detail={placeFactors.geologyDetail}
+              />
+            </ul>
+            <p className="mt-2 text-[10px] leading-relaxed text-muted">
+              Main field = WMM planetary model. Geology = distance to Holocene
+              magma systems (separate score). Neither measures household EMF.
+            </p>
+          </div>
         </div>
       )}
 
