@@ -1,13 +1,23 @@
 "use client";
 
 import { Check, Flame, Minus, Plus, Timer, X } from "lucide-react";
-import { useMemo, useOptimistic, useState, useTransition } from "react";
+import {
+  useEffect,
+  useMemo,
+  useOptimistic,
+  useState,
+  useTransition,
+} from "react";
 import type { Protocol } from "@/db/schema";
 import {
   logCompletionAction,
   removeOneCompletionAction,
 } from "@/lib/actions/completions";
 import { orderProtocolsForNow } from "@/lib/checklist-order";
+import {
+  isMagnetismKeystoneId,
+  isWaterKeystoneId,
+} from "@/lib/lwm";
 import {
   formatSunriseMultiplier,
   isSunriseKeystoneProtocol,
@@ -40,6 +50,8 @@ type Props = {
     dayPoints: number;
     streak: { current: number; best: number };
   }) => void;
+  /** Live checklist counts for L·W·M strip */
+  onCompletionCountsChange?: (counts: Record<string, number>) => void;
 };
 
 export function ScheduleDay({
@@ -57,6 +69,7 @@ export function ScheduleDay({
   sunriseMultiplier: initialMult = 1,
   sunriseTierLabel: initialTierLabel = null,
   onStatsChange,
+  onCompletionCountsChange,
 }: Props) {
   const { push } = useToast();
   const [pending, start] = useTransition();
@@ -85,6 +98,10 @@ export function ScheduleDay({
       return next;
     },
   );
+
+  useEffect(() => {
+    onCompletionCountsChange?.(counts);
+  }, [counts, onCompletionCountsChange]);
 
   const { suggested, rest } = useMemo(
     () =>
@@ -125,10 +142,10 @@ export function ScheduleDay({
 
   function protocolHint(p: Protocol): string {
     const max = maxLogsPerDay(p);
-    const keystone = isSunriseKeystoneProtocol(p);
-    // Base points only on tags — day boost is shown once at the top
     const parts: string[] = [`${p.points} pts`];
-    if (keystone) parts.push("morning light");
+    if (isSunriseKeystoneProtocol(p)) parts.push("Light keystone");
+    else if (isWaterKeystoneId(p.id)) parts.push("Water keystone");
+    else if (isMagnetismKeystoneId(p.id)) parts.push("Magnetism keystone");
     if (p.allowsMultiple) parts.push(`up to ${max}×`);
     if (p.durationEnabled) {
       parts.push(`scales ~${p.referenceMinutes} min`);

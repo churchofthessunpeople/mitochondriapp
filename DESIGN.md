@@ -4,23 +4,33 @@
 Use this to mark up changes: edit sections, strike through old rules, add **Decision** notes.  
 When code and this doc disagree, treat this doc as the *intent* you want — then implement.
 
-**Last updated:** 2026-07-12 (reflects SPA shell, in-page sheets, tiered morning-light boosts)
+**Last updated:** 2026-07-12 (L · W · M pillars, keystones, teaching sheets)
 
 ---
 
 ## 1. Product thesis
 
-**Mitochondriapp** is a daily lifestyle tracker inspired by Dr. Jack Kruse–style priorities:
+**Mitochondriapp** is a daily **mitochondrial environment** tracker inspired by Dr. Jack Kruse–style priorities.
 
-- **Light first** (especially morning / sunrise), then place, then protocols  
+### Spine: Light · Water · Magnetism
+
+| Pillar | Daily keystone | Place / teaching |
+|--------|----------------|------------------|
+| **Light** | Sunrise quality tiers → day boost (2× / 1.5× / 1.25×) | Sun times, latitude · guide sheet |
+| **Water** | Low-D hydration, deuterium-aware meal, or mineralized water | Deuterium / ATP synthase *lifestyle frame* · guide sheet |
+| **Magnetism** | Barefoot, low-field hour, nnEMF block, nature | Geology score (GVP/USGS) · guide sheet |
+
+Supporting catalog: cold, sleep architecture, daylight movement.
+
+Also:
+
 - **Only log what you can actually do** (personal “via” / available list)  
-- **Where you are matters** (ZIP → sun times; nearest curated region → lifestyle scores)  
-- **Gamification that teaches** — points, streaks, leaderboards, without medical claims  
+- **Where you are matters** (ZIP → sun; magma catalog for magnetism place score)  
+- **Gamification that teaches** — LWM strip, keystone labels, points/streaks  
 
 **Tone / UI:** Low-blue “firelight” night + parchment day (warm amber accents, not cyan).  
-**Audience:** People already interested in circadian / mitochondrial lifestyle practices.
 
-> **Not medical advice.** Place scores and protocols are educational / lifestyle framework only.
+> **Not medical advice.** Scores and protocols are educational / lifestyle framework only.
 
 ---
 
@@ -30,14 +40,13 @@ When code and this doc disagree, treat this doc as the *intent* you want — the
 Register / log in
     → Onboarding (ZIP + starter activities + optional first log)
         → Daily home (/app)
+            → L · W · M progress strip (tap → teaching sheets)
             → Morning light check-in (tier → day boost)
-            → Checklist of available activities
-            → Place (sun times, ZIP, scores)
-            → Catalog (toggle available)
+            → Checklist · Place · Catalog (pillar-grouped)
         → Account (history, boards, friends, reminders, profile)
 ```
 
-**Success for a day:** User gets real outdoor morning light (best: sun over horizon), logs a few available protocols, sees points + streak.
+**Success for a day:** L · W · M strip shows 3/3 — morning light keystone, water keystone, magnetism action — plus optional support protocols.
 
 ---
 

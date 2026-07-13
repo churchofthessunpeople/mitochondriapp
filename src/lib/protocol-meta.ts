@@ -15,15 +15,23 @@ const DEFAULT: ProtocolMeta = { equipment: "none" };
 const META: Record<string, ProtocolMeta> = {
   "sunrise-horizon": {
     equipment: "none",
-    how: "Bare eyes on the solar disk as it clears the horizon — no glass, no sunglasses.",
+    how: "Bare eyes on the solar disk as it clears the horizon — no glass, no sunglasses. Light keystone.",
   },
   "sunrise-open-sky": {
     equipment: "none",
-    how: "Outside under a wide sky in the morning; full-spectrum light to the eyes.",
+    how: "Outside under a wide sky in the morning; full-spectrum light to the eyes. Light keystone.",
   },
   "sunrise-outside": {
     equipment: "none",
-    how: "Any outdoor morning light, even with trees, buildings, or heavy overcast.",
+    how: "Any outdoor morning light, even with trees, buildings, or heavy overcast. Light keystone.",
+  },
+  "low-d-hydration": {
+    equipment: "optional",
+    how: "First mineralized water outdoors or by a windowless open door — Water keystone.",
+  },
+  "deuterium-aware-meal": {
+    equipment: "none",
+    how: "Prefer seafood, quality fats, C3 plants — Water keystone meal.",
   },
   "morning-natural-light": {
     equipment: "none",

@@ -13,6 +13,9 @@ import {
 import type { AccountPanelUser } from "@/components/account-panel";
 import { AdminPanel } from "@/components/admin-panel";
 import { AppSheet } from "@/components/app-sheet";
+import { GuideLightPanel } from "@/components/guide-light-panel";
+import { GuideMagnetismPanel } from "@/components/guide-magnetism-panel";
+import { GuideWaterPanel } from "@/components/guide-water-panel";
 import { HistoryDayPanel } from "@/components/history-day-panel";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
 import { RegionBrowsePanel } from "@/components/region-browse-panel";
@@ -283,6 +286,36 @@ export function AppShell({
             onClose={closeSheet}
           >
             <AdminPanel allowed={isAdmin} />
+          </AppSheet>
+        )}
+
+        {sheet?.id === "guideLight" && (
+          <AppSheet
+            title="Light"
+            subtitle="Solar call · circadian timing · mitochondrial light stack"
+            onClose={closeSheet}
+          >
+            <GuideLightPanel />
+          </AppSheet>
+        )}
+
+        {sheet?.id === "guideWater" && (
+          <AppSheet
+            title="Water"
+            subtitle="Deuterium-aware hydration & fuel · lifestyle frame for ATP synthase"
+            onClose={closeSheet}
+          >
+            <GuideWaterPanel />
+          </AppSheet>
+        )}
+
+        {sheet?.id === "guideMagnetism" && (
+          <AppSheet
+            title="Magnetism"
+            subtitle="Earth / geology context · grounding · nnEMF hygiene"
+            onClose={closeSheet}
+          >
+            <GuideMagnetismPanel />
           </AppSheet>
         )}
 

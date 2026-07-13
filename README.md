@@ -8,9 +8,11 @@ Track Dr. Jack Kruse–inspired lifestyle protocols — light, magnetism, water,
 
 Full product intent and behavior (for editing / conforming the app): **[DESIGN.md](./DESIGN.md)**.
 
+**Mission:** Stay on track with mitochondrial lifestyle levers — **Light · Water · Magnetism** — via protocols where you live.
+
 | Surface | Role |
 |---------|------|
-| **Today** (`/app`) | SPA shell: Checklist · Place · Catalog |
+| **Today** (`/app`) | LWM strip · Checklist · Place · Catalog (pillar-grouped) |
 | **Account** | History · boards · friends · reminders · profile (in-page tabs + sheets) |
 
 - **Available / via list** — only show protocols you can actually do (e.g. rebounding if you have a rebounder)

@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
+import { LwmStrip } from "@/components/lwm-strip";
 import { RegionCard } from "@/components/region-card";
 import { ScheduleDay } from "@/components/schedule-day";
 import { ZipForm } from "@/components/zip-form";
@@ -85,6 +86,18 @@ export function TodayHome({
   const [section, setSection] = useState<TodaySection>(
     hasPlace ? "checklist" : "place",
   );
+  const [liveCounts, setLiveCounts] = useState(completionCounts);
+
+  useEffect(() => {
+    setLiveCounts(completionCounts);
+  }, [completionCounts]);
+
+  const onCompletionCountsChange = useCallback(
+    (counts: Record<string, number>) => {
+      setLiveCounts(counts);
+    },
+    [],
+  );
 
   const availableProtocols = useMemo(() => {
     const set = new Set(availableIds);
@@ -102,13 +115,24 @@ export function TodayHome({
     <div className="space-y-5">
       <div>
         <p className="text-xs uppercase tracking-[0.18em] text-accent">
-          Daily log
+          Light · Water · Magnetism
         </p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
           {dateLabel}
         </h1>
-        <p className="mt-1.5 truncate text-sm text-muted">{placeSummary}</p>
+        <p className="mt-1.5 text-sm text-muted">
+          Mitochondrial environment day — optimize light, water, and magnetism
+          where you are.
+        </p>
+        <p className="mt-1 truncate text-xs text-muted">{placeSummary}</p>
       </div>
+
+      <LwmStrip
+        completionCounts={liveCounts}
+        protocols={allProtocols}
+        sunriseMultiplier={sunriseMultiplier}
+        onOpenSheet={onOpenSheet}
+      />
 
       {isTravel && travelUntil && (
         <p className="rounded-2xl border border-accent/25 bg-accent/5 px-3.5 py-2 text-xs text-accent">
@@ -159,21 +183,43 @@ export function TodayHome({
             weekly={weekly}
             sunriseMultiplier={sunriseMultiplier}
             sunriseTierLabel={sunriseTierLabel}
+            onCompletionCountsChange={onCompletionCountsChange}
           />
         )}
 
         {section === "place" && (
           <div className="space-y-4">
             <p className="text-sm text-muted">
-              Sun times, lifestyle scores, and ZIP.{" "}
+              <strong className="font-medium text-foreground">Light</strong>{" "}
+              environment (sun times, latitude) and{" "}
+              <strong className="font-medium text-foreground">Magnetism</strong>{" "}
+              place context (geology).{" "}
               {onOpenSheet ? (
-                <button
-                  type="button"
-                  onClick={() => onOpenSheet({ id: "scoring" })}
-                  className="text-accent hover:underline"
-                >
-                  How scoring works
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onOpenSheet({ id: "guideLight" })}
+                    className="text-accent hover:underline"
+                  >
+                    Light
+                  </button>
+                  {" · "}
+                  <button
+                    type="button"
+                    onClick={() => onOpenSheet({ id: "guideMagnetism" })}
+                    className="text-accent hover:underline"
+                  >
+                    Magnetism
+                  </button>
+                  {" · "}
+                  <button
+                    type="button"
+                    onClick={() => onOpenSheet({ id: "scoring" })}
+                    className="text-accent hover:underline"
+                  >
+                    How scores work
+                  </button>
+                </>
               ) : null}
             </p>
 
@@ -222,12 +268,21 @@ export function TodayHome({
         )}
 
         {section === "catalog" && (
-          <ActivityCatalogExpand
-            protocols={allProtocols}
-            availableIds={availableIds}
-            onAvailableIdsChange={onAvailableIdsChange}
-            embedded
-          />
+          <div className="space-y-3">
+            <p className="text-sm text-muted">
+              Grouped by{" "}
+              <strong className="font-medium text-foreground">
+                Light · Water · Magnetism · Support
+              </strong>
+              . Toggle only what you can actually do.
+            </p>
+            <ActivityCatalogExpand
+              protocols={allProtocols}
+              availableIds={availableIds}
+              onAvailableIdsChange={onAvailableIdsChange}
+              embedded
+            />
+          </div>
         )}
       </div>
     </div>

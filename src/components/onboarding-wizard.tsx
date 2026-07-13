@@ -122,28 +122,39 @@ export function OnboardingWizard({
             className="mx-auto h-20 w-20 rounded-2xl object-cover ring-1 ring-border"
           />
           <p className="mt-6 text-xs uppercase tracking-[0.2em] text-accent">
-            Welcome
+            Welcome · L · W · M
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Your mitochondrial day
+            Mitochondrial environment
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Track light, movement, and lifestyle protocols — personalized to
-            what <strong className="text-foreground">you</strong> can actually
-            do. Setup takes about a minute.
+            Stay on track with{" "}
+            <strong className="text-foreground">Light</strong>,{" "}
+            <strong className="text-foreground">Water</strong>, and{" "}
+            <strong className="text-foreground">Magnetism</strong> — plus
+            protocols you can actually do. Setup takes about a minute.
           </p>
           <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left text-sm text-muted">
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-              Local sunrise/sunset from your ZIP
+              <span>
+                <strong className="text-foreground">Light</strong> — sunrise
+                keystone & outdoor spectrum from your ZIP
+              </span>
             </li>
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-              A short list of activities that fit your life
+              <span>
+                <strong className="text-foreground">Water</strong> — low-D
+                hydration & deuterium-aware meals
+              </span>
             </li>
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-              Daily checklist — tap when done
+              <span>
+                <strong className="text-foreground">Magnetism</strong> — ground,
+                geology place score, cut nnEMF
+              </span>
             </li>
           </ul>
           <button
@@ -359,8 +370,10 @@ export function OnboardingWizard({
             You&apos;re set
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Your checklist shows only what you can do. Suggested-now items float
-            to the top with sunrise and sunset. Place holds your ZIP and scores.
+            Aim for <strong className="text-foreground">L · W · M</strong> each
+            day: morning light, a water keystone, and ground or low-RF time.
+            Place shows sun times and geology. Checklist only shows what you can
+            do.
           </p>
           <div className="glass mx-auto mt-6 max-w-sm rounded-3xl p-4 text-left text-sm text-muted">
             <p>

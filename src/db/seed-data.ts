@@ -142,8 +142,9 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "barefoot-earth",
     name: "Barefoot earth contact",
-    description: "Barefoot time on soil, grass, sand, or stone.",
-    points: 6,
+    description:
+      "Barefoot time on soil, grass, sand, or stone. Magnetism keystone — Earth contact lifestyle.",
+    points: 7,
     category: "grounding",
     timeOfDay: "morning",
     allowsMultiple: true,
@@ -178,10 +179,23 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 22,
   }),
   p({
+    id: "low-d-hydration",
+    name: "Low-D morning hydration",
+    description:
+      "First mineralized water in daylight — Water keystone. Lifestyle proxy for lower deuterium load on the mitochondrial water story.",
+    points: 8,
+    category: "water_food",
+    timeOfDay: "morning",
+    allowsMultiple: true,
+    maxPerDay: 3,
+    sortOrder: 8,
+  }),
+  p({
     id: "mineralized-water",
     name: "Mineralized / structured water",
-    description: "Well-mineralized water (not only deionized all day).",
-    points: 3,
+    description:
+      "Well-mineralized water (not only deionized all day). Counts toward Water keystone.",
+    points: 4,
     category: "water_food",
     timeOfDay: "anytime",
     allowsMultiple: true,
@@ -202,13 +216,14 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "deuterium-aware-meal",
     name: "Deuterium-aware meal",
-    description: "Lower-deuterium choices: seafood, C3 plants, quality fats.",
-    points: 6,
+    description:
+      "Lower-deuterium choices: seafood, C3 plants, quality fats. Water keystone — ATP synthase / mitochondrial water lifestyle frame.",
+    points: 8,
     category: "water_food",
     timeOfDay: "morning",
     allowsMultiple: true,
     maxPerDay: 3,
-    sortOrder: 12,
+    sortOrder: 9,
   }),
   p({
     id: "seafood-meal",
@@ -272,8 +287,9 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "magnetic-awareness",
     name: "Low artificial field hour",
-    description: "Hour outdoors or in lower artificial EM environment.",
-    points: 6,
+    description:
+      "Hour outdoors or in lower artificial EM environment. Magnetism keystone.",
+    points: 7,
     category: "emf",
     timeOfDay: "anytime",
     allowsMultiple: true,

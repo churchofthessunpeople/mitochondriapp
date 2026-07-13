@@ -141,7 +141,7 @@ export function buildPlaceFactors(opts: {
     nearestVolcanoKm: mag.nearestKm,
     // Clearest for users: this is the closest catalog anchor, not "under your feet"
     geologyLabel: mag.nearestName,
-    geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest free-flowing magma system in our model (drives magnetism score)`,
+    geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest magma / volcanic system (Magnetism place score · GVP/USGS catalog)`,
   };
 }
 

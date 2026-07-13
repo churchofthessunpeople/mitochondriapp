@@ -1,11 +1,12 @@
 import type { ProtocolCategory } from "@/db/schema";
+import { type LwmPillarId, pillarForCategory } from "@/lib/lwm";
 
 export const CATEGORY_ORDER: ProtocolCategory[] = [
   "light",
-  "grounding",
   "water_food",
-  "cold",
+  "grounding",
   "emf",
+  "cold",
   "movement",
   "sleep",
   "other",
@@ -13,14 +14,48 @@ export const CATEGORY_ORDER: ProtocolCategory[] = [
 
 export const CATEGORY_META: Record<
   ProtocolCategory,
-  { label: string; blurb: string }
+  { label: string; blurb: string; pillar: LwmPillarId }
 > = {
-  light: { label: "Light & sun", blurb: "Solar call, UV, red/NIR, circadian cues." },
-  grounding: { label: "Grounding & earth", blurb: "Barefoot contact and nature charge." },
-  water_food: { label: "Water & food", blurb: "Deuterium-aware fuel and hydration." },
-  cold: { label: "Cold", blurb: "Thermogenesis and mitochondrial challenge." },
-  emf: { label: "EMF / magnetism", blurb: "nnEMF hygiene and field awareness." },
-  movement: { label: "Movement", blurb: "Daylight-timed physical work and play." },
-  sleep: { label: "Night & sleep", blurb: "Darkness, timing, and recovery." },
-  other: { label: "Other", blurb: "Everything else in the stack." },
+  light: {
+    label: "Light & sun",
+    blurb: "Sunrise, outdoor spectrum, UV, red/NIR, circadian cues.",
+    pillar: "light",
+  },
+  water_food: {
+    label: "Water & fuel",
+    blurb: "Deuterium-aware hydration and meals · ATP synthase context.",
+    pillar: "water",
+  },
+  grounding: {
+    label: "Grounding",
+    blurb: "Barefoot earth contact — magnetism lifestyle.",
+    pillar: "magnetism",
+  },
+  emf: {
+    label: "Field hygiene",
+    blurb: "nnEMF reduction and lower artificial EM environment.",
+    pillar: "magnetism",
+  },
+  cold: {
+    label: "Cold",
+    blurb: "Thermogenesis and mitochondrial challenge.",
+    pillar: "support",
+  },
+  movement: {
+    label: "Movement",
+    blurb: "Daylight-timed physical work and play.",
+    pillar: "support",
+  },
+  sleep: {
+    label: "Night & sleep",
+    blurb: "Darkness, blue hygiene, recovery window.",
+    pillar: "support",
+  },
+  other: {
+    label: "Other",
+    blurb: "Everything else in the stack.",
+    pillar: "support",
+  },
 };
+
+export { pillarForCategory };

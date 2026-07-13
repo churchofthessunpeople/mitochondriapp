@@ -6,6 +6,12 @@ import type { Protocol, ProtocolCategory } from "@/db/schema";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import {
+  LWM_PILLARS,
+  PILLAR_ORDER,
+  pillarForCategory,
+  type LwmPillarId,
+} from "@/lib/lwm";
+import {
   equipmentLabel,
   getProtocolMeta,
 } from "@/lib/protocol-meta";
@@ -46,7 +52,7 @@ export function ActivityCatalogExpand({
   }
 
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<ProtocolCategory | "all">("all");
+  const [pillar, setPillar] = useState<LwmPillarId | "all">("all");
   /** Default: show items not yet on the checklist (add more) */
   const [listFilter, setListFilter] = useState<"not_on" | "on" | "all">(
     "not_on",
@@ -65,19 +71,33 @@ export function ActivityCatalogExpand({
     return protocols.filter((p) => {
       if (listFilter === "not_on" && available.has(p.id)) return false;
       if (listFilter === "on" && !available.has(p.id)) return false;
-      if (category !== "all" && p.category !== category) return false;
+      if (pillar !== "all" && pillarForCategory(p.category) !== pillar) {
+        return false;
+      }
       if (q) {
         const hay = `${p.name} ${p.description}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [protocols, query, category, listFilter, available]);
+  }, [protocols, query, pillar, listFilter, available]);
 
   const grouped = useMemo(() => {
-    const map = new Map<ProtocolCategory, Protocol[]>();
-    for (const c of CATEGORY_ORDER) map.set(c, []);
-    for (const p of filtered) map.get(p.category)?.push(p);
+    const map = new Map<LwmPillarId, Protocol[]>();
+    for (const id of PILLAR_ORDER) map.set(id, []);
+    for (const p of filtered) {
+      map.get(pillarForCategory(p.category))?.push(p);
+    }
+    // Within pillar, keep seed category order
+    for (const id of PILLAR_ORDER) {
+      const list = map.get(id) ?? [];
+      list.sort(
+        (a, b) =>
+          CATEGORY_ORDER.indexOf(a.category) -
+            CATEGORY_ORDER.indexOf(b.category) ||
+          a.sortOrder - b.sortOrder,
+      );
+    }
     return map;
   }, [filtered]);
 
@@ -149,29 +169,31 @@ export function ActivityCatalogExpand({
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <Chip
-              active={category === "all"}
-              onClick={() => setCategory("all")}
-              label="Any group"
+              active={pillar === "all"}
+              onClick={() => setPillar("all")}
+              label="All pillars"
             />
-            {CATEGORY_ORDER.map((c) => (
+            {LWM_PILLARS.map((p) => (
               <Chip
-                key={c}
-                active={category === c}
-                onClick={() => setCategory(c)}
-                label={CATEGORY_META[c].label}
+                key={p.id}
+                active={pillar === p.id}
+                onClick={() => setPillar(p.id)}
+                label={p.label}
               />
             ))}
           </div>
 
           <div className="max-h-[min(28rem,50vh)] space-y-4 overflow-y-auto pr-0.5">
-            {CATEGORY_ORDER.map((cat) => {
-              const list = grouped.get(cat) ?? [];
+            {PILLAR_ORDER.map((pid) => {
+              const list = grouped.get(pid) ?? [];
               if (list.length === 0) return null;
+              const pillarMeta = LWM_PILLARS.find((x) => x.id === pid)!;
               return (
-                <section key={cat}>
-                  <h3 className="mb-2 text-[10px] font-medium uppercase tracking-[0.16em] text-muted">
-                    {CATEGORY_META[cat].label}
+                <section key={pid}>
+                  <h3 className="mb-0.5 text-[10px] font-medium uppercase tracking-[0.16em] text-accent">
+                    {pillarMeta.label}
                   </h3>
+                  <p className="mb-2 text-[11px] text-muted">{pillarMeta.blurb}</p>
                   <ul className="space-y-2">
                     {list.map((p) => {
                       const on = available.has(p.id);
@@ -211,7 +233,8 @@ export function ActivityCatalogExpand({
                                 </span>
                               )}
                               <span className="mt-1 block text-[10px] text-muted">
-                                {p.points} pts · {equipmentLabel(meta.equipment)}
+                                {p.points} pts · {CATEGORY_META[p.category].label}{" "}
+                                · {equipmentLabel(meta.equipment)}
                                 {on ? " · on checklist" : ""}
                               </span>
                             </span>

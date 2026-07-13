@@ -3,6 +3,9 @@ export type AppSheet =
   | { id: "scoring" }
   | { id: "regions" }
   | { id: "historyDay"; date: string }
-  | { id: "admin" };
+  | { id: "admin" }
+  | { id: "guideLight" }
+  | { id: "guideWater" }
+  | { id: "guideMagnetism" };
 
 export type OpenAppSheet = (sheet: AppSheet) => void;
