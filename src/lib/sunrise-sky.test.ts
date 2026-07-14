@@ -28,6 +28,13 @@ describe("sunrise sky encoding", () => {
     assert.equal(decoded.endOffset, 15);
     assert.equal(decoded.sky, "clear");
   });
+
+  it("decodes legacy partly_cloudy index as cloudy", () => {
+    const encoded = 20_000 + (-15 + 500) * 10 + 1;
+    const decoded = decodeSunriseEndOffset(encoded);
+    assert.equal(decoded.endOffset, -15);
+    assert.equal(decoded.sky, "cloudy");
+  });
 });
 
 describe("sunrise sky duration factor", () => {

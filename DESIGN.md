@@ -287,7 +287,6 @@ Minimum effective multiplier after modifiers: **1×**.
 | Sky | Minutes needed |
 |-----|----------------|
 | Clear | 30 |
-| Partly cloudy | 38 |
 | Cloudy | 45 |
 | Heavy overcast | 60 |
 
@@ -346,7 +345,7 @@ Sum of `pointsEarned` on all completion rows for that user-local calendar day (i
 **Open for product review**
 
 - [ ] Tier mults 2 / 1.5 / 1.25 feel right?  
-- [ ] Sky duration thresholds (30 / 38 / 45 / 60) fair?  
+- [ ] Sky duration thresholds (30 / 45 / 60) fair?  
 - [ ] Should sunset ever get a small evening bonus (not a day unlock)?  
 - [ ] Streak bonus too generous / stingy?  
 
@@ -600,7 +599,7 @@ Use this section as a working scratchpad. Check when decided; note the rule in t
 | P8 | Medical disclaimers stronger? | **Implemented** | Sitewide `SiteDisclaimer` bar |
 | P9 | Public vs friends-only default boards | Open | Public opt-out today |
 | P10 | Sunrise in catalog? | Decided no | Daily check-in + Morning light row only |
-| P11 | Sky duration for full boost? | Implemented | 30 / 38 / 45 / 60 min by sky |
+| P11 | Sky duration for full boost? | Implemented | 30 / 45 / 60 min (clear / cloudy / overcast) |
 
 ---
 

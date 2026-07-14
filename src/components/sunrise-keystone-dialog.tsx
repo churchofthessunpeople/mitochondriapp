@@ -408,7 +408,6 @@ export function SunriseKeystoneDialog({
                     title={option.label}
                     subtitle={option.subtitle}
                     selected={modifiers.sky === option.id}
-                    highlight={option.id === "clear"}
                     onClick={() =>
                       setModifiers((m) => ({ ...m, sky: option.id }))
                     }

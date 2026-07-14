@@ -1,10 +1,6 @@
 /** Sky clarity affects how long morning-light viewing must last for full points/boost. */
 
-export type SunriseSky =
-  | "clear"
-  | "partly_cloudy"
-  | "cloudy"
-  | "overcast";
+export type SunriseSky = "clear" | "cloudy" | "overcast";
 
 export type SunriseSkyOption = {
   id: SunriseSky;
@@ -22,12 +18,6 @@ export const SUNRISE_SKY_OPTIONS: readonly SunriseSkyOption[] = [
     fullMinutes: 30,
   },
   {
-    id: "partly_cloudy",
-    label: "Partly cloudy",
-    subtitle: "Full points & boost at 38 min",
-    fullMinutes: 38,
-  },
-  {
     id: "cloudy",
     label: "Cloudy",
     subtitle: "Full points & boost at 45 min",
@@ -41,14 +31,18 @@ export const SUNRISE_SKY_OPTIONS: readonly SunriseSkyOption[] = [
   },
 ] as const;
 
+/** Stable indices in encoded completion rows (slot 1 reserved for legacy partly_cloudy). */
 const SKY_INDEX: Record<SunriseSky, number> = {
   clear: 0,
-  partly_cloudy: 1,
   cloudy: 2,
   overcast: 3,
 };
 
-const SKY_BY_INDEX = SUNRISE_SKY_OPTIONS.map((o) => o.id);
+function skyFromStoredIndex(skyIdx: number): SunriseSky {
+  if (skyIdx === 3) return "overcast";
+  if (skyIdx === 2 || skyIdx === 1) return "cloudy";
+  return "clear";
+}
 
 /** Values below this are legacy raw end offsets (pre–sky encoding). */
 const ENCODED_END_BASE = 20_000;
@@ -87,7 +81,7 @@ export function decodeSunriseEndOffset(encoded: number | null | undefined): {
   }
   const raw = encoded - ENCODED_END_BASE;
   const skyIdx = ((raw % 10) + 10) % 10;
-  const sky = SKY_BY_INDEX[skyIdx] ?? "clear";
+  const sky = skyFromStoredIndex(skyIdx);
   return {
     endOffset: Math.floor(raw / 10) - END_OFFSET_SHIFT,
     sky,
