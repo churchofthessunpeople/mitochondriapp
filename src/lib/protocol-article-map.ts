@@ -1,0 +1,36 @@
+/**
+ * Primary Mitoversity article for each catalog activity (1:1).
+ * Stored on protocol meta as `articleId`; used for "Learn more" links.
+ */
+export const PROTOCOL_ARTICLE_IDS: Record<string, string> = {
+  "sunrise-horizon": "sunrise-horizon",
+  "sunrise-open-sky": "sunrise-open-sky",
+  "sunrise-outside": "sunrise-outside",
+  "morning-natural-light": "morning-natural-light",
+  "midday-sun-skin": "solar-noon-vitamin-d",
+  "sunset-viewing": "sunset-viewing-why",
+  "red-nir-light": "red-nir-light",
+  "barefoot-earth": "barefoot-earth",
+  "nature-contact": "nature-contact",
+  "low-d-hydration": "high-latitude-low-deuterium-water",
+  "mineralized-water": "mineralized-water",
+  "carbonated-water": "carbonated-water-co2",
+  "hydration-timing": "hydration-timing",
+  "deuterium-aware-meal": "deuterium-atp-synthase",
+  "seafood-meal": "seafood-meal",
+  "early-dinner": "early-dinner",
+  "cold-face-plunge": "cold-face-plunge",
+  "cold-thermogenesis": "cold-thermogenesis-skin-50",
+  "reduce-nnemf-block": "reduce-nnemf-block",
+  "magnetic-awareness": "earth-field-vs-geology",
+  "phone-away-sleep": "phone-away-sleep",
+  "magnetico-sleep-pad": "magnetico-sleep-pad",
+  "breaker-off-bedroom": "breaker-off-bedroom",
+  "breaker-off-office": "breaker-off-office",
+  "morning-movement": "morning-movement",
+  "mastic-gum": "mastic-gum-chewing",
+  "blue-light-hygiene": "blue-light-hygiene",
+  "dark-bedroom": "true-dark-bedroom",
+  "cool-bedroom-sleep": "cool-sleep-65",
+  "consistent-sleep-window": "consistent-sleep-window",
+};

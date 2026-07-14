@@ -479,19 +479,22 @@ function ProtocolForm({
       <Field label="Name">
         <input name="name" defaultValue={editor.merged.name} className={inputClass} />
       </Field>
-      <Field label="Description">
-        <textarea
-          name="description"
-          rows={3}
-          defaultValue={editor.merged.description}
-          className={inputClass}
-        />
-      </Field>
       <Field label="How-to">
         <textarea
           name="how"
-          rows={4}
+          rows={6}
           defaultValue={editor.meta.how ?? ""}
+          className={inputClass}
+        />
+      </Field>
+      <p className="text-xs text-muted">
+        List cards show the first paragraph of how-to as a short preview.
+      </p>
+      <Field label="Mitoversity article id">
+        <input
+          name="articleId"
+          defaultValue={editor.meta.articleId ?? ""}
+          placeholder="e.g. solar-noon-vitamin-d"
           className={inputClass}
         />
       </Field>
@@ -609,16 +612,20 @@ function CreateProtocolForm({
       <Field label="Name">
         <input name="name" defaultValue="New activity" className={inputClass} />
       </Field>
-      <Field label="Description">
+      <Field label="How-to">
         <textarea
-          name="description"
-          rows={3}
-          defaultValue="Describe what this activity is."
+          name="how"
+          rows={6}
+          defaultValue="Describe what to do, step by step."
           className={inputClass}
         />
       </Field>
-      <Field label="How-to">
-        <textarea name="how" rows={4} className={inputClass} />
+      <Field label="Mitoversity article id">
+        <input
+          name="articleId"
+          placeholder="same-as-activity-id or existing article"
+          className={inputClass}
+        />
       </Field>
       <div className="grid grid-cols-2 gap-2">
         <Field label="Points">

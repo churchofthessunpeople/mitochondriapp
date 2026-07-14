@@ -3,16 +3,20 @@
  * Keeps migrations light while improving catalog UX.
  */
 
+import { PROTOCOL_ARTICLE_IDS } from "@/lib/protocol-article-map";
+
 export type EquipmentNeed = "none" | "optional" | "required";
 
 export type ProtocolMeta = {
   equipment: EquipmentNeed;
   how?: string;
+  /** Primary Mitoversity article for this activity */
+  articleId?: string;
 };
 
 const DEFAULT: ProtocolMeta = { equipment: "none" };
 
-export const PROTOCOL_META_BASE: Record<string, ProtocolMeta> = {
+const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   "sunrise-horizon": {
     equipment: "none",
     how: "Be outside before the sun clears the horizon. Look at the solar disk with bare eyes — no sunglasses, no window glass between you and the sky.\n\nFull points when your viewing session falls within 15 minutes before or after local sunrise; each minute outside costs 1 point (worst edge of start/finish). Skin, grounding, and sunglasses adjust your day boost on the check-in.",
@@ -135,6 +139,17 @@ export const PROTOCOL_META_BASE: Record<string, ProtocolMeta> = {
   },
 };
 
+export const PROTOCOL_META_BASE: Record<string, ProtocolMeta> =
+  Object.fromEntries(
+    Object.entries(PROTOCOL_META_RAW).map(([id, meta]) => [
+      id,
+      {
+        ...meta,
+        articleId: meta.articleId ?? PROTOCOL_ARTICLE_IDS[id],
+      },
+    ]),
+  );
+
 export function getProtocolMeta(
   protocolId: string,
   metaMap?: Record<string, ProtocolMeta>,
@@ -157,4 +172,12 @@ export function equipmentLabel(e: EquipmentNeed): string {
   if (e === "required") return "Needs gear";
   if (e === "optional") return "Gear optional";
   return "No gear";
+}
+
+/** First paragraph of how-to, collapsed to one line for list cards. */
+export function protocolTeaserFromHowTo(howTo: string, maxLen = 140): string {
+  const first = howTo.split(/\n\n+/)[0]?.trim() ?? howTo.trim();
+  const oneLine = first.replace(/\s+/g, " ");
+  if (oneLine.length <= maxLen) return oneLine;
+  return `${oneLine.slice(0, maxLen - 1).trimEnd()}…`;
 }

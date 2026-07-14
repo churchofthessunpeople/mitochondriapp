@@ -18,6 +18,7 @@ import { LWM_PILLARS, type LwmPillarMeta } from "@/lib/lwm";
 import { TIME_OF_DAY_META, TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 import type { TimeOfDay } from "@/db/schema";
 import { seedToProtocol } from "@/lib/catalog";
+import { getProtocolTeaser } from "@/lib/protocol-display";
 
 export type OverrideMap = Map<string, unknown>;
 
@@ -177,23 +178,21 @@ export function mergeProtocols(
   overrides: OverrideMap,
   seeds: readonly ProtocolSeed[] = PROTOCOL_SEEDS,
 ): Protocol[] {
+  const allMeta = mergeAllProtocolMeta(overrides);
   const out: Protocol[] = [];
   for (const seed of seeds) {
-    const patch = overrides.get(contentKey.protocol(seed.id)) as
-      | ProtocolOverride
-      | undefined;
     if (isProtocolDeleted(overrides, seed.id)) continue;
     const merged = mergeProtocolSeed(seed, overrides);
-    out.push(seedToProtocol(merged));
+    const teaser = getProtocolTeaser(merged, allMeta);
+    out.push(seedToProtocol({ ...merged, description: teaser }));
   }
   for (const id of getRegistryIds(overrides, REGISTRY_CUSTOM_PROTOCOLS)) {
     if (seeds.some((seed) => seed.id === id)) continue;
-    const patch = overrides.get(contentKey.protocol(id)) as
-      | ProtocolOverride
-      | undefined;
     if (isProtocolDeleted(overrides, id)) continue;
     const custom = getCustomProtocolSeed(id, overrides);
-    if (custom) out.push(seedToProtocol(custom));
+    if (!custom) continue;
+    const teaser = getProtocolTeaser(custom, allMeta);
+    out.push(seedToProtocol({ ...custom, description: teaser }));
   }
   return out.sort(
     (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name),
@@ -219,7 +218,11 @@ export function mergeAllProtocolMeta(
   ]);
   const out: Record<string, ProtocolMeta> = {};
   for (const id of ids) {
-    out[id] = mergeProtocolMeta(id, overrides);
+    const merged = mergeProtocolMeta(id, overrides);
+    out[id] = {
+      ...merged,
+      articleId: merged.articleId ?? PROTOCOL_META_BASE[id]?.articleId,
+    };
   }
   return out;
 }

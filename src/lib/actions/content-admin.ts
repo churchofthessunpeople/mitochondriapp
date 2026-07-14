@@ -35,6 +35,7 @@ import {
   type MitoPillar,
 } from "@/lib/mitoversity";
 import { revalidateApp } from "@/lib/revalidate-app";
+import { protocolTeaserFromHowTo } from "@/lib/protocol-meta";
 import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 import { LWM_PILLARS } from "@/lib/lwm";
 import type { TimeOfDay } from "@/db/schema";
@@ -43,9 +44,13 @@ const CONTENT_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function parseProtocolForm(raw: Record<string, unknown>, fallback?: ProtocolSeed) {
   const locked = raw.lockedTimeOfDay;
+  const how = String(raw.how ?? "");
+  const description = how.trim()
+    ? protocolTeaserFromHowTo(how)
+    : String(fallback?.description ?? "New activity");
   return {
     name: String(raw.name ?? fallback?.name ?? "New activity"),
-    description: String(raw.description ?? fallback?.description ?? ""),
+    description,
     points: Number(raw.points ?? fallback?.points ?? 5),
     category: (raw.category as ProtocolCategory) ?? fallback?.category ?? "other",
     timeOfDay: (raw.timeOfDay as TimeOfDay) ?? fallback?.timeOfDay ?? "anytime",
@@ -72,6 +77,55 @@ async function setCustomProtocolRegistry(ids: string[]) {
 
 async function setCustomMitoRegistry(ids: string[]) {
   await upsertContentOverrideAction(REGISTRY_CUSTOM_MITO, ids);
+}
+
+function categoryToMitoPillar(
+  category: ProtocolCategory,
+): MitoPillar {
+  if (category === "light") return "light";
+  if (category === "water_food") return "water";
+  if (category === "grounding" || category === "emf") return "magnetism";
+  return "support";
+}
+
+async function ensureMitoArticleForProtocol(
+  articleId: string,
+  protocolId: string,
+  title: string,
+  how: string,
+  category: ProtocolCategory,
+): Promise<void> {
+  const overrides = await loadContentOverrides();
+  if (
+    MITOVERSITY_ENTRIES.some((e) => e.id === articleId) ||
+    isCustomMitoId(overrides, articleId) ||
+    overrides.has(contentKey.mito(articleId))
+  ) {
+    return;
+  }
+
+  const summary = protocolTeaserFromHowTo(how);
+  const entry: MitoEntry = {
+    id: articleId,
+    title,
+    pillar: categoryToMitoPillar(category),
+    summary,
+    relatedProtocolIds: [protocolId],
+    sections: [
+      {
+        heading: "How to",
+        body: how.trim() || summary,
+      },
+      {
+        heading: "Learn more over time",
+        body: "Expand this article in Admin → Content → Articles with deeper sections when ready.",
+      },
+    ],
+  };
+
+  const registry = getRegistryIds(overrides, REGISTRY_CUSTOM_MITO);
+  await setCustomMitoRegistry([...registry, articleId]);
+  await upsertContentOverrideAction(contentKey.mito(articleId), entry);
 }
 
 async function adminUserId() {
@@ -201,6 +255,7 @@ export async function saveAdminProtocolAction(
   const metaPatch: ProtocolMetaOverride = {
     equipment: (raw.equipment as ProtocolMetaOverride["equipment"]) ?? "none",
     how: String(raw.how ?? ""),
+    articleId: String(raw.articleId ?? "").trim() || undefined,
   };
 
   if (isCustom) {
@@ -213,11 +268,21 @@ export async function saveAdminProtocolAction(
       active: fields.active,
     });
   } else {
-    const patch: ProtocolOverride = fields;
+    const { description: _desc, ...patch } = fields;
     await upsertContentOverrideAction(contentKey.protocol(protocolId), patch);
   }
 
   await upsertContentOverrideAction(contentKey.protocolMeta(protocolId), metaPatch);
+  const articleId = metaPatch.articleId ?? protocolId;
+  if (articleId && metaPatch.how?.trim()) {
+    await ensureMitoArticleForProtocol(
+      articleId,
+      protocolId,
+      fields.name,
+      metaPatch.how,
+      fields.category,
+    );
+  }
   await ensureProtocolInDb(protocolId);
 }
 
@@ -246,7 +311,11 @@ export async function createAdminProtocolAction(
   const metaPatch: ProtocolMetaOverride = {
     equipment: (raw.equipment as ProtocolMetaOverride["equipment"]) ?? "none",
     how: String(raw.how ?? ""),
+    articleId: String(raw.articleId ?? "").trim() || undefined,
   };
+
+  const articleId = metaPatch.articleId ?? id;
+  metaPatch.articleId = articleId;
 
   const registry = getRegistryIds(overrides, REGISTRY_CUSTOM_PROTOCOLS);
   await setCustomProtocolRegistry([...registry, id]);
@@ -255,6 +324,15 @@ export async function createAdminProtocolAction(
     active: true,
   });
   await upsertContentOverrideAction(contentKey.protocolMeta(id), metaPatch);
+  if (metaPatch.how?.trim()) {
+    await ensureMitoArticleForProtocol(
+      articleId,
+      id,
+      fields.name,
+      metaPatch.how,
+      fields.category,
+    );
+  }
   await ensureProtocolInDb(id);
   return id;
 }

@@ -9,6 +9,8 @@
  * Expand this catalog over time. Educational only — not medical advice.
  */
 
+import { MITOVERSITY_PROTOCOL_GUIDES } from "@/lib/mitoversity-protocol-guides";
+
 export type MitoPillar = "light" | "water" | "magnetism" | "support";
 
 export type MitoEntrySection = {
@@ -779,6 +781,7 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
     ],
   },
+  ...MITOVERSITY_PROTOCOL_GUIDES,
 ];
 
 export function getMitoEntry(id: string): MitoEntry | undefined {

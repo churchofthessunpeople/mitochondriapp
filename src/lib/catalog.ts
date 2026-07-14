@@ -14,10 +14,12 @@ import {
   loadContentOverrides,
   mergeProtocolSeed,
   mergeProtocols,
+  mergeAllProtocolMeta,
   isCustomProtocolId,
   getCustomProtocolSeed,
   isProtocolDeleted,
 } from "@/lib/content-overrides";
+import { getProtocolTeaser } from "@/lib/protocol-display";
 
 export function seedToProtocol(seed: ProtocolSeed): Protocol {
   return {
@@ -53,12 +55,18 @@ export async function getMergedCatalogProtocolById(
 
   const seed = PROTOCOL_SEEDS.find((s) => s.id === id);
   if (seed) {
-    return seedToProtocol(mergeProtocolSeed(seed, overrides));
+    const merged = mergeProtocolSeed(seed, overrides);
+    const allMeta = mergeAllProtocolMeta(overrides);
+    const teaser = getProtocolTeaser(merged, allMeta);
+    return seedToProtocol({ ...merged, description: teaser });
   }
 
   if (isCustomProtocolId(overrides, id)) {
     const custom = getCustomProtocolSeed(id, overrides);
-    return custom ? seedToProtocol(custom) : undefined;
+    if (!custom) return undefined;
+    const allMeta = mergeAllProtocolMeta(overrides);
+    const teaser = getProtocolTeaser(custom, allMeta);
+    return seedToProtocol({ ...custom, description: teaser });
   }
 
   return undefined;
