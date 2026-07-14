@@ -1,11 +1,14 @@
 "use client";
 
+import { Copy, Eye, EyeOff, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import type { AuthFormState } from "@/lib/actions/auth";
 import { loginAction, registerAction } from "@/lib/actions/auth";
+import { generateStrongPassword } from "@/lib/generate-password";
 import { ROUTES } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 
 type Mode = "login" | "register";
 
@@ -18,6 +21,32 @@ export function AuthForm({
 }) {
   const action = mode === "login" ? loginAction : registerAction;
   const [state, formAction, pending] = useActionState(action, {});
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [generatedHint, setGeneratedHint] = useState(false);
+
+  function applyPassword(value: string) {
+    const input = passwordRef.current;
+    if (!input) return;
+    input.value = value;
+    setGeneratedHint(true);
+  }
+
+  function handleGeneratePassword() {
+    applyPassword(generateStrongPassword());
+    setShowPassword(true);
+  }
+
+  async function handleCopyPassword() {
+    const value = passwordRef.current?.value;
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      setGeneratedHint(true);
+    } catch {
+      /* ignore — user can still copy manually */
+    }
+  }
 
   return (
     <div className="mx-auto w-full max-w-md">
@@ -82,25 +111,74 @@ export function AuthForm({
         )}
 
         <label className="block space-y-1.5 text-left">
-          <span className="text-sm font-medium text-foreground/80">Password</span>
-          <input
-            name="password"
-            type="password"
-            required
-            minLength={mode === "register" ? 8 : 1}
-            maxLength={128}
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
-            placeholder={
-              mode === "register" ? "At least 8 characters" : "••••••••"
-            }
-            className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
-          />
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-medium text-foreground/80">
+              Password
+            </span>
+            {mode === "register" && (
+              <button
+                type="button"
+                onClick={handleGeneratePassword}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
+              >
+                <RefreshCw className="h-3.5 w-3.5" strokeWidth={2.25} />
+                Generate strong
+              </button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <input
+              ref={passwordRef}
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={mode === "register" ? 8 : 1}
+              maxLength={128}
+              autoComplete={
+                mode === "login" ? "current-password" : "new-password"
+              }
+              placeholder={
+                mode === "register" ? "At least 8 characters" : "••••••••"
+              }
+              className="field-input min-w-0 flex-1 rounded-2xl px-4 py-3 text-[15px]"
+            />
+            {mode === "register" && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border text-muted transition hover:border-accent/40 hover:text-accent"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" strokeWidth={2.25} />
+                  ) : (
+                    <Eye className="h-4 w-4" strokeWidth={2.25} />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyPassword}
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border text-muted transition hover:border-accent/40 hover:text-accent"
+                  aria-label="Copy password"
+                >
+                  <Copy className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+              </>
+            )}
+          </div>
         </label>
 
         {mode === "register" && (
-          <p className="text-left text-xs text-muted">
-            Username: 3–24 characters, start with a letter. Password: 8+ with a
-            letter and a number.
+          <p
+            className={cn(
+              "text-left text-xs text-muted",
+              generatedHint && "text-accent/90",
+            )}
+          >
+            {generatedHint
+              ? "Strong password generated — copy it somewhere safe before creating your account."
+              : "Username: 3–24 characters, start with a letter. Password: 8+ with a letter and a number, or use Generate strong."}
           </p>
         )}
 
