@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  DURATION_BLOCK_MINUTES,
   bestSunriseTier,
   computeSunriseMultiplier,
   formatSunriseMultiplier,
@@ -17,7 +18,7 @@ const morning = {
   id: "morning-natural-light",
   points: 10,
   durationEnabled: true,
-  referenceMinutes: 10,
+  referenceMinutes: 15,
   maxDurationMinutes: 60,
   timeOfDay: "morning" as const,
   lockedTimeOfDay: null as null,
@@ -38,12 +39,13 @@ describe("pointsForLog", () => {
     assert.equal(pointsForLog(morning, null), 10);
   });
 
-  it("scales with duration", () => {
-    assert.equal(pointsForLog(morning, 20), 20);
+  it("awards points per 15-minute block", () => {
+    assert.equal(pointsForLog(morning, 15), 10);
+    assert.equal(pointsForLog(morning, 30), 20);
   });
 
   it("caps at max duration", () => {
-    assert.equal(pointsForLog(morning, 120), 60);
+    assert.equal(pointsForLog(morning, 120), 40);
   });
 
   it("applies tier multiplier to non-keystone when set", () => {
@@ -137,8 +139,11 @@ describe("maxLogsPerDay", () => {
   it("single = 1", () => {
     assert.equal(maxLogsPerDay({ allowsMultiple: false, maxPerDay: 5 }), 1);
   });
-  it("multi uses maxPerDay", () => {
-    assert.equal(maxLogsPerDay({ allowsMultiple: true, maxPerDay: 4 }), 4);
+  it("multi is uncapped", () => {
+    assert.equal(
+      maxLogsPerDay({ allowsMultiple: true, maxPerDay: 4 }),
+      Number.MAX_SAFE_INTEGER,
+    );
   });
 });
 

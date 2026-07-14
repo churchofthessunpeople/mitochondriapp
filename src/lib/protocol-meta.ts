@@ -1,5 +1,5 @@
 /**
- * Extra catalog metadata not stored in DB (equipment / how).
+ * Extra catalog metadata not stored in DB (equipment / how-to).
  * Keeps migrations light while improving catalog UX.
  */
 
@@ -15,88 +15,134 @@ const DEFAULT: ProtocolMeta = { equipment: "none" };
 const META: Record<string, ProtocolMeta> = {
   "sunrise-horizon": {
     equipment: "none",
-    how: "Bare eyes on the solar disk as it clears the horizon — no glass, no sunglasses. Light keystone.",
+    how: "Be outside before the sun clears the horizon. Look at the solar disk with bare eyes — no sunglasses, no window glass between you and the sky.\n\nStand or sit still for a few minutes as the disk appears. Log when you actually saw it rise.",
   },
   "sunrise-open-sky": {
     equipment: "none",
-    how: "Outside under a wide sky in the morning; full-spectrum light to the eyes. Light keystone.",
+    how: "Get outside in the morning under a reasonably open sky — yard, park, or balcony with wide sky view.\n\nEyes open to outdoor light (no sunglasses). A few minutes is enough; longer is fine if you have time.",
   },
   "sunrise-outside": {
     equipment: "none",
-    how: "Any outdoor morning light, even with trees, buildings, or heavy overcast. Light keystone.",
-  },
-  "low-d-hydration": {
-    equipment: "optional",
-    how: "First mineralized water outdoors or by a windowless open door — Water keystone.",
-  },
-  "deuterium-aware-meal": {
-    equipment: "none",
-    how: "Prefer seafood, quality fats, C3 plants — Water keystone meal.",
-  },
-  "carbonated-water": {
-    equipment: "optional",
-    how: "Home carbonator or unsweetened sparkling / natural mineral water — not sugary soda.",
-  },
-  "magnetico-sleep-pad": {
-    equipment: "required",
-    how: "Magnetico under mattress / box spring (≥4″ spacer), not on top of bed; correct N-hemisphere negative polarity. Phone away from bed if you can.",
+    how: "Step outside in the morning even if trees, buildings, or heavy cloud limit the view.\n\nAny outdoor morning light to the eyes counts — porch, street, or trail. No glass between you and the sky if you can avoid it.",
   },
   "morning-natural-light": {
     equipment: "none",
-    how: "Step outside under open sky — windows don't count as full spectrum.",
+    how: "Go outside for natural light without a window in between — porch, yard, or walk.\n\nAim for open sky when you can. Even a short outdoor stop before indoor work helps anchor the day.",
   },
   "midday-sun-skin": {
     equipment: "none",
-    how: "Safe non-burning UV on skin when your latitude/season allows.",
+    how: "Near solar noon (check Place for your location), get outdoors with skin exposed — arms, legs, or more if comfortable.\n\nStay within a non-burning window; build time gradually. Glass blocks UVB, so windows do not count.\n\nLog with minutes — each + adds 15 min, or set a custom duration.",
   },
   "sunset-viewing": {
     equipment: "none",
-    how: "Watch sunset with bare eyes; dim indoor LEDs afterward.",
+    how: "Watch the actual sunset outdoors with bare eyes — no sunglasses in that window.\n\nStay outside as the sky dims, then move indoors and dim artificial light afterward.",
   },
   "red-nir-light": {
     equipment: "optional",
-    how: "Natural dusk red or a red/NIR panel if you own one.",
+    how: "Prefer natural dusk red light outdoors when possible. If you own a red/NIR panel, use it per the device guidance.\n\nLog duration in 15-minute blocks or set custom minutes.",
   },
   "barefoot-earth": {
     equipment: "none",
-    how: "Grass, sand, soil, or stone — not asphalt if you can avoid it.",
+    how: "Stand or walk barefoot on soil, grass, sand, or stone — real earth when you can, not asphalt if avoidable.\n\nLog time in 15-minute blocks (+ button) or set custom minutes.",
   },
-  "cold-face-plunge": {
-    equipment: "optional",
-    how: "Cold water on face/neck; bowl or shower is enough.",
-  },
-  "cold-thermogenesis": {
-    equipment: "optional",
-    how: "Cold shower, outdoor cold, or plunge if available.",
-  },
-  "blue-light-hygiene": {
-    equipment: "optional",
-    how: "Dim screens, warm bulbs, or blue blockers after sunset.",
-  },
-  "dark-bedroom": {
-    equipment: "optional",
-    how: "Blackout or eye mask; cover LEDs.",
-  },
-  "phone-away-sleep": {
+  "nature-contact": {
     equipment: "none",
-    how: "Phone outside bedroom or airplane + far from head.",
+    how: "Spend time in green or blue space — park, trail, beach, or garden — away from dense screens and routers when possible.\n\nLog duration in 15-minute blocks; aim for unhurried outdoor time.",
   },
-  "morning-movement": {
-    equipment: "none",
-    how: "Walk, lift, or play outside in daylight when possible.",
-  },
-  "mastic-gum": {
-    equipment: "required",
-    how: "Chew real Chios mastic resin/gum (not candy gum), both sides, 5–20 min. Skip if jaw/TMJ pain or no gum on hand.",
+  "low-d-hydration": {
+    equipment: "optional",
+    how: "First mineralized water of the day outdoors or through an open door — not only through glass.\n\nPlain filtered water with minerals added counts; prioritize quality and timing before heavy indoor work.",
   },
   "mineralized-water": {
     equipment: "optional",
-    how: "Mineral water or remineralized filter water.",
+    how: "Drink well-mineralized water — natural mineral water or remineralized filter water, not deionized-only all day.\n\nSpread through the day; log each intentional serving.",
+  },
+  "carbonated-water": {
+    equipment: "optional",
+    how: "Unsweetened sparkling or carbonated mineral water — home carbonator or bottled, not sugary soda.\n\nUse as a hydration habit you actually enjoy and will repeat.",
+  },
+  "hydration-timing": {
+    equipment: "none",
+    how: "Front-load hydration earlier in the day; taper large volumes in the last few hours before sleep.\n\nLog when you deliberately shifted timing — earlier glasses, less late chugging.",
+  },
+  "deuterium-aware-meal": {
+    equipment: "none",
+    how: "Build the meal around lower-deuterium choices when you can: seafood, quality animal fats, C3 plants (most fruits and vegetables).\n\nLog a real meal you ate with that intent — not a snack on the run unless that was the meal.",
+  },
+  "seafood-meal": {
+    equipment: "none",
+    how: "Center the meal on cold-water seafood or high-quality marine fats — salmon, sardines, mackerel, etc.\n\nLog when seafood was the main protein of the meal.",
+  },
+  "early-dinner": {
+    equipment: "none",
+    how: "Finish your last substantial meal with a buffer before bed — commonly 3+ hours, adjusted to what lets you sleep well.\n\nLog when you actually ate earlier than your old default.",
+  },
+  "cold-face-plunge": {
+    equipment: "optional",
+    how: "Cold water on face, neck, or brief head immersion — bowl of ice water, cold tap, or shower splash.\n\nShort and sharp is fine; breathe steadily. Skip if it triggers dizziness or you are unsafe to do so.",
+  },
+  "cold-thermogenesis": {
+    equipment: "optional",
+    how: "Deliberate cold exposure: cold shower, outdoor cold, or plunge if you have safe access.\n\nBuild duration gradually. Log minutes in 15-minute blocks (+) or custom time.",
+  },
+  "reduce-nnemf-block": {
+    equipment: "optional",
+    how: "Run a deliberate low-RF block: airplane mode, router off or distant, outdoor time away from dense EM, or a planned screen-off hour.\n\nLog duration in 15-minute blocks while the block is active.",
+  },
+  "magnetic-awareness": {
+    equipment: "none",
+    how: "Spend an hour outdoors or in the lowest artificial-EM environment available to you — yard, park, or a room with routers and chargers removed.\n\nLog in 15-minute increments (+) until you reach your session length.",
+  },
+  "phone-away-sleep": {
+    equipment: "none",
+    how: "Phone out of the bedroom entirely, or on airplane mode and far from your head — not on the nightstand.\n\nSet up before bed so you are not reaching for it if you wake.",
+  },
+  "magnetico-sleep-pad": {
+    equipment: "required",
+    how: "Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nOnce on your available list this auto-logs nightly; tap to skip when traveling.",
+  },
+  "breaker-off-bedroom": {
+    equipment: "optional",
+    how: "With an electrician, label bedroom circuits. Flip those breakers off at the panel before sleep.\n\nKeep fridge, heat, safety, and egress lighting circuits on. Auto-logs nightly while on your list; skip when away.",
+  },
+  "breaker-off-office": {
+    equipment: "optional",
+    how: "Label desk and office circuits. Cut power when you leave or on a fixed schedule that matches your workday.\n\nAuto-logs daily while on your list; skip on days the office stayed powered.",
+  },
+  "morning-movement": {
+    equipment: "none",
+    how: "Zone 2 walk, resistance work, or play outside in daylight when possible — not only under gym fluorescents.\n\nLog minutes in 15-minute blocks (+) or set custom duration.",
+  },
+  "mastic-gum": {
+    equipment: "required",
+    how: "Use real Chios mastic resin or gum — not candy gum. Take a piece large enough to give real jaw resistance.\n\nChew actively on both sides of the jaw for about 15 minutes (or your logged duration). Switch sides if one fatigues. Stop if you have TMJ pain or jaw issues.",
+  },
+  "blue-light-hygiene": {
+    equipment: "optional",
+    how: "After sunset, dim screens, use warm bulbs, or wear blue blockers if needed.\n\nLower brightness and color temperature through the evening so light matches winding down.",
+  },
+  "dark-bedroom": {
+    equipment: "optional",
+    how: "Make the room pitch-black: blackout curtains, eye mask, tape over standby LEDs, cover charger lights.\n\nYou should not see your hand in front of your face when lights are out.",
+  },
+  "consistent-sleep-window": {
+    equipment: "none",
+    how: "Go to bed and wake on a consistent window aligned with night — same rough times even on weekends within reason.\n\nLog when you hit your target sleep window, not just when you were tired.",
   },
 };
 
 export function getProtocolMeta(protocolId: string): ProtocolMeta {
   return META[protocolId] ?? DEFAULT;
+}
+
+/** How-to copy for the activity dialog; falls back to catalog description. */
+export function getProtocolHowTo(protocol: {
+  id: string;
+  description: string;
+}): string {
+  const how = META[protocol.id]?.how;
+  if (how?.trim()) return how.trim();
+  return protocol.description.trim();
 }
 
 export function equipmentLabel(e: EquipmentNeed): string {

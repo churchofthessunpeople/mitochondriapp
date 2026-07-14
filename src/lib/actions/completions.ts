@@ -1,21 +1,24 @@
 "use server";
 
 import { and, desc, eq } from "drizzle-orm";
+import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
-import {
-  ensureCatalogSyncedToDb,
-  getCatalogProtocolById,
-} from "@/lib/catalog";
+import { getCatalogProtocolById } from "@/lib/catalog";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
-import { revalidateApp } from "@/lib/revalidate-app";
+import {
+  clearPermanentSkip,
+  ensurePermanentCompletions,
+  recordPermanentSkip,
+} from "@/lib/permanent-completions";
+import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { revalidatePath } from "next/cache";
 import {
   bestSunriseMultiplier,
   computeSunriseMultiplier,
   isSunriseKeystoneProtocol,
-  maxLogsPerDay,
   pointsForLog,
   streakBonusPoints,
   sunriseTierForProtocolId,
@@ -39,8 +42,14 @@ async function userToday(userId: string) {
   return getTodayIsoForTimezone(u?.timezone || "UTC");
 }
 
-function revalidateLogs() {
-  revalidateApp();
+/**
+ * Don't block (or refetch) the /app shell after each tap — the client already
+ * applies the action snapshot. History day pages catch up in the background.
+ */
+function scheduleHistoryRevalidate() {
+  after(() => {
+    revalidatePath("/history", "layout");
+  });
 }
 
 export type CompletionResult = {
@@ -50,6 +59,8 @@ export type CompletionResult = {
   dayPoints: number;
   streak: { current: number; best: number };
   count: number;
+  /** Sum of logged minutes today for timed activities */
+  durationMinutesTotal: number;
   /** Best morning-light multiplier for the day (1 = none) */
   sunriseMultiplier: number;
   sunriseTierLabel: string | null;
@@ -67,6 +78,7 @@ async function daySnapshot(
     | "dayPoints"
     | "streak"
     | "count"
+    | "durationMinutesTotal"
     | "sunriseMultiplier"
     | "sunriseTierLabel"
     | "sunriseBuffActive"
@@ -81,6 +93,7 @@ async function daySnapshot(
     dayPoints: stats.points,
     streak,
     count: stats.completionCounts.get(protocolId) ?? 0,
+    durationMinutesTotal: stats.completionDurations.get(protocolId) ?? 0,
     sunriseMultiplier: buff.multiplier,
     sunriseTierLabel: buff.tier?.shortLabel ?? null,
     sunriseBuffActive: buff.multiplier > 1,
@@ -188,8 +201,7 @@ export async function logCompletionAction(
   const userId = await requireUser();
   const completedOn = await userToday(userId);
 
-  // Catalog is local (seed-data.ts); sync so Neon FKs accept the protocolId
-  await ensureCatalogSyncedToDb();
+  // Local seeds are source of truth — skip full catalog upsert on every tap
   const protocol = getCatalogProtocolById(protocolId);
   if (!protocol) throw new Error("Activity not found");
 
@@ -212,7 +224,6 @@ export async function logCompletionAction(
     );
 
   const count = existing.length;
-  const max = maxLogsPerDay(protocol);
   const wasKeystone = isSunriseKeystoneProtocol(protocol);
 
   if (!protocol.allowsMultiple) {
@@ -225,14 +236,19 @@ export async function logCompletionAction(
             eq(dailyCompletions.userId, userId),
           ),
         );
+      if (isPermanentProtocolId(protocolId)) {
+        await recordPermanentSkip(userId, protocolId, completedOn);
+      }
       const buff = await getSunriseBuffToday(userId, completedOn);
       await recomputeDayPoints(userId, completedOn, buff.multiplier);
-      revalidateLogs();
+      scheduleHistoryRevalidate();
       const snap = await daySnapshot(userId, completedOn, protocolId);
       return { action: "removed", points: 0, ...snap };
     }
-  } else if (count >= max) {
-    throw new Error(`Daily limit reached (${max}× for this activity).`);
+  }
+
+  if (isPermanentProtocolId(protocolId)) {
+    await clearPermanentSkip(userId, protocolId, completedOn);
   }
 
   const buffBefore = await getSunriseBuffToday(userId, completedOn);
@@ -263,15 +279,16 @@ export async function logCompletionAction(
   });
 
   // New/better keystone: retroactively apply best mult to non-keystone logs
+  let buffAfter = buffBefore;
   if (wasKeystone) {
-    const buffAfter = await getSunriseBuffToday(userId, completedOn);
+    buffAfter = await getSunriseBuffToday(userId, completedOn);
     await recomputeDayPoints(userId, completedOn, buffAfter.multiplier);
   }
 
   let streakBonus = 0;
+  let streak = await getUserStreak(userId, completedOn);
   if (count === 0 && !(await hasStreakBonusToday(userId, completedOn))) {
-    const { current } = await getUserStreak(userId, completedOn);
-    const streakDays = Math.max(current, 1);
+    const streakDays = Math.max(streak.current, 1);
     streakBonus = streakBonusPoints(streakDays);
     if (streakBonus > 0) {
       await db.insert(dailyCompletions).values({
@@ -283,12 +300,25 @@ export async function logCompletionAction(
         timeOfDay: null,
         durationMinutes: null,
       });
+      // First log of the day may bump current streak
+      streak = await getUserStreak(userId, completedOn);
     }
   }
 
-  revalidateLogs();
-  const snap = await daySnapshot(userId, completedOn, protocolId);
-  return { action: "added", points, streakBonus, ...snap };
+  scheduleHistoryRevalidate();
+  const stats = await getUserDayStats(userId, completedOn);
+  return {
+    action: "added",
+    points,
+    streakBonus,
+    dayPoints: stats.points,
+    streak,
+    count: stats.completionCounts.get(protocolId) ?? 0,
+    durationMinutesTotal: stats.completionDurations.get(protocolId) ?? 0,
+    sunriseMultiplier: buffAfter.multiplier,
+    sunriseTierLabel: buffAfter.tier?.shortLabel ?? null,
+    sunriseBuffActive: buffAfter.multiplier > 1,
+  };
 }
 
 export async function removeOneCompletionAction(
@@ -322,9 +352,13 @@ export async function removeOneCompletionAction(
       and(eq(dailyCompletions.id, row.id), eq(dailyCompletions.userId, userId)),
     );
 
+  if (isPermanentProtocolId(protocolId)) {
+    await recordPermanentSkip(userId, protocolId, completedOn);
+  }
+
   const buff = await getSunriseBuffToday(userId, completedOn);
   await recomputeDayPoints(userId, completedOn, buff.multiplier);
-  revalidateLogs();
+  scheduleHistoryRevalidate();
   const snap = await daySnapshot(userId, completedOn, protocolId);
   return { action: "removed", points: 0, ...snap };
 }
@@ -332,3 +366,18 @@ export async function removeOneCompletionAction(
 export async function toggleCompletionAction(protocolId: string) {
   return logCompletionAction(protocolId);
 }
+
+/** Re-log a permanent activity after skipping tonight, or refresh auto-logs. */
+export async function logPermanentTonightAction(
+  protocolId: string,
+): Promise<CompletionResult> {
+  const userId = await requireUser();
+  const completedOn = await userToday(userId);
+  if (!isPermanentProtocolId(protocolId)) {
+    return logCompletionAction(protocolId);
+  }
+  await clearPermanentSkip(userId, protocolId, completedOn);
+  return logCompletionAction(protocolId);
+}
+
+export { ensurePermanentCompletions };

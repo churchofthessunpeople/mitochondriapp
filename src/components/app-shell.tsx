@@ -61,6 +61,7 @@ export type AppShellProps = {
   allProtocols: Protocol[];
   availableIds: string[];
   completionCounts: Record<string, number>;
+  completionDurations?: Record<string, number>;
   dayPoints: number;
   streak: { current: number; best: number };
   placeLabel: string | null;
@@ -111,6 +112,7 @@ export function AppShell({
   allProtocols,
   availableIds: initialAvailableIds,
   completionCounts,
+  completionDurations,
   dayPoints,
   streak,
   placeLabel,
@@ -262,7 +264,12 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-8">
+      <main
+        className={cn(
+          "mx-auto max-w-2xl px-4 sm:px-6",
+          tab === "schedule" ? "py-3" : "py-6 sm:py-8",
+        )}
+      >
         {sheet?.id === "scoring" && (
           <AppSheet
             title="How scores are calculated"
@@ -340,6 +347,7 @@ export function AppShell({
             availableIds={availableIds}
             onAvailableIdsChange={setAvailableIds}
             completionCounts={completionCounts}
+            completionDurations={completionDurations}
             dayPoints={dayPoints}
             streak={streak}
             placeLabel={placeLabel}

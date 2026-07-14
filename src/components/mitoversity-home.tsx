@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
   MITO_PILLAR_LABEL,
@@ -28,14 +28,19 @@ export function MitoversityHome({
   initialEntryId?: string | null;
 }) {
   const [pillar, setPillar] = useState<MitoPillar | "all">("all");
+  const [titleQuery, setTitleQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(
     initialEntryId && entryExists(initialEntryId) ? initialEntryId : null,
   );
 
   const entries = useMemo(() => {
-    if (pillar === "all") return [...MITOVERSITY_ENTRIES];
-    return MITOVERSITY_ENTRIES.filter((e) => e.pillar === pillar);
-  }, [pillar]);
+    const q = titleQuery.trim().toLowerCase();
+    return MITOVERSITY_ENTRIES.filter((e) => {
+      if (pillar !== "all" && e.pillar !== pillar) return false;
+      if (q && !e.title.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [pillar, titleQuery]);
 
   const openEntry = openId
     ? MITOVERSITY_ENTRIES.find((e) => e.id === openId) ?? null
@@ -73,6 +78,31 @@ export function MitoversityHome({
         </p>
       </div>
 
+      <label className="relative block">
+        <span className="sr-only">Search articles by title</span>
+        <Search
+          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+          aria-hidden
+        />
+        <input
+          type="search"
+          value={titleQuery}
+          onChange={(e) => setTitleQuery(e.target.value)}
+          placeholder="Search by title…"
+          className="h-11 w-full rounded-2xl border border-border bg-foreground/[0.03] pl-10 pr-10 text-sm text-foreground placeholder:text-muted focus:border-accent/40 focus:outline-none focus:ring-2 focus:ring-accent/20"
+        />
+        {titleQuery ? (
+          <button
+            type="button"
+            onClick={() => setTitleQuery("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-muted transition hover:bg-foreground/5 hover:text-foreground"
+            aria-label="Clear search"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
+      </label>
+
       <div className="flex gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {PILLAR_FILTERS.map((f) => (
           <button
@@ -93,7 +123,9 @@ export function MitoversityHome({
 
       {entries.length === 0 ? (
         <div className="glass rounded-3xl border border-dashed border-border px-5 py-10 text-center text-sm text-muted">
-          No lessons in this category yet. Check back as Mitoversity grows.
+          {titleQuery.trim()
+            ? `No articles match “${titleQuery.trim()}”.`
+            : "No lessons in this category yet. Check back as Mitoversity grows."}
         </div>
       ) : (
         <ul className="space-y-3">

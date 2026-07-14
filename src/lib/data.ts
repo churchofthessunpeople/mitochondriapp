@@ -41,13 +41,21 @@ export async function getUserDayStats(userId: string, date: string) {
     .reduce((a, c) => a + c.pointsEarned, 0);
   const points = completions.reduce((acc, c) => acc + c.pointsEarned, 0);
   const counts = new Map<string, number>();
+  const durationTotals = new Map<string, number>();
   for (const c of real) {
     counts.set(c.protocolId, (counts.get(c.protocolId) ?? 0) + 1);
+    if (c.durationMinutes && c.durationMinutes > 0) {
+      durationTotals.set(
+        c.protocolId,
+        (durationTotals.get(c.protocolId) ?? 0) + c.durationMinutes,
+      );
+    }
   }
   return {
     completions,
     completedIds: new Set(real.map((c) => c.protocolId)),
     completionCounts: counts,
+    completionDurations: durationTotals,
     points,
     activityPoints: points - bonus,
     streakBonus: bonus,

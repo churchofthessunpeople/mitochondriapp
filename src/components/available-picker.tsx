@@ -4,8 +4,13 @@ import { Check, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { Protocol, ProtocolCategory } from "@/db/schema";
+import {
+  ProtocolHowToButton,
+  ProtocolHowToDialog,
+} from "@/components/protocol-how-to-dialog";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
+import { isPermanentProtocolId } from "@/lib/permanent-activities";
 import { useToast } from "@/components/toast";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -36,6 +41,7 @@ export function AvailablePicker({
   const [, start] = useTransition();
 
   const [available, setAvailable] = useState(() => new Set(initialIds));
+  const [howToFor, setHowToFor] = useState<Protocol | null>(null);
 
   useEffect(() => {
     setAvailable(new Set(initialIds));
@@ -86,8 +92,10 @@ export function AvailablePicker({
       <div className="glass rounded-3xl p-4 text-sm text-muted">
         <p>
           Toggle what <strong className="text-foreground">you</strong> can do.
-          Example: rebounding only if you have a rebounder. Your schedule is
-          built only from this list.
+          Example: rebounding only if you have a rebounder.{" "}
+          <strong className="text-foreground">Permanent</strong> activities
+          (e.g. Magnetico sleep pad) auto-log every day while they stay on your
+          list.
         </p>
         <p className="mt-2">
           <span className="font-medium text-accent">{available.size}</span> of{" "}
@@ -176,12 +184,12 @@ export function AvailablePicker({
               {list.map((p) => {
                 const on = available.has(p.id);
                 return (
-                  <li key={p.id}>
+                  <li key={p.id} className="flex items-stretch gap-1.5">
                     <button
                       type="button"
                       onClick={() => toggle(p.id, p.name)}
                       className={cn(
-                        "flex w-full items-start gap-3 rounded-2xl border px-3.5 py-3 text-left transition",
+                        "flex min-w-0 flex-1 items-start gap-3 rounded-2xl border px-3.5 py-3 text-left transition",
                         on
                           ? "border-accent/40 bg-accent/10"
                           : "border-border bg-card hover:border-accent/25",
@@ -204,11 +212,17 @@ export function AvailablePicker({
                         </span>
                         <span className="mt-1 block text-[11px] text-muted">
                           {p.points} pts
-                          {p.allowsMultiple ? " · multi-log" : ""}
+                          {isPermanentProtocolId(p.id) ? " · permanent" : ""}
                           {on ? " · available to you" : ""}
                         </span>
                       </span>
                     </button>
+                    <ProtocolHowToButton
+                      protocol={p}
+                      size="sm"
+                      onClick={() => setHowToFor(p)}
+                      className="mt-3 self-start"
+                    />
                   </li>
                 );
               })}
@@ -222,6 +236,10 @@ export function AvailablePicker({
           No activities match. Try another filter.
         </p>
       )}
+      <ProtocolHowToDialog
+        protocol={howToFor}
+        onClose={() => setHowToFor(null)}
+      />
     </div>
   );
 }

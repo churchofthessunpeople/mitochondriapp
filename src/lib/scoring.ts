@@ -192,6 +192,8 @@ export function formatSunriseMultiplier(mult: number): string {
   return `${s}×`;
 }
 
+export const DURATION_BLOCK_MINUTES = 15;
+
 /** Points for one log event, optionally scaled by duration and sunrise buff. */
 export function pointsForLog(
   protocol: Pick<
@@ -215,11 +217,16 @@ export function pointsForLog(
   if (!protocol.durationEnabled || !durationMinutes || durationMinutes <= 0) {
     pts = protocol.points;
   } else {
-    const ref = Math.max(1, protocol.referenceMinutes || 10);
-    const maxMin = Math.max(ref, protocol.maxDurationMinutes || 60);
-    const mins = Math.min(Math.max(1, Math.round(durationMinutes)), maxMin);
-    pts = Math.round((protocol.points * mins) / ref);
-    pts = Math.max(1, pts);
+    const maxMin = Math.max(
+      DURATION_BLOCK_MINUTES,
+      protocol.maxDurationMinutes || 180,
+    );
+    const mins = Math.min(
+      Math.max(1, Math.round(durationMinutes)),
+      maxMin,
+    );
+    const blocks = mins / DURATION_BLOCK_MINUTES;
+    pts = Math.max(1, Math.round(protocol.points * blocks));
   }
 
   const mult =
@@ -237,11 +244,12 @@ export function pointsForLog(
   return pts;
 }
 
+/** Max logs per day. Multi-log activities are uncapped; single-log stay toggle (0/1). */
 export function maxLogsPerDay(
   protocol: Pick<Protocol, "allowsMultiple" | "maxPerDay">,
 ): number {
   if (!protocol.allowsMultiple) return 1;
-  return Math.max(1, protocol.maxPerDay || 5);
+  return Number.MAX_SAFE_INTEGER;
 }
 
 /** Streak bonus points for maintaining N consecutive active days (cap 7). */

@@ -18,11 +18,14 @@ export type ProtocolSeed = {
   timeOfDay: TimeOfDay;
   lockedTimeOfDay: TimeOfDay | null;
   allowsMultiple: boolean;
+  /** Legacy DB field — multi-log activities are uncapped in app logic */
   maxPerDay: number;
   durationEnabled: boolean;
   referenceMinutes: number;
   maxDurationMinutes: number;
   sortOrder: number;
+  /** Auto-log every day while on the user's available list */
+  permanent?: boolean;
 };
 
 function p(
@@ -34,6 +37,7 @@ function p(
     | "maxDurationMinutes"
     | "allowsMultiple"
     | "lockedTimeOfDay"
+    | "permanent"
   > &
     Partial<
       Pick<
@@ -44,6 +48,7 @@ function p(
         | "maxDurationMinutes"
         | "allowsMultiple"
         | "lockedTimeOfDay"
+        | "permanent"
       >
     >,
 ): ProtocolSeed {
@@ -52,9 +57,10 @@ function p(
     lockedTimeOfDay: partial.lockedTimeOfDay ?? null,
     allowsMultiple: multi,
     durationEnabled: partial.durationEnabled ?? false,
-    referenceMinutes: partial.referenceMinutes ?? 10,
+    referenceMinutes: partial.referenceMinutes ?? 15,
     maxDurationMinutes: partial.maxDurationMinutes ?? 60,
-    maxPerDay: partial.maxPerDay ?? (multi ? 5 : 1),
+    maxPerDay: partial.maxPerDay ?? (multi ? 9999 : 1),
+    permanent: partial.permanent ?? false,
     id: partial.id,
     name: partial.name,
     description: partial.description,
@@ -107,18 +113,17 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "light",
     timeOfDay: "morning",
     allowsMultiple: true,
-    maxPerDay: 4,
     sortOrder: 10,
   }),
   p({
     id: "midday-sun-skin",
     name: "Pure / midday sun on skin",
-    description: "Safe non-burning UV on skin when season/latitude allows.",
+    description:
+      "Safe non-burning UV on skin near solar noon when season/latitude allow—natural vitamin D₃ production; prefer outdoor sun over routine pills when UV is available.",
     points: 8,
     category: "light",
     timeOfDay: "afternoon",
     allowsMultiple: true,
-    maxPerDay: 4,
     durationEnabled: true,
     referenceMinutes: 15,
     maxDurationMinutes: 45,
@@ -138,13 +143,12 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "red-nir-light",
     name: "Red / near-IR light",
     description: "Natural dusk red or intentional red/NIR exposure.",
-    points: 4,
+    points: 6,
     category: "light",
     timeOfDay: "anytime",
     allowsMultiple: true,
-    maxPerDay: 3,
     durationEnabled: true,
-    referenceMinutes: 10,
+    referenceMinutes: 15,
     maxDurationMinutes: 30,
     sortOrder: 53,
   }),
@@ -157,7 +161,6 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "grounding",
     timeOfDay: "morning",
     allowsMultiple: true,
-    maxPerDay: 5,
     durationEnabled: true,
     referenceMinutes: 15,
     maxDurationMinutes: 60,
@@ -167,13 +170,12 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "nature-contact",
     name: "Nature immersion",
     description: "Green/blue space away from dense artificial light and RF.",
-    points: 5,
+    points: 4,
     category: "grounding",
     timeOfDay: "afternoon",
     allowsMultiple: true,
-    maxPerDay: 3,
     durationEnabled: true,
-    referenceMinutes: 20,
+    referenceMinutes: 15,
     maxDurationMinutes: 120,
     sortOrder: 22,
   }),
@@ -186,31 +188,28 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "water_food",
     timeOfDay: "morning",
     allowsMultiple: true,
-    maxPerDay: 3,
     sortOrder: 8,
   }),
   p({
     id: "mineralized-water",
-    name: "Mineralized / structured water",
+    name: "Purified and Mineralized Water",
     description:
-      "Well-mineralized water (not only deionized all day). Counts toward Water keystone.",
+      "Mineralized/spring water. Remineralize if using RO purified water",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
     allowsMultiple: true,
-    maxPerDay: 6,
     sortOrder: 50,
   }),
   p({
     id: "carbonated-water",
     name: "Carbonated / sparkling water",
     description:
-      "Unsweetened sparkling or carbonated mineral water (not soda). CO₂-rich hydration habit.",
+      "Sparkling or carbonated water (not soda). Can purchase a Sodastream or other carbonator to make at home.",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
     allowsMultiple: true,
-    maxPerDay: 6,
     sortOrder: 51,
   }),
   p({
@@ -221,7 +220,6 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "water_food",
     timeOfDay: "anytime",
     allowsMultiple: true,
-    maxPerDay: 4,
     sortOrder: 54,
   }),
   p({
@@ -233,7 +231,6 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "water_food",
     timeOfDay: "morning",
     allowsMultiple: true,
-    maxPerDay: 3,
     sortOrder: 9,
   }),
   p({
@@ -244,7 +241,6 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "water_food",
     timeOfDay: "afternoon",
     allowsMultiple: true,
-    maxPerDay: 2,
     sortOrder: 23,
   }),
   p({
@@ -264,20 +260,18 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "cold",
     timeOfDay: "morning",
     allowsMultiple: true,
-    maxPerDay: 3,
     sortOrder: 11,
   }),
   p({
     id: "cold-thermogenesis",
     name: "Cold thermogenesis session",
     description: "Cold shower, plunge, or deliberate cold exposure.",
-    points: 8,
+    points: 24,
     category: "cold",
     timeOfDay: "anytime",
     allowsMultiple: true,
-    maxPerDay: 2,
     durationEnabled: true,
-    referenceMinutes: 5,
+    referenceMinutes: 15,
     maxDurationMinutes: 20,
     sortOrder: 51,
   }),
@@ -285,13 +279,12 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "reduce-nnemf-block",
     name: "nnEMF reduction block",
     description: "Airplane mode, router distance, or outdoor low-RF block.",
-    points: 5,
+    points: 3,
     category: "emf",
     timeOfDay: "afternoon",
     allowsMultiple: true,
-    maxPerDay: 4,
     durationEnabled: true,
-    referenceMinutes: 30,
+    referenceMinutes: 15,
     maxDurationMinutes: 180,
     sortOrder: 21,
   }),
@@ -300,13 +293,12 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     name: "Low artificial field hour",
     description:
       "Hour outdoors or in lower artificial EM environment. Magnetism keystone.",
-    points: 7,
+    points: 2,
     category: "emf",
     timeOfDay: "anytime",
     allowsMultiple: true,
-    maxPerDay: 3,
     durationEnabled: true,
-    referenceMinutes: 60,
+    referenceMinutes: 15,
     maxDurationMinutes: 180,
     sortOrder: 52,
   }),
@@ -324,24 +316,47 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "magnetico-sleep-pad",
     name: "Magnetico sleep pad",
     description:
-      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Not dual-polar top-of-bed pads. Equipment required.",
+      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Permanent: auto-logs nightly while on your available list.",
     points: 6,
     category: "emf",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
+    permanent: true,
     sortOrder: 63,
+  }),
+  p({
+    id: "breaker-off-bedroom",
+    name: "Bedroom breakers off",
+    description:
+      "Bedroom circuits switched off at the panel overnight (dirty electricity / AC fields). Permanent: auto-logs nightly while on your available list.",
+    points: 6,
+    category: "emf",
+    timeOfDay: "night",
+    lockedTimeOfDay: "night",
+    permanent: true,
+    sortOrder: 64,
+  }),
+  p({
+    id: "breaker-off-office",
+    name: "Office breakers off",
+    description:
+      "Main work / office circuits off when not in use (or on a low-field schedule). Permanent: auto-logs daily while on your available list.",
+    points: 6,
+    category: "emf",
+    timeOfDay: "morning",
+    permanent: true,
+    sortOrder: 22,
   }),
   p({
     id: "morning-movement",
     name: "Mitochondrial movement",
     description: "Zone 2, resistance, or play outside in daylight.",
-    points: 5,
+    points: 3,
     category: "movement",
     timeOfDay: "morning",
     allowsMultiple: true,
-    maxPerDay: 3,
     durationEnabled: true,
-    referenceMinutes: 30,
+    referenceMinutes: 15,
     maxDurationMinutes: 120,
     sortOrder: 13,
   }),
@@ -350,13 +365,12 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     name: "Mastic gum chewing",
     description:
       "Chew real Chios mastic resin/gum for intentional jaw load and a non-snack oral habit. Not candy gum. Equipment required.",
-    points: 3,
+    points: 5,
     category: "movement",
     timeOfDay: "anytime",
     allowsMultiple: true,
-    maxPerDay: 5,
     durationEnabled: true,
-    referenceMinutes: 10,
+    referenceMinutes: 15,
     maxDurationMinutes: 45,
     sortOrder: 55,
   }),

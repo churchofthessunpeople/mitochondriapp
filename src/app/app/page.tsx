@@ -38,6 +38,7 @@ import {
   getUserAppFlags,
   redirectIfNeedsOnboarding,
 } from "@/lib/require-onboarding";
+import { ensurePermanentCompletions } from "@/lib/permanent-completions";
 import { getSunriseBuffToday } from "@/lib/actions/completions";
 import { getUserStreak } from "@/lib/streaks";
 import { formatTimeInZone, getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
@@ -85,6 +86,8 @@ export default async function AppPage({
   const tz =
     loc.timezone || h.get("x-vercel-ip-timezone") || "UTC";
   const date = getTodayIsoForTimezone(tz);
+
+  await ensurePermanentCompletions(userId, date);
 
   const friendIds = await getFriendIds(userId);
   const friendScope = [...friendIds, userId];
@@ -227,6 +230,7 @@ export default async function AppPage({
       allProtocols={allProtocols}
       availableIds={[...availableIds]}
       completionCounts={Object.fromEntries(dayStats.completionCounts)}
+      completionDurations={Object.fromEntries(dayStats.completionDurations)}
       dayPoints={dayStats.points}
       streak={streak}
       placeLabel={loc.placeLabel ?? null}

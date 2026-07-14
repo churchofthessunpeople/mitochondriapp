@@ -38,14 +38,53 @@ export function GuideLightPanel() {
 
       <section className="glass space-y-2 rounded-3xl p-5">
         <h2 className="text-base font-semibold text-foreground">
+          Evening · Sunset
+        </h2>
+        <ul className="list-inside list-disc space-y-1.5">
+          <li>
+            <strong className="text-foreground">Watch the sunset</strong> —
+            outdoors as the sky dims, bare eyes (no sunglasses); last natural
+            light signal before indoor dimming
+          </li>
+          <li>
+            Warm red / near-IR at dusk supports wind-down; avoid jumping straight
+            to bright indoor LEDs afterward
+          </li>
+          <li>
+            Pairs with blue-light hygiene and true dark bedroom — sunset hands
+            off to darkness, it does not replace it
+          </li>
+        </ul>
+      </section>
+
+      <section className="glass space-y-2 rounded-3xl p-5">
+        <h2 className="text-base font-semibold text-foreground">
+          Solar noon · Vitamin D
+        </h2>
+        <ul className="list-inside list-disc space-y-1.5">
+          <li>
+            <strong className="text-foreground">Midday sun on skin</strong> —
+            UVB near solar noon (see Place) drives natural vitamin D₃ in skin;
+            not the same job as morning light to the eyes
+          </li>
+          <li>
+            Short, non-burning outdoor blocks beat window glass or pills-only
+            habits when latitude and season allow UV
+          </li>
+          <li>
+            Supplements can help documented deficiency or winter gaps—this stack
+            prefers structured sun first; do not stop prescribed D without your
+            clinician
+          </li>
+        </ul>
+      </section>
+
+      <section className="glass space-y-2 rounded-3xl p-5">
+        <h2 className="text-base font-semibold text-foreground">
           Through the day
         </h2>
         <ul className="list-inside list-disc space-y-1.5">
           <li>Outdoor blocks without window glass between you and the sky</li>
-          <li>
-            Midday UV on skin when season/latitude allows (non-burning)
-          </li>
-          <li>Sunset / red-NIR for evening circadian wind-down</li>
         </ul>
       </section>
 

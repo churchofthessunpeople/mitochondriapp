@@ -170,13 +170,33 @@ export const protocols = pgTable("protocols", {
   maxPerDay: integer("max_per_day").notNull().default(1),
   /** If true, user can enter duration; points scale with minutes */
   durationEnabled: boolean("duration_enabled").notNull().default(false),
-  /** Minutes that earn base `points` when durationEnabled */
-  referenceMinutes: integer("reference_minutes").notNull().default(10),
+  /** Points per 15-minute block when durationEnabled */
+  referenceMinutes: integer("reference_minutes").notNull().default(15),
   maxDurationMinutes: integer("max_duration_minutes").notNull().default(60),
   sortOrder: integer("sort_order").notNull().default(0),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
+
+/** Skip auto-log for a permanent activity on a specific calendar day */
+export const userPermanentSkips = pgTable(
+  "user_permanent_skips",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    protocolId: text("protocol_id")
+      .notNull()
+      .references(() => protocols.id, { onDelete: "cascade" }),
+    completedOn: date("completed_on", { mode: "string" }).notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.userId, table.protocolId, table.completedOn],
+    }),
+  ],
+);
 
 export const userFavorites = pgTable(
   "user_favorites",

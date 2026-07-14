@@ -160,6 +160,16 @@ await sql`
 `;
 await sql`CREATE UNIQUE INDEX IF NOT EXISTS user_reminder_time_uidx ON user_reminders (user_id, local_time)`;
 
+await sql`
+  CREATE TABLE IF NOT EXISTS user_permanent_skips (
+    user_id text NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    protocol_id text NOT NULL REFERENCES protocols(id) ON DELETE CASCADE,
+    completed_on date NOT NULL,
+    created_at timestamp NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, protocol_id, completed_on)
+  )
+`;
+
 console.log("Schema OK. Seeding protocols...");
 const seed = spawnSync("npx", ["tsx", "src/db/seed.ts"], {
   stdio: "inherit",

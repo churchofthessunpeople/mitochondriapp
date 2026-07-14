@@ -3,6 +3,10 @@
 import { Check, ChevronDown, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { Protocol, ProtocolCategory } from "@/db/schema";
+import {
+  ProtocolHowToButton,
+  ProtocolHowToDialog,
+} from "@/components/protocol-how-to-dialog";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import {
@@ -59,6 +63,7 @@ export function ActivityCatalogExpand({
   );
   const [, start] = useTransition();
   const [available, setAvailable] = useState(() => new Set(initialIds));
+  const [howToFor, setHowToFor] = useState<Protocol | null>(null);
 
   useEffect(() => {
     setAvailable(new Set(initialIds));
@@ -199,12 +204,12 @@ export function ActivityCatalogExpand({
                       const on = available.has(p.id);
                       const meta = getProtocolMeta(p.id);
                       return (
-                        <li key={p.id}>
+                        <li key={p.id} className="flex items-stretch gap-1.5">
                           <button
                             type="button"
                             onClick={() => toggle(p.id, p.name)}
                             className={cn(
-                              "flex w-full items-start gap-3 rounded-2xl border px-3 py-2.5 text-left transition",
+                              "flex min-w-0 flex-1 items-start gap-3 rounded-2xl border px-3 py-2.5 text-left transition",
                               on
                                 ? "border-accent/40 bg-accent/10"
                                 : "border-border bg-foreground/[0.02] hover:border-accent/25",
@@ -227,11 +232,6 @@ export function ActivityCatalogExpand({
                               <span className="mt-0.5 block text-[11px] leading-relaxed text-muted">
                                 {p.description}
                               </span>
-                              {meta.how && (
-                                <span className="mt-0.5 block text-[11px] leading-relaxed text-foreground/80">
-                                  How: {meta.how}
-                                </span>
-                              )}
                               <span className="mt-1 block text-[10px] text-muted">
                                 {p.points} pts · {CATEGORY_META[p.category].label}{" "}
                                 · {equipmentLabel(meta.equipment)}
@@ -239,6 +239,12 @@ export function ActivityCatalogExpand({
                               </span>
                             </span>
                           </button>
+                          <ProtocolHowToButton
+                            protocol={p}
+                            size="sm"
+                            onClick={() => setHowToFor(p)}
+                            className="mt-2 self-start"
+                          />
                         </li>
                       );
                     })}
@@ -256,10 +262,19 @@ export function ActivityCatalogExpand({
   );
 
   if (embedded) {
-    return <div className="space-y-4">{body}</div>;
+    return (
+      <>
+        <div className="space-y-4">{body}</div>
+        <ProtocolHowToDialog
+          protocol={howToFor}
+          onClose={() => setHowToFor(null)}
+        />
+      </>
+    );
   }
 
   return (
+    <>
     <div className="glass rounded-3xl p-4 sm:p-5">
       <button
         type="button"
@@ -284,6 +299,11 @@ export function ActivityCatalogExpand({
       </button>
       {expanded && body}
     </div>
+    <ProtocolHowToDialog
+      protocol={howToFor}
+      onClose={() => setHowToFor(null)}
+    />
+    </>
   );
 }
 

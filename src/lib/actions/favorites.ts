@@ -8,7 +8,11 @@ import {
   ensureCatalogSyncedToDb,
   getCatalogProtocolById,
 } from "@/lib/catalog";
+import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { ensurePermanentCompletions } from "@/lib/permanent-completions";
 import { revalidateApp } from "@/lib/revalidate-app";
+import { users } from "@/db/schema";
 
 async function requireUserId() {
   const session = await auth();
@@ -63,6 +67,15 @@ export async function toggleFavoriteAction(protocolId: string) {
       );
   } else {
     await db.insert(userFavorites).values({ userId, protocolId });
+    if (isPermanentProtocolId(protocolId)) {
+      const [u] = await db
+        .select({ timezone: users.timezone })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      const completedOn = getTodayIsoForTimezone(u?.timezone || "UTC");
+      await ensurePermanentCompletions(userId, completedOn);
+    }
   }
 
   revalidateAvailable();
