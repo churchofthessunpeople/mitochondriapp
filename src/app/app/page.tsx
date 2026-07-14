@@ -11,6 +11,7 @@ import {
   mitoLessonFromSearchParam,
   tabFromSearchParam,
 } from "@/lib/app-tabs";
+import { ensureAdminFlagSynced } from "@/lib/admin";
 import {
   getActiveProtocols,
   getLeaderboard,
@@ -61,6 +62,8 @@ export default async function AppPage({
   const initialTab = tabFromSearchParam(params.t);
   const initialAccountSection = accountSectionFromSearchParam(params.t);
   const initialMitoLesson = mitoLessonFromSearchParam(params.lesson);
+  const initialOpenAdmin =
+    (Array.isArray(params.t) ? params.t[0] : params.t) === "admin";
   const h = await headers();
   const userId = session.user.id;
 
@@ -132,12 +135,7 @@ export default async function AppPage({
     listRegions(),
   ]);
 
-  const isAdmin =
-    Boolean(fullUser.isAdmin) ||
-    (process.env.ADMIN_USERNAMES?.split(",")
-      .map((s) => s.trim().toLowerCase())
-      .includes(fullUser.username ?? "") ??
-      false);
+  const isAdmin = await ensureAdminFlagSynced(userId);
 
   const hasCoords = loc.latitude != null && loc.longitude != null;
   const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
@@ -240,6 +238,7 @@ export default async function AppPage({
       sun={sun}
       timeZone={tz}
       isAdmin={isAdmin}
+      initialOpenAdmin={initialOpenAdmin && isAdmin}
       phaseHint={phaseHint}
       placeFactors={placeFactors}
       distanceKm={distanceKm}

@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarCheck, GraduationCap, User } from "lucide-react";
+import { CalendarCheck, GraduationCap, Shield, User } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
@@ -86,6 +86,8 @@ export type AppShellProps = {
   accountUser: AccountPanelUser;
   currentUserId: string;
   isAdmin?: boolean;
+  /** Open admin sheet on first paint (e.g. ?t=admin) */
+  initialOpenAdmin?: boolean;
   history: HistoryRow[];
   lifetimePoints: number;
   leaderboards: LeaderboardBoards;
@@ -137,6 +139,7 @@ export function AppShell({
   accountUser,
   currentUserId,
   isAdmin = false,
+  initialOpenAdmin = false,
   history,
   lifetimePoints,
   leaderboards,
@@ -145,7 +148,9 @@ export function AppShell({
   reminderSunPresets,
 }: AppShellProps) {
   const [tab, setTabState] = useState<AppTab>(initialTab);
-  const [sheet, setSheet] = useState<AppSheetState | null>(null);
+  const [sheet, setSheet] = useState<AppSheetState | null>(
+    initialOpenAdmin && isAdmin ? { id: "admin" } : null,
+  );
   const [availableIds, setAvailableIds] = useState(initialAvailableIds);
   const [sunriseMultiplier, setSunriseMultiplier] =
     useState(initialSunriseMult);
@@ -258,6 +263,20 @@ export function AppShell({
                   {item.label}
                 </button>
               ))}
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => openSheet({ id: "admin" })}
+                  className={cn(
+                    "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
+                    sheet?.id === "admin"
+                      ? "bg-foreground/10 text-foreground"
+                      : "text-muted hover:bg-foreground/5 hover:text-foreground",
+                  )}
+                >
+                  Admin
+                </button>
+              )}
             </nav>
             <ThemeToggle size="sm" className="ml-1 shrink-0" />
           </div>
@@ -302,11 +321,11 @@ export function AppShell({
 
         {sheet?.id === "admin" && (
           <AppSheet
-            title="Admin · protocols"
-            subtitle="Catalog management"
+            title="Admin"
+            subtitle="Users, profiles, and catalog"
             onClose={closeSheet}
           >
-            <AdminPanel allowed={isAdmin} />
+            <AdminPanel allowed={isAdmin} currentUserId={currentUserId} />
           </AppSheet>
         )}
 
@@ -384,6 +403,7 @@ export function AppShell({
             lifetimePoints={lifetimePoints}
             leaderboards={leaderboards}
             currentUserId={currentUserId}
+            isAdmin={isAdmin}
             friends={friends}
             reminders={reminders}
             reminderSunPresets={reminderSunPresets}
@@ -416,6 +436,24 @@ export function AppShell({
               </li>
             );
           })}
+          {isAdmin && (
+            <li className="flex-1">
+              <button
+                type="button"
+                onClick={() => openSheet({ id: "admin" })}
+                className={cn(
+                  "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
+                  sheet?.id === "admin"
+                    ? "text-accent"
+                    : "text-muted hover:text-foreground",
+                )}
+                aria-label="Admin"
+              >
+                <Shield className="h-5 w-5" />
+                Admin
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
     </div>

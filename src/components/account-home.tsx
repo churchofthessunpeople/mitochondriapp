@@ -60,6 +60,7 @@ type Props = {
   lifetimePoints: number;
   leaderboards: LeaderboardBoards;
   currentUserId: string;
+  isAdmin?: boolean;
   friends: FriendRow[];
   reminders: ReminderRow[];
   reminderSunPresets?: {
@@ -81,6 +82,7 @@ export function AccountHome({
   lifetimePoints,
   leaderboards,
   currentUserId,
+  isAdmin = false,
   friends,
   reminders,
   reminderSunPresets,
@@ -279,7 +281,7 @@ export function AccountHome({
             </section>
 
             <div className="flex flex-wrap gap-2 text-sm">
-              {onOpenSheet ? (
+              {isAdmin && onOpenSheet ? (
                 <button
                   type="button"
                   onClick={() => onOpenSheet({ id: "admin" })}

@@ -17,7 +17,7 @@ export const ROUTES = {
    */
   regionBrowse: "/region",
   regionScoring: "/region/scoring",
-  admin: "/admin",
+  admin: "/app?t=admin",
   exportCsv: "/api/export/csv",
   login: "/login",
   register: "/register",
