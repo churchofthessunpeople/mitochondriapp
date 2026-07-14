@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, Sun } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
   computeSunriseMultiplier,
@@ -156,6 +156,14 @@ export function SunriseKeystoneDialog({
   const [startHm, setStartHm] = useState(initialHm.startHm);
   const [finishHm, setFinishHm] = useState(initialHm.endHm);
 
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   const computedMultiplier =
     selected != null ? computeSunriseMultiplier(selected.tier, modifiers) : 1;
 
@@ -264,73 +272,76 @@ export function SunriseKeystoneDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/55 p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center overflow-hidden bg-black/55 p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="sunrise-check-title"
     >
-      <div className="glass w-full max-w-md rounded-3xl p-5 shadow-xl sm:p-6">
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-accent/40 bg-accent/15 text-accent">
-            <Sun className="h-5 w-5" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-accent">
-              Daily light check
-            </p>
-            <h2
-              id="sunrise-check-title"
-              className="mt-1 text-xl font-semibold tracking-tight"
-            >
-              {step === "tier"
-                ? "Morning light — how did you do?"
-                : step === "modifiers"
-                  ? "Sky, skin, eyes, and grounding"
-                  : "Confirm morning light"}
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              {step === "tier" ? (
-                <>
-                  First light sets the day. Pick the best sky view — then we&apos;ll
-                  fine-tune skin, sunglasses, and grounding for your day boost.
-                  {riseLabel ? (
-                    <>
-                      {" "}
-                      Local sunrise ≈{" "}
-                      <span className="text-foreground">{riseLabel}</span>
-                      {optimalWindow ? (
-                        <>
-                          . Optimal window{" "}
-                          <span className="text-foreground">
-                            {optimalWindow}
-                          </span>
-                          .
-                        </>
-                      ) : null}
-                    </>
-                  ) : null}
-                </>
-              ) : step === "modifiers" ? (
-                <>
-                  Clear skies need 30 min for full points and boost; cloudy skies
-                  need 45 min. Skin, sunglasses, and grounding still adjust your
-                  day multiplier.
-                </>
-              ) : (
-                <>
-                  Logging{" "}
-                  <span className="text-foreground">
-                    {selected?.tier.shortLabel}
-                  </span>{" "}
-                  with {describeSunriseModifiers(modifiers)}.
-                </>
-              )}
-            </p>
+      <div className="glass flex max-h-[min(90dvh,calc(100vh-2rem))] w-full max-w-md flex-col overflow-hidden rounded-3xl shadow-xl">
+        <div className="shrink-0 p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-accent/40 bg-accent/15 text-accent">
+              <Sun className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-accent">
+                Daily light check
+              </p>
+              <h2
+                id="sunrise-check-title"
+                className="mt-1 text-xl font-semibold tracking-tight"
+              >
+                {step === "tier"
+                  ? "Morning light — how did you do?"
+                  : step === "modifiers"
+                    ? "Sky, skin, eyes, and grounding"
+                    : "Confirm morning light"}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                {step === "tier" ? (
+                  <>
+                    First light sets the day. Pick the best sky view — then we&apos;ll
+                    fine-tune skin, sunglasses, and grounding for your day boost.
+                    {riseLabel ? (
+                      <>
+                        {" "}
+                        Local sunrise ≈{" "}
+                        <span className="text-foreground">{riseLabel}</span>
+                        {optimalWindow ? (
+                          <>
+                            . Optimal window{" "}
+                            <span className="text-foreground">
+                              {optimalWindow}
+                            </span>
+                            .
+                          </>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </>
+                ) : step === "modifiers" ? (
+                  <>
+                    Clear skies need 30 min for full points and boost; cloudy skies
+                    need 45 min. Skin, sunglasses, and grounding still adjust your
+                    day multiplier.
+                  </>
+                ) : (
+                  <>
+                    Logging{" "}
+                    <span className="text-foreground">
+                      {selected?.tier.shortLabel}
+                    </span>{" "}
+                    with {describeSunriseModifiers(modifiers)}.
+                  </>
+                )}
+              </p>
+            </div>
           </div>
         </div>
 
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-5 sm:px-6 sm:pb-6">
         {step === "tier" ? (
-          <div className="mt-5 flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
             {tiersAvailable.map(({ tier, protocol }) => (
               <button
                 key={tier.id}
@@ -396,7 +407,7 @@ export function SunriseKeystoneDialog({
         ) : null}
 
         {step === "modifiers" && selected ? (
-          <div className="mt-5 flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
                 Sky conditions
@@ -532,7 +543,7 @@ export function SunriseKeystoneDialog({
         ) : null}
 
         {step === "confirm" && selected ? (
-          <div className="mt-5 flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             <div className="rounded-2xl border border-border bg-foreground/[0.02] px-4 py-3 text-sm">
               <p>
                 <span className="font-semibold text-foreground">
@@ -648,6 +659,7 @@ export function SunriseKeystoneDialog({
             </button>
           </div>
         ) : null}
+        </div>
       </div>
     </div>
   );

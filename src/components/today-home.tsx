@@ -20,6 +20,7 @@ import { LwmStrip } from "@/components/lwm-strip";
 import { RegionCard } from "@/components/region-card";
 import { ScheduleDay } from "@/components/schedule-day";
 import { ZipForm } from "@/components/zip-form";
+import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import type { OpenAppSheet } from "@/lib/app-sheets";
 import type { TodaySection } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
@@ -66,10 +67,11 @@ type Props = {
   magneticoGauss?: number;
   sleepRoomTempF?: number;
   initialSection?: TodaySection | null;
-  leaderboards?: LeaderboardBoards;
+  leaderboards?: LeaderboardBoards | null;
   currentUserId?: string;
-  onOpenFriends?: () => void;
   onOpenSheet?: OpenAppSheet;
+  isAdmin?: boolean;
+  onAdminEditContent?: (focus: string) => void;
 };
 
 const TABS: {
@@ -125,8 +127,9 @@ export function TodayHome({
   initialSection,
   leaderboards,
   currentUserId,
-  onOpenFriends,
   onOpenSheet,
+  isAdmin = false,
+  onAdminEditContent,
 }: Props) {
   const hasPlace = Boolean(placeLabel || region);
   const [section, setSection] = useState<TodaySection>(
@@ -198,6 +201,14 @@ export function TodayHome({
     },
     [],
   );
+
+  const onPermanentAutoLog = useCallback((snap: PermanentAutoLogSnap) => {
+    setLiveCounts((prev) => ({ ...prev, [snap.protocolId]: snap.count }));
+    if (snap.dayPoints > 0) setLivePoints(snap.dayPoints);
+    if (snap.streak.current > 0 || snap.streak.best > 0) {
+      setLiveStreak(snap.streak);
+    }
+  }, []);
 
   const onStatsChange = useCallback(
     (s: {
@@ -530,17 +541,19 @@ export function TodayHome({
               protocols={catalogProtocols}
               availableIds={availableIds}
               onAvailableIdsChange={onAvailableIdsChange}
+              onPermanentAutoLog={onPermanentAutoLog}
+              isAdmin={isAdmin}
+              onAdminEditContent={onAdminEditContent}
               embedded
             />
           </div>
         )}
 
-        {section === "leaderboard" && leaderboards && currentUserId && (
+        {section === "leaderboard" && currentUserId && (
           <LeaderboardPanel
             compact
-            boards={leaderboards}
+            boards={leaderboards ?? null}
             currentUserId={currentUserId}
-            onOpenFriends={onOpenFriends}
           />
         )}
       </div>

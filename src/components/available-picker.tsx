@@ -9,6 +9,7 @@ import {
   ProtocolHowToDialog,
 } from "@/components/protocol-how-to-dialog";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
+import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import { isPermanentProtocolId } from "@/lib/permanent-activities";
 import { isCatalogSelectableProtocol } from "@/lib/scoring";
@@ -23,6 +24,8 @@ type Props = {
   onOpenSchedule?: () => void;
   /** Notify parent shell so Schedule tab updates without full navigation */
   onAvailableIdsChange?: (ids: string[]) => void;
+  /** Sync checklist when a permanent auto-logs for today */
+  onPermanentAutoLog?: (snap: PermanentAutoLogSnap) => void;
 };
 
 /**
@@ -34,6 +37,7 @@ export function AvailablePicker({
   availableIds: initialIds,
   onOpenSchedule,
   onAvailableIdsChange,
+  onPermanentAutoLog,
 }: Props) {
   const { push } = useToast();
   const [query, setQuery] = useState("");
@@ -83,9 +87,21 @@ export function AvailablePicker({
     onAvailableIdsChange?.([...next]);
     push(wasOn ? `Removed “${name}”` : `Available: ${name}`);
 
+    if (!wasOn && isPermanentProtocolId(protocolId)) {
+      onPermanentAutoLog?.({
+        protocolId,
+        count: 1,
+        dayPoints: 0,
+        streak: { current: 0, best: 0 },
+      });
+    }
+
     start(async () => {
       try {
-        await toggleFavoriteAction(protocolId);
+        const res = await toggleFavoriteAction(protocolId);
+        if (res.autoLogged) {
+          onPermanentAutoLog?.(res.autoLogged);
+        }
       } catch (e) {
         setAvailable(previous);
         onAvailableIdsChange?.([...previous]);

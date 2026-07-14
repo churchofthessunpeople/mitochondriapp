@@ -1,21 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LeaderboardTable,
   type LeaderboardRow,
 } from "@/components/leaderboard-table";
+import { getLeaderboardsAction } from "@/lib/actions/leaderboards";
 import { cn } from "@/lib/utils";
 
 export type LeaderboardBoards = {
-  lightWeek: LeaderboardRow[];
   week: LeaderboardRow[];
   month: LeaderboardRow[];
   allTime: LeaderboardRow[];
-  friendsWeek: LeaderboardRow[];
 };
 
 type BoardKey = keyof LeaderboardBoards;
+
+const EMPTY: LeaderboardBoards = { week: [], month: [], allTime: [] };
 
 const TABS: {
   key: BoardKey;
@@ -24,15 +25,8 @@ const TABS: {
   empty: string;
 }[] = [
   {
-    key: "lightWeek",
-    label: "Week · light",
-    blurb:
-      "Light-category points only this week — morning outdoor light, sun, sunset…",
-    empty: "No light logs this week yet.",
-  },
-  {
     key: "week",
-    label: "Week · all",
+    label: "Week",
     blurb: "All points this week.",
     empty: "No weekly points yet.",
   },
@@ -45,31 +39,51 @@ const TABS: {
   {
     key: "allTime",
     label: "All time",
-    blurb: "Lifetime lifetime totals.",
+    blurb: "Lifetime totals.",
     empty: "Leaderboard is empty.",
-  },
-  {
-    key: "friendsWeek",
-    label: "Friends",
-    blurb: "Private board among accepted friends (this week).",
-    empty: "Add friends to see a private board.",
   },
 ];
 
 export function LeaderboardPanel({
-  boards,
+  boards: initialBoards,
   currentUserId,
-  onOpenFriends,
   compact,
 }: {
-  boards: LeaderboardBoards;
+  /** Optional prefetched boards; when omitted, loads on mount. */
+  boards?: LeaderboardBoards | null;
   currentUserId: string;
-  onOpenFriends?: () => void;
   /** Hide page title when nested under Account tabs */
   compact?: boolean;
 }) {
-  const [tab, setTab] = useState<BoardKey>("lightWeek");
+  const [tab, setTab] = useState<BoardKey>("week");
+  const [boards, setBoards] = useState<LeaderboardBoards>(
+    initialBoards ?? EMPTY,
+  );
+  const [loading, setLoading] = useState(!initialBoards);
   const meta = TABS.find((t) => t.key === tab)!;
+
+  useEffect(() => {
+    if (initialBoards) {
+      setBoards(initialBoards);
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    getLeaderboardsAction()
+      .then((next) => {
+        if (!cancelled) setBoards(next);
+      })
+      .catch(() => {
+        if (!cancelled) setBoards(EMPTY);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [initialBoards]);
 
   return (
     <div className="space-y-4">
@@ -107,21 +121,15 @@ export function LeaderboardPanel({
 
       <p className="text-xs text-muted">{meta.blurb}</p>
 
-      {tab === "friendsWeek" && onOpenFriends && (
-        <button
-          type="button"
-          onClick={onOpenFriends}
-          className="text-xs text-accent hover:underline"
-        >
-          Manage friends →
-        </button>
+      {loading ? (
+        <p className="py-8 text-center text-sm text-muted">Loading ranks…</p>
+      ) : (
+        <LeaderboardTable
+          rows={boards[tab]}
+          currentUserId={currentUserId}
+          emptyMessage={meta.empty}
+        />
       )}
-
-      <LeaderboardTable
-        rows={boards[tab]}
-        currentUserId={currentUserId}
-        emptyMessage={meta.empty}
-      />
     </div>
   );
 }

@@ -27,6 +27,8 @@ type Props = {
   todayIso: string;
   /** Best multiplier today (1 = none) */
   sunriseMultiplier: number;
+  /** Server truth — keystone logged today even when boost is exactly 1× */
+  morningLightLogged?: boolean;
   allProtocols: Protocol[];
   sun: SunTimes | null;
   timeZone: string;
@@ -42,6 +44,7 @@ export function SunriseCheckIn({
   userId,
   todayIso,
   sunriseMultiplier,
+  morningLightLogged = false,
   allProtocols,
   sun,
   timeZone,
@@ -63,7 +66,7 @@ export function SunriseCheckIn({
   }, [todayIso]);
 
   useEffect(() => {
-    if (sunriseMultiplier > 1) {
+    if (morningLightLogged || sunriseMultiplier > 1) {
       setOpen(false);
       return;
     }
@@ -84,7 +87,7 @@ export function SunriseCheckIn({
       /* private mode */
     }
     setOpen(true);
-  }, [userId, todayIso, sunriseMultiplier, forceOpen]);
+  }, [userId, todayIso, sunriseMultiplier, morningLightLogged, forceOpen]);
 
   function dismissSession() {
     try {

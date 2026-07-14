@@ -13,24 +13,19 @@ import {
   todaySectionFromSearchParam,
 } from "@/lib/app-tabs";
 import { ensureAdminFlagSynced } from "@/lib/admin";
+import { loadAppContent } from "@/lib/content-overrides";
+import { scheduleCatalogSync } from "@/lib/catalog-sync";
 import {
-  getActiveProtocols,
-  getLeaderboard,
-  getLeaderboardPeriod,
-  getMonthlyLeaderboard,
   getUserDayStats,
   getUserHistory,
   getUserTotalPoints,
-  getWeeklyLeaderboard,
-  getWeeklyLightLeaderboard,
 } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
-import { getFriendIds, getFriendships } from "@/lib/friends";
 import { haversineKm } from "@/lib/geo";
 import { effectiveLocation } from "@/lib/location-effective";
 import {
-  buildPlaceFactorsWithElevation,
+  buildPlaceFactors,
   latitudeBand,
   sunPhaseHint,
 } from "@/lib/place-factors";
@@ -47,6 +42,7 @@ import { formatTimeInZone, getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 import { displayTimeToHm, shiftHm } from "@/lib/time-hm";
 import { ROUTES } from "@/lib/routes";
 import { getWeeklySummary } from "@/lib/weekly";
+import { hasMorningLightLoggedToday } from "@/lib/scoring";
 
 export const metadata = { title: "Home" };
 
@@ -72,17 +68,23 @@ export default async function AppPage({
   const h = await headers();
   const userId = session.user.id;
 
-  const [userFlags, allProtocols, availableIds, fullUser] = await Promise.all([
-    getUserAppFlags(userId),
-    getActiveProtocols(),
-    getUserFavoriteIds(userId),
-    db
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1)
-      .then((r) => r[0] ?? null),
-  ]);
+  const [userFlags, appContent, availableIds, fullUser, isAdmin] =
+    await Promise.all([
+      getUserAppFlags(userId),
+      loadAppContent(),
+      getUserFavoriteIds(userId),
+      db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1)
+        .then((r) => r[0] ?? null),
+      ensureAdminFlagSynced(userId),
+    ]);
+
+  // FK sync never blocks first paint — runs after the response is sent.
+  scheduleCatalogSync();
+  const allProtocols = appContent.protocols;
 
   if (!fullUser) redirect(ROUTES.login);
 
@@ -95,10 +97,8 @@ export default async function AppPage({
     loc.timezone || h.get("x-vercel-ip-timezone") || "UTC";
   const date = getTodayIsoForTimezone(tz);
 
+  // Permanent auto-logs must finish before day stats so checklist counts are right.
   await ensurePermanentCompletions(userId, date);
-
-  const friendIds = await getFriendIds(userId);
-  const friendScope = [...friendIds, userId];
 
   const [
     dayStats,
@@ -108,12 +108,6 @@ export default async function AppPage({
     sunriseBuff,
     history,
     lifetimePoints,
-    lightWeek,
-    week,
-    month,
-    allTime,
-    friendsWeek,
-    friendships,
     reminderRows,
     regions,
   ] = await Promise.all([
@@ -124,23 +118,9 @@ export default async function AppPage({
     getSunriseBuffToday(userId, date),
     getUserHistory(userId, 45),
     getUserTotalPoints(userId),
-    getWeeklyLightLeaderboard(25),
-    getWeeklyLeaderboard(25),
-    getMonthlyLeaderboard(25),
-    getLeaderboard(25),
-    friendIds.length
-      ? getLeaderboardPeriod({
-          limit: 25,
-          fromDate: new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10),
-          userIds: friendScope,
-        })
-      : Promise.resolve([]),
-    getFriendships(userId),
     db.select().from(userReminders).where(eq(userReminders.userId, userId)),
     listRegions(),
   ]);
-
-  const isAdmin = await ensureAdminFlagSynced(userId);
 
   const hasCoords = loc.latitude != null && loc.longitude != null;
   const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
@@ -151,9 +131,10 @@ export default async function AppPage({
       ? getSunTimesForLocalDay(new Date(), sunLat, sunLng, tz)
       : null;
 
+  // Sync place factors only — skip elevation/geomag network on first paint.
   const placeFactors =
     sun && sunLat != null && sunLng != null
-      ? await buildPlaceFactorsWithElevation({
+      ? buildPlaceFactors({
           latitude: sunLat,
           longitude: sunLng,
           sun,
@@ -223,6 +204,10 @@ export default async function AppPage({
       }).format(fullUser.createdAt)
     : null;
 
+  const morningLightLogged = hasMorningLightLoggedToday(
+    Object.fromEntries(dayStats.completionCounts),
+  );
+
   return (
     <AppShell
       initialTab={initialTab}
@@ -246,6 +231,7 @@ export default async function AppPage({
       isAdmin={isAdmin}
       initialOpenAdmin={initialOpenAdmin && isAdmin}
       forceSunriseCheckIn={forceSunriseCheckIn}
+      morningLightLogged={morningLightLogged}
       phaseHint={phaseHint}
       placeFactors={placeFactors}
       distanceKm={distanceKm}
@@ -273,21 +259,7 @@ export default async function AppPage({
       }}
       history={history}
       lifetimePoints={lifetimePoints}
-      leaderboards={{
-        lightWeek,
-        week,
-        month,
-        allTime,
-        friendsWeek,
-      }}
-      friends={friendships.map((r) => ({
-        id: r.id,
-        status: r.status,
-        otherName: r.otherName,
-        otherUsername: r.otherUsername,
-        isIncoming: r.isIncoming,
-        isOutgoing: r.isOutgoing,
-      }))}
+      leaderboards={null}
       reminders={reminderRows.map((r) => ({
         id: r.id,
         label: r.label,
@@ -295,6 +267,7 @@ export default async function AppPage({
         enabled: r.enabled,
       }))}
       reminderSunPresets={reminderSunPresets}
+      appContent={appContent}
     />
   );
 }

@@ -8,7 +8,10 @@ import {
   ProtocolHowToDialog,
 } from "@/components/protocol-how-to-dialog";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
+import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
+import { useAppContentOptional } from "@/components/app-content-context";
+import { isPermanentProtocolId } from "@/lib/permanent-activities";
 import {
   LWM_PILLARS,
   PILLAR_ORDER,
@@ -27,12 +30,16 @@ type Props = {
   protocols: Protocol[];
   availableIds: string[];
   onAvailableIdsChange?: (ids: string[]) => void;
+  /** Sync checklist when a permanent auto-logs for today */
+  onPermanentAutoLog?: (snap: PermanentAutoLogSnap) => void;
   /** Controlled expand (legacy collapsible chrome) */
   expanded?: boolean;
   onExpandedChange?: (open: boolean) => void;
   defaultExpanded?: boolean;
   /** Always show body — used under Today tab row */
   embedded?: boolean;
+  isAdmin?: boolean;
+  onAdminEditContent?: (focus: string) => void;
 };
 
 /**
@@ -42,12 +49,18 @@ export function ActivityCatalogExpand({
   protocols,
   availableIds: initialIds,
   onAvailableIdsChange,
+  onPermanentAutoLog,
+  isAdmin = false,
+  onAdminEditContent,
   expanded: controlledExpanded,
   onExpandedChange,
   defaultExpanded = false,
   embedded = false,
 }: Props) {
   const { push } = useToast();
+  const content = useAppContentOptional();
+  const categoryMeta = content?.categoryMeta ?? CATEGORY_META;
+  const protocolMetaMap = content?.protocolMeta;
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
   const expanded = embedded || (controlledExpanded ?? internalExpanded);
 
@@ -122,9 +135,21 @@ export function ActivityCatalogExpand({
     onAvailableIdsChange?.([...next]);
     push(wasOn ? `Removed “${name}”` : `Added to checklist: ${name}`);
 
+    if (!wasOn && isPermanentProtocolId(protocolId)) {
+      onPermanentAutoLog?.({
+        protocolId,
+        count: 1,
+        dayPoints: 0,
+        streak: { current: 0, best: 0 },
+      });
+    }
+
     start(async () => {
       try {
-        await toggleFavoriteAction(protocolId);
+        const res = await toggleFavoriteAction(protocolId);
+        if (res.autoLogged) {
+          onPermanentAutoLog?.(res.autoLogged);
+        }
       } catch (e) {
         setAvailable(previous);
         onAvailableIdsChange?.([...previous]);
@@ -210,7 +235,7 @@ export function ActivityCatalogExpand({
                   <ul className="space-y-2">
                     {list.map((p) => {
                       const on = available.has(p.id);
-                      const meta = getProtocolMeta(p.id);
+                      const meta = getProtocolMeta(p.id, protocolMetaMap);
                       return (
                         <li key={p.id} className="flex items-stretch gap-1.5">
                           <button
@@ -241,7 +266,7 @@ export function ActivityCatalogExpand({
                                 {p.description}
                               </span>
                               <span className="mt-1 block text-[10px] text-muted">
-                                {p.points} pts · {CATEGORY_META[p.category].label}{" "}
+                                {p.points} pts · {categoryMeta[p.category].label}{" "}
                                 · {equipmentLabel(meta.equipment)}
                                 {on ? " · on checklist" : ""}
                               </span>
@@ -276,6 +301,12 @@ export function ActivityCatalogExpand({
         <ProtocolHowToDialog
           protocol={howToFor}
           onClose={() => setHowToFor(null)}
+          isAdmin={isAdmin}
+          onAdminEdit={
+            howToFor && onAdminEditContent
+              ? () => onAdminEditContent(`protocol:${howToFor.id}`)
+              : undefined
+          }
         />
       </>
     );
@@ -310,6 +341,12 @@ export function ActivityCatalogExpand({
     <ProtocolHowToDialog
       protocol={howToFor}
       onClose={() => setHowToFor(null)}
+      isAdmin={isAdmin}
+      onAdminEdit={
+        howToFor && onAdminEditContent
+          ? () => onAdminEditContent(`protocol:${howToFor.id}`)
+          : undefined
+      }
     />
     </>
   );

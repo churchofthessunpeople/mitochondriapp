@@ -9,7 +9,6 @@ export const ROUTES = {
   mitoversity: "/app?t=mitoversity",
   history: "/app?t=history",
   leaderboard: "/app?t=leaderboard",
-  friends: "/app?t=friends",
   reminders: "/app?t=reminders",
   /**
    * Legacy path stubs — middleware/pages redirect into /app.
@@ -35,7 +34,7 @@ export const LEGACY_REDIRECTS: { from: string; to: string; exact?: boolean }[] =
     { from: "/account", to: ROUTES.account },
     { from: "/history", to: ROUTES.history, exact: true },
     { from: "/leaderboard", to: ROUTES.leaderboard },
-    { from: "/friends", to: ROUTES.friends },
+    { from: "/friends", to: ROUTES.account },
     { from: "/reminders", to: ROUTES.reminders },
   ];
 

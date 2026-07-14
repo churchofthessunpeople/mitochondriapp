@@ -10,10 +10,24 @@ import {
   getCatalogProtocolById,
 } from "@/lib/catalog";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { getUserDayStats } from "@/lib/data";
 import { isPermanentProtocolId } from "@/lib/permanent-activities";
 import { isCatalogSelectableProtocolId } from "@/lib/scoring";
 import { ensurePermanentCompletions } from "@/lib/permanent-completions";
+import { getUserStreak } from "@/lib/streaks";
 import { revalidatePath } from "next/cache";
+
+export type PermanentAutoLogSnap = {
+  protocolId: string;
+  count: number;
+  dayPoints: number;
+  streak: { current: number; best: number };
+};
+
+export type ToggleFavoriteResult = {
+  favorited: boolean;
+  autoLogged?: PermanentAutoLogSnap;
+};
 
 async function requireUserId() {
   const session = await auth();
@@ -28,7 +42,9 @@ async function requireUserId() {
  * Client already updates checklist state optimistically — do not revalidate
  * the /app shell here (that was the main lag source).
  */
-export async function toggleFavoriteAction(protocolId: string) {
+export async function toggleFavoriteAction(
+  protocolId: string,
+): Promise<ToggleFavoriteResult> {
   const userId = await requireUserId();
 
   if (!getCatalogProtocolById(protocolId)) {
@@ -69,6 +85,7 @@ export async function toggleFavoriteAction(protocolId: string) {
           eq(userScheduleItems.protocolId, protocolId),
         ),
       );
+    return { favorited: false };
   } else {
     await db.insert(userFavorites).values({ userId, protocolId });
     if (isPermanentProtocolId(protocolId)) {
@@ -79,11 +96,28 @@ export async function toggleFavoriteAction(protocolId: string) {
         .limit(1);
       const completedOn = getTodayIsoForTimezone(u?.timezone || "UTC");
       await ensurePermanentCompletions(userId, completedOn);
+      const [stats, streak] = await Promise.all([
+        getUserDayStats(userId, completedOn),
+        getUserStreak(userId, completedOn),
+      ]);
+      const count = stats.completionCounts.get(protocolId) ?? 0;
       after(() => {
         revalidatePath("/history", "layout");
       });
+      return {
+        favorited: true,
+        autoLogged:
+          count > 0
+            ? {
+                protocolId,
+                count,
+                dayPoints: stats.points,
+                streak,
+              }
+            : undefined,
+      };
     }
   }
 
-  return { favorited: !existing };
+  return { favorited: true };
 }

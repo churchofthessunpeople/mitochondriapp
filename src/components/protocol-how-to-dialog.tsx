@@ -2,6 +2,8 @@
 
 import { CircleHelp, X } from "lucide-react";
 import type { Protocol } from "@/db/schema";
+import { useAppContentOptional } from "@/components/app-content-context";
+import { AdminEditButton } from "@/components/admin-edit-button";
 import {
   equipmentLabel,
   getProtocolHowTo,
@@ -12,13 +14,22 @@ import { cn } from "@/lib/utils";
 type DialogProps = {
   protocol: Protocol | null;
   onClose: () => void;
+  isAdmin?: boolean;
+  onAdminEdit?: () => void;
 };
 
-export function ProtocolHowToDialog({ protocol, onClose }: DialogProps) {
+export function ProtocolHowToDialog({
+  protocol,
+  onClose,
+  isAdmin,
+  onAdminEdit,
+}: DialogProps) {
+  const content = useAppContentOptional();
   if (!protocol) return null;
 
-  const meta = getProtocolMeta(protocol.id);
-  const howTo = getProtocolHowTo(protocol);
+  const metaMap = content?.protocolMeta;
+  const meta = getProtocolMeta(protocol.id, metaMap);
+  const howTo = getProtocolHowTo(protocol, metaMap);
   const paragraphs = howTo.split(/\n\n+/).filter(Boolean);
 
   return (
@@ -41,6 +52,11 @@ export function ProtocolHowToDialog({ protocol, onClose }: DialogProps) {
             <p className="mt-1 text-xs text-muted">
               {protocol.points} pts · {equipmentLabel(meta.equipment)}
             </p>
+            {isAdmin && onAdminEdit && (
+              <div className="mt-2">
+                <AdminEditButton label={protocol.name} onClick={onAdminEdit} />
+              </div>
+            )}
           </div>
           <button
             type="button"

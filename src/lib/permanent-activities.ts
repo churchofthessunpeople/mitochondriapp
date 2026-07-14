@@ -15,6 +15,15 @@ export function isPermanentProtocolId(id: string): boolean {
   return PERMANENT_IDS.has(id);
 }
 
+/** Prefer when you have a merged catalog row (includes admin overrides). */
+export function isPermanentProtocol(p: {
+  id: string;
+  permanent?: boolean | null;
+}): boolean {
+  if (p.permanent) return true;
+  return PERMANENT_IDS.has(p.id);
+}
+
 export function getPermanentProtocolIds(): readonly string[] {
   return [...PERMANENT_IDS];
 }

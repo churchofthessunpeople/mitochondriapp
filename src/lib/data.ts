@@ -3,10 +3,6 @@ import { cache } from "react";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users } from "@/db/schema";
 import type { Protocol } from "@/db/schema";
-import {
-  ensureCatalogSyncedToDb,
-  getCatalogProtocols,
-} from "@/lib/catalog";
 import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
 
 /**
@@ -14,8 +10,11 @@ import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
  * Syncs definitions into Neon for FKs, then returns the local catalog.
  */
 export const getActiveProtocols = cache(async (): Promise<Protocol[]> => {
-  await ensureCatalogSyncedToDb();
-  return getCatalogProtocols();
+  // Reads are local/merged — do not block on Neon FK sync.
+  const { getMergedCatalogProtocols } = await import("@/lib/catalog");
+  const { scheduleCatalogSync } = await import("@/lib/catalog-sync");
+  scheduleCatalogSync();
+  return getMergedCatalogProtocols();
 });
 
 export async function getCompletionsForUserDay(userId: string, date: string) {
@@ -177,51 +176,6 @@ export async function getWeeklyLeaderboard(limit = 20) {
     limit,
     fromDate: from.toISOString().slice(0, 10),
   });
-}
-
-/** Weekly ranking by light-category protocol points (not total points). */
-export async function getWeeklyLightLeaderboard(limit = 20) {
-  const from = new Date();
-  from.setDate(from.getDate() - 7);
-  const fromDate = from.toISOString().slice(0, 10);
-  const lightIds = getCatalogProtocols()
-    .filter((p) => p.category === "light")
-    .map((p) => p.id);
-  if (lightIds.length === 0) return [];
-  try {
-    const rows = await db
-      .select({
-        userId: dailyCompletions.userId,
-        name: users.displayName,
-        username: users.username,
-        totalPoints: sum(dailyCompletions.pointsEarned).mapWith(Number),
-        totalActions: sql<number>`count(*) filter (where ${dailyCompletions.isStreakBonus} = false)::int`,
-      })
-      .from(dailyCompletions)
-      .innerJoin(users, eq(users.id, dailyCompletions.userId))
-      .where(
-        and(
-          eq(users.showOnLeaderboard, true),
-          gte(dailyCompletions.completedOn, fromDate),
-          inArray(dailyCompletions.protocolId, lightIds),
-          eq(dailyCompletions.isStreakBonus, false),
-        ),
-      )
-      .groupBy(dailyCompletions.userId, users.displayName, users.username)
-      .orderBy(desc(sum(dailyCompletions.pointsEarned)))
-      .limit(limit);
-
-    return rows.map((r, index) => ({
-      rank: index + 1,
-      userId: r.userId,
-      name: r.name || r.username || "Mitochondriac",
-      username: r.username,
-      totalPoints: r.totalPoints ?? 0,
-      totalActions: r.totalActions ?? 0,
-    }));
-  } catch {
-    return [];
-  }
 }
 
 export async function getMonthlyLeaderboard(limit = 20) {

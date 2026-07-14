@@ -7,7 +7,6 @@ import {
   UsernameForm,
 } from "@/components/account-forms";
 import type { AccountPanelUser } from "@/components/account-panel";
-import { FriendsClient } from "@/components/friends-client";
 import { HistoryList } from "@/components/history-list";
 import { RemindersClient } from "@/components/reminders-client";
 import { logoutAction } from "@/lib/actions/auth";
@@ -20,15 +19,6 @@ import type { AccountSection } from "@/lib/app-tabs";
 import type { OpenAppSheet } from "@/lib/app-sheets";
 import { ROUTES } from "@/lib/routes";
 import { cn, formatPoints } from "@/lib/utils";
-
-export type FriendRow = {
-  id: string;
-  status: string;
-  otherName: string;
-  otherUsername: string;
-  isIncoming: boolean;
-  isOutgoing: boolean;
-};
 
 export type ReminderRow = {
   id: string;
@@ -43,7 +33,6 @@ type Section = NonNullable<AccountSection>;
 
 const TABS: { id: Section; label: string }[] = [
   { id: "history", label: "History" },
-  { id: "friends", label: "Friends" },
   { id: "reminders", label: "Reminders" },
   { id: "profile", label: "Profile" },
 ];
@@ -54,7 +43,6 @@ type Props = {
   history: HistoryRow[];
   lifetimePoints: number;
   isAdmin?: boolean;
-  friends: FriendRow[];
   reminders: ReminderRow[];
   reminderSunPresets?: {
     sunrise?: string | null;
@@ -74,7 +62,6 @@ export function AccountHome({
   history,
   lifetimePoints,
   isAdmin = false,
-  friends,
   reminders,
   reminderSunPresets,
   onOpenSheet,
@@ -114,7 +101,7 @@ export function AccountHome({
         <p className="mt-1.5 text-sm text-muted">
           {user.memberSinceLabel
             ? `Member since ${user.memberSinceLabel}.`
-            : "History, friends, reminders, and settings."}
+            : "History, reminders, and settings."}
         </p>
       </div>
 
@@ -169,15 +156,6 @@ export function AccountHome({
                 Export all logs (CSV)
               </a>
             </p>
-          </div>
-        )}
-
-        {section === "friends" && (
-          <div className="space-y-3">
-            <p className="text-sm text-muted">
-              Private board among people you accept.
-            </p>
-            <FriendsClient rows={friends} />
           </div>
         )}
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { Check, Flame, Minus, Plus, Sun, Timer, X } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Check, ChevronDown, Flame, Minus, Plus, Sun, Timer, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import type { Protocol } from "@/db/schema";
 import {
   ProtocolHowToButton,
@@ -100,6 +100,79 @@ type Props = {
 
 const MORNING_LIGHT_BUSY_ID = "morning-light";
 
+type ChecklistSectionId =
+  | "morningLight"
+  | "suggested"
+  | "available"
+  | "performed"
+  | "permanent";
+
+const DEFAULT_SECTIONS_OPEN: Record<ChecklistSectionId, boolean> = {
+  morningLight: true,
+  suggested: true,
+  available: true,
+  performed: true,
+  permanent: false,
+};
+
+function CollapsibleChecklistSection({
+  title,
+  count,
+  subtitle,
+  accent = false,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  count: number;
+  subtitle?: string;
+  accent?: boolean;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <section className="space-y-2">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-start justify-between gap-2 rounded-xl py-0.5 text-left transition hover:opacity-90"
+      >
+        <span className="min-w-0">
+          <span
+            className={cn(
+              "text-xs font-medium uppercase tracking-[0.16em]",
+              accent ? "text-accent" : "text-muted",
+            )}
+          >
+            {title}
+            {count > 0 ? (
+              <span className="ml-1.5 tabular-nums text-foreground/70">
+                ({count})
+              </span>
+            ) : null}
+          </span>
+          {subtitle ? (
+            <span className="mt-0.5 block text-[11px] normal-case leading-relaxed tracking-normal text-muted">
+              {subtitle}
+            </span>
+          ) : null}
+        </span>
+        <ChevronDown
+          className={cn(
+            "mt-0.5 h-4 w-4 shrink-0 text-muted transition-transform duration-200",
+            open && "rotate-180",
+          )}
+          aria-hidden
+        />
+      </button>
+      {open ? children : null}
+    </section>
+  );
+}
+
 export function ScheduleDay({
   protocols,
   completionCounts,
@@ -157,6 +230,12 @@ export function ScheduleDay({
     setSleepRoomTempF(parseSleepRoomTempF(initialSleepRoomTempF));
   }, [initialSleepRoomTempF]);
 
+  const [sectionsOpen, setSectionsOpen] = useState(DEFAULT_SECTIONS_OPEN);
+
+  function toggleSection(id: ChecklistSectionId) {
+    setSectionsOpen((s) => ({ ...s, [id]: !s[id] }));
+  }
+
   // Local state (not useOptimistic) so UI doesn't snap back when the
   // transition ends before any RSC refresh.
   const [counts, setCounts] = useState(completionCounts);
@@ -200,14 +279,25 @@ export function ScheduleDay({
     });
   }
 
-  const { suggested, rest } = useMemo(() => {
-    const manual = protocols.filter((p) => !isPermanentProtocolId(p.id));
-    return orderProtocolsForNow(manual, {
+  const manualProtocols = useMemo(
+    () => protocols.filter((p) => !isPermanentProtocolId(p.id)),
+    [protocols],
+  );
+
+  const performed = useMemo(
+    () => manualProtocols.filter((p) => (counts[p.id] ?? 0) > 0),
+    [manualProtocols, counts],
+  );
+
+  const { suggested, available } = useMemo(() => {
+    const pending = manualProtocols.filter((p) => (counts[p.id] ?? 0) === 0);
+    const { suggested: sug, rest } = orderProtocolsForNow(pending, {
       phase,
       localHour,
       completionCounts: counts,
     });
-  }, [protocols, phase, localHour, counts]);
+    return { suggested: sug, available: rest };
+  }, [manualProtocols, phase, localHour, counts]);
 
   const permanentProtocols = useMemo(
     () => protocols.filter((p) => isPermanentProtocolId(p.id)),
@@ -452,10 +542,13 @@ export function ScheduleDay({
     const rowBusy = busyId === MORNING_LIGHT_BUSY_ID;
 
     return (
-      <section className="space-y-2">
-        <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-accent">
-          Morning light
-        </h2>
+      <CollapsibleChecklistSection
+        title="Morning light"
+        count={morningLightLogged ? 1 : 0}
+        accent
+        open={sectionsOpen.morningLight}
+        onToggle={() => toggleSection("morningLight")}
+      >
         <div className="space-y-1.5">
           <div className="flex items-stretch gap-1.5">
             <button
@@ -533,7 +626,7 @@ export function ScheduleDay({
             })}
           </div>
         </div>
-      </section>
+      </CollapsibleChecklistSection>
     );
   }
 
@@ -938,34 +1031,46 @@ export function ScheduleDay({
         <div className="space-y-5">
           {renderSunriseSection()}
           {suggested.length > 0 && (
-            <section className="space-y-2">
-              <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-accent">
-                Suggested now
-              </h2>
+            <CollapsibleChecklistSection
+              title="Suggested"
+              count={suggested.length}
+              accent
+              open={sectionsOpen.suggested}
+              onToggle={() => toggleSection("suggested")}
+            >
               <ul className="space-y-2">{suggested.map(renderRow)}</ul>
-            </section>
+            </CollapsibleChecklistSection>
           )}
-          {rest.length > 0 && (
-            <section className="space-y-2">
-              {suggested.length > 0 && (
-                <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
-                  Rest of your list
-                </h2>
-              )}
-              <ul className="space-y-2">{rest.map(renderRow)}</ul>
-            </section>
+          {available.length > 0 && (
+            <CollapsibleChecklistSection
+              title="Available"
+              count={available.length}
+              open={sectionsOpen.available}
+              onToggle={() => toggleSection("available")}
+            >
+              <ul className="space-y-2">{available.map(renderRow)}</ul>
+            </CollapsibleChecklistSection>
+          )}
+          {performed.length > 0 && (
+            <CollapsibleChecklistSection
+              title="Performed"
+              count={performed.length}
+              open={sectionsOpen.performed}
+              onToggle={() => toggleSection("performed")}
+            >
+              <ul className="space-y-2">{performed.map(renderRow)}</ul>
+            </CollapsibleChecklistSection>
           )}
           {permanentProtocols.length > 0 && (
-            <section className="space-y-2">
-              <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
-                Automatic · every day
-              </h2>
-              <p className="text-[11px] leading-relaxed text-muted">
-                On your available list — logged each day. Tap to skip tonight if
-                needed.
-              </p>
+            <CollapsibleChecklistSection
+              title="Permanent"
+              count={permanentProtocols.length}
+              subtitle="On your available list — logged each day. Tap to skip tonight if needed."
+              open={sectionsOpen.permanent}
+              onToggle={() => toggleSection("permanent")}
+            >
               <ul className="space-y-2">{permanentProtocols.map(renderRow)}</ul>
-            </section>
+            </CollapsibleChecklistSection>
           )}
         </div>
       )}

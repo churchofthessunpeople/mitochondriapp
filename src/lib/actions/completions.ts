@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
-import { getCatalogProtocolById } from "@/lib/catalog";
+import { getMergedCatalogProtocolById } from "@/lib/catalog";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import {
@@ -251,7 +251,7 @@ export async function logCompletionAction(
   const completedOn = await userToday(userId);
 
   // Local seeds are source of truth — skip full catalog upsert on every tap
-  const protocol = getCatalogProtocolById(protocolId);
+  const protocol = await getMergedCatalogProtocolById(protocolId);
   if (!protocol) throw new Error("Activity not found");
 
   const slot =
@@ -496,6 +496,29 @@ export async function logPermanentTonightAction(
     return logCompletionAction(protocolId);
   }
   await clearPermanentSkip(userId, protocolId, completedOn);
+
+  const existing = await db
+    .select({ pointsEarned: dailyCompletions.pointsEarned })
+    .from(dailyCompletions)
+    .where(
+      and(
+        eq(dailyCompletions.userId, userId),
+        eq(dailyCompletions.protocolId, protocolId),
+        eq(dailyCompletions.completedOn, completedOn),
+        eq(dailyCompletions.isStreakBonus, false),
+      ),
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    const snap = await daySnapshot(userId, completedOn, protocolId);
+    return {
+      action: "added",
+      points: existing[0]!.pointsEarned,
+      ...snap,
+    };
+  }
+
   return logCompletionAction(protocolId);
 }
 

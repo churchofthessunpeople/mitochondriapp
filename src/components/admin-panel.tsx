@@ -9,31 +9,19 @@ import {
 } from "react";
 import {
   deleteAdminUserAction,
-  deleteProtocolAction,
   getAdminUserDetailAction,
-  listAdminProtocolsAction,
   listAdminUsersAction,
   resetAdminUserPasswordAction,
   resetAllUserActivityAction,
   updateAdminUserAction,
-  upsertProtocolAction,
   type AdminUserDetail,
   type AdminUserListItem,
 } from "@/lib/actions/admin";
-import { CATEGORY_ORDER } from "@/lib/categories";
-import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
+import { AdminContentTab } from "@/components/admin-content-tab";
 import { useToast } from "@/components/toast";
 import { cn, formatPoints } from "@/lib/utils";
 
-type CatalogRow = {
-  id: string;
-  name: string;
-  category: string;
-  points: number;
-  active: boolean;
-};
-
-type AdminTab = "users" | "protocols";
+type AdminTab = "users" | "content";
 
 type AdminConfirmRequest = {
   title: string;
@@ -46,9 +34,12 @@ type AdminConfirmRequest = {
 export function AdminPanel({
   allowed,
   currentUserId,
+  contentFocus,
 }: {
   allowed: boolean;
   currentUserId: string;
+  /** e.g. protocol:id or mito:id for inline edit deep link */
+  contentFocus?: string | null;
 }) {
   const [tab, setTab] = useState<AdminTab>("users");
   const { push } = useToast();
@@ -95,7 +86,7 @@ export function AdminPanel({
         {(
           [
             { id: "users", label: "Users" },
-            { id: "protocols", label: "Protocols" },
+            { id: "content", label: "Content" },
           ] as const
         ).map((t) => {
           const active = tab === t.id;
@@ -125,7 +116,7 @@ export function AdminPanel({
           requestConfirm={requestConfirm}
         />
       ) : (
-        <AdminProtocolsTab />
+        <AdminContentTab initialFocus={contentFocus} />
       )}
 
       <div className="glass space-y-3 rounded-3xl border border-red-500/20 p-5">
@@ -266,7 +257,7 @@ function AdminUsersTab({
           }
           requestConfirm({
             title: "Delete user?",
-            message: `Permanently delete @${detail.username}? This removes all their logs, friends, and reminders.`,
+            message: `Permanently delete @${detail.username}? This removes all their logs and reminders.`,
             confirmLabel: "Delete user",
             danger: true,
             action: async () => {
@@ -615,167 +606,6 @@ function Field({
       <span className="text-xs font-medium text-muted">{label}</span>
       {children}
     </label>
-  );
-}
-
-function AdminProtocolsTab() {
-  const { push } = useToast();
-  const [pending, start] = useTransition();
-  const [catalog, setCatalog] = useState<CatalogRow[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  function reload() {
-    listAdminProtocolsAction()
-      .then(setCatalog)
-      .catch((e) =>
-        setError(e instanceof Error ? e.message : "Could not load catalog"),
-      );
-  }
-
-  useEffect(() => {
-    reload();
-  }, []);
-
-  return (
-    <div className="space-y-6">
-      <p className="text-sm text-muted">Create or update catalog activities.</p>
-
-      <form
-        className="glass space-y-3 rounded-3xl p-5"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const fd = new FormData(e.currentTarget);
-          start(async () => {
-            try {
-              await upsertProtocolAction(fd);
-              push("Activity saved");
-              e.currentTarget.reset();
-              reload();
-            } catch (err) {
-              push(err instanceof Error ? err.message : "Save failed", "err");
-            }
-          });
-        }}
-      >
-        <h2 className="font-semibold">Upsert activity</h2>
-        <input
-          name="id"
-          required
-          placeholder="id-slug"
-          className="field-input w-full rounded-xl px-3 py-2 text-sm"
-        />
-        <input
-          name="name"
-          required
-          placeholder="Name"
-          className="field-input w-full rounded-xl px-3 py-2 text-sm"
-        />
-        <textarea
-          name="description"
-          required
-          placeholder="Description"
-          className="field-input w-full rounded-xl px-3 py-2 text-sm"
-          rows={3}
-        />
-        <input
-          name="points"
-          type="number"
-          defaultValue={5}
-          className="field-input w-full rounded-xl px-3 py-2 text-sm"
-        />
-        <select
-          name="category"
-          className="field-input w-full rounded-xl px-3 py-2 text-sm"
-        >
-          {CATEGORY_ORDER.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <select
-          name="timeOfDay"
-          className="field-input w-full rounded-xl px-3 py-2 text-sm"
-        >
-          {TIME_OF_DAY_ORDER.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="allowsMultiple" /> Multi-log
-        </label>
-        <input
-          name="maxPerDay"
-          type="number"
-          defaultValue={5}
-          className="field-input w-full rounded-xl px-3 py-2 text-sm"
-        />
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="durationEnabled" /> Duration timer
-        </label>
-        <button
-          type="submit"
-          disabled={pending}
-          className="btn-primary h-11 w-full rounded-2xl font-semibold disabled:opacity-50"
-        >
-          {pending ? "Saving…" : "Save"}
-        </button>
-      </form>
-
-      {error && <p className="text-sm text-red-400">{error}</p>}
-
-      {catalog === null && !error && (
-        <p className="text-sm text-muted">Loading catalog…</p>
-      )}
-
-      {catalog && (
-        <ul className="space-y-2">
-          {catalog.map((p) => (
-            <li
-              key={p.id}
-              className="glass flex items-start justify-between gap-3 rounded-2xl p-3 text-sm"
-            >
-              <div>
-                <p className="font-medium">
-                  {p.name}{" "}
-                  {!p.active && (
-                    <span className="text-xs text-red-400">inactive</span>
-                  )}
-                </p>
-                <p className="text-xs text-muted">
-                  {p.id} · {p.category} · +{p.points}
-                </p>
-              </div>
-              {p.active && (
-                <button
-                  type="button"
-                  disabled={pending}
-                  className="text-xs text-red-400"
-                  onClick={() => {
-                    start(async () => {
-                      try {
-                        await deleteProtocolAction(p.id);
-                        push("Disabled");
-                        reload();
-                      } catch (err) {
-                        push(
-                          err instanceof Error ? err.message : "Failed",
-                          "err",
-                        );
-                      }
-                    });
-                  }}
-                >
-                  Disable
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
   );
 }
 

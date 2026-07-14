@@ -173,6 +173,15 @@ await sql`
   )
 `;
 
+await sql`
+  CREATE TABLE IF NOT EXISTS content_overrides (
+    key text PRIMARY KEY,
+    value jsonb NOT NULL,
+    updated_at timestamp NOT NULL DEFAULT now(),
+    updated_by text REFERENCES users(id) ON DELETE SET NULL
+  )
+`;
+
 console.log("Schema OK. Seeding protocols...");
 const seed = spawnSync("npx", ["tsx", "src/db/seed.ts"], {
   stdio: "inherit",

@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { userFavorites, userScheduleItems, type TimeOfDay } from "@/db/schema";
 import {
-  ensureCatalogSyncedToDb,
+  ensureProtocolInDb,
   getCatalogProtocolById,
 } from "@/lib/catalog";
 import { revalidateApp } from "@/lib/revalidate-app";
@@ -29,7 +29,7 @@ export async function addToScheduleAction(
   const userId = await requireUserId();
   if (!isTimeOfDay(timeOfDay)) throw new Error("Invalid time of day");
 
-  await ensureCatalogSyncedToDb();
+  await ensureProtocolInDb(protocolId);
   const protocol = getCatalogProtocolById(protocolId);
   if (!protocol) throw new Error("Activity not found");
   if (!canAssignToSlot(protocol, timeOfDay)) {
@@ -106,7 +106,7 @@ export async function moveScheduleItemAction(
 
   if (!item) throw new Error("Schedule item not found");
 
-  await ensureCatalogSyncedToDb();
+  await ensureProtocolInDb(item.protocolId);
   const protocol = getCatalogProtocolById(item.protocolId);
 
   if (!protocol || !canAssignToSlot(protocol, timeOfDay)) {

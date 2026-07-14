@@ -8,6 +8,8 @@ import {
   type MitoEntry,
   type MitoPillar,
 } from "@/lib/mitoversity";
+import { useAppContentOptional } from "@/components/app-content-context";
+import { AdminEditButton } from "@/components/admin-edit-button";
 import { cn } from "@/lib/utils";
 
 const PILLAR_FILTERS: { id: MitoPillar | "all"; label: string }[] = [
@@ -24,26 +26,39 @@ const PILLAR_FILTERS: { id: MitoPillar | "all"; label: string }[] = [
  */
 export function MitoversityHome({
   initialEntryId,
+  isAdmin = false,
+  onAdminEditContent,
 }: {
   initialEntryId?: string | null;
+  isAdmin?: boolean;
+  onAdminEditContent?: (focus: string) => void;
 }) {
+  const content = useAppContentOptional();
+  const allEntries = content?.mitoEntries ?? [...MITOVERSITY_ENTRIES];
+  const intro =
+    content?.mitoversityIntro ??
+    "Stand-alone explainers on light, water, magnetism, and support habits for mitochondrial lifestyle tracking. Where a claim is specific to Dr. Jack Kruse's public teaching, it is cited as such.";
+  const pillarLabels = content?.mitoPillarLabels ?? MITO_PILLAR_LABEL;
+
   const [pillar, setPillar] = useState<MitoPillar | "all">("all");
   const [titleQuery, setTitleQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(
-    initialEntryId && entryExists(initialEntryId) ? initialEntryId : null,
+    initialEntryId && allEntries.some((e) => e.id === initialEntryId)
+      ? initialEntryId
+      : null,
   );
 
   const entries = useMemo(() => {
     const q = titleQuery.trim().toLowerCase();
-    return MITOVERSITY_ENTRIES.filter((e) => {
+    return allEntries.filter((e) => {
       if (pillar !== "all" && e.pillar !== pillar) return false;
       if (q && !e.title.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [pillar, titleQuery]);
+  }, [pillar, titleQuery, allEntries]);
 
   const openEntry = openId
-    ? MITOVERSITY_ENTRIES.find((e) => e.id === openId) ?? null
+    ? allEntries.find((e) => e.id === openId) ?? null
     : null;
 
   // Escape + body scroll lock while article is open
@@ -70,12 +85,15 @@ export function MitoversityHome({
         <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
           Mitoversity
         </h1>
-        <p className="mt-1.5 text-sm text-muted">
-          Stand-alone explainers on light, water, magnetism, and support
-          habits for mitochondrial lifestyle tracking. Where a claim is
-          specific to Dr. Jack Kruse&apos;s public teaching, it is cited as
-          such.
-        </p>
+        <p className="mt-1.5 text-sm text-muted">{intro}</p>
+        {isAdmin && onAdminEditContent && (
+          <div className="mt-2">
+            <AdminEditButton
+              label="Mitoversity intro"
+              onClick={() => onAdminEditContent("copy:mitoversity-intro")}
+            />
+          </div>
+        )}
       </div>
 
       <label className="relative block">
@@ -133,7 +151,14 @@ export function MitoversityHome({
             <li key={entry.id}>
               <EntryListCard
                 entry={entry}
+                pillarLabel={pillarLabels[entry.pillar]}
                 onOpen={() => setOpenId(entry.id)}
+                isAdmin={isAdmin}
+                onAdminEdit={
+                  onAdminEditContent
+                    ? () => onAdminEditContent(`mito:${entry.id}`)
+                    : undefined
+                }
               />
             </li>
           ))}
@@ -146,22 +171,34 @@ export function MitoversityHome({
       </p>
 
       {openEntry && (
-        <ArticleModal entry={openEntry} onClose={() => setOpenId(null)} />
+        <ArticleModal
+          entry={openEntry}
+          pillarLabel={pillarLabels[openEntry.pillar]}
+          onClose={() => setOpenId(null)}
+          isAdmin={isAdmin}
+          onAdminEdit={
+            onAdminEditContent
+              ? () => onAdminEditContent(`mito:${openEntry.id}`)
+              : undefined
+          }
+        />
       )}
     </div>
   );
 }
 
-function entryExists(id: string) {
-  return MITOVERSITY_ENTRIES.some((e) => e.id === id);
-}
-
 function EntryListCard({
   entry,
+  pillarLabel,
   onOpen,
+  isAdmin,
+  onAdminEdit,
 }: {
   entry: MitoEntry;
+  pillarLabel: string;
   onOpen: () => void;
+  isAdmin?: boolean;
+  onAdminEdit?: () => void;
 }) {
   return (
     <button
@@ -171,7 +208,7 @@ function EntryListCard({
     >
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-accent">
-          {MITO_PILLAR_LABEL[entry.pillar]}
+          {pillarLabel}
         </p>
         <p className="mt-1 text-base font-semibold tracking-tight text-foreground">
           {entry.title}
@@ -190,10 +227,16 @@ function EntryListCard({
 
 function ArticleModal({
   entry,
+  pillarLabel,
   onClose,
+  isAdmin,
+  onAdminEdit,
 }: {
   entry: MitoEntry;
+  pillarLabel: string;
   onClose: () => void;
+  isAdmin?: boolean;
+  onAdminEdit?: () => void;
 }) {
   return (
     <div
@@ -207,11 +250,10 @@ function ArticleModal({
         className="glass flex max-h-[min(92dvh,900px)] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-accent/25 shadow-xl sm:max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Sticky header */}
         <div className="flex shrink-0 items-start gap-3 border-b border-border px-4 py-4 sm:px-5">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-accent">
-              {MITO_PILLAR_LABEL[entry.pillar]}
+              {pillarLabel}
             </p>
             <h2
               id="mito-article-title"
@@ -219,6 +261,11 @@ function ArticleModal({
             >
               {entry.title}
             </h2>
+            {isAdmin && onAdminEdit && (
+              <div className="mt-2">
+                <AdminEditButton label={entry.title} onClick={onAdminEdit} />
+              </div>
+            )}
           </div>
           <button
             type="button"

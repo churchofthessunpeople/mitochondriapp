@@ -3,6 +3,7 @@ import {
   date,
   doublePrecision,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -300,6 +301,16 @@ export const userReminders = pgTable(
   },
   (table) => [unique("user_reminder_time_uidx").on(table.userId, table.localTime)],
 );
+
+/** Admin-editable descriptor overrides (merged over TS seed defaults at read time). */
+export const contentOverrides = pgTable("content_overrides", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  updatedBy: text("updated_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+});
 
 export type User = typeof users.$inferSelect;
 export type Region = typeof regions.$inferSelect;

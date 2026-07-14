@@ -12,7 +12,7 @@ export type ProtocolMeta = {
 
 const DEFAULT: ProtocolMeta = { equipment: "none" };
 
-const META: Record<string, ProtocolMeta> = {
+export const PROTOCOL_META_BASE: Record<string, ProtocolMeta> = {
   "sunrise-horizon": {
     equipment: "none",
     how: "Be outside before the sun clears the horizon. Look at the solar disk with bare eyes — no sunglasses, no window glass between you and the sky.\n\nFull points when your viewing session falls within 15 minutes before or after local sunrise; each minute outside costs 1 point (worst edge of start/finish). Skin, grounding, and sunglasses adjust your day boost on the check-in.",
@@ -135,16 +135,20 @@ const META: Record<string, ProtocolMeta> = {
   },
 };
 
-export function getProtocolMeta(protocolId: string): ProtocolMeta {
-  return META[protocolId] ?? DEFAULT;
+export function getProtocolMeta(
+  protocolId: string,
+  metaMap?: Record<string, ProtocolMeta>,
+): ProtocolMeta {
+  if (metaMap) return metaMap[protocolId] ?? DEFAULT;
+  return PROTOCOL_META_BASE[protocolId] ?? DEFAULT;
 }
 
 /** How-to copy for the activity dialog; falls back to catalog description. */
-export function getProtocolHowTo(protocol: {
-  id: string;
-  description: string;
-}): string {
-  const how = META[protocol.id]?.how;
+export function getProtocolHowTo(
+  protocol: { id: string; description: string },
+  metaMap?: Record<string, ProtocolMeta>,
+): string {
+  const how = getProtocolMeta(protocol.id, metaMap).how;
   if (how?.trim()) return how.trim();
   return protocol.description.trim();
 }

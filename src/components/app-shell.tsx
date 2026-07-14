@@ -6,12 +6,13 @@ import { useCallback, useEffect, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import {
   AccountHome,
-  type FriendRow,
   type HistoryRow,
   type ReminderRow,
 } from "@/components/account-home";
 import type { AccountPanelUser } from "@/components/account-panel";
 import { AdminPanel } from "@/components/admin-panel";
+import { AppContentProvider } from "@/components/app-content-context";
+import type { AppContentBundle } from "@/lib/content-overrides";
 import { AppSheet } from "@/components/app-sheet";
 import { GuideLightPanel } from "@/components/guide-light-panel";
 import { GuideMagnetismPanel } from "@/components/guide-magnetism-panel";
@@ -91,12 +92,13 @@ export type AppShellProps = {
   isAdmin?: boolean;
   /** Open morning-light check-in on first paint (e.g. after onboarding ?sunrise=1) */
   forceSunriseCheckIn?: boolean;
+  /** Server truth — skip check-in when keystone already logged today */
+  morningLightLogged?: boolean;
   /** Open admin sheet on first paint (e.g. ?t=admin) */
   initialOpenAdmin?: boolean;
   history: HistoryRow[];
   lifetimePoints: number;
-  leaderboards: LeaderboardBoards;
-  friends: FriendRow[];
+  leaderboards?: LeaderboardBoards | null;
   reminders: ReminderRow[];
   reminderSunPresets?: {
     sunrise?: string | null;
@@ -104,6 +106,7 @@ export type AppShellProps = {
     beforeSunset?: string | null;
     afterSunrise?: string | null;
   };
+  appContent: AppContentBundle;
 };
 
 /**
@@ -148,26 +151,35 @@ export function AppShell({
   currentUserId,
   isAdmin = false,
   forceSunriseCheckIn = false,
+  morningLightLogged = false,
   initialOpenAdmin = false,
   history,
   lifetimePoints,
   leaderboards,
-  friends,
   reminders,
   reminderSunPresets,
+  appContent,
 }: AppShellProps) {
   const [tab, setTabState] = useState<AppTab>(initialTab);
   const [sheet, setSheet] = useState<AppSheetState | null>(
     initialOpenAdmin && isAdmin ? { id: "admin" } : null,
+  );
+  const [adminContentFocus, setAdminContentFocus] = useState<string | null>(
+    null,
   );
   const [accountSection, setAccountSection] =
     useState<AccountSection>(initialAccountSection);
   const [availableIds, setAvailableIds] = useState(initialAvailableIds);
   const [sunriseMultiplier, setSunriseMultiplier] =
     useState(initialSunriseMult);
+  const [morningLightDone, setMorningLightDone] = useState(morningLightLogged);
   const [sunriseTierLabel, setSunriseTierLabel] = useState(
     initialSunriseTierLabel,
   );
+
+  useEffect(() => {
+    setMorningLightDone(morningLightLogged);
+  }, [morningLightLogged]);
 
   useEffect(() => {
     setSunriseMultiplier(initialSunriseMult);
@@ -228,35 +240,37 @@ export function AppShell({
     }
   }, []);
 
-  const closeSheet = useCallback(() => setSheet(null), []);
-
-  const openAccountFriends = useCallback(() => {
-    setAccountSection("friends");
-    setTabState("account");
-    setSheet(null);
+  const openAdminContent = useCallback((focus: string) => {
+    setAdminContentFocus(focus);
+    setSheet({ id: "admin" });
     try {
-      window.history.replaceState(null, "", ROUTES.friends);
+      window.history.replaceState(null, "", ROUTES.admin);
     } catch {
       /* ignore */
     }
-    try {
-      window.scrollTo({ top: 0, behavior: "auto" });
-    } catch {
-      window.scrollTo(0, 0);
-    }
+  }, []);
+
+  const closeSheet = useCallback(() => {
+    setSheet(null);
+    setAdminContentFocus(null);
   }, []);
 
   return (
+    <AppContentProvider content={appContent}>
     <div className="min-h-screen pb-[calc(6rem+var(--site-disclaimer-offset))] md:pb-[calc(4rem+var(--site-disclaimer-offset))]">
       <SunriseCheckIn
         userId={currentUserId}
         todayIso={todayIso}
         sunriseMultiplier={sunriseMultiplier}
+        morningLightLogged={morningLightDone}
         allProtocols={allProtocols}
         sun={sun}
         timeZone={timeZone}
         forceOpen={forceSunriseCheckIn}
-        onLogged={(mult) => setSunriseMultiplier(mult)}
+        onLogged={(mult) => {
+          setMorningLightDone(true);
+          setSunriseMultiplier(mult);
+        }}
       />
 
       <header
@@ -355,10 +369,14 @@ export function AppShell({
         {sheet?.id === "admin" && (
           <AppSheet
             title="Admin"
-            subtitle="Users, profiles, and catalog"
+            subtitle="Users, profiles, and editable content"
             onClose={closeSheet}
           >
-            <AdminPanel allowed={isAdmin} currentUserId={currentUserId} />
+            <AdminPanel
+              allowed={isAdmin}
+              currentUserId={currentUserId}
+              contentFocus={adminContentFocus}
+            />
           </AppSheet>
         )}
 
@@ -426,13 +444,18 @@ export function AppShell({
             initialSection={initialTodaySection}
             leaderboards={leaderboards}
             currentUserId={currentUserId}
-            onOpenFriends={openAccountFriends}
             onOpenSheet={openSheet}
+            isAdmin={isAdmin}
+            onAdminEditContent={openAdminContent}
           />
         )}
 
         {!sheet && tab === "mitoversity" && (
-          <MitoversityHome initialEntryId={initialMitoLesson} />
+          <MitoversityHome
+            initialEntryId={initialMitoLesson}
+            isAdmin={isAdmin}
+            onAdminEditContent={openAdminContent}
+          />
         )}
 
         {!sheet && tab === "account" && (
@@ -442,7 +465,6 @@ export function AppShell({
             history={history}
             lifetimePoints={lifetimePoints}
             isAdmin={isAdmin}
-            friends={friends}
             reminders={reminders}
             reminderSunPresets={reminderSunPresets}
             onOpenSheet={openSheet}
@@ -496,5 +518,6 @@ export function AppShell({
         </ul>
       </nav>
     </div>
+    </AppContentProvider>
   );
 }

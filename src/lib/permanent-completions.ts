@@ -8,7 +8,7 @@ import {
 } from "@/db/schema";
 import {
   ensureProtocolInDb,
-  getCatalogProtocolById,
+  getMergedCatalogProtocolById,
 } from "@/lib/catalog";
 import { getUserFavoriteIds } from "@/lib/favorites";
 import {
@@ -101,7 +101,7 @@ export async function ensurePermanentCompletions(
   let streakAwarded = false;
 
   for (const protocolId of targets) {
-    const protocol = getCatalogProtocolById(protocolId);
+    const protocol = await getMergedCatalogProtocolById(protocolId);
     if (!protocol || protocol.allowsMultiple) continue;
 
     const [skipped] = await db

@@ -229,6 +229,15 @@ export function isSunriseKeystoneProtocolId(protocolId: string): boolean {
   return sunriseTierForProtocolId(protocolId) != null;
 }
 
+/** True when any morning-light keystone was logged today (even at 1× boost). */
+export function hasMorningLightLoggedToday(
+  completionCounts: Record<string, number>,
+): boolean {
+  return Object.entries(completionCounts).some(
+    ([id, count]) => count > 0 && isSunriseKeystoneProtocolId(id),
+  );
+}
+
 /** Morning-light keystones are logged via the daily check-in, not the catalog. */
 export function isCatalogSelectableProtocol(protocol: {
   id?: string | null;

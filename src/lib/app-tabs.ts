@@ -9,12 +9,7 @@ export type AppTab = (typeof APP_TABS)[number];
 
 export type TodaySection = "checklist" | "place" | "catalog" | "leaderboard";
 
-export type AccountSection =
-  | "history"
-  | "friends"
-  | "reminders"
-  | "profile"
-  | null;
+export type AccountSection = "history" | "reminders" | "profile" | null;
 
 export function isAppTab(value: string | null | undefined): value is AppTab {
   return (
@@ -37,12 +32,7 @@ export function isTodaySection(
 export function isAccountSection(
   value: string | null | undefined,
 ): value is NonNullable<AccountSection> {
-  return (
-    value === "history" ||
-    value === "friends" ||
-    value === "reminders" ||
-    value === "profile"
-  );
+  return value === "history" || value === "reminders" || value === "profile";
 }
 
 export function tabFromSearchParam(
