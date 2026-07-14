@@ -99,15 +99,13 @@ export async function deleteProtocolAction(id: string) {
 
 export async function listAdminProtocolsAction() {
   await requireAdmin();
-  const rows = await db
-    .select({
-      id: protocols.id,
-      name: protocols.name,
-      category: protocols.category,
-      points: protocols.points,
-      active: protocols.active,
-    })
-    .from(protocols)
-    .orderBy(protocols.sortOrder);
-  return rows;
+  // Catalog is local seed-data.ts; list that (synced to DB for FKs)
+  const { getCatalogProtocols } = await import("@/lib/catalog");
+  return getCatalogProtocols().map((p) => ({
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    points: p.points,
+    active: p.active,
+  }));
 }

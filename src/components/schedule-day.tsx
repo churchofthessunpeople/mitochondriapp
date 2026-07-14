@@ -1,13 +1,7 @@
 "use client";
 
 import { Check, Flame, Minus, Plus, Timer, X } from "lucide-react";
-import {
-  useEffect,
-  useMemo,
-  useOptimistic,
-  useState,
-  useTransition,
-} from "react";
+import { useMemo, useOptimistic, useState, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
 import {
   logCompletionAction,
@@ -18,13 +12,17 @@ import {
   isMagnetismKeystoneId,
   isWaterKeystoneId,
 } from "@/lib/lwm";
+import { SunriseKeystoneDialog } from "@/components/sunrise-keystone-dialog";
 import {
   formatSunriseMultiplier,
   isSunriseKeystoneProtocol,
   maxLogsPerDay,
   pointsForLog,
+  type SunriseModifiers,
+  type SunriseTier,
 } from "@/lib/scoring";
 import type { WeeklySummary } from "@/lib/weekly";
+import type { SunTimes } from "@/lib/sun";
 import { useToast } from "@/components/toast";
 import { cn, formatPoints } from "@/lib/utils";
 
@@ -46,6 +44,9 @@ type Props = {
   /** Best morning-light multiplier for the day (1 = none) */
   sunriseMultiplier?: number;
   sunriseTierLabel?: string | null;
+  sun?: SunTimes | null;
+  timeZone?: string;
+  allProtocols?: Protocol[];
   onStatsChange?: (s: {
     dayPoints: number;
     streak: { current: number; best: number };
@@ -68,6 +69,9 @@ export function ScheduleDay({
   weekly,
   sunriseMultiplier: initialMult = 1,
   sunriseTierLabel: initialTierLabel = null,
+  sun = null,
+  timeZone = "UTC",
+  allProtocols,
   onStatsChange,
   onCompletionCountsChange,
 }: Props) {
@@ -79,29 +83,27 @@ export function ScheduleDay({
   const [sunriseTierLabel, setSunriseTierLabel] = useState(initialTierLabel);
   const [durationFor, setDurationFor] = useState<Protocol | null>(null);
   const [durationMins, setDurationMins] = useState(15);
+  const [sunriseKeystoneFor, setSunriseKeystoneFor] = useState<Protocol | null>(
+    null,
+  );
 
   const [counts, setCounts] = useOptimistic(
     completionCounts,
     (
       current: Record<string, number>,
       update: { protocolId: string; delta: number; absolute?: number },
-    ) => {
-      const next = { ...current };
-      if (update.absolute != null) {
-        if (update.absolute <= 0) delete next[update.protocolId];
-        else next[update.protocolId] = update.absolute;
-        return next;
-      }
-      const v = Math.max(0, (next[update.protocolId] ?? 0) + update.delta);
-      if (v === 0) delete next[update.protocolId];
-      else next[update.protocolId] = v;
-      return next;
-    },
+    ) => applyCountUpdate(current, update),
   );
 
-  useEffect(() => {
-    onCompletionCountsChange?.(counts);
-  }, [counts, onCompletionCountsChange]);
+  /** Update optimistic counts and notify parent (no useEffect — avoids render loops). */
+  function bumpCounts(update: {
+    protocolId: string;
+    delta: number;
+    absolute?: number;
+  }) {
+    setCounts(update);
+    onCompletionCountsChange?.(applyCountUpdate(counts, update));
+  }
 
   const { suggested, rest } = useMemo(
     () =>
@@ -132,7 +134,7 @@ export function ScheduleDay({
     }
     onStatsChange?.({ dayPoints: snap.dayPoints, streak: snap.streak });
     if (snap.protocolId != null && snap.count != null) {
-      setCounts({
+      bumpCounts({
         protocolId: snap.protocolId,
         delta: 0,
         absolute: snap.count,
@@ -159,10 +161,14 @@ export function ScheduleDay({
       setDurationMins(protocol.referenceMinutes || 15);
       return;
     }
+    const count = counts[protocol.id] ?? 0;
+    if (count === 0 && isSunriseKeystoneProtocol(protocol)) {
+      setSunriseKeystoneFor(protocol);
+      return;
+    }
     start(async () => {
       try {
-        const count = counts[protocol.id] ?? 0;
-        setCounts({ protocolId: protocol.id, delta: count > 0 ? -1 : 1 });
+        bumpCounts({ protocolId: protocol.id, delta: count > 0 ? -1 : 1 });
         const res = await logCompletionAction(protocol.id);
         applySnap({ ...res, protocolId: protocol.id });
         if (res.action === "added") {
@@ -184,6 +190,29 @@ export function ScheduleDay({
     });
   }
 
+  function logSunriseKeystone(
+    protocol: Protocol,
+    tier: SunriseTier,
+    modifiers: SunriseModifiers,
+  ) {
+    start(async () => {
+      try {
+        bumpCounts({ protocolId: protocol.id, delta: 1 });
+        const res = await logCompletionAction(protocol.id, { sunriseModifiers: modifiers });
+        applySnap({ ...res, protocolId: protocol.id });
+        setSunriseKeystoneFor(null);
+        const boost =
+          res.sunriseMultiplier > 1
+            ? ` · ${formatSunriseMultiplier(res.sunriseMultiplier)} day boost`
+            : "";
+        push(`${tier.shortLabel} · +${res.points} pts${boost}`);
+      } catch (e) {
+        bumpCounts({ protocolId: protocol.id, delta: -1 });
+        push(e instanceof Error ? e.message : "Could not log", "err");
+      }
+    });
+  }
+
   function addOne(protocol: Protocol, durationMinutes?: number) {
     start(async () => {
       try {
@@ -198,7 +227,7 @@ export function ScheduleDay({
           setDurationMins(protocol.referenceMinutes || 15);
           return;
         }
-        setCounts({ protocolId: protocol.id, delta: 1 });
+        bumpCounts({ protocolId: protocol.id, delta: 1 });
         const res = await logCompletionAction(protocol.id, {
           durationMinutes,
         });
@@ -222,7 +251,7 @@ export function ScheduleDay({
       try {
         const count = counts[protocol.id] ?? 0;
         if (count <= 0) return;
-        setCounts({ protocolId: protocol.id, delta: -1 });
+        bumpCounts({ protocolId: protocol.id, delta: -1 });
         const res = await removeOneCompletionAction(protocol.id);
         applySnap({ ...res, protocolId: protocol.id });
         push("−1 removed");
@@ -522,8 +551,35 @@ export function ScheduleDay({
           </div>
         </div>
       )}
+      {sunriseKeystoneFor ? (
+        <SunriseKeystoneDialog
+          allProtocols={allProtocols ?? protocols}
+          sun={sun}
+          timeZone={timeZone}
+          pending={pending}
+          initialProtocol={sunriseKeystoneFor}
+          onLog={logSunriseKeystone}
+          onCancel={() => setSunriseKeystoneFor(null)}
+        />
+      ) : null}
     </div>
   );
+}
+
+function applyCountUpdate(
+  current: Record<string, number>,
+  update: { protocolId: string; delta: number; absolute?: number },
+): Record<string, number> {
+  const next = { ...current };
+  if (update.absolute != null) {
+    if (update.absolute <= 0) delete next[update.protocolId];
+    else next[update.protocolId] = update.absolute;
+    return next;
+  }
+  const v = Math.max(0, (next[update.protocolId] ?? 0) + update.delta);
+  if (v === 0) delete next[update.protocolId];
+  else next[update.protocolId] = v;
+  return next;
 }
 
 function DayStats({

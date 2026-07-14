@@ -3,12 +3,11 @@
 import { and, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
+import { userFavorites, userScheduleItems, type TimeOfDay } from "@/db/schema";
 import {
-  protocols,
-  userFavorites,
-  userScheduleItems,
-  type TimeOfDay,
-} from "@/db/schema";
+  ensureCatalogSyncedToDb,
+  getCatalogProtocolById,
+} from "@/lib/catalog";
 import { revalidateApp } from "@/lib/revalidate-app";
 import { canAssignToSlot } from "@/lib/schedule-rules";
 import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
@@ -30,12 +29,8 @@ export async function addToScheduleAction(
   const userId = await requireUserId();
   if (!isTimeOfDay(timeOfDay)) throw new Error("Invalid time of day");
 
-  const [protocol] = await db
-    .select()
-    .from(protocols)
-    .where(and(eq(protocols.id, protocolId), eq(protocols.active, true)))
-    .limit(1);
-
+  await ensureCatalogSyncedToDb();
+  const protocol = getCatalogProtocolById(protocolId);
   if (!protocol) throw new Error("Activity not found");
   if (!canAssignToSlot(protocol, timeOfDay)) {
     throw new Error(
@@ -111,11 +106,8 @@ export async function moveScheduleItemAction(
 
   if (!item) throw new Error("Schedule item not found");
 
-  const [protocol] = await db
-    .select()
-    .from(protocols)
-    .where(eq(protocols.id, item.protocolId))
-    .limit(1);
+  await ensureCatalogSyncedToDb();
+  const protocol = getCatalogProtocolById(item.protocolId);
 
   if (!protocol || !canAssignToSlot(protocol, timeOfDay)) {
     throw new Error(

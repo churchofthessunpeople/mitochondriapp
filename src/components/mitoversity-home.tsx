@@ -1,0 +1,236 @@
+"use client";
+
+import { ChevronRight, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  MITO_PILLAR_LABEL,
+  MITOVERSITY_ENTRIES,
+  type MitoEntry,
+  type MitoPillar,
+} from "@/lib/mitoversity";
+import { cn } from "@/lib/utils";
+
+const PILLAR_FILTERS: { id: MitoPillar | "all"; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "light", label: "Light" },
+  { id: "water", label: "Water" },
+  { id: "magnetism", label: "Magnetism" },
+  { id: "support", label: "Support" },
+];
+
+/**
+ * Mitoversity: research-style lessons on mitochondrial lifestyle levers.
+ * Expand entries in src/lib/mitoversity.ts.
+ */
+export function MitoversityHome({
+  initialEntryId,
+}: {
+  initialEntryId?: string | null;
+}) {
+  const [pillar, setPillar] = useState<MitoPillar | "all">("all");
+  const [openId, setOpenId] = useState<string | null>(
+    initialEntryId && entryExists(initialEntryId) ? initialEntryId : null,
+  );
+
+  const entries = useMemo(() => {
+    if (pillar === "all") return [...MITOVERSITY_ENTRIES];
+    return MITOVERSITY_ENTRIES.filter((e) => e.pillar === pillar);
+  }, [pillar]);
+
+  const openEntry = openId
+    ? MITOVERSITY_ENTRIES.find((e) => e.id === openId) ?? null
+    : null;
+
+  // Escape + body scroll lock while article is open
+  useEffect(() => {
+    if (!openEntry) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenId(null);
+    };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [openEntry]);
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <p className="text-xs uppercase tracking-[0.18em] text-accent">
+          Learn
+        </p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+          Mitoversity
+        </h1>
+        <p className="mt-1.5 text-sm text-muted">
+          Stand-alone explainers on light, water, magnetism, and support
+          habits for mitochondrial lifestyle tracking. Where a claim is
+          specific to Dr. Jack Kruse&apos;s public teaching, it is cited as
+          such.
+        </p>
+      </div>
+
+      <div className="flex gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {PILLAR_FILTERS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setPillar(f.id)}
+            className={cn(
+              "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition",
+              pillar === f.id
+                ? "bg-accent text-on-accent"
+                : "border border-border text-muted hover:text-foreground",
+            )}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {entries.length === 0 ? (
+        <div className="glass rounded-3xl border border-dashed border-border px-5 py-10 text-center text-sm text-muted">
+          No lessons in this category yet. Check back as Mitoversity grows.
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {entries.map((entry) => (
+            <li key={entry.id}>
+              <EntryListCard
+                entry={entry}
+                onOpen={() => setOpenId(entry.id)}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="text-center text-[11px] leading-relaxed text-muted">
+        Educational only — not medical advice. Research summaries and lifestyle
+        frameworks are for personal learning, not diagnosis or treatment.
+      </p>
+
+      {openEntry && (
+        <ArticleModal entry={openEntry} onClose={() => setOpenId(null)} />
+      )}
+    </div>
+  );
+}
+
+function entryExists(id: string) {
+  return MITOVERSITY_ENTRIES.some((e) => e.id === id);
+}
+
+function EntryListCard({
+  entry,
+  onOpen,
+}: {
+  entry: MitoEntry;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="glass flex w-full items-start gap-3 rounded-3xl border border-border px-4 py-4 text-left transition hover:border-accent/35 sm:px-5"
+    >
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-accent">
+          {MITO_PILLAR_LABEL[entry.pillar]}
+        </p>
+        <p className="mt-1 text-base font-semibold tracking-tight text-foreground">
+          {entry.title}
+        </p>
+        <p className="mt-1.5 text-xs leading-relaxed text-muted">
+          {entry.summary}
+        </p>
+      </div>
+      <ChevronRight
+        className="mt-1 h-5 w-5 shrink-0 text-muted"
+        aria-hidden
+      />
+    </button>
+  );
+}
+
+function ArticleModal({
+  entry,
+  onClose,
+}: {
+  entry: MitoEntry;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/55 p-3 sm:items-center sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mito-article-title"
+      onClick={onClose}
+    >
+      <div
+        className="glass flex max-h-[min(92dvh,900px)] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-accent/25 shadow-xl sm:max-w-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Sticky header */}
+        <div className="flex shrink-0 items-start gap-3 border-b border-border px-4 py-4 sm:px-5">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-accent">
+              {MITO_PILLAR_LABEL[entry.pillar]}
+            </p>
+            <h2
+              id="mito-article-title"
+              className="mt-1 text-lg font-semibold tracking-tight text-foreground sm:text-xl"
+            >
+              {entry.title}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl p-1.5 text-muted transition hover:bg-foreground/5 hover:text-foreground"
+            aria-label="Close article"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Scrollable body — stays in view without page scroll hunting */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
+          <p className="text-sm leading-relaxed text-muted">{entry.summary}</p>
+          <div className="mt-5 space-y-5">
+            {entry.sections.map((s) => (
+              <section key={s.heading} className="space-y-1.5">
+                <h3 className="text-sm font-semibold text-foreground">
+                  {s.heading}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted">{s.body}</p>
+              </section>
+            ))}
+          </div>
+          {entry.relatedProtocolIds && entry.relatedProtocolIds.length > 0 && (
+            <p className="mt-6 text-[11px] text-muted">
+              Related checklist habits:{" "}
+              <span className="text-foreground/90">
+                {entry.relatedProtocolIds.join(" · ")}
+              </span>
+            </p>
+          )}
+        </div>
+
+        <div className="shrink-0 border-t border-border px-4 py-3 sm:px-5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-primary h-11 w-full rounded-2xl text-sm font-semibold"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

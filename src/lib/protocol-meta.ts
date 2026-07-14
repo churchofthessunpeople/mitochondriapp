@@ -33,6 +33,14 @@ const META: Record<string, ProtocolMeta> = {
     equipment: "none",
     how: "Prefer seafood, quality fats, C3 plants — Water keystone meal.",
   },
+  "carbonated-water": {
+    equipment: "optional",
+    how: "Home carbonator or unsweetened sparkling / natural mineral water — not sugary soda.",
+  },
+  "magnetico-sleep-pad": {
+    equipment: "required",
+    how: "Magnetico under mattress / box spring (≥4″ spacer), not on top of bed; correct N-hemisphere negative polarity. Phone away from bed if you can.",
+  },
   "morning-natural-light": {
     equipment: "none",
     how: "Step outside under open sky — windows don't count as full spectrum.",
@@ -65,10 +73,6 @@ const META: Record<string, ProtocolMeta> = {
     equipment: "optional",
     how: "Dim screens, warm bulbs, or blue blockers after sunset.",
   },
-  "candle-firelight": {
-    equipment: "optional",
-    how: "Candles, fire, or very warm low-lux only after dark.",
-  },
   "dark-bedroom": {
     equipment: "optional",
     how: "Blackout or eye mask; cover LEDs.",
@@ -83,7 +87,7 @@ const META: Record<string, ProtocolMeta> = {
   },
   "mastic-gum": {
     equipment: "required",
-    how: "Only if you have mastic gum — skip otherwise.",
+    how: "Chew real Chios mastic resin/gum (not candy gum), both sides, 5–20 min. Skip if jaw/TMJ pain or no gum on hand.",
   },
   "mineralized-water": {
     equipment: "optional",

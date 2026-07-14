@@ -1,3 +1,12 @@
+/**
+ * LOCAL ACTIVITY CATALOG — source of truth (like Mitoversity articles).
+ *
+ * Edit this file to add/change/remove activities, then restart `npm run dev`.
+ * Neon auto-syncs these rows for favorites/logs FKs; you do not need db:seed
+ * just to try a new activity locally.
+ *
+ * Optional how-to / equipment: src/lib/protocol-meta.ts
+ */
 import type { ProtocolCategory, TimeOfDay } from "./schema";
 
 export type ProtocolSeed = {
@@ -155,16 +164,6 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 12,
   }),
   p({
-    id: "sunset-grounding",
-    name: "Sunset grounding",
-    description: "Barefoot earth contact during the sunset window.",
-    points: 7,
-    category: "grounding",
-    timeOfDay: "sunset",
-    lockedTimeOfDay: "sunset",
-    sortOrder: 31,
-  }),
-  p({
     id: "nature-contact",
     name: "Nature immersion",
     description: "Green/blue space away from dense artificial light and RF.",
@@ -201,6 +200,18 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     allowsMultiple: true,
     maxPerDay: 6,
     sortOrder: 50,
+  }),
+  p({
+    id: "carbonated-water",
+    name: "Carbonated / sparkling water",
+    description:
+      "Unsweetened sparkling or carbonated mineral water (not soda). CO₂-rich hydration habit.",
+    points: 4,
+    category: "water_food",
+    timeOfDay: "anytime",
+    allowsMultiple: true,
+    maxPerDay: 6,
+    sortOrder: 51,
   }),
   p({
     id: "hydration-timing",
@@ -310,6 +321,17 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 61,
   }),
   p({
+    id: "magnetico-sleep-pad",
+    name: "Magnetico sleep pad",
+    description:
+      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Not dual-polar top-of-bed pads. Equipment required.",
+    points: 6,
+    category: "emf",
+    timeOfDay: "night",
+    lockedTimeOfDay: "night",
+    sortOrder: 63,
+  }),
+  p({
     id: "morning-movement",
     name: "Mitochondrial movement",
     description: "Zone 2, resistance, or play outside in daylight.",
@@ -326,7 +348,8 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "mastic-gum",
     name: "Mastic gum chewing",
-    description: "Chew mastic gum for jaw tone and oral rest from snacking.",
+    description:
+      "Chew real Chios mastic resin/gum for intentional jaw load and a non-snack oral habit. Not candy gum. Equipment required.",
     points: 3,
     category: "movement",
     timeOfDay: "anytime",
@@ -345,15 +368,6 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     category: "sleep",
     timeOfDay: "evening",
     sortOrder: 40,
-  }),
-  p({
-    id: "candle-firelight",
-    name: "Candle / firelight evening",
-    description: "Fire, candles, or very warm low lux after dark.",
-    points: 6,
-    category: "sleep",
-    timeOfDay: "evening",
-    sortOrder: 41,
   }),
   p({
     id: "dark-bedroom",

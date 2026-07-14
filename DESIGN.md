@@ -57,10 +57,10 @@ Register / log in
 | Destination | URL | Role |
 |-------------|-----|------|
 | **Today** | `/app` | Daily log, place, catalog |
-| **Kruseiversity** | `/app?t=kruseiversity` | Why actions matter (Kruse-style teaching); expandable lessons |
+| **Mitoversity** | `/app?t=mitoversity` | Research-style lessons on light/water/magnetism; Kruse cited where his theories are specific |
 | **Account** | `/app?t=account` (and deep links) | Profile, social, history |
 
-Bottom nav: **Today · Learn · Account**. Lessons live in `src/lib/kruseiversity.ts` (add entries over time).
+Bottom nav: **Today · Learn · Account**. Lessons live in `src/lib/mitoversity.ts` (add entries over time).
 
 ### 3.2 Today sections (in-page tabs, not routes)
 

@@ -4,15 +4,22 @@ import { and, desc, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
+import {
+  ensureCatalogSyncedToDb,
+  getCatalogProtocolById,
+} from "@/lib/catalog";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { revalidateApp } from "@/lib/revalidate-app";
 import {
-  bestSunriseTier,
+  bestSunriseMultiplier,
+  computeSunriseMultiplier,
   isSunriseKeystoneProtocol,
   maxLogsPerDay,
   pointsForLog,
   streakBonusPoints,
+  sunriseTierForProtocolId,
+  type SunriseModifiers,
   type SunriseTier,
 } from "@/lib/scoring";
 import { getUserStreak, hasStreakBonusToday } from "@/lib/streaks";
@@ -92,7 +99,10 @@ export async function getSunriseBuffToday(
 ): Promise<SunriseBuffState> {
   try {
     const rows = await db
-      .select({ protocolId: dailyCompletions.protocolId })
+      .select({
+        protocolId: dailyCompletions.protocolId,
+        sunriseBuffMultiplier: dailyCompletions.sunriseBuffMultiplier,
+      })
       .from(dailyCompletions)
       .where(
         and(
@@ -102,11 +112,12 @@ export async function getSunriseBuffToday(
         ),
       );
 
-    const tier = bestSunriseTier(rows.map((r) => r.protocolId));
-    return {
-      multiplier: tier?.multiplier ?? 1,
-      tier,
-    };
+    return bestSunriseMultiplier(
+      rows.map((r) => ({
+        protocolId: r.protocolId,
+        multiplier: r.sunriseBuffMultiplier,
+      })),
+    );
   } catch {
     return { multiplier: 1, tier: null };
   }
@@ -168,17 +179,18 @@ async function recomputeDayPoints(
 
 export async function logCompletionAction(
   protocolId: string,
-  options?: { timeOfDay?: TimeOfDay | null; durationMinutes?: number | null },
+  options?: {
+    timeOfDay?: TimeOfDay | null;
+    durationMinutes?: number | null;
+    sunriseModifiers?: SunriseModifiers;
+  },
 ): Promise<CompletionResult> {
   const userId = await requireUser();
   const completedOn = await userToday(userId);
 
-  const [protocol] = await db
-    .select()
-    .from(protocols)
-    .where(and(eq(protocols.id, protocolId), eq(protocols.active, true)))
-    .limit(1);
-
+  // Catalog is local (seed-data.ts); sync so Neon FKs accept the protocolId
+  await ensureCatalogSyncedToDb();
+  const protocol = getCatalogProtocolById(protocolId);
   if (!protocol) throw new Error("Activity not found");
 
   const slot =
@@ -231,12 +243,21 @@ export async function logCompletionAction(
     sunriseMultiplier: multForThisLog,
   });
 
+  const tier = wasKeystone ? sunriseTierForProtocolId(protocolId) : null;
+  const sunriseBuffMultiplier =
+    wasKeystone && tier
+      ? options?.sunriseModifiers
+        ? computeSunriseMultiplier(tier, options.sunriseModifiers)
+        : tier.multiplier
+      : null;
+
   await db.insert(dailyCompletions).values({
     userId,
     protocolId,
     completedOn,
     timeOfDay: slot,
     durationMinutes: options?.durationMinutes ?? null,
+    sunriseBuffMultiplier,
     pointsEarned: points,
     isStreakBonus: false,
   });

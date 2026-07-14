@@ -3,7 +3,11 @@
 import { and, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { protocols, userFavorites, userScheduleItems } from "@/db/schema";
+import { userFavorites, userScheduleItems } from "@/db/schema";
+import {
+  ensureCatalogSyncedToDb,
+  getCatalogProtocolById,
+} from "@/lib/catalog";
 import { revalidateApp } from "@/lib/revalidate-app";
 
 async function requireUserId() {
@@ -23,12 +27,10 @@ function revalidateAvailable() {
 export async function toggleFavoriteAction(protocolId: string) {
   const userId = await requireUserId();
 
-  const [protocol] = await db
-    .select({ id: protocols.id })
-    .from(protocols)
-    .where(and(eq(protocols.id, protocolId), eq(protocols.active, true)))
-    .limit(1);
-  if (!protocol) throw new Error("Activity not found");
+  await ensureCatalogSyncedToDb();
+  if (!getCatalogProtocolById(protocolId)) {
+    throw new Error("Activity not found");
+  }
 
   const [existing] = await db
     .select()

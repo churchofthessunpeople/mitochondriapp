@@ -44,10 +44,10 @@ export function AppChrome({
               Today
             </Link>
             <Link
-              href={ROUTES.kruseiversity}
+              href={ROUTES.mitoversity}
               className="hidden rounded-full px-3 py-1.5 text-sm text-muted transition hover:text-foreground sm:inline"
             >
-              Kruseiversity
+              Mitoversity
             </Link>
             <Link
               href={ROUTES.account}

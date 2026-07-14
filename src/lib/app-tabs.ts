@@ -1,9 +1,9 @@
 /**
- * Bottom nav: Today · Kruseiversity · Account.
+ * Bottom nav: Today · Mitoversity · Account.
  * Deep links like ?t=leaderboard open Account with that section.
- * ?t=kruseiversity opens the learn tab.
+ * ?t=mitoversity opens the learn tab.
  */
-export const APP_TABS = ["schedule", "kruseiversity", "account"] as const;
+export const APP_TABS = ["schedule", "mitoversity", "account"] as const;
 
 export type AppTab = (typeof APP_TABS)[number];
 
@@ -17,7 +17,7 @@ export type AccountSection =
 
 export function isAppTab(value: string | null | undefined): value is AppTab {
   return (
-    value === "schedule" || value === "kruseiversity" || value === "account"
+    value === "schedule" || value === "mitoversity" || value === "account"
   );
 }
 
@@ -38,8 +38,15 @@ export function tabFromSearchParam(
 ): AppTab {
   const v = Array.isArray(raw) ? raw[0] : raw;
   if (v === "place" || v === "activities" || v === "today") return "schedule";
-  if (v === "learn" || v === "kruse" || v === "university") {
-    return "kruseiversity";
+  // Legacy alias
+  if (
+    v === "learn" ||
+    v === "mitoversity" ||
+    v === "kruseiversity" ||
+    v === "kruse" ||
+    v === "university"
+  ) {
+    return "mitoversity";
   }
   if (isAccountSection(v)) return "account";
   return isAppTab(v) ? v : "schedule";
@@ -54,8 +61,8 @@ export function accountSectionFromSearchParam(
   return null;
 }
 
-/** Optional lesson to expand on Kruseiversity deep link ?lesson=sunrise-why */
-export function kruseLessonFromSearchParam(
+/** Optional lesson to expand on Mitoversity deep link ?lesson=sunrise-why */
+export function mitoLessonFromSearchParam(
   raw: string | string[] | undefined,
 ): string | null {
   const v = Array.isArray(raw) ? raw[0] : raw;

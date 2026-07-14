@@ -66,11 +66,19 @@ Open [http://localhost:3000](http://localhost:3000).
 
 `GET /api/health` — DB ping for deploys/canaries.
 
-## Customizing protocols
+## Customizing activities (local catalog)
 
-Edit `src/db/seed-data.ts`, then `npm run db:seed`.
+**Source of truth:** `src/db/seed-data.ts` (same idea as Mitoversity lessons).
 
-Optional UX metadata (equipment / how-to) lives in `src/lib/protocol-meta.ts`.
+1. Edit / add protocols in that file  
+2. Restart the dev server (`npm run dev`)  
+3. Open Catalog and enable the activity on your list  
+
+Neon still stores **who logged what** (and favorites). Protocol definitions are
+synced into the DB automatically so foreign keys work — you usually don’t need
+`npm run db:seed` just to change the activity list.
+
+Optional UX metadata (equipment / how-to): `src/lib/protocol-meta.ts`.
 
 ### Volcanic anchors (magnetism score)
 

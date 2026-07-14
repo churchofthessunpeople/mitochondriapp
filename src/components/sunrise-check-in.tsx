@@ -1,18 +1,17 @@
 "use client";
 
-import { Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
+import { SunriseKeystoneDialog } from "@/components/sunrise-keystone-dialog";
 import { logCompletionAction } from "@/lib/actions/completions";
 import {
   formatSunriseMultiplier,
-  SUNRISE_TIERS,
+  type SunriseModifiers,
   type SunriseTier,
 } from "@/lib/scoring";
-import { formatTimeInZone, type SunTimes } from "@/lib/sun";
+import type { SunTimes } from "@/lib/sun";
 import { useToast } from "@/components/toast";
-import { cn } from "@/lib/utils";
 
 const DAY_KEY = (date: string) => `mito-sunrise-missed:${date}`;
 const SESSION_KEY = (date: string) => `mito-sunrise-session:${date}`;
@@ -28,7 +27,7 @@ type Props = {
 };
 
 /**
- * Daily morning-light accountability: pick a quality tier (2× / 1.5× / 1.25×).
+ * Daily morning-light accountability with tier + modifier questions.
  */
 export function SunriseCheckIn({
   todayIso,
@@ -43,19 +42,8 @@ export function SunriseCheckIn({
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
 
-  const tiersAvailable = useMemo(() => {
-    const byId = new Map(allProtocols.map((p) => [p.id, p]));
-    return SUNRISE_TIERS.map((tier) => ({
-      tier,
-      protocol: byId.get(tier.protocolId) ?? null,
-    })).filter((x) => x.protocol != null) as {
-      tier: SunriseTier;
-      protocol: Protocol;
-    }[];
-  }, [allProtocols]);
-
   useEffect(() => {
-    if (sunriseMultiplier > 1 || tiersAvailable.length === 0) {
+    if (sunriseMultiplier > 1) {
       setOpen(false);
       return;
     }
@@ -72,7 +60,7 @@ export function SunriseCheckIn({
       /* private mode */
     }
     setOpen(true);
-  }, [todayIso, sunriseMultiplier, tiersAvailable.length]);
+  }, [todayIso, sunriseMultiplier]);
 
   function dismissSession() {
     try {
@@ -93,10 +81,14 @@ export function SunriseCheckIn({
     setOpen(false);
   }
 
-  function logTier(protocol: Protocol, tier: SunriseTier) {
+  function logTier(
+    protocol: Protocol,
+    tier: SunriseTier,
+    modifiers: SunriseModifiers,
+  ) {
     start(async () => {
       try {
-        const res = await logCompletionAction(protocol.id);
+        const res = await logCompletionAction(protocol.id, { sunriseModifiers: modifiers });
         try {
           sessionStorage.setItem(SESSION_KEY(todayIso), "1");
           localStorage.removeItem(DAY_KEY(todayIso));
@@ -117,99 +109,18 @@ export function SunriseCheckIn({
     });
   }
 
-  if (!open || tiersAvailable.length === 0) return null;
-
-  const riseLabel = sun?.sunrise
-    ? formatTimeInZone(sun.sunrise, timeZone)
-    : null;
+  if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/55 p-4 sm:items-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="sunrise-check-title"
-    >
-      <div className="glass w-full max-w-md rounded-3xl p-5 shadow-xl sm:p-6">
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-accent/40 bg-accent/15 text-accent">
-            <Sun className="h-5 w-5" />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-accent">
-              Daily light check
-            </p>
-            <h2
-              id="sunrise-check-title"
-              className="mt-1 text-xl font-semibold tracking-tight"
-            >
-              Morning light — how did you do?
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted">
-              First light sets the day. Pick the best description that fits —
-              higher quality unlocks a stronger points boost on everything else
-              you log today.
-              {riseLabel ? (
-                <>
-                  {" "}
-                  Local sunrise ≈{" "}
-                  <span className="text-foreground">{riseLabel}</span>.
-                </>
-              ) : null}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-col gap-2">
-          {tiersAvailable.map(({ tier, protocol }) => (
-            <button
-              key={tier.id}
-              type="button"
-              disabled={pending}
-              onClick={() => logTier(protocol, tier)}
-              className={cn(
-                "rounded-2xl border px-4 py-3 text-left transition disabled:opacity-60",
-                tier.id === "horizon"
-                  ? "border-accent/40 bg-accent/10 hover:bg-accent/15"
-                  : "border-border bg-foreground/[0.02] hover:border-accent/30",
-              )}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-semibold text-foreground">
-                  {tier.shortLabel}
-                </span>
-                <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">
-                  {formatSunriseMultiplier(tier.multiplier)} day
-                </span>
-              </div>
-              <p className="mt-1 text-xs leading-relaxed text-muted">
-                {tier.description}
-                <span className="text-foreground/80">
-                  {" "}
-                  · +{protocol.points} pts
-                </span>
-              </p>
-            </button>
-          ))}
-
-          <button
-            type="button"
-            disabled={pending}
-            onClick={dismissSession}
-            className="btn-secondary mt-1 h-11 rounded-2xl text-sm font-semibold"
-          >
-            Not yet — ask me later
-          </button>
-          <button
-            type="button"
-            disabled={pending}
-            onClick={dismissDay}
-            className="h-10 rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
-          >
-            Missed it today — don&apos;t ask again until tomorrow
-          </button>
-        </div>
-      </div>
-    </div>
+    <SunriseKeystoneDialog
+      todayIso={todayIso}
+      allProtocols={allProtocols}
+      sun={sun}
+      timeZone={timeZone}
+      pending={pending}
+      onLog={logTier}
+      onDismissSession={dismissSession}
+      onDismissDay={dismissDay}
+    />
   );
 }

@@ -6,7 +6,7 @@
 export const ROUTES = {
   home: "/app",
   account: "/app?t=account",
-  kruseiversity: "/app?t=kruseiversity",
+  mitoversity: "/app?t=mitoversity",
   history: "/app?t=history",
   leaderboard: "/app?t=leaderboard",
   friends: "/app?t=friends",

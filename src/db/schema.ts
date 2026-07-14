@@ -230,6 +230,8 @@ export const dailyCompletions = pgTable("daily_completions", {
   completedOn: date("completed_on", { mode: "string" }).notNull(),
   timeOfDay: timeOfDayEnum("time_of_day"),
   durationMinutes: integer("duration_minutes"),
+  /** Effective day boost when this row is a morning-light keystone log */
+  sunriseBuffMultiplier: doublePrecision("sunrise_buff_multiplier"),
   pointsEarned: integer("points_earned").notNull(),
   isStreakBonus: boolean("is_streak_bonus").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),

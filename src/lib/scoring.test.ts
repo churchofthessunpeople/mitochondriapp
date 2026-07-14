@@ -2,12 +2,14 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   bestSunriseTier,
+  computeSunriseMultiplier,
   formatSunriseMultiplier,
   isSunriseKeystoneProtocol,
   isSunriseProtocol,
   maxLogsPerDay,
   pointsForLog,
   streakBonusPoints,
+  sunriseTierById,
   sunriseTierForProtocolId,
 } from "./scoring";
 
@@ -84,6 +86,32 @@ describe("sunrise tiers", () => {
   it("formats multipliers", () => {
     assert.equal(formatSunriseMultiplier(2), "2×");
     assert.equal(formatSunriseMultiplier(1.5), "1.5×");
+  });
+
+  it("applies modifier penalties from tier max", () => {
+    const horizon = sunriseTierById("horizon");
+    const ideal = {
+      grounded: true,
+      skin: "full" as const,
+      sunglasses: "none" as const,
+    };
+    assert.equal(computeSunriseMultiplier(horizon, ideal), 2);
+    assert.equal(
+      computeSunriseMultiplier(horizon, { ...ideal, sunglasses: "worn" }),
+      1.5,
+    );
+    assert.equal(
+      computeSunriseMultiplier(horizon, {
+        ...ideal,
+        skin: "partial",
+        grounded: false,
+      }),
+      1.5,
+    );
+    assert.equal(
+      computeSunriseMultiplier(sunriseTierById("open_sky"), ideal),
+      1.5,
+    );
   });
 });
 

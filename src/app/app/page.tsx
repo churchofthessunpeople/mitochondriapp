@@ -8,7 +8,7 @@ import { db } from "@/db";
 import { userReminders, users } from "@/db/schema";
 import {
   accountSectionFromSearchParam,
-  kruseLessonFromSearchParam,
+  mitoLessonFromSearchParam,
   tabFromSearchParam,
 } from "@/lib/app-tabs";
 import {
@@ -59,7 +59,7 @@ export default async function AppPage({
   const params = await searchParams;
   const initialTab = tabFromSearchParam(params.t);
   const initialAccountSection = accountSectionFromSearchParam(params.t);
-  const initialKruseLesson = kruseLessonFromSearchParam(params.lesson);
+  const initialMitoLesson = mitoLessonFromSearchParam(params.lesson);
   const h = await headers();
   const userId = session.user.id;
 
@@ -221,7 +221,7 @@ export default async function AppPage({
     <AppShell
       initialTab={initialTab}
       initialAccountSection={initialAccountSection}
-      initialKruseLesson={initialKruseLesson}
+      initialMitoLesson={initialMitoLesson}
       dateLabel={dateLabel}
       todayIso={date}
       allProtocols={allProtocols}

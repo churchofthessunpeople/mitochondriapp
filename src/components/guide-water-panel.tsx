@@ -53,10 +53,13 @@ export function GuideWaterPanel() {
           How we talk about ATP synthase
         </h2>
         <p>
-          Kruse-style teaching links deuterium load to mitochondrial water and
-          rotary efficiency of ATP production. This app tracks{" "}
-          <em>behaviors</em> that reduce heavy-water / high-D inputs in that
-          narrative. It does not measure your body deuterium or diagnose disease.
+          Established bioenergetics describes ATP synthase as a proton-driven
+          rotary enzyme. Dr. Jack Kruse&apos;s public teaching additionally
+          stresses environmental deuterium load as a lifestyle lever on that
+          water/hydrogen story. This app tracks{" "}
+          <em>behaviors</em> (hydration and meal patterns)—it does not measure
+          body deuterium or diagnose disease. See Mitoversity for the full
+          explainer.
         </p>
       </section>
 

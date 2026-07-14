@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  */
 const nav = [
   { href: ROUTES.home, label: "Today", key: "today" },
-  { href: ROUTES.kruseiversity, label: "Kruseiversity", key: "kruseiversity" },
+  { href: ROUTES.mitoversity, label: "Mitoversity", key: "mitoversity" },
   { href: ROUTES.account, label: "Account", key: "account" },
 ] as const;
 
@@ -29,8 +29,8 @@ export async function SiteHeader({
     active === "today" ||
     active === "home"
       ? "today"
-      : active === "kruseiversity" || active === "learn"
-        ? "kruseiversity"
+      : active === "mitoversity" || active === "learn" || active === "kruseiversity"
+        ? "mitoversity"
         : active === "history" ||
             active === "leaderboard" ||
             active === "account"

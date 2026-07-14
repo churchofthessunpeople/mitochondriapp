@@ -123,6 +123,7 @@ await sql`ALTER TABLE daily_completions DROP CONSTRAINT IF EXISTS user_protocol_
 await sql`DROP INDEX IF EXISTS user_protocol_day_uidx`;
 await sql`ALTER TABLE daily_completions ADD COLUMN IF NOT EXISTS time_of_day time_of_day`;
 await sql`ALTER TABLE daily_completions ADD COLUMN IF NOT EXISTS duration_minutes integer`;
+await sql`ALTER TABLE daily_completions ADD COLUMN IF NOT EXISTS sunrise_buff_multiplier double precision`;
 await sql`ALTER TABLE daily_completions ADD COLUMN IF NOT EXISTS is_streak_bonus boolean NOT NULL DEFAULT false`;
 
 // Rate limits

@@ -17,7 +17,7 @@ import { GuideLightPanel } from "@/components/guide-light-panel";
 import { GuideMagnetismPanel } from "@/components/guide-magnetism-panel";
 import { GuideWaterPanel } from "@/components/guide-water-panel";
 import { HistoryDayPanel } from "@/components/history-day-panel";
-import { KruseiversityHome } from "@/components/kruseiversity-home";
+import { MitoversityHome } from "@/components/mitoversity-home";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
 import { RegionBrowsePanel } from "@/components/region-browse-panel";
 import { ScoringGuidePanel } from "@/components/scoring-guide-panel";
@@ -41,8 +41,8 @@ const NAV: {
 }[] = [
   { id: "schedule", label: "Today", icon: CalendarCheck },
   {
-    id: "kruseiversity",
-    label: "Kruseiversity",
+    id: "mitoversity",
+    label: "Mitoversity",
     shortLabel: "Learn",
     icon: GraduationCap,
   },
@@ -54,8 +54,8 @@ const CACHE_KEY = "mitochondriapp-shell-v1";
 export type AppShellProps = {
   initialTab: AppTab;
   initialAccountSection?: AccountSection;
-  /** Deep-link lesson id for Kruseiversity (?lesson=) */
-  initialKruseLesson?: string | null;
+  /** Deep-link lesson id for Mitoversity (?lesson=) */
+  initialMitoLesson?: string | null;
   dateLabel: string;
   todayIso: string;
   allProtocols: Protocol[];
@@ -99,13 +99,13 @@ export type AppShellProps = {
 };
 
 /**
- * Today · Kruseiversity · Account.
+ * Today · Mitoversity · Account.
  * Scoring, regions, day detail, admin, guides open as in-page cards.
  */
 export function AppShell({
   initialTab,
   initialAccountSection = null,
-  initialKruseLesson = null,
+  initialMitoLesson = null,
   dateLabel,
   todayIso,
   allProtocols,
@@ -183,8 +183,8 @@ export function AppShell({
       const url =
         next === "schedule"
           ? ROUTES.home
-          : next === "kruseiversity"
-            ? ROUTES.kruseiversity
+          : next === "mitoversity"
+            ? ROUTES.mitoversity
             : ROUTES.account;
       window.history.replaceState(null, "", url);
     } catch {
@@ -364,8 +364,8 @@ export function AppShell({
           />
         )}
 
-        {!sheet && tab === "kruseiversity" && (
-          <KruseiversityHome initialEntryId={initialKruseLesson} />
+        {!sheet && tab === "mitoversity" && (
+          <MitoversityHome initialEntryId={initialMitoLesson} />
         )}
 
         {!sheet && tab === "account" && (

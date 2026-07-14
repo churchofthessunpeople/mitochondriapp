@@ -6,9 +6,19 @@ import type { Protocol } from "@/db/schema";
  */
 export type SunriseTierId = "horizon" | "open_sky" | "outside";
 
+export type SunriseSkinExposure = "full" | "partial";
+export type SunriseSunglasses = "none" | "worn";
+
+/** Answers from the morning-light check-in that adjust the day boost. */
+export type SunriseModifiers = {
+  grounded: boolean;
+  skin: SunriseSkinExposure;
+  sunglasses: SunriseSunglasses;
+};
+
 export type SunriseTier = {
   id: SunriseTierId;
-  /** Multiplier on non-keystone logs that day */
+  /** Max multiplier when tier + skin + eyes + grounding are ideal */
   multiplier: number;
   /** Higher = better (used to pick best of day) */
   rank: number;
@@ -28,7 +38,7 @@ export const SUNRISE_TIERS: readonly SunriseTier[] = [
     protocolId: "sunrise-horizon",
     shortLabel: "Horizon sunrise",
     description:
-      "Saw the sun come up over the horizon (eyes to the disk, no glass)",
+      "Saw the sun come up over the horizon (eyes to the disk, no glass). Up to 2× with exposed skin, no sunglasses, and grounding.",
   },
   {
     id: "open_sky",
@@ -36,7 +46,7 @@ export const SUNRISE_TIERS: readonly SunriseTier[] = [
     rank: 2,
     protocolId: "sunrise-open-sky",
     shortLabel: "Open-sky light",
-    description: "Outside under decent open skies in the morning",
+    description: "Outside under decent open skies in the morning. Up to 1.5× day boost.",
   },
   {
     id: "outside",
@@ -44,7 +54,8 @@ export const SUNRISE_TIERS: readonly SunriseTier[] = [
     rank: 1,
     protocolId: "sunrise-outside",
     shortLabel: "Outside morning",
-    description: "Outside in the morning with limited sky view (trees, streets, overcast)",
+    description:
+      "Outside in the morning with limited sky view (trees, streets, overcast). Up to 1.25× day boost.",
   },
 ] as const;
 
@@ -57,6 +68,47 @@ const LEGACY_SUNRISE_PROTOCOL_TIER: Record<string, SunriseTierId> = {
 const TIER_BY_ID = Object.fromEntries(
   SUNRISE_TIERS.map((t) => [t.id, t]),
 ) as Record<SunriseTierId, SunriseTier>;
+
+/** Penalties subtracted from the tier max (e.g. sunglasses: 2× → 1.5×). */
+export const SUNRISE_MODIFIER_PENALTIES = {
+  sunglasses: 0.5,
+  partialSkin: 0.25,
+  notGrounded: 0.25,
+} as const;
+
+/** Compute day boost from tier + grounding / skin / sunglasses answers. */
+export function computeSunriseMultiplier(
+  tier: Pick<SunriseTier, "multiplier">,
+  modifiers: SunriseModifiers,
+): number {
+  let mult = tier.multiplier;
+  if (modifiers.sunglasses === "worn") mult -= SUNRISE_MODIFIER_PENALTIES.sunglasses;
+  if (modifiers.skin === "partial") mult -= SUNRISE_MODIFIER_PENALTIES.partialSkin;
+  if (!modifiers.grounded) mult -= SUNRISE_MODIFIER_PENALTIES.notGrounded;
+  return Math.max(1, Math.round(mult * 100) / 100);
+}
+
+export function sunriseMultiplierForLog(
+  protocolId: string,
+  modifiers?: SunriseModifiers | null,
+  storedMultiplier?: number | null,
+): number {
+  if (storedMultiplier != null && storedMultiplier > 0) return storedMultiplier;
+  const tier = sunriseTierForProtocolId(protocolId);
+  if (!tier) return 1;
+  if (modifiers) return computeSunriseMultiplier(tier, modifiers);
+  return tier.multiplier;
+}
+
+export function describeSunriseModifiers(modifiers: SunriseModifiers): string {
+  const parts: string[] = [];
+  if (modifiers.grounded) parts.push("grounded");
+  parts.push(modifiers.skin === "full" ? "mostly exposed skin" : "partial skin");
+  parts.push(
+    modifiers.sunglasses === "none" ? "no sunglasses" : "sunglasses",
+  );
+  return parts.join(" · ");
+}
 
 /** @deprecated use tier multipliers — kept for any external refs */
 export const SUNRISE_MULTIPLIER = 1.5;
@@ -96,7 +148,7 @@ export function isSunriseProtocol(
   );
 }
 
-/** Pick best tier from a list of protocol ids logged today. */
+/** Pick best tier from a list of protocol ids logged today (rank only). */
 export function bestSunriseTier(
   protocolIds: string[],
 ): SunriseTier | null {
@@ -107,6 +159,31 @@ export function bestSunriseTier(
     if (!best || tier.rank > best.rank) best = tier;
   }
   return best;
+}
+
+/** Pick best stored/effective multiplier across keystone logs. */
+export function bestSunriseMultiplier(
+  entries: { protocolId: string; multiplier?: number | null }[],
+): { multiplier: number; tier: SunriseTier | null } {
+  let bestMult = 1;
+  let bestTier: SunriseTier | null = null;
+  for (const entry of entries) {
+    const tier = sunriseTierForProtocolId(entry.protocolId);
+    if (!tier) continue;
+    const mult = sunriseMultiplierForLog(
+      entry.protocolId,
+      null,
+      entry.multiplier,
+    );
+    const better =
+      mult > bestMult ||
+      (mult === bestMult && tier.rank > (bestTier?.rank ?? -1));
+    if (better) {
+      bestMult = mult;
+      bestTier = tier;
+    }
+  }
+  return { multiplier: bestMult, tier: bestTier };
 }
 
 export function formatSunriseMultiplier(mult: number): string {

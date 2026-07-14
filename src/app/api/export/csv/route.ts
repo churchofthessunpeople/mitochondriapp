@@ -1,7 +1,8 @@
 import { asc, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { dailyCompletions, protocols } from "@/db/schema";
+import { dailyCompletions } from "@/db/schema";
+import { getCatalogProtocolById } from "@/lib/catalog";
 
 export async function GET() {
   const session = await auth();
@@ -13,7 +14,6 @@ export async function GET() {
     .select({
       date: dailyCompletions.completedOn,
       protocolId: dailyCompletions.protocolId,
-      protocolName: protocols.name,
       points: dailyCompletions.pointsEarned,
       durationMinutes: dailyCompletions.durationMinutes,
       timeOfDay: dailyCompletions.timeOfDay,
@@ -21,7 +21,6 @@ export async function GET() {
       createdAt: dailyCompletions.createdAt,
     })
     .from(dailyCompletions)
-    .leftJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
     .where(eq(dailyCompletions.userId, session.user.id))
     .orderBy(asc(dailyCompletions.completedOn));
 
@@ -38,18 +37,21 @@ export async function GET() {
 
   const lines = [
     header.join(","),
-    ...rows.map((r) =>
-      [
+    ...rows.map((r) => {
+      const name =
+        getCatalogProtocolById(r.protocolId)?.name ??
+        (r.isStreakBonus ? "streak_bonus" : r.protocolId);
+      return [
         r.date,
         r.protocolId,
-        csvEscape(r.protocolName ?? (r.isStreakBonus ? "streak_bonus" : "")),
+        csvEscape(name),
         r.points,
         r.durationMinutes ?? "",
         r.timeOfDay ?? "",
         r.isStreakBonus,
         r.createdAt?.toISOString?.() ?? "",
-      ].join(","),
-    ),
+      ].join(",");
+    }),
   ];
 
   return new Response(lines.join("\n"), {

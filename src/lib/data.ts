@@ -2,28 +2,19 @@ import { and, desc, eq, gte, inArray, sql, sum } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users } from "@/db/schema";
-import { PROTOCOL_SEEDS } from "@/db/seed-data";
 import type { Protocol } from "@/db/schema";
+import {
+  ensureCatalogSyncedToDb,
+  getCatalogProtocols,
+} from "@/lib/catalog";
 
-/** Request-deduped catalog (Activities + Schedule often load same list). */
+/**
+ * Activity list from local seed-data.ts (source of truth).
+ * Syncs definitions into Neon for FKs, then returns the local catalog.
+ */
 export const getActiveProtocols = cache(async (): Promise<Protocol[]> => {
-  try {
-    const rows = await db
-      .select()
-      .from(protocols)
-      .where(eq(protocols.active, true))
-      .orderBy(protocols.sortOrder);
-
-    if (rows.length > 0) return rows;
-  } catch {
-    // fall through
-  }
-
-  return PROTOCOL_SEEDS.map((seed) => ({
-    ...seed,
-    active: true,
-    createdAt: new Date(),
-  }));
+  await ensureCatalogSyncedToDb();
+  return getCatalogProtocols();
 });
 
 export async function getCompletionsForUserDay(userId: string, date: string) {
@@ -90,6 +81,7 @@ export async function getUserHistory(userId: string, days = 30) {
 
 export async function getDayDetail(userId: string, date: string) {
   try {
+    const { getCatalogProtocolById } = await import("@/lib/catalog");
     const rows = await db
       .select({
         completion: dailyCompletions,
@@ -105,7 +97,14 @@ export async function getDayDetail(userId: string, date: string) {
       )
       .orderBy(desc(dailyCompletions.createdAt));
 
-    return rows;
+    // Prefer local catalog names/points if present
+    return rows.map((r) => {
+      const fromCatalog = getCatalogProtocolById(r.completion.protocolId);
+      return {
+        completion: r.completion,
+        protocol: fromCatalog ?? r.protocol,
+      };
+    });
   } catch {
     return [];
   }
@@ -174,6 +173,10 @@ export async function getWeeklyLightLeaderboard(limit = 20) {
   const from = new Date();
   from.setDate(from.getDate() - 7);
   const fromDate = from.toISOString().slice(0, 10);
+  const lightIds = getCatalogProtocols()
+    .filter((p) => p.category === "light")
+    .map((p) => p.id);
+  if (lightIds.length === 0) return [];
   try {
     const rows = await db
       .select({
@@ -185,12 +188,11 @@ export async function getWeeklyLightLeaderboard(limit = 20) {
       })
       .from(dailyCompletions)
       .innerJoin(users, eq(users.id, dailyCompletions.userId))
-      .innerJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
       .where(
         and(
           eq(users.showOnLeaderboard, true),
           gte(dailyCompletions.completedOn, fromDate),
-          eq(protocols.category, "light"),
+          inArray(dailyCompletions.protocolId, lightIds),
           eq(dailyCompletions.isStreakBonus, false),
         ),
       )

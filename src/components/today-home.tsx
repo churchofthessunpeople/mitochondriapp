@@ -94,7 +94,17 @@ export function TodayHome({
 
   const onCompletionCountsChange = useCallback(
     (counts: Record<string, number>) => {
-      setLiveCounts(counts);
+      setLiveCounts((prev) => {
+        const pk = Object.keys(prev);
+        const nk = Object.keys(counts);
+        if (
+          pk.length === nk.length &&
+          pk.every((k) => prev[k] === counts[k])
+        ) {
+          return prev;
+        }
+        return counts;
+      });
     },
     [],
   );
@@ -183,6 +193,9 @@ export function TodayHome({
             weekly={weekly}
             sunriseMultiplier={sunriseMultiplier}
             sunriseTierLabel={sunriseTierLabel}
+            sun={sun}
+            timeZone={timeZone}
+            allProtocols={allProtocols}
             onCompletionCountsChange={onCompletionCountsChange}
           />
         )}
