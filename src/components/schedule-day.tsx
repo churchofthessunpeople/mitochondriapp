@@ -424,7 +424,7 @@ export function ScheduleDay({
         for (const t of SUNRISE_TIERS) {
           if ((countsRef.current[t.protocolId] ?? 0) > 0) {
             await removeOneCompletionAction(t.protocolId);
-            bumpCounts({ protocolId: t.protocolId, absolute: 0 });
+            bumpCounts({ protocolId: t.protocolId, delta: 0, absolute: 0 });
           }
         }
         bumpCounts({ protocolId: protocol.id, delta: 1 });

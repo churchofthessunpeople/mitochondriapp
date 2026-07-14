@@ -67,7 +67,7 @@ const DEFAULT_MODIFIERS: SunriseModifiers = {
 
 function defaultSessionHm(
   timeZone: string,
-  sunrise: Date | null | undefined,
+  sunrise: Date | string | null | undefined,
 ): { startHm: string; endHm: string } {
   if (sunrise) {
     try {
