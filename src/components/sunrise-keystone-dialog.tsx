@@ -11,6 +11,26 @@ import {
   type SunriseModifiers,
   type SunriseTier,
 } from "@/lib/scoring";
+import {
+  effectiveSunriseBoostMultiplier,
+  encodeSunriseEndOffset,
+  pointsForSunriseKeystoneLog,
+} from "@/lib/sunrise-keystone-points";
+import {
+  fullMinutesForSky,
+  SUNRISE_SKY_OPTIONS,
+  sunriseSessionMinutesFromOffsets,
+  sunriseSkyDurationFactor,
+} from "@/lib/sunrise-sky";
+import {
+  computeSunriseSessionOffsets,
+  currentLocalHm,
+  formatSunriseWindow,
+  isSunriseSessionOptimal,
+  minutesBeyondOptimalWindow,
+  optimalWindowHm,
+  viewedAtFromLocalHm,
+} from "@/lib/sunrise-timing";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +46,8 @@ type Props = {
     protocol: Protocol,
     tier: SunriseTier,
     modifiers: SunriseModifiers,
+    viewedAtStartIso: string,
+    viewedAtEndIso: string,
   ) => void;
   onDismissSession?: () => void;
   onDismissDay?: () => void;
@@ -40,7 +62,23 @@ const DEFAULT_MODIFIERS: SunriseModifiers = {
   grounded: true,
   skin: "full",
   sunglasses: "none",
+  sky: "clear",
 };
+
+function defaultSessionHm(
+  timeZone: string,
+  sunrise: Date | null | undefined,
+): { startHm: string; endHm: string } {
+  if (sunrise) {
+    try {
+      return optimalWindowHm(sunrise, timeZone);
+    } catch {
+      /* fall through */
+    }
+  }
+  const now = currentLocalHm(timeZone);
+  return { startHm: now, endHm: now };
+}
 
 function ChoiceButton({
   title,
@@ -81,6 +119,7 @@ function ChoiceButton({
  * Morning-light keystone flow: tier → grounding / skin / sunglasses → confirm.
  */
 export function SunriseKeystoneDialog({
+  todayIso,
   allProtocols,
   sun,
   timeZone,
@@ -106,26 +145,119 @@ export function SunriseKeystoneDialog({
     );
   }, [initialProtocol, tiersAvailable]);
 
+  const initialHm = useMemo(
+    () => defaultSessionHm(timeZone, sun?.sunrise),
+    [timeZone, sun?.sunrise],
+  );
+
   const [step, setStep] = useState<Step>(initialTier ? "modifiers" : "tier");
   const [selected, setSelected] = useState<TierOption | null>(initialTier);
   const [modifiers, setModifiers] = useState<SunriseModifiers>(DEFAULT_MODIFIERS);
+  const [startHm, setStartHm] = useState(initialHm.startHm);
+  const [finishHm, setFinishHm] = useState(initialHm.endHm);
 
   const computedMultiplier =
     selected != null ? computeSunriseMultiplier(selected.tier, modifiers) : 1;
 
+  const sessionOffsets =
+    todayIso && sun?.sunrise
+      ? computeSunriseSessionOffsets(
+          todayIso,
+          startHm,
+          finishHm,
+          timeZone,
+          sun.sunrise,
+        )
+      : null;
+  const sessionMinutes =
+    sessionOffsets != null
+      ? sunriseSessionMinutesFromOffsets(
+          sessionOffsets.startOffset,
+          sessionOffsets.endOffset,
+        )
+      : null;
+  const encodedEndOffset =
+    sessionOffsets != null
+      ? encodeSunriseEndOffset(sessionOffsets.endOffset, modifiers.sky)
+      : null;
+  const timingPoints =
+    selected != null && sessionOffsets != null
+      ? pointsForSunriseKeystoneLog(
+          selected.protocol.points,
+          sessionOffsets.startOffset,
+          encodedEndOffset,
+        )
+      : selected?.protocol.points ?? 0;
+  const effectiveBoost =
+    selected != null
+      ? effectiveSunriseBoostMultiplier(
+          selected.tier,
+          modifiers,
+          sessionOffsets?.startOffset ?? null,
+          encodedEndOffset,
+        )
+      : 1;
+  const skyDurationFactor = sunriseSkyDurationFactor(
+    sessionMinutes,
+    modifiers.sky,
+  );
+  const requiredSkyMinutes = fullMinutesForSky(modifiers.sky);
+  const timingOptimal =
+    sessionOffsets != null &&
+    isSunriseSessionOptimal(
+      sessionOffsets.startOffset,
+      sessionOffsets.endOffset,
+    );
+
   const riseLabel = sun?.sunrise
     ? formatTimeInZone(sun.sunrise, timeZone)
+    : null;
+  const optimalWindow = sun?.sunrise
+    ? formatSunriseWindow(sun.sunrise, timeZone)
     : null;
 
   function pickTier(option: TierOption) {
     setSelected(option);
     setModifiers(DEFAULT_MODIFIERS);
+    const hm = defaultSessionHm(timeZone, sun?.sunrise);
+    setStartHm(hm.startHm);
+    setFinishHm(hm.endHm);
     setStep("modifiers");
   }
 
   function confirm() {
     if (!selected) return;
-    onLog(selected.protocol, selected.tier, modifiers);
+    let viewedAtStartIso: string;
+    let viewedAtEndIso: string;
+    if (todayIso) {
+      try {
+        viewedAtStartIso = viewedAtFromLocalHm(
+          todayIso,
+          startHm,
+          timeZone,
+        ).toISOString();
+        viewedAtEndIso = viewedAtFromLocalHm(
+          todayIso,
+          finishHm,
+          timeZone,
+        ).toISOString();
+      } catch {
+        const now = new Date().toISOString();
+        viewedAtStartIso = now;
+        viewedAtEndIso = now;
+      }
+    } else {
+      const now = new Date().toISOString();
+      viewedAtStartIso = now;
+      viewedAtEndIso = now;
+    }
+    onLog(
+      selected.protocol,
+      selected.tier,
+      modifiers,
+      viewedAtStartIso,
+      viewedAtEndIso,
+    );
   }
 
   if (tiersAvailable.length === 0) return null;
@@ -153,7 +285,7 @@ export function SunriseKeystoneDialog({
               {step === "tier"
                 ? "Morning light — how did you do?"
                 : step === "modifiers"
-                  ? "Skin, eyes, and grounding"
+                  ? "Sky, skin, eyes, and grounding"
                   : "Confirm morning light"}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -165,15 +297,24 @@ export function SunriseKeystoneDialog({
                     <>
                       {" "}
                       Local sunrise ≈{" "}
-                      <span className="text-foreground">{riseLabel}</span>.
+                      <span className="text-foreground">{riseLabel}</span>
+                      {optimalWindow ? (
+                        <>
+                          . Optimal window{" "}
+                          <span className="text-foreground">
+                            {optimalWindow}
+                          </span>
+                          .
+                        </>
+                      ) : null}
                     </>
                   ) : null}
                 </>
               ) : step === "modifiers" ? (
                 <>
-                  Horizon + mostly exposed skin + no sunglasses + grounding is the
-                  strongest boost. Sunglasses, covered skin, or no grounding lower
-                  it.
+                  Clear skies need 30 min for full points and boost; cloudy skies
+                  need 45 min. Skin, sunglasses, and grounding still adjust your
+                  day multiplier.
                 </>
               ) : (
                 <>
@@ -236,7 +377,7 @@ export function SunriseKeystoneDialog({
                 type="button"
                 disabled={pending}
                 onClick={onDismissDay}
-                className="h-10 rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
+                className="btn-secondary h-10 rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
               >
                 Missed it today — don&apos;t ask again until tomorrow
               </button>
@@ -256,6 +397,27 @@ export function SunriseKeystoneDialog({
 
         {step === "modifiers" && selected ? (
           <div className="mt-5 flex flex-col gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                Sky conditions
+              </p>
+              <div className="mt-2 grid grid-cols-1 gap-2">
+                {SUNRISE_SKY_OPTIONS.map((option) => (
+                  <ChoiceButton
+                    key={option.id}
+                    title={option.label}
+                    subtitle={option.subtitle}
+                    selected={modifiers.sky === option.id}
+                    highlight={option.id === "clear"}
+                    onClick={() =>
+                      setModifiers((m) => ({ ...m, sky: option.id }))
+                    }
+                    disabled={pending}
+                  />
+                ))}
+              </div>
+            </div>
+
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
                 Grounded?
@@ -331,7 +493,7 @@ export function SunriseKeystoneDialog({
             </div>
 
             <div className="rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3">
-              <p className="text-xs text-muted">Estimated day boost</p>
+              <p className="text-xs text-muted">Max day boost (at full duration)</p>
               <p className="mt-1 text-lg font-semibold text-accent">
                 {formatSunriseMultiplier(computedMultiplier)} on other activities
               </p>
@@ -382,9 +544,90 @@ export function SunriseKeystoneDialog({
                   · {describeSunriseModifiers(modifiers)}
                 </span>
               </p>
+              {optimalWindow ? (
+                <p className="mt-2 text-xs text-muted">
+                  Best timing within{" "}
+                  <span className="text-foreground">{optimalWindow}</span>
+                  {riseLabel ? (
+                    <span> (sunrise {riseLabel})</span>
+                  ) : null}
+                  . {modifiers.sky === "clear" ? "Clear" : "Your"} skies need{" "}
+                  <span className="text-foreground">{requiredSkyMinutes} min</span>{" "}
+                  for full points and boost.
+                </p>
+              ) : (
+                <p className="mt-2 text-xs text-muted">
+                  {modifiers.sky === "clear" ? "Clear" : "Your"} skies need{" "}
+                  <span className="text-foreground">{requiredSkyMinutes} min</span>{" "}
+                  for full points and boost.
+                </p>
+              )}
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Start
+                  </span>
+                  <input
+                    type="time"
+                    value={startHm}
+                    onChange={(e) => setStartHm(e.target.value)}
+                    disabled={pending}
+                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Finish
+                  </span>
+                  <input
+                    type="time"
+                    value={finishHm}
+                    onChange={(e) => setFinishHm(e.target.value)}
+                    disabled={pending}
+                    className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
+                  />
+                </label>
+              </div>
+              <p
+                className={cn(
+                  "mt-2 text-xs",
+                  timingOptimal && skyDurationFactor >= 1
+                    ? "text-accent"
+                    : "text-muted",
+                )}
+              >
+                {sessionMinutes != null ? (
+                  <>
+                    Session length:{" "}
+                    <span className="text-foreground">{sessionMinutes} min</span>
+                    {skyDurationFactor >= 1 ? (
+                      timingOptimal ? (
+                        " — optimal timing & full sky duration"
+                      ) : (
+                        " — full sky duration"
+                      )
+                    ) : (
+                      ` — need ${requiredSkyMinutes} min for full credit (${Math.round(skyDurationFactor * 100)}%)`
+                    )}
+                    {!timingOptimal && sessionOffsets != null ? (
+                      <>
+                        {" "}
+                        ·{" "}
+                        {Math.max(
+                          minutesBeyondOptimalWindow(sessionOffsets.startOffset),
+                          minutesBeyondOptimalWindow(sessionOffsets.endOffset),
+                        )}{" "}
+                        min outside sunrise window
+                      </>
+                    ) : null}
+                  </>
+                ) : (
+                  `+${timingPoints} pts`
+                )}
+              </p>
               <p className="mt-2 text-accent">
-                {formatSunriseMultiplier(computedMultiplier)} day boost · +
-                {selected.protocol.points} pts
+                {formatSunriseMultiplier(effectiveBoost)} day boost · +
+                {timingPoints} pts
               </p>
             </div>
             <button

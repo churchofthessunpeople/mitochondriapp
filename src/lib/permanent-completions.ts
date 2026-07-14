@@ -3,14 +3,27 @@ import { db } from "@/db";
 import {
   dailyCompletions,
   userPermanentSkips,
+  users,
   type TimeOfDay,
 } from "@/db/schema";
 import {
-  ensureCatalogSyncedToDb,
+  ensureProtocolInDb,
   getCatalogProtocolById,
 } from "@/lib/catalog";
 import { getUserFavoriteIds } from "@/lib/favorites";
+import {
+  isMagneticoProtocolId,
+  parseMagneticoGauss,
+} from "@/lib/magnetico";
 import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import {
+  isVariantProtocolId,
+  variantBasePoints,
+} from "@/lib/protocol-variants";
+import {
+  isSleepRoomTempProtocolId,
+  parseSleepRoomTempF,
+} from "@/lib/sleep-room-temp";
 import {
   bestSunriseMultiplier,
   isSunriseKeystoneProtocol,
@@ -18,6 +31,7 @@ import {
   streakBonusPoints,
 } from "@/lib/scoring";
 import { hasStreakBonusToday, getUserStreak } from "@/lib/streaks";
+import { dedupeSingleLogCompletions } from "@/lib/completion-dedupe";
 
 async function sunriseMultiplierForDay(
   userId: string,
@@ -48,6 +62,21 @@ async function sunriseMultiplierForDay(
   }
 }
 
+async function userVariantPreferences(userId: string) {
+  const [u] = await db
+    .select({
+      magneticoGauss: users.magneticoGauss,
+      sleepRoomTempF: users.sleepRoomTempF,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return {
+    magneticoGauss: parseMagneticoGauss(u?.magneticoGauss),
+    sleepRoomTempF: parseSleepRoomTempF(u?.sleepRoomTempF),
+  };
+}
+
 /**
  * Insert today's auto-logs for permanent activities on the user's available list.
  * Returns how many new completion rows were added.
@@ -56,10 +85,17 @@ export async function ensurePermanentCompletions(
   userId: string,
   completedOn: string,
 ): Promise<number> {
-  await ensureCatalogSyncedToDb();
   const favoriteIds = await getUserFavoriteIds(userId);
   const targets = [...favoriteIds].filter(isPermanentProtocolId);
   if (targets.length === 0) return 0;
+
+  await dedupeSingleLogCompletions(userId, completedOn);
+
+  await Promise.all(targets.map((id) => ensureProtocolInDb(id)));
+
+  const variantPrefs = targets.some(isVariantProtocolId)
+    ? await userVariantPreferences(userId)
+    : null;
 
   let inserted = 0;
   let streakAwarded = false;
@@ -101,8 +137,20 @@ export async function ensurePermanentCompletions(
     const multForThisLog = isSunriseKeystoneProtocol(protocol)
       ? 1
       : buffBefore;
+
+    const isMagnetico = isMagneticoProtocolId(protocolId);
+    const isSleepTemp = isSleepRoomTempProtocolId(protocolId);
+    const variantValue = isMagnetico
+      ? variantPrefs!.magneticoGauss
+      : isSleepTemp
+        ? variantPrefs!.sleepRoomTempF
+        : null;
     const points = pointsForLog(protocol, null, {
       sunriseMultiplier: multForThisLog,
+      basePoints:
+        variantValue != null
+          ? variantBasePoints(protocolId, variantValue, protocol.points)
+          : undefined,
     });
 
     await db.insert(dailyCompletions).values({
@@ -111,6 +159,7 @@ export async function ensurePermanentCompletions(
       completedOn,
       timeOfDay: slot,
       durationMinutes: null,
+      variantValue,
       sunriseBuffMultiplier: null,
       pointsEarned: points,
       isStreakBonus: false,

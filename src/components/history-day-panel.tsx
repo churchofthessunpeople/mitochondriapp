@@ -1,12 +1,88 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   getDayDetailAction,
   type DayDetailRow,
 } from "@/lib/actions/history";
+import { displayName, formatLoggedMinutes } from "@/lib/format-day-activities";
+import {
+  aggregateDayActivities,
+  groupAggregatedBySection,
+  HISTORY_SECTIONS,
+} from "@/lib/history-sections";
+import {
+  formatSunriseLogDetail,
+  isSunriseKeystoneProtocolId,
+} from "@/lib/scoring";
+import { formatVariantLabel } from "@/lib/protocol-variants";
 import { formatPoints } from "@/lib/utils";
+
+function ActivityRow({ r }: { r: DayDetailRow }) {
+  const variant =
+    r.protocolId &&
+    r.variantValue != null &&
+    !isSunriseKeystoneProtocolId(r.protocolId)
+      ? formatVariantLabel(r.protocolId, r.variantValue)
+      : null;
+  const sunriseDetail =
+    r.protocolId && isSunriseKeystoneProtocolId(r.protocolId)
+      ? formatSunriseLogDetail(
+          r.protocolId,
+          r.sunriseBuffMultiplier,
+          r.variantValue,
+          r.durationMinutes,
+        )
+      : null;
+
+  return (
+    <li className="glass flex items-start justify-between gap-3 rounded-2xl p-4">
+      <div>
+        <p className="font-medium">
+          {r.isStreakBonus ? "Streak bonus" : (r.protocolName ?? "Activity")}
+        </p>
+        <p className="text-xs text-muted">
+          {variant
+            ? `${variant} · `
+            : sunriseDetail
+              ? `${sunriseDetail} · `
+              : ""}
+          {r.durationMinutes &&
+          r.protocolId &&
+          !isSunriseKeystoneProtocolId(r.protocolId)
+            ? `${r.durationMinutes} min · `
+            : ""}
+          {r.timeOfDay ?? ""}
+          {r.isStreakBonus ? "consistency reward" : ""}
+        </p>
+      </div>
+      <span className="font-semibold text-accent-2">+{r.pointsEarned}</span>
+    </li>
+  );
+}
+
+function AggregatedRow({
+  name,
+  totalMins,
+  totalPoints,
+}: {
+  name: string;
+  totalMins: number;
+  totalPoints: number;
+}) {
+  return (
+    <li className="glass flex items-start justify-between gap-3 rounded-2xl p-4">
+      <div>
+        <p className="font-medium">{name}</p>
+        {totalMins > 0 ? (
+          <p className="text-xs text-muted">{formatLoggedMinutes(totalMins)} logged</p>
+        ) : null}
+      </div>
+      <span className="font-semibold text-accent-2">+{totalPoints}</span>
+    </li>
+  );
+}
 
 export function HistoryDayPanel({ date }: { date: string }) {
   const [rows, setRows] = useState<DayDetailRow[] | null>(null);
@@ -30,6 +106,16 @@ export function HistoryDayPanel({ date }: { date: string }) {
     };
   }, [date]);
 
+  const { grouped, streakRows } = useMemo(() => {
+    if (!rows) return { grouped: null, streakRows: [] as DayDetailRow[] };
+    const streakRows = rows.filter((r) => r.isStreakBonus);
+    const aggregated = aggregateDayActivities(rows, displayName);
+    return {
+      grouped: groupAggregatedBySection(aggregated),
+      streakRows,
+    };
+  }, [rows]);
+
   const total = rows?.reduce((s, r) => s + r.pointsEarned, 0) ?? 0;
 
   return (
@@ -51,31 +137,40 @@ export function HistoryDayPanel({ date }: { date: string }) {
         <p className="text-sm text-muted">No logs this day.</p>
       )}
 
-      {rows && rows.length > 0 && (
-        <ul className="space-y-2">
-          {rows.map((r) => (
-            <li
-              key={r.id}
-              className="glass flex items-start justify-between gap-3 rounded-2xl p-4"
-            >
-              <div>
-                <p className="font-medium">
-                  {r.isStreakBonus
-                    ? "Streak bonus"
-                    : r.protocolName ?? "Activity"}
-                </p>
-                <p className="text-xs text-muted">
-                  {r.durationMinutes ? `${r.durationMinutes} min · ` : ""}
-                  {r.timeOfDay ?? ""}
-                  {r.isStreakBonus ? "consistency reward" : ""}
-                </p>
-              </div>
-              <span className="font-semibold text-accent-2">
-                +{r.pointsEarned}
-              </span>
-            </li>
-          ))}
-        </ul>
+      {grouped && (
+        <div className="space-y-5">
+          {HISTORY_SECTIONS.map((section) => {
+            const items = grouped.get(section.id) ?? [];
+            if (items.length === 0) return null;
+            return (
+              <section key={section.id} className="space-y-2">
+                <h3 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
+                  {section.label}
+                </h3>
+                <ul className="space-y-2">
+                  {items.map((item) => (
+                    <AggregatedRow
+                      key={item.key}
+                      name={item.name}
+                      totalMins={item.totalMins}
+                      totalPoints={item.totalPoints}
+                    />
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+
+          {streakRows.length > 0 && (
+            <section className="space-y-2">
+              <ul className="space-y-2">
+                {streakRows.map((r) => (
+                  <ActivityRow key={r.id} r={r} />
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
       )}
     </div>
   );

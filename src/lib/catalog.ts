@@ -31,6 +31,65 @@ export function getCatalogProtocolById(id: string): Protocol | undefined {
   return seed ? seedToProtocol(seed) : undefined;
 }
 
+function protocolUpsertValues(seed: ProtocolSeed) {
+  return {
+    id: seed.id,
+    name: seed.name,
+    description: seed.description,
+    points: seed.points,
+    category: seed.category,
+    timeOfDay: seed.timeOfDay,
+    lockedTimeOfDay: seed.lockedTimeOfDay,
+    allowsMultiple: seed.allowsMultiple,
+    maxPerDay: seed.maxPerDay,
+    durationEnabled: seed.durationEnabled,
+    referenceMinutes: seed.referenceMinutes,
+    maxDurationMinutes: seed.maxDurationMinutes,
+    sortOrder: seed.sortOrder,
+    active: true,
+  };
+}
+
+function protocolUpsertSet(seed: ProtocolSeed) {
+  return {
+    name: seed.name,
+    description: seed.description,
+    points: seed.points,
+    category: seed.category,
+    timeOfDay: seed.timeOfDay,
+    lockedTimeOfDay: seed.lockedTimeOfDay,
+    allowsMultiple: seed.allowsMultiple,
+    maxPerDay: seed.maxPerDay,
+    durationEnabled: seed.durationEnabled,
+    referenceMinutes: seed.referenceMinutes,
+    maxDurationMinutes: seed.maxDurationMinutes,
+    sortOrder: seed.sortOrder,
+    active: true,
+  };
+}
+
+/**
+ * Upsert a single seed into Neon for FK integrity (favorites / completions).
+ * Prefer this on hot paths — full catalog sync is for page loads only.
+ */
+export async function ensureProtocolInDb(protocolId: string): Promise<boolean> {
+  const seed = PROTOCOL_SEEDS.find((s) => s.id === protocolId);
+  if (!seed) return false;
+  try {
+    await db
+      .insert(protocols)
+      .values(protocolUpsertValues(seed))
+      .onConflictDoUpdate({
+        target: protocols.id,
+        set: protocolUpsertSet(seed),
+      });
+    return true;
+  } catch (e) {
+    console.warn("[catalog] single protocol sync failed", protocolId, e);
+    return false;
+  }
+}
+
 /**
  * Upsert local catalog into Neon so favorites/completions FKs keep working.
  * Request-scoped (React cache) — runs at most once per server request.
@@ -40,39 +99,10 @@ export const ensureCatalogSyncedToDb = cache(async () => {
     for (const seed of PROTOCOL_SEEDS) {
       await db
         .insert(protocols)
-        .values({
-          id: seed.id,
-          name: seed.name,
-          description: seed.description,
-          points: seed.points,
-          category: seed.category,
-          timeOfDay: seed.timeOfDay,
-          lockedTimeOfDay: seed.lockedTimeOfDay,
-          allowsMultiple: seed.allowsMultiple,
-          maxPerDay: seed.maxPerDay,
-          durationEnabled: seed.durationEnabled,
-          referenceMinutes: seed.referenceMinutes,
-          maxDurationMinutes: seed.maxDurationMinutes,
-          sortOrder: seed.sortOrder,
-          active: true,
-        })
+        .values(protocolUpsertValues(seed))
         .onConflictDoUpdate({
           target: protocols.id,
-          set: {
-            name: seed.name,
-            description: seed.description,
-            points: seed.points,
-            category: seed.category,
-            timeOfDay: seed.timeOfDay,
-            lockedTimeOfDay: seed.lockedTimeOfDay,
-            allowsMultiple: seed.allowsMultiple,
-            maxPerDay: seed.maxPerDay,
-            durationEnabled: seed.durationEnabled,
-            referenceMinutes: seed.referenceMinutes,
-            maxDurationMinutes: seed.maxDurationMinutes,
-            sortOrder: seed.sortOrder,
-            active: true,
-          },
+          set: protocolUpsertSet(seed),
         });
     }
   } catch (e) {

@@ -14,11 +14,36 @@ import {
   recordPermanentSkip,
 } from "@/lib/permanent-completions";
 import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import {
+  isColdThermoProtocolId,
+  OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
+  parseColdThermoSkinTempF,
+} from "@/lib/cold-thermo-skin-temp";
+import {
+  isMagneticoProtocolId,
+  parseMagneticoGauss,
+} from "@/lib/magnetico";
+import {
+  isVariantProtocolId,
+  variantBasePoints,
+} from "@/lib/protocol-variants";
+import { parseSleepRoomTempF, isSleepRoomTempProtocolId } from "@/lib/sleep-room-temp";
+import {
+  effectiveSunriseBoostMultiplier,
+  encodeSunriseEndOffset,
+  pointsForSunriseKeystoneLog,
+  sunriseSkyFromModifiers,
+} from "@/lib/sunrise-keystone-points";
+import {
+  resolveSunriseSessionOffsets,
+  resolveSunriseViewOffset,
+} from "@/lib/sunrise-timing";
+import { getUserSunriseForDate } from "@/lib/sunrise-timing-server";
 import { revalidatePath } from "next/cache";
 import {
   bestSunriseMultiplier,
-  computeSunriseMultiplier,
   isSunriseKeystoneProtocol,
+  isSunriseKeystoneProtocolId,
   pointsForLog,
   streakBonusPoints,
   sunriseTierForProtocolId,
@@ -159,6 +184,7 @@ async function recomputeDayPoints(
       id: dailyCompletions.id,
       protocolId: dailyCompletions.protocolId,
       durationMinutes: dailyCompletions.durationMinutes,
+      variantValue: dailyCompletions.variantValue,
       pointsEarned: dailyCompletions.pointsEarned,
       protocol: protocols,
     })
@@ -173,8 +199,23 @@ async function recomputeDayPoints(
     );
 
   for (const row of rows) {
+    let basePoints: number | undefined;
+    if (isSunriseKeystoneProtocolId(row.protocolId)) {
+      basePoints = pointsForSunriseKeystoneLog(
+        row.protocol.points,
+        row.variantValue,
+        row.durationMinutes,
+      );
+    } else {
+      basePoints = variantBasePoints(
+        row.protocolId,
+        row.variantValue,
+        row.protocol.points,
+      );
+    }
     const next = pointsForLog(row.protocol, row.durationMinutes, {
       sunriseMultiplier,
+      basePoints,
     });
     if (next !== row.pointsEarned) {
       await db
@@ -196,6 +237,14 @@ export async function logCompletionAction(
     timeOfDay?: TimeOfDay | null;
     durationMinutes?: number | null;
     sunriseModifiers?: SunriseModifiers;
+    /** ISO timestamp when morning light viewing started (defaults to now). */
+    viewedAtStart?: string;
+    /** ISO timestamp when morning light viewing ended (defaults to start). */
+    viewedAtEnd?: string;
+    /** @deprecated use viewedAtStart */
+    viewedAt?: string;
+    /** Optional skin surface temp (°F) for cold thermogenesis logs. */
+    skinTempF?: number | null;
   },
 ): Promise<CompletionResult> {
   const userId = await requireUser();
@@ -255,15 +304,82 @@ export async function logCompletionAction(
   // Keystones never receive the mult; other logs use best tier so far
   const multForThisLog = wasKeystone ? 1 : buffBefore.multiplier;
 
+  let variantValue: number | null = null;
+  let durationMinutes: number | null = options?.durationMinutes ?? null;
+  let basePoints: number | undefined;
+  if (isSunriseKeystoneProtocol(protocol)) {
+    const sunriseCtx = await getUserSunriseForDate(userId, completedOn);
+    const sky = sunriseSkyFromModifiers(options?.sunriseModifiers);
+    const hasSession =
+      options?.viewedAtStart != null || options?.viewedAtEnd != null;
+    if (hasSession) {
+      const { startOffset, endOffset } = resolveSunriseSessionOffsets(
+        completedOn,
+        options?.viewedAtStart,
+        options?.viewedAtEnd,
+        sunriseCtx,
+      );
+      variantValue = startOffset;
+      durationMinutes = encodeSunriseEndOffset(endOffset, sky);
+    } else {
+      variantValue = resolveSunriseViewOffset(
+        completedOn,
+        options?.viewedAt,
+        sunriseCtx,
+      );
+      durationMinutes = null;
+    }
+    basePoints = pointsForSunriseKeystoneLog(
+      protocol.points,
+      variantValue,
+      durationMinutes,
+    );
+  } else if (isColdThermoProtocolId(protocolId)) {
+    variantValue = parseColdThermoSkinTempF(
+      options?.skinTempF ?? OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
+    );
+    basePoints = variantBasePoints(protocolId, variantValue, protocol.points);
+  } else if (isVariantProtocolId(protocolId)) {
+    const [u] = await db
+      .select({
+        magneticoGauss: users.magneticoGauss,
+        sleepRoomTempF: users.sleepRoomTempF,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    const rawVariant = isMagneticoProtocolId(protocolId)
+      ? u?.magneticoGauss
+      : isSleepRoomTempProtocolId(protocolId)
+        ? u?.sleepRoomTempF
+        : null;
+    variantValue =
+      rawVariant != null
+        ? isMagneticoProtocolId(protocolId)
+          ? parseMagneticoGauss(rawVariant)
+          : parseSleepRoomTempF(rawVariant)
+        : null;
+    basePoints =
+      variantValue != null
+        ? variantBasePoints(protocolId, variantValue, protocol.points)
+        : undefined;
+  }
+
   const points = pointsForLog(protocol, options?.durationMinutes, {
     sunriseMultiplier: multForThisLog,
+    basePoints,
   });
 
   const tier = wasKeystone ? sunriseTierForProtocolId(protocolId) : null;
   const sunriseBuffMultiplier =
     wasKeystone && tier
       ? options?.sunriseModifiers
-        ? computeSunriseMultiplier(tier, options.sunriseModifiers)
+        ? effectiveSunriseBoostMultiplier(
+            tier,
+            options.sunriseModifiers,
+            variantValue,
+            durationMinutes,
+          )
         : tier.multiplier
       : null;
 
@@ -272,7 +388,10 @@ export async function logCompletionAction(
     protocolId,
     completedOn,
     timeOfDay: slot,
-    durationMinutes: options?.durationMinutes ?? null,
+    durationMinutes: isSunriseKeystoneProtocol(protocol)
+      ? durationMinutes
+      : (options?.durationMinutes ?? null),
+    variantValue,
     sunriseBuffMultiplier,
     pointsEarned: points,
     isStreakBonus: false,

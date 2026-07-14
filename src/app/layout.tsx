@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { BottomNav } from "@/components/bottom-nav";
+import { SiteDisclaimer } from "@/components/site-disclaimer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/components/toast";
 import { themeInitScript } from "@/lib/theme";
@@ -61,6 +62,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             {children}
+            <SiteDisclaimer />
             <BottomNav />
           </ToastProvider>
         </ThemeProvider>

@@ -265,7 +265,8 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "cold-thermogenesis",
     name: "Cold thermogenesis session",
-    description: "Cold shower, plunge, or deliberate cold exposure.",
+    description:
+      "Cold shower, plunge, or deliberate cold exposure. Skin temp ~50°F optimal; warmer in 5° steps earns fewer base points before duration.",
     points: 24,
     category: "cold",
     timeOfDay: "anytime",
@@ -316,8 +317,8 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "magnetico-sleep-pad",
     name: "Magnetico sleep pad",
     description:
-      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Permanent: auto-logs nightly while on your available list.",
-    points: 6,
+      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Choose 5 / 10 / 20 gauss — 1.25× / 1.5× / 2× on base points. Permanent: auto-logs nightly while on your available list.",
+    points: 10,
     category: "emf",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
@@ -386,12 +387,26 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "dark-bedroom",
     name: "True dark sleep environment",
-    description: "Pitch-black or eye mask; minimal night light pollution.",
+    description:
+      "Pitch-black or eye mask; minimal night light pollution. Permanent: auto-logs nightly while on your available list.",
     points: 8,
     category: "sleep",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
+    permanent: true,
     sortOrder: 60,
+  }),
+  p({
+    id: "cool-bedroom-sleep",
+    name: "Cool bedroom sleep",
+    description:
+      "Bedroom at 65°F or cooler for overnight thermoregulation. 65°F = 10 pts; each degree warmer on the thermostat costs 1 pt. Permanent: auto-logs nightly while on your available list.",
+    points: 10,
+    category: "sleep",
+    timeOfDay: "night",
+    lockedTimeOfDay: "night",
+    permanent: true,
+    sortOrder: 61,
   }),
   p({
     id: "consistent-sleep-window",

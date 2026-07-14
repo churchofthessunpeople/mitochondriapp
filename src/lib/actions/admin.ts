@@ -12,6 +12,7 @@ import { db } from "@/db";
 import {
   dailyCompletions,
   protocols,
+  userPermanentSkips,
   users,
   type ProtocolCategory,
   type TimeOfDay,
@@ -412,4 +413,28 @@ export async function countAdminUsersAction(): Promise<number> {
   await requireAdmin();
   const [row] = await db.select({ n: count() }).from(users);
   return Number(row?.n) || 0;
+}
+
+/** Wipe all activity logs and permanent skip records for every user. */
+export async function resetAllUserActivityAction(): Promise<{
+  completionsDeleted: number;
+  skipsDeleted: number;
+}> {
+  await requireAdmin();
+
+  const [completionRow] = await db
+    .select({ n: count() })
+    .from(dailyCompletions);
+  const [skipRow] = await db
+    .select({ n: count() })
+    .from(userPermanentSkips);
+
+  await db.delete(userPermanentSkips);
+  await db.delete(dailyCompletions);
+
+  revalidateApp();
+  return {
+    completionsDeleted: Number(completionRow?.n) || 0,
+    skipsDeleted: Number(skipRow?.n) || 0,
+  };
 }

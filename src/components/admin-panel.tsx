@@ -14,6 +14,7 @@ import {
   listAdminProtocolsAction,
   listAdminUsersAction,
   resetAdminUserPasswordAction,
+  resetAllUserActivityAction,
   updateAdminUserAction,
   upsertProtocolAction,
   type AdminUserDetail,
@@ -34,6 +35,14 @@ type CatalogRow = {
 
 type AdminTab = "users" | "protocols";
 
+type AdminConfirmRequest = {
+  title: string;
+  message: string;
+  confirmLabel: string;
+  danger?: boolean;
+  action: () => void | Promise<void>;
+};
+
 export function AdminPanel({
   allowed,
   currentUserId,
@@ -42,6 +51,26 @@ export function AdminPanel({
   currentUserId: string;
 }) {
   const [tab, setTab] = useState<AdminTab>("users");
+  const { push } = useToast();
+  const [pending, start] = useTransition();
+  const [confirm, setConfirm] = useState<AdminConfirmRequest | null>(null);
+
+  function requestConfirm(req: AdminConfirmRequest) {
+    setConfirm(req);
+  }
+
+  function runConfirm() {
+    if (!confirm) return;
+    const action = confirm.action;
+    setConfirm(null);
+    start(async () => {
+      try {
+        await action();
+      } catch (err) {
+        push(err instanceof Error ? err.message : "Action failed", "err");
+      }
+    });
+  }
 
   if (!allowed) {
     return (
@@ -91,15 +120,65 @@ export function AdminPanel({
       </div>
 
       {tab === "users" ? (
-        <AdminUsersTab currentUserId={currentUserId} />
+        <AdminUsersTab
+          currentUserId={currentUserId}
+          requestConfirm={requestConfirm}
+        />
       ) : (
         <AdminProtocolsTab />
       )}
+
+      <div className="glass space-y-3 rounded-3xl border border-red-500/20 p-5">
+        <h2 className="font-semibold text-red-400">Danger zone</h2>
+        <p className="text-xs leading-relaxed text-muted">
+          Deletes every activity log, streak bonus row, and permanent skip for all
+          users. Accounts, schedules, favorites, and protocols are kept.
+        </p>
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() =>
+            requestConfirm({
+              title: "Reset all user activity?",
+              message:
+                "This permanently deletes every completion log, streak bonus, and permanent skip for all accounts. User profiles, schedules, and protocols are kept. This cannot be undone.",
+              confirmLabel: "Reset all activity",
+              danger: true,
+              action: async () => {
+                const res = await resetAllUserActivityAction();
+                push(
+                  `Cleared ${res.completionsDeleted} logs and ${res.skipsDeleted} skips`,
+                );
+              },
+            })
+          }
+          className="h-11 w-full rounded-2xl border border-red-500/40 text-sm font-semibold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
+        >
+          {pending ? "Resetting…" : "Reset all user activity"}
+        </button>
+      </div>
+
+      <AdminConfirmDialog
+        open={confirm != null}
+        title={confirm?.title ?? ""}
+        message={confirm?.message ?? ""}
+        confirmLabel={confirm?.confirmLabel ?? "Confirm"}
+        danger={confirm?.danger}
+        pending={pending}
+        onCancel={() => setConfirm(null)}
+        onConfirm={runConfirm}
+      />
     </div>
   );
 }
 
-function AdminUsersTab({ currentUserId }: { currentUserId: string }) {
+function AdminUsersTab({
+  currentUserId,
+  requestConfirm,
+}: {
+  currentUserId: string;
+  requestConfirm: (req: AdminConfirmRequest) => void;
+}) {
   const { push } = useToast();
   const [pending, start] = useTransition();
   const [query, setQuery] = useState("");
@@ -169,21 +248,15 @@ function AdminUsersTab({ currentUserId }: { currentUserId: string }) {
           });
         }}
         onResetPassword={() => {
-          if (
-            !window.confirm(
-              `Reset password for @${detail.username}? They will be signed out of all sessions.`,
-            )
-          ) {
-            return;
-          }
-          start(async () => {
-            try {
+          requestConfirm({
+            title: "Reset password?",
+            message: `Generate a new password for @${detail.username}. They will be signed out of all sessions.`,
+            confirmLabel: "Reset password",
+            action: async () => {
               const { password } = await resetAdminUserPasswordAction(detail.id);
               setGeneratedPassword(password);
               push("Password reset — copy it now");
-            } catch (err) {
-              push(err instanceof Error ? err.message : "Reset failed", "err");
-            }
+            },
           });
         }}
         onDelete={() => {
@@ -191,22 +264,17 @@ function AdminUsersTab({ currentUserId }: { currentUserId: string }) {
             push("You cannot delete your own account", "err");
             return;
           }
-          if (
-            !window.confirm(
-              `Permanently delete @${detail.username}? This removes all their logs, friends, and reminders.`,
-            )
-          ) {
-            return;
-          }
-          start(async () => {
-            try {
+          requestConfirm({
+            title: "Delete user?",
+            message: `Permanently delete @${detail.username}? This removes all their logs, friends, and reminders.`,
+            confirmLabel: "Delete user",
+            danger: true,
+            action: async () => {
               await deleteAdminUserAction(detail.id);
               push("User deleted");
               setSelectedId(null);
               reload(query);
-            } catch (err) {
-              push(err instanceof Error ? err.message : "Delete failed", "err");
-            }
+            },
           });
         }}
       />
@@ -707,6 +775,73 @@ function AdminProtocolsTab() {
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function AdminConfirmDialog({
+  open,
+  title,
+  message,
+  confirmLabel,
+  danger,
+  pending,
+  onCancel,
+  onConfirm,
+}: {
+  open: boolean;
+  title: string;
+  message: string;
+  confirmLabel: string;
+  danger?: boolean;
+  pending: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[120] flex items-end justify-center bg-black/50 p-4 sm:items-center">
+      <div
+        className="glass w-full max-w-sm rounded-3xl p-5"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-confirm-title"
+      >
+        <h2
+          id="admin-confirm-title"
+          className={cn(
+            "text-lg font-semibold",
+            danger ? "text-red-400" : "text-foreground",
+          )}
+        >
+          {title}
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted">{message}</p>
+        <div className="mt-5 flex gap-2">
+          <button
+            type="button"
+            disabled={pending}
+            onClick={onCancel}
+            className="btn-secondary h-11 flex-1 rounded-2xl text-sm font-semibold disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={onConfirm}
+            className={cn(
+              "h-11 flex-1 rounded-2xl text-sm font-semibold disabled:opacity-50",
+              danger
+                ? "border border-red-500/40 text-red-400 transition hover:bg-red-500/10"
+                : "btn-primary",
+            )}
+          >
+            {pending ? "Working…" : confirmLabel}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

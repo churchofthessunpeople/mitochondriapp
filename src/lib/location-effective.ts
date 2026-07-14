@@ -1,4 +1,4 @@
-import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { getTodayIsoForTimezone } from "@/lib/date-tz";
 
 export type LocationFields = {
   latitude: number | null;

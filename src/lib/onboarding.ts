@@ -4,8 +4,6 @@
  */
 /** Light + Water + Magnetism keystones first, then supporting habits. */
 export const STARTER_PROTOCOL_IDS = [
-  "sunrise-horizon",
-  "sunrise-open-sky",
   "low-d-hydration",
   "deuterium-aware-meal",
   "barefoot-earth",

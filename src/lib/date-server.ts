@@ -1,17 +1,7 @@
 import { headers } from "next/headers";
-import { todayIsoDate } from "@/lib/utils";
+import { getTodayIsoForTimezone } from "@/lib/date-tz";
 
-/**
- * Calendar "today" in an explicit IANA timezone.
- * Prefer user.timezone over IP guess for scoring / streaks.
- */
-export function getTodayIsoForTimezone(timeZone: string): string {
-  try {
-    return todayIsoDate(timeZone || "UTC");
-  } catch {
-    return todayIsoDate("UTC");
-  }
-}
+export { getTodayIsoForTimezone } from "@/lib/date-tz";
 
 /**
  * Calendar "today" for the request when user TZ unknown.

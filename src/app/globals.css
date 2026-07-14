@@ -29,6 +29,7 @@ html.dark {
   --surface-glow-2: rgba(255, 122, 69, 0.09);
   --surface-glow-3: rgba(160, 70, 30, 0.08);
   --shadow-icon: 0 12px 40px rgba(0, 0, 0, 0.4);
+  --site-disclaimer-offset: 3.25rem;
   color-scheme: dark;
 }
 
@@ -54,6 +55,7 @@ html.light {
   --surface-glow-2: rgba(196, 77, 26, 0.07);
   --surface-glow-3: rgba(140, 80, 30, 0.06);
   --shadow-icon: 0 12px 40px rgba(42, 30, 18, 0.1);
+  --site-disclaimer-offset: 3.25rem;
   color-scheme: light;
 }
 
@@ -112,6 +114,7 @@ body {
 .welcome-screen {
   background: var(--bg) !important;
   color: var(--fg);
+  padding-bottom: var(--site-disclaimer-offset);
 }
 
 a {
@@ -194,4 +197,8 @@ html.light ::selection {
 /* Text sitting on accent fills (chips, checkmarks) */
 .text-on-accent {
   color: var(--on-accent);
+}
+
+.site-disclaimer {
+  padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
 }

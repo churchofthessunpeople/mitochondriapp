@@ -24,7 +24,7 @@ import { ScoringGuidePanel } from "@/components/scoring-guide-panel";
 import { SunriseCheckIn } from "@/components/sunrise-check-in";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TodayHome } from "@/components/today-home";
-import type { AccountSection, AppTab } from "@/lib/app-tabs";
+import type { AccountSection, AppTab, TodaySection } from "@/lib/app-tabs";
 import type { AppSheet as AppSheetState } from "@/lib/app-sheets";
 import type { PlaceFactors } from "@/lib/place-factors";
 import { ROUTES } from "@/lib/routes";
@@ -54,6 +54,7 @@ const CACHE_KEY = "mitochondriapp-shell-v1";
 export type AppShellProps = {
   initialTab: AppTab;
   initialAccountSection?: AccountSection;
+  initialTodaySection?: TodaySection | null;
   /** Deep-link lesson id for Mitoversity (?lesson=) */
   initialMitoLesson?: string | null;
   dateLabel: string;
@@ -83,9 +84,13 @@ export type AppShellProps = {
   travelUntil?: string | null;
   homePostalCode?: string | null;
   travelLabel?: string | null;
+  magneticoGauss?: number;
+  sleepRoomTempF?: number;
   accountUser: AccountPanelUser;
   currentUserId: string;
   isAdmin?: boolean;
+  /** Open morning-light check-in on first paint (e.g. after onboarding ?sunrise=1) */
+  forceSunriseCheckIn?: boolean;
   /** Open admin sheet on first paint (e.g. ?t=admin) */
   initialOpenAdmin?: boolean;
   history: HistoryRow[];
@@ -108,6 +113,7 @@ export type AppShellProps = {
 export function AppShell({
   initialTab,
   initialAccountSection = null,
+  initialTodaySection = null,
   initialMitoLesson = null,
   dateLabel,
   todayIso,
@@ -136,9 +142,12 @@ export function AppShell({
   travelUntil,
   homePostalCode,
   travelLabel,
+  magneticoGauss = 10,
+  sleepRoomTempF = 65,
   accountUser,
   currentUserId,
   isAdmin = false,
+  forceSunriseCheckIn = false,
   initialOpenAdmin = false,
   history,
   lifetimePoints,
@@ -151,6 +160,8 @@ export function AppShell({
   const [sheet, setSheet] = useState<AppSheetState | null>(
     initialOpenAdmin && isAdmin ? { id: "admin" } : null,
   );
+  const [accountSection, setAccountSection] =
+    useState<AccountSection>(initialAccountSection);
   const [availableIds, setAvailableIds] = useState(initialAvailableIds);
   const [sunriseMultiplier, setSunriseMultiplier] =
     useState(initialSunriseMult);
@@ -165,6 +176,10 @@ export function AppShell({
   useEffect(() => {
     setSunriseTierLabel(initialSunriseTierLabel);
   }, [initialSunriseTierLabel]);
+
+  useEffect(() => {
+    setAccountSection(initialAccountSection);
+  }, [initialAccountSection]);
 
   useEffect(() => {
     try {
@@ -215,14 +230,32 @@ export function AppShell({
 
   const closeSheet = useCallback(() => setSheet(null), []);
 
+  const openAccountFriends = useCallback(() => {
+    setAccountSection("friends");
+    setTabState("account");
+    setSheet(null);
+    try {
+      window.history.replaceState(null, "", ROUTES.friends);
+    } catch {
+      /* ignore */
+    }
+    try {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
   return (
-    <div className="min-h-screen pb-24 md:pb-16">
+    <div className="min-h-screen pb-[calc(6rem+var(--site-disclaimer-offset))] md:pb-[calc(4rem+var(--site-disclaimer-offset))]">
       <SunriseCheckIn
+        userId={currentUserId}
         todayIso={todayIso}
         sunriseMultiplier={sunriseMultiplier}
         allProtocols={allProtocols}
         sun={sun}
         timeZone={timeZone}
+        forceOpen={forceSunriseCheckIn}
         onLogged={(mult) => setSunriseMultiplier(mult)}
       />
 
@@ -362,6 +395,7 @@ export function AppShell({
         {!sheet && tab === "schedule" && (
           <TodayHome
             dateLabel={dateLabel}
+            todayIso={todayIso}
             allProtocols={allProtocols}
             availableIds={availableIds}
             onAvailableIdsChange={setAvailableIds}
@@ -387,6 +421,12 @@ export function AppShell({
             travelUntil={travelUntil}
             homePostalCode={homePostalCode}
             travelLabel={travelLabel}
+            magneticoGauss={magneticoGauss}
+            sleepRoomTempF={sleepRoomTempF}
+            initialSection={initialTodaySection}
+            leaderboards={leaderboards}
+            currentUserId={currentUserId}
+            onOpenFriends={openAccountFriends}
             onOpenSheet={openSheet}
           />
         )}
@@ -398,11 +438,9 @@ export function AppShell({
         {!sheet && tab === "account" && (
           <AccountHome
             user={accountUser}
-            initialSection={initialAccountSection}
+            initialSection={accountSection}
             history={history}
             lifetimePoints={lifetimePoints}
-            leaderboards={leaderboards}
-            currentUserId={currentUserId}
             isAdmin={isAdmin}
             friends={friends}
             reminders={reminders}
@@ -413,7 +451,8 @@ export function AppShell({
       </main>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-[var(--header-bg)] pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"
+        className="fixed inset-x-0 z-40 border-t border-border bg-[var(--header-bg)] pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"
+        style={{ bottom: "var(--site-disclaimer-offset)" }}
         aria-label="Main"
       >
         <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">

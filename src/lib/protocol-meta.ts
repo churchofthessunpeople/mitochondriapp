@@ -15,7 +15,7 @@ const DEFAULT: ProtocolMeta = { equipment: "none" };
 const META: Record<string, ProtocolMeta> = {
   "sunrise-horizon": {
     equipment: "none",
-    how: "Be outside before the sun clears the horizon. Look at the solar disk with bare eyes — no sunglasses, no window glass between you and the sky.\n\nStand or sit still for a few minutes as the disk appears. Log when you actually saw it rise.",
+    how: "Be outside before the sun clears the horizon. Look at the solar disk with bare eyes — no sunglasses, no window glass between you and the sky.\n\nFull points when your viewing session falls within 15 minutes before or after local sunrise; each minute outside costs 1 point (worst edge of start/finish). Skin, grounding, and sunglasses adjust your day boost on the check-in.",
   },
   "sunrise-open-sky": {
     equipment: "none",
@@ -83,7 +83,7 @@ const META: Record<string, ProtocolMeta> = {
   },
   "cold-thermogenesis": {
     equipment: "optional",
-    how: "Deliberate cold exposure: cold shower, outdoor cold, or plunge if you have safe access.\n\nBuild duration gradually. Log minutes in 15-minute blocks (+) or custom time.",
+    how: "Deliberate cold exposure: cold shower, outdoor cold, or plunge if you have safe access.\n\nBuild duration gradually. Log minutes in 15-minute blocks (+) or custom time. Set skin surface temp: ~50°F is the target; each 5°F warmer reduces base points before duration scales.",
   },
   "reduce-nnemf-block": {
     equipment: "optional",
@@ -99,7 +99,7 @@ const META: Record<string, ProtocolMeta> = {
   },
   "magnetico-sleep-pad": {
     equipment: "required",
-    how: "Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nOnce on your available list this auto-logs nightly; tap to skip when traveling.",
+    how: "Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nSet pad strength on the checklist: 5 G = 1.25×, 10 G = 1.5×, 20 G = 2× base points. Once on your available list this auto-logs nightly; tap to skip when traveling.",
   },
   "breaker-off-bedroom": {
     equipment: "optional",
@@ -124,6 +124,10 @@ const META: Record<string, ProtocolMeta> = {
   "dark-bedroom": {
     equipment: "optional",
     how: "Make the room pitch-black: blackout curtains, eye mask, tape over standby LEDs, cover charger lights.\n\nYou should not see your hand in front of your face when lights are out.",
+  },
+  "cool-bedroom-sleep": {
+    equipment: "optional",
+    how: "Set the bedroom thermostat at 65°F (18°C) or cooler — cool under covers, not shivering. Fans and breathable bedding help without over-chilling.\n\nPick your sleep temp on the checklist: 65°F earns 10 pts; each degree warmer costs 1 point. Auto-logs nightly while on your list; skip when traveling.",
   },
   "consistent-sleep-window": {
     equipment: "none",

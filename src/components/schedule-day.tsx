@@ -1,7 +1,7 @@
 "use client";
 
-import { Check, Flame, Minus, Plus, Timer, X } from "lucide-react";
-import { useMemo, useRef, useState, useTransition } from "react";
+import { Check, Flame, Minus, Plus, Sun, Timer, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
 import {
   ProtocolHowToButton,
@@ -12,18 +12,46 @@ import {
   logPermanentTonightAction,
   removeOneCompletionAction,
 } from "@/lib/actions/completions";
+import { setMagneticoGaussAction } from "@/lib/actions/magnetico";
+import { setSleepRoomTempAction } from "@/lib/actions/sleep-room-temp";
 import { orderProtocolsForNow } from "@/lib/checklist-order";
 import {
   isMagnetismKeystoneId,
   isWaterKeystoneId,
 } from "@/lib/lwm";
 import { SunriseKeystoneDialog } from "@/components/sunrise-keystone-dialog";
+import {
+  coldThermoSkinTempBasePoints,
+  COLD_THERMO_SKIN_TEMP_OPTIONS,
+  formatColdThermoSkinTemp,
+  isColdThermoProtocolId,
+  OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
+  type ColdThermoSkinTempF,
+} from "@/lib/cold-thermo-skin-temp";
+import {
+  formatMagneticoGauss,
+  formatMagneticoGaussMultiplier,
+  isMagneticoProtocolId,
+  MAGNETICO_GAUSS_OPTIONS,
+  parseMagneticoGauss,
+  pointsForMagneticoGauss,
+  type MagneticoGauss,
+} from "@/lib/magnetico";
+import {
+  formatSleepRoomTemp,
+  isSleepRoomTempProtocolId,
+  parseSleepRoomTempF,
+  pointsForSleepRoomTemp,
+  SLEEP_ROOM_TEMP_OPTIONS,
+  type SleepRoomTempF,
+} from "@/lib/sleep-room-temp";
 import { isPermanentProtocolId } from "@/lib/permanent-activities";
 import {
   DURATION_BLOCK_MINUTES,
   formatSunriseMultiplier,
   isSunriseKeystoneProtocol,
   pointsForLog,
+  SUNRISE_TIERS,
   type SunriseModifiers,
   type SunriseTier,
 } from "@/lib/scoring";
@@ -56,6 +84,7 @@ type Props = {
   sun?: SunTimes | null;
   timeZone?: string;
   allProtocols?: Protocol[];
+  todayIso?: string;
   onStatsChange?: (s: {
     dayPoints: number;
     streak: { current: number; best: number };
@@ -65,7 +94,11 @@ type Props = {
   /** Live checklist counts for L·W·M strip */
   onCompletionCountsChange?: (counts: Record<string, number>) => void;
   onCompletionDurationsChange?: (durations: Record<string, number>) => void;
+  magneticoGauss?: number;
+  sleepRoomTempF?: number;
 };
+
+const MORNING_LIGHT_BUSY_ID = "morning-light";
 
 export function ScheduleDay({
   protocols,
@@ -86,9 +119,12 @@ export function ScheduleDay({
   sun = null,
   timeZone = "UTC",
   allProtocols,
+  todayIso,
   onStatsChange,
   onCompletionCountsChange,
   onCompletionDurationsChange,
+  magneticoGauss: initialMagneticoGauss = 10,
+  sleepRoomTempF: initialSleepRoomTempF = 65,
 }: Props) {
   const { push } = useToast();
   const [, start] = useTransition();
@@ -97,12 +133,29 @@ export function ScheduleDay({
   const [streak, setStreak] = useState(initialStreak);
   const [sunriseMult, setSunriseMult] = useState(initialMult);
   const [sunriseTierLabel, setSunriseTierLabel] = useState(initialTierLabel);
+  const [coldThermoSkinTempF, setColdThermoSkinTempF] =
+    useState<ColdThermoSkinTempF>(OPTIMAL_COLD_THERMO_SKIN_TEMP_F);
   const [durationFor, setDurationFor] = useState<Protocol | null>(null);
   const [howToFor, setHowToFor] = useState<Protocol | null>(null);
   const [durationMins, setDurationMins] = useState(15);
-  const [sunriseKeystoneFor, setSunriseKeystoneFor] = useState<Protocol | null>(
-    null,
+  const [sunriseDialog, setSunriseDialog] = useState<{
+    open: boolean;
+    initialProtocol: Protocol | null;
+  }>({ open: false, initialProtocol: null });
+  const [magneticoGauss, setMagneticoGauss] = useState<MagneticoGauss>(() =>
+    parseMagneticoGauss(initialMagneticoGauss),
   );
+  const [sleepRoomTempF, setSleepRoomTempF] = useState<SleepRoomTempF>(() =>
+    parseSleepRoomTempF(initialSleepRoomTempF),
+  );
+
+  useEffect(() => {
+    setMagneticoGauss(parseMagneticoGauss(initialMagneticoGauss));
+  }, [initialMagneticoGauss]);
+
+  useEffect(() => {
+    setSleepRoomTempF(parseSleepRoomTempF(initialSleepRoomTempF));
+  }, [initialSleepRoomTempF]);
 
   // Local state (not useOptimistic) so UI doesn't snap back when the
   // transition ends before any RSC refresh.
@@ -161,6 +214,35 @@ export function ScheduleDay({
     [protocols],
   );
 
+  const sunriseCatalog = allProtocols ?? protocols;
+
+  const sunriseTierOptions = useMemo(
+    () =>
+      SUNRISE_TIERS.map((tier) => ({
+        tier,
+        protocol: sunriseCatalog.find((p) => p.id === tier.protocolId) ?? null,
+      })).filter((x) => x.protocol != null) as {
+        tier: SunriseTier;
+        protocol: Protocol;
+      }[],
+    [sunriseCatalog],
+  );
+
+  const loggedSunriseTier = useMemo(
+    () => SUNRISE_TIERS.find((t) => (counts[t.protocolId] ?? 0) > 0) ?? null,
+    [counts],
+  );
+
+  const morningLightLogged = sunriseMult > 1 || loggedSunriseTier != null;
+
+  function openSunriseDialog(initialProtocol: Protocol | null = null) {
+    setSunriseDialog({ open: true, initialProtocol });
+  }
+
+  function closeSunriseDialog() {
+    setSunriseDialog({ open: false, initialProtocol: null });
+  }
+
   function applySnap(snap: {
     dayPoints: number;
     streak: { current: number; best: number };
@@ -198,7 +280,30 @@ export function ScheduleDay({
     }
   }
 
+  function coldThermoLogBase(protocol: Protocol): number {
+    return coldThermoSkinTempBasePoints(coldThermoSkinTempF, protocol.points);
+  }
+
   function protocolHint(p: Protocol): string {
+    if (isMagneticoProtocolId(p.id)) {
+      const pts = pointsForMagneticoGauss(magneticoGauss, p.points);
+      const parts = [
+        `${formatMagneticoGauss(magneticoGauss)} · ${formatMagneticoGaussMultiplier(magneticoGauss)} · ${pts} pts`,
+      ];
+      if (isPermanentProtocolId(p.id)) parts.push("automatic daily");
+      return parts.join(" · ");
+    }
+    if (isSleepRoomTempProtocolId(p.id)) {
+      const parts = [
+        `${formatSleepRoomTemp(sleepRoomTempF)} · ${pointsForSleepRoomTemp(sleepRoomTempF)} pts`,
+      ];
+      if (isPermanentProtocolId(p.id)) parts.push("automatic daily");
+      return parts.join(" · ");
+    }
+    if (isColdThermoProtocolId(p.id)) {
+      const base = coldThermoLogBase(p);
+      return `${formatColdThermoSkinTemp(coldThermoSkinTempF)} · ${base} pts / 15 min`;
+    }
     const parts: string[] = [`${p.points} pts`];
     if (isSunriseKeystoneProtocol(p)) parts.push("Light keystone");
     else if (isWaterKeystoneId(p.id)) parts.push("Water keystone");
@@ -208,6 +313,42 @@ export function ScheduleDay({
       parts.push(`${p.points} pts / 15 min`);
     }
     return parts.join(" · ");
+  }
+
+  function setGauss(next: MagneticoGauss) {
+    const prev = magneticoGauss;
+    if (next === prev) return;
+    setMagneticoGauss(next);
+    start(async () => {
+      try {
+        const res = await setMagneticoGaussAction(next);
+        setMagneticoGauss(res.gauss);
+        setDayPoints(res.dayPoints);
+        onStatsChange?.({ dayPoints: res.dayPoints, streak });
+        push(`Magnetico set to ${formatMagneticoGauss(res.gauss)}`);
+      } catch (e) {
+        setMagneticoGauss(prev);
+        push(e instanceof Error ? e.message : "Could not update gauss", "err");
+      }
+    });
+  }
+
+  function setSleepTemp(next: SleepRoomTempF) {
+    const prev = sleepRoomTempF;
+    if (next === prev) return;
+    setSleepRoomTempF(next);
+    start(async () => {
+      try {
+        const res = await setSleepRoomTempAction(next);
+        setSleepRoomTempF(res.tempF);
+        setDayPoints(res.dayPoints);
+        onStatsChange?.({ dayPoints: res.dayPoints, streak });
+        push(`Sleep temp set to ${formatSleepRoomTemp(res.tempF)}`);
+      } catch (e) {
+        setSleepRoomTempF(prev);
+        push(e instanceof Error ? e.message : "Could not update temp", "err");
+      }
+    });
   }
 
   function openDurationDialog(protocol: Protocol) {
@@ -243,7 +384,7 @@ export function ScheduleDay({
       return;
     }
     if (count === 0 && isSunriseKeystoneProtocol(protocol)) {
-      setSunriseKeystoneFor(protocol);
+      openSunriseDialog(protocol);
       return;
     }
     runLog(protocol.id, async () => {
@@ -275,15 +416,25 @@ export function ScheduleDay({
     protocol: Protocol,
     tier: SunriseTier,
     modifiers: SunriseModifiers,
+    viewedAtStartIso: string,
+    viewedAtEndIso: string,
   ) {
-    runLog(protocol.id, async () => {
+    runLog(MORNING_LIGHT_BUSY_ID, async () => {
       try {
+        for (const t of SUNRISE_TIERS) {
+          if ((countsRef.current[t.protocolId] ?? 0) > 0) {
+            await removeOneCompletionAction(t.protocolId);
+            bumpCounts({ protocolId: t.protocolId, absolute: 0 });
+          }
+        }
         bumpCounts({ protocolId: protocol.id, delta: 1 });
         const res = await logCompletionAction(protocol.id, {
           sunriseModifiers: modifiers,
+          viewedAtStart: viewedAtStartIso,
+          viewedAtEnd: viewedAtEndIso,
         });
         applySnap({ ...res, protocolId: protocol.id });
-        setSunriseKeystoneFor(null);
+        closeSunriseDialog();
         const boost =
           res.sunriseMultiplier > 1
             ? ` · ${formatSunriseMultiplier(res.sunriseMultiplier)} day boost`
@@ -294,6 +445,96 @@ export function ScheduleDay({
         push(e instanceof Error ? e.message : "Could not log", "err");
       }
     });
+  }
+
+  function renderSunriseSection() {
+    if (sunriseTierOptions.length === 0) return null;
+    const rowBusy = busyId === MORNING_LIGHT_BUSY_ID;
+
+    return (
+      <section className="space-y-2">
+        <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-accent">
+          Morning light
+        </h2>
+        <div className="space-y-1.5">
+          <div className="flex items-stretch gap-1.5">
+            <button
+              type="button"
+              disabled={rowBusy}
+              onClick={() => openSunriseDialog(null)}
+              className={cn(
+                "flex min-w-0 flex-1 items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition disabled:opacity-60",
+                morningLightLogged
+                  ? "border-accent/40 bg-accent/10"
+                  : "border-border bg-card hover:border-accent/30",
+              )}
+            >
+              <span
+                className={cn(
+                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+                  morningLightLogged
+                    ? "border-accent/50 bg-accent text-on-accent"
+                    : "border-border text-muted",
+                )}
+              >
+                <Sun className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span
+                  className={cn(
+                    "block font-medium leading-snug",
+                    morningLightLogged && "text-accent",
+                  )}
+                >
+                  {loggedSunriseTier?.shortLabel ?? "Morning light check-in"}
+                </span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  {morningLightLogged
+                    ? [
+                        sunriseTierLabel ?? loggedSunriseTier?.shortLabel,
+                        sunriseMult > 1
+                          ? `${formatSunriseMultiplier(sunriseMult)} day boost`
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")
+                    : "Tap a tier below or open to set skin, eyes, and timing"}
+                </span>
+              </span>
+            </button>
+          </div>
+          <div
+            className="flex flex-wrap items-center gap-1.5 pl-1"
+            role="group"
+            aria-label="Morning light tier"
+          >
+            <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
+              Tier
+            </span>
+            {sunriseTierOptions.map(({ tier, protocol }) => {
+              const active = loggedSunriseTier?.id === tier.id;
+              return (
+                <button
+                  key={tier.id}
+                  type="button"
+                  disabled={rowBusy}
+                  onClick={() => openSunriseDialog(protocol)}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-xs font-semibold transition",
+                    active
+                      ? "bg-accent text-on-accent"
+                      : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
+                    tier.id === "horizon" && !active && "border-accent/30",
+                  )}
+                >
+                  {tier.shortLabel} · {formatSunriseMultiplier(tier.multiplier)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
   }
 
   function addOne(protocol: Protocol, durationMinutes?: number) {
@@ -312,6 +553,9 @@ export function ScheduleDay({
       try {
         const res = await logCompletionAction(protocol.id, {
           durationMinutes: mins,
+          skinTempF: isColdThermoProtocolId(protocol.id)
+            ? coldThermoSkinTempF
+            : undefined,
         });
         applySnap({ ...res, protocolId: protocol.id });
         if (res.action === "added") {
@@ -360,13 +604,13 @@ export function ScheduleDay({
 
     if (multi) {
       return (
-        <li
-          key={p.id}
-          className={cn(
-            "flex items-center gap-3 rounded-2xl border px-3.5 py-3",
-            isDone ? "border-accent/40 bg-accent/10" : "border-border bg-card",
-          )}
-        >
+        <li key={p.id} className="space-y-1.5">
+          <div
+            className={cn(
+              "flex items-center gap-3 rounded-2xl border px-3.5 py-3",
+              isDone ? "border-accent/40 bg-accent/10" : "border-border bg-card",
+            )}
+          >
           <span
             className={cn(
               "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
@@ -440,63 +684,162 @@ export function ScheduleDay({
               <Plus className="h-4 w-4" strokeWidth={2.5} />
             </button>
           </div>
+          </div>
+          {isColdThermoProtocolId(p.id) && (
+            <div
+              className="flex flex-wrap items-center gap-1.5 pl-1"
+              role="group"
+              aria-label="Skin surface temperature"
+            >
+              <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
+                Skin
+              </span>
+              {COLD_THERMO_SKIN_TEMP_OPTIONS.map((t) => {
+                const active = coldThermoSkinTempF === t;
+                const base = coldThermoSkinTempBasePoints(t, p.points);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    disabled={rowBusy}
+                    onClick={() => setColdThermoSkinTempF(t)}
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs font-semibold transition",
+                      active
+                        ? "bg-accent text-on-accent"
+                        : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
+                      t === 50 && !active && "border-accent/30",
+                    )}
+                  >
+                    {t}°F · {base} base
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </li>
       );
     }
 
     return (
-      <li key={p.id} className="flex items-stretch gap-1.5">
-        <button
-          type="button"
-          disabled={rowBusy}
-          onClick={() => toggleSingle(p)}
-          className={cn(
-            "flex min-w-0 flex-1 items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition disabled:opacity-60",
-            isDone
-              ? "border-accent/40 bg-accent/10"
-              : "border-border bg-card hover:border-accent/30",
-          )}
-        >
-          <span
+      <li key={p.id} className="space-y-1.5">
+        <div className="flex items-stretch gap-1.5">
+          <button
+            type="button"
+            disabled={rowBusy}
+            onClick={() => toggleSingle(p)}
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+              "flex min-w-0 flex-1 items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition disabled:opacity-60",
               isDone
-                ? "border-accent/50 bg-accent text-on-accent"
-                : "border-border text-muted",
+                ? "border-accent/40 bg-accent/10"
+                : "border-border bg-card hover:border-accent/30",
             )}
           >
-            <Check className="h-4 w-4" strokeWidth={2.5} />
-          </span>
-          <span className="min-w-0 flex-1">
             <span
               className={cn(
-                "block font-medium leading-snug",
-                isDone && "text-accent",
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+                isDone
+                  ? "border-accent/50 bg-accent text-on-accent"
+                  : "border-border text-muted",
               )}
             >
-              {p.name}
+              <Check className="h-4 w-4" strokeWidth={2.5} />
             </span>
-            <span className="mt-0.5 block text-xs text-muted">
-              {protocolHint(p)}
-              {isDone
-                ? isPermanentProtocolId(p.id)
-                  ? " · logged · tap to skip tonight"
-                  : p.durationEnabled && totalMins > 0
-                    ? ` · ${totalMins} min`
-                    : " · done"
-                : isPermanentProtocolId(p.id)
-                  ? " · auto-logs daily"
-                  : p.durationEnabled
-                    ? ` · tap to set minutes`
-                    : ""}
+            <span className="min-w-0 flex-1">
+              <span
+                className={cn(
+                  "block font-medium leading-snug",
+                  isDone && "text-accent",
+                )}
+              >
+                {p.name}
+              </span>
+              <span className="mt-0.5 block text-xs text-muted">
+                {protocolHint(p)}
+                {isDone
+                  ? isPermanentProtocolId(p.id)
+                    ? " · logged · tap to skip tonight"
+                    : p.durationEnabled && totalMins > 0
+                      ? ` · ${totalMins} min`
+                      : " · done"
+                  : isPermanentProtocolId(p.id)
+                    ? " · auto-logs daily"
+                    : p.durationEnabled
+                      ? ` · tap to set minutes`
+                      : ""}
+              </span>
             </span>
-          </span>
-        </button>
-        <ProtocolHowToButton
-          protocol={p}
-          onClick={() => setHowToFor(p)}
-          className="self-center"
-        />
+          </button>
+          <ProtocolHowToButton
+            protocol={p}
+            onClick={() => setHowToFor(p)}
+            className="self-center"
+          />
+        </div>
+        {isMagneticoProtocolId(p.id) && (
+          <div
+            className="flex flex-wrap items-center gap-1.5 pl-1"
+            role="group"
+            aria-label="Magnetico gauss rating"
+          >
+            <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
+              Gauss
+            </span>
+            {MAGNETICO_GAUSS_OPTIONS.map((g) => {
+              const active = magneticoGauss === g;
+              const pts = pointsForMagneticoGauss(g, p.points);
+              const mult = formatMagneticoGaussMultiplier(g);
+              return (
+                <button
+                  key={g}
+                  type="button"
+                  disabled={rowBusy}
+                  onClick={() => setGauss(g)}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-xs font-semibold transition",
+                    active
+                      ? "bg-accent text-on-accent"
+                      : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
+                  )}
+                >
+                  {g} G · {mult} · {pts} pts
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {isSleepRoomTempProtocolId(p.id) && (
+          <div
+            className="flex flex-wrap items-center gap-1.5 pl-1"
+            role="group"
+            aria-label="Bedroom sleep temperature"
+          >
+            <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
+              Temp
+            </span>
+            {SLEEP_ROOM_TEMP_OPTIONS.map((t) => {
+              const active = sleepRoomTempF === t;
+              const pts = pointsForSleepRoomTemp(t);
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  disabled={rowBusy}
+                  onClick={() => setSleepTemp(t)}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-xs font-semibold transition",
+                    active
+                      ? "bg-accent text-on-accent"
+                      : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
+                    t === 65 && !active && "border-accent/30",
+                  )}
+                >
+                  {t}°F · {pts} pts
+                </button>
+              );
+            })}
+          </div>
+        )}
       </li>
     );
   }
@@ -527,11 +870,11 @@ export function ScheduleDay({
               </span>
             </p>
           ) : (
-            protocols.some(isSunriseKeystoneProtocol) && (
+            sunriseMult <= 1 && (
               <p className="rounded-2xl border border-border px-3.5 py-2.5 text-xs leading-relaxed text-muted">
                 <span className="font-medium text-foreground">Tip · </span>
                 Morning light boosts the rest of today: horizon 2× · open sky
-                1.5× · outside 1.25×
+                1.5× · outside 1.25× — logged from the daily sunrise check-in.
               </p>
             )
           )}
@@ -573,23 +916,27 @@ export function ScheduleDay({
       )}
 
       {protocols.length === 0 ? (
-        <div className="glass rounded-3xl border border-dashed border-border p-6 text-center">
-          <p className="font-medium">No activities on your list yet</p>
-          <p className="mt-2 text-sm text-muted">
-            Expand the catalog below and toggle what you can actually do.
-          </p>
-          {onExpandCatalog && (
-            <button
-              type="button"
-              onClick={onExpandCatalog}
-              className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
-            >
-              Browse catalog
-            </button>
-          )}
+        <div className="space-y-5">
+          {renderSunriseSection()}
+          <div className="glass rounded-3xl border border-dashed border-border p-6 text-center">
+            <p className="font-medium">No activities on your list yet</p>
+            <p className="mt-2 text-sm text-muted">
+              Expand the catalog below and toggle what you can actually do.
+            </p>
+            {onExpandCatalog && (
+              <button
+                type="button"
+                onClick={onExpandCatalog}
+                className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
+              >
+                Browse catalog
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="space-y-5">
+          {renderSunriseSection()}
           {suggested.length > 0 && (
             <section className="space-y-2">
               <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-accent">
@@ -685,12 +1032,44 @@ export function ScheduleDay({
                 className="field-input mt-1 w-full rounded-xl px-3 py-2 text-sm"
               />
             </label>
+            {isColdThermoProtocolId(durationFor.id) && (
+              <div
+                className="mt-4 flex flex-wrap items-center gap-1.5"
+                role="group"
+                aria-label="Skin surface temperature"
+              >
+                <span className="mr-1 w-full text-[10px] uppercase tracking-wider text-muted">
+                  Skin temp
+                </span>
+                {COLD_THERMO_SKIN_TEMP_OPTIONS.map((t) => {
+                  const active = coldThermoSkinTempF === t;
+                  const base = coldThermoSkinTempBasePoints(t, durationFor.points);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setColdThermoSkinTempF(t)}
+                      className={cn(
+                        "rounded-full px-2.5 py-1 text-xs font-semibold transition",
+                        active
+                          ? "bg-accent text-on-accent"
+                          : "border border-border text-muted",
+                        t === 50 && !active && "border-accent/30",
+                      )}
+                    >
+                      {t}°F · {base}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <p className="mt-2 text-xs text-accent">
               ≈{" "}
               {pointsForLog(durationFor, durationMins, {
                 sunriseMultiplier: isSunriseKeystoneProtocol(durationFor)
                   ? 1
                   : sunriseMult,
+                basePoints: coldThermoLogBase(durationFor),
               })}{" "}
               pts this log
             </p>
@@ -705,15 +1084,16 @@ export function ScheduleDay({
           </div>
         </div>
       )}
-      {sunriseKeystoneFor ? (
+      {sunriseDialog.open ? (
         <SunriseKeystoneDialog
-          allProtocols={allProtocols ?? protocols}
+          todayIso={todayIso}
+          allProtocols={sunriseCatalog}
           sun={sun}
           timeZone={timeZone}
-          pending={busyId === sunriseKeystoneFor.id}
-          initialProtocol={sunriseKeystoneFor}
+          pending={busyId === MORNING_LIGHT_BUSY_ID}
+          initialProtocol={sunriseDialog.initialProtocol}
           onLog={logSunriseKeystone}
-          onCancel={() => setSunriseKeystoneFor(null)}
+          onCancel={closeSunriseDialog}
         />
       ) : null}
     </div>

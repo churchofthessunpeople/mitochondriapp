@@ -11,6 +11,7 @@ import {
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isCatalogSelectableProtocol } from "@/lib/scoring";
 import { useToast } from "@/components/toast";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -43,13 +44,18 @@ export function AvailablePicker({
   const [available, setAvailable] = useState(() => new Set(initialIds));
   const [howToFor, setHowToFor] = useState<Protocol | null>(null);
 
+  const catalogProtocols = useMemo(
+    () => protocols.filter(isCatalogSelectableProtocol),
+    [protocols],
+  );
+
   useEffect(() => {
     setAvailable(new Set(initialIds));
   }, [initialIds]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return protocols.filter((p) => {
+    return catalogProtocols.filter((p) => {
       if (showOnlyAvailable && !available.has(p.id)) return false;
       if (category !== "all" && p.category !== category) return false;
       if (q) {
@@ -58,7 +64,7 @@ export function AvailablePicker({
       }
       return true;
     });
-  }, [protocols, query, category, showOnlyAvailable, available]);
+  }, [catalogProtocols, query, category, showOnlyAvailable, available]);
 
   const grouped = useMemo(() => {
     const map = new Map<ProtocolCategory, Protocol[]>();
@@ -68,20 +74,21 @@ export function AvailablePicker({
   }, [filtered]);
 
   function toggle(protocolId: string, name: string) {
+    const wasOn = available.has(protocolId);
+    const previous = new Set(available);
+    const next = new Set(available);
+    if (wasOn) next.delete(protocolId);
+    else next.add(protocolId);
+    setAvailable(next);
+    onAvailableIdsChange?.([...next]);
+    push(wasOn ? `Removed “${name}”` : `Available: ${name}`);
+
     start(async () => {
       try {
-        const wasOn = available.has(protocolId);
-        const next = new Set(available);
-        if (wasOn) next.delete(protocolId);
-        else next.add(protocolId);
-        setAvailable(next);
-        onAvailableIdsChange?.([...next]);
         await toggleFavoriteAction(protocolId);
-        push(wasOn ? `Removed “${name}”` : `Available: ${name}`);
       } catch (e) {
-        // Revert local state on failure
-        setAvailable(new Set(available));
-        onAvailableIdsChange?.([...available]);
+        setAvailable(previous);
+        onAvailableIdsChange?.([...previous]);
         push(e instanceof Error ? e.message : "Could not update", "err");
       }
     });
@@ -99,7 +106,7 @@ export function AvailablePicker({
         </p>
         <p className="mt-2">
           <span className="font-medium text-accent">{available.size}</span> of{" "}
-          {protocols.length} available
+          {catalogProtocols.length} available
           {available.size > 0 && (
             <>
               {" · "}

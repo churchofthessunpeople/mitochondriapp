@@ -10,6 +10,7 @@ import {
   accountSectionFromSearchParam,
   mitoLessonFromSearchParam,
   tabFromSearchParam,
+  todaySectionFromSearchParam,
 } from "@/lib/app-tabs";
 import { ensureAdminFlagSynced } from "@/lib/admin";
 import {
@@ -52,7 +53,7 @@ export const metadata = { title: "Home" };
 export default async function AppPage({
   searchParams,
 }: {
-  searchParams: Promise<{ t?: string; lesson?: string }>;
+  searchParams: Promise<{ t?: string; lesson?: string; sunrise?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) redirect(ROUTES.login);
@@ -61,9 +62,13 @@ export default async function AppPage({
   const params = await searchParams;
   const initialTab = tabFromSearchParam(params.t);
   const initialAccountSection = accountSectionFromSearchParam(params.t);
+  const initialTodaySection = todaySectionFromSearchParam(params.t);
   const initialMitoLesson = mitoLessonFromSearchParam(params.lesson);
   const initialOpenAdmin =
     (Array.isArray(params.t) ? params.t[0] : params.t) === "admin";
+  const forceSunriseCheckIn =
+    (Array.isArray(params.sunrise) ? params.sunrise[0] : params.sunrise) ===
+    "1";
   const h = await headers();
   const userId = session.user.id;
 
@@ -222,6 +227,7 @@ export default async function AppPage({
     <AppShell
       initialTab={initialTab}
       initialAccountSection={initialAccountSection}
+      initialTodaySection={initialTodaySection}
       initialMitoLesson={initialMitoLesson}
       dateLabel={dateLabel}
       todayIso={date}
@@ -239,6 +245,7 @@ export default async function AppPage({
       timeZone={tz}
       isAdmin={isAdmin}
       initialOpenAdmin={initialOpenAdmin && isAdmin}
+      forceSunriseCheckIn={forceSunriseCheckIn}
       phaseHint={phaseHint}
       placeFactors={placeFactors}
       distanceKm={distanceKm}
@@ -252,6 +259,8 @@ export default async function AppPage({
       travelUntil={loc.travelUntil}
       homePostalCode={userFlags?.postalCode ?? null}
       travelLabel={userFlags?.travelPlaceLabel ?? null}
+      magneticoGauss={fullUser.magneticoGauss ?? 10}
+      sleepRoomTempF={fullUser.sleepRoomTempF ?? 65}
       currentUserId={userId}
       accountUser={{
         username: fullUser.username,

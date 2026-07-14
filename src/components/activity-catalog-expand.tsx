@@ -15,6 +15,7 @@ import {
   pillarForCategory,
   type LwmPillarId,
 } from "@/lib/lwm";
+import { isCatalogSelectableProtocol } from "@/lib/scoring";
 import {
   equipmentLabel,
   getProtocolMeta,
@@ -65,15 +66,20 @@ export function ActivityCatalogExpand({
   const [available, setAvailable] = useState(() => new Set(initialIds));
   const [howToFor, setHowToFor] = useState<Protocol | null>(null);
 
+  const catalogProtocols = useMemo(
+    () => protocols.filter(isCatalogSelectableProtocol),
+    [protocols],
+  );
+
   useEffect(() => {
     setAvailable(new Set(initialIds));
   }, [initialIds]);
 
-  const remaining = protocols.length - available.size;
+  const remaining = catalogProtocols.length - available.size;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return protocols.filter((p) => {
+    return catalogProtocols.filter((p) => {
       if (listFilter === "not_on" && available.has(p.id)) return false;
       if (listFilter === "on" && !available.has(p.id)) return false;
       if (pillar !== "all" && pillarForCategory(p.category) !== pillar) {
@@ -85,7 +91,7 @@ export function ActivityCatalogExpand({
       }
       return true;
     });
-  }, [protocols, query, pillar, listFilter, available]);
+  }, [catalogProtocols, query, pillar, listFilter, available]);
 
   const grouped = useMemo(() => {
     const map = new Map<LwmPillarId, Protocol[]>();
@@ -107,19 +113,21 @@ export function ActivityCatalogExpand({
   }, [filtered]);
 
   function toggle(protocolId: string, name: string) {
+    const wasOn = available.has(protocolId);
+    const previous = new Set(available);
+    const next = new Set(available);
+    if (wasOn) next.delete(protocolId);
+    else next.add(protocolId);
+    setAvailable(next);
+    onAvailableIdsChange?.([...next]);
+    push(wasOn ? `Removed “${name}”` : `Added to checklist: ${name}`);
+
     start(async () => {
       try {
-        const wasOn = available.has(protocolId);
-        const next = new Set(available);
-        if (wasOn) next.delete(protocolId);
-        else next.add(protocolId);
-        setAvailable(next);
-        onAvailableIdsChange?.([...next]);
         await toggleFavoriteAction(protocolId);
-        push(wasOn ? `Removed “${name}”` : `Added to checklist: ${name}`);
       } catch (e) {
-        setAvailable(new Set(available));
-        onAvailableIdsChange?.([...available]);
+        setAvailable(previous);
+        onAvailableIdsChange?.([...previous]);
         push(e instanceof Error ? e.message : "Could not update", "err");
       }
     });
@@ -129,7 +137,7 @@ export function ActivityCatalogExpand({
         <div className={cn("space-y-4", !embedded && "mt-4 border-t border-border pt-4")}>
           <p className="text-xs text-muted">
             {available.size === 0
-              ? `Pick what you can do (${protocols.length} in catalog).`
+              ? `Pick what you can do (${catalogProtocols.length} in catalog). Morning light is logged each day from the sunrise check-in.`
               : `${available.size} on your checklist · ${remaining} more available.`}{" "}
             Toggle only what you can actually do (equipment, access).
           </p>
@@ -286,7 +294,7 @@ export function ActivityCatalogExpand({
           <p className="font-semibold">Browse all activities</p>
           <p className="mt-0.5 text-xs text-muted">
             {available.size === 0
-              ? `Pick what you can do (${protocols.length} in catalog)`
+              ? `Pick what you can do (${catalogProtocols.length} in catalog)`
               : `${available.size} on your list · ${remaining} more in catalog`}
           </p>
         </div>

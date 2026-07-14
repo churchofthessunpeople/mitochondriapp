@@ -7,29 +7,37 @@ import {
   Flame,
   LayoutGrid,
   MapPin,
+  Trophy,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
+import {
+  LeaderboardPanel,
+  type LeaderboardBoards,
+} from "@/components/leaderboard-panel";
 import { LwmStrip } from "@/components/lwm-strip";
 import { RegionCard } from "@/components/region-card";
 import { ScheduleDay } from "@/components/schedule-day";
 import { ZipForm } from "@/components/zip-form";
 import type { OpenAppSheet } from "@/lib/app-sheets";
+import type { TodaySection } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
+import { ROUTES } from "@/lib/routes";
 import {
   formatSunriseMultiplier,
-  isSunriseKeystoneProtocol,
+  isCatalogSelectableProtocol,
 } from "@/lib/scoring";
 import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
 import { formatTimeInZone } from "@/lib/sun";
 import { cn, formatPoints } from "@/lib/utils";
 
-export type TodaySection = "checklist" | "place" | "catalog";
+export type { TodaySection };
 
 type Props = {
   dateLabel: string;
+  todayIso: string;
   allProtocols: Protocol[];
   availableIds: string[];
   onAvailableIdsChange: (ids: string[]) => void;
@@ -55,6 +63,12 @@ type Props = {
   travelUntil?: string | null;
   homePostalCode?: string | null;
   travelLabel?: string | null;
+  magneticoGauss?: number;
+  sleepRoomTempF?: number;
+  initialSection?: TodaySection | null;
+  leaderboards?: LeaderboardBoards;
+  currentUserId?: string;
+  onOpenFriends?: () => void;
   onOpenSheet?: OpenAppSheet;
 };
 
@@ -67,6 +81,12 @@ const TABS: {
   { id: "checklist", label: "Checklist", shortLabel: "Log", icon: ClipboardList },
   { id: "place", label: "Place", shortLabel: "Place", icon: MapPin },
   { id: "catalog", label: "Catalog", shortLabel: "List", icon: LayoutGrid },
+  {
+    id: "leaderboard",
+    label: "Leaderboard",
+    shortLabel: "Ranks",
+    icon: Trophy,
+  },
 ];
 
 /**
@@ -74,6 +94,7 @@ const TABS: {
  */
 export function TodayHome({
   dateLabel,
+  todayIso,
   allProtocols,
   availableIds,
   onAvailableIdsChange,
@@ -99,11 +120,17 @@ export function TodayHome({
   travelUntil,
   homePostalCode,
   travelLabel,
+  magneticoGauss = 10,
+  sleepRoomTempF = 65,
+  initialSection,
+  leaderboards,
+  currentUserId,
+  onOpenFriends,
   onOpenSheet,
 }: Props) {
   const hasPlace = Boolean(placeLabel || region);
   const [section, setSection] = useState<TodaySection>(
-    hasPlace ? "checklist" : "place",
+    initialSection ?? (hasPlace ? "checklist" : "place"),
   );
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [liveCounts, setLiveCounts] = useState(completionCounts);
@@ -114,6 +141,27 @@ export function TodayHome({
   const [liveSunriseTierLabel, setLiveSunriseTierLabel] = useState(
     sunriseTierLabel ?? null,
   );
+
+  useEffect(() => {
+    if (initialSection) setSection(initialSection);
+  }, [initialSection]);
+
+  function selectSection(next: TodaySection) {
+    setSection(next);
+    try {
+      const url =
+        next === "leaderboard"
+          ? ROUTES.leaderboard
+          : next === "place"
+            ? "/app?t=place"
+            : next === "catalog"
+              ? "/app?t=catalog"
+              : ROUTES.home;
+      window.history.replaceState(null, "", url);
+    } catch {
+      /* ignore */
+    }
+  }
 
   // New calendar day (or hard navigation) — adopt server props once.
   // Do not sync on every prop change: logs update live state without /app revalidate.
@@ -168,10 +216,15 @@ export function TodayHome({
     [],
   );
 
+  const catalogProtocols = useMemo(
+    () => allProtocols.filter(isCatalogSelectableProtocol),
+    [allProtocols],
+  );
+
   const availableProtocols = useMemo(() => {
     const set = new Set(availableIds);
-    return allProtocols.filter((p) => set.has(p.id));
-  }, [allProtocols, availableIds]);
+    return catalogProtocols.filter((p) => set.has(p.id));
+  }, [catalogProtocols, availableIds]);
 
   const placeSummary = useMemo(() => {
     if (!placeLabel && !region) return "Set ZIP for sun times";
@@ -180,7 +233,7 @@ export function TodayHome({
     return `${label} · ↑${formatTimeInZone(sun.sunrise, timeZone)} ↓${formatTimeInZone(sun.sunset, timeZone)}`;
   }, [placeLabel, region, sun, timeZone]);
 
-  const hasSunriseKeystone = availableProtocols.some(isSunriseKeystoneProtocol);
+  const showMorningLightTip = liveSunriseMult <= 1;
 
   return (
     <div className="space-y-3">
@@ -198,7 +251,7 @@ export function TodayHome({
               type="button"
               role="tab"
               aria-selected={active}
-              onClick={() => setSection(t.id)}
+              onClick={() => selectSection(t.id)}
               className={cn(
                 "flex min-w-0 flex-1 shrink-0 flex-col items-center gap-0.5 rounded-xl px-2 py-2 transition sm:flex-row sm:gap-2 sm:px-3 sm:py-2.5",
                 active
@@ -310,7 +363,7 @@ export function TodayHome({
                   ) : null}
                 </p>
               ) : (
-                hasSunriseKeystone && (
+                showMorningLightTip && (
                   <p className="rounded-xl border border-border px-3 py-2 text-xs leading-relaxed text-muted">
                     Morning light boosts the rest of today: horizon 2× · open
                     sky 1.5× · outside 1.25×
@@ -363,9 +416,10 @@ export function TodayHome({
             dayPoints={livePoints}
             streak={liveStreak}
             dateLabel={dateLabel}
+            todayIso={todayIso}
             hideTitle
             compact
-            onExpandCatalog={() => setSection("catalog")}
+            onExpandCatalog={() => selectSection("catalog")}
             phase={phase}
             localHour={localHour}
             seasonLine={seasonLine}
@@ -377,6 +431,8 @@ export function TodayHome({
             allProtocols={allProtocols}
             onCompletionCountsChange={onCompletionCountsChange}
             onCompletionDurationsChange={onCompletionDurationsChange}
+            magneticoGauss={magneticoGauss}
+            sleepRoomTempF={sleepRoomTempF}
             onStatsChange={onStatsChange}
           />
         )}
@@ -471,12 +527,21 @@ export function TodayHome({
               . Toggle only what you can actually do.
             </p>
             <ActivityCatalogExpand
-              protocols={allProtocols}
+              protocols={catalogProtocols}
               availableIds={availableIds}
               onAvailableIdsChange={onAvailableIdsChange}
               embedded
             />
           </div>
+        )}
+
+        {section === "leaderboard" && leaderboards && currentUserId && (
+          <LeaderboardPanel
+            compact
+            boards={leaderboards}
+            currentUserId={currentUserId}
+            onOpenFriends={onOpenFriends}
+          />
         )}
       </div>
     </div>

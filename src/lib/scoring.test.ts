@@ -96,6 +96,7 @@ describe("sunrise tiers", () => {
       grounded: true,
       skin: "full" as const,
       sunglasses: "none" as const,
+      sky: "clear" as const,
     };
     assert.equal(computeSunriseMultiplier(horizon, ideal), 2);
     assert.equal(

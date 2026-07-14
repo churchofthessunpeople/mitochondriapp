@@ -1,6 +1,7 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { protocols, userFavorites } from "@/db/schema";
+import { protocols, userFavorites, userScheduleItems } from "@/db/schema";
+import { isCatalogSelectableProtocolId } from "@/lib/scoring";
 
 export async function getUserFavoriteIds(userId: string): Promise<Set<string>> {
   try {
@@ -8,7 +9,27 @@ export async function getUserFavoriteIds(userId: string): Promise<Set<string>> {
       .select({ protocolId: userFavorites.protocolId })
       .from(userFavorites)
       .where(eq(userFavorites.userId, userId));
-    return new Set(rows.map((r) => r.protocolId));
+    const ids = rows.map((r) => r.protocolId);
+    const stale = ids.filter((id) => !isCatalogSelectableProtocolId(id));
+    if (stale.length > 0) {
+      await db
+        .delete(userFavorites)
+        .where(
+          and(
+            eq(userFavorites.userId, userId),
+            inArray(userFavorites.protocolId, stale),
+          ),
+        );
+      await db
+        .delete(userScheduleItems)
+        .where(
+          and(
+            eq(userScheduleItems.userId, userId),
+            inArray(userScheduleItems.protocolId, stale),
+          ),
+        );
+    }
+    return new Set(ids.filter(isCatalogSelectableProtocolId));
   } catch {
     return new Set();
   }

@@ -7,6 +7,7 @@ import {
   ensureCatalogSyncedToDb,
   getCatalogProtocols,
 } from "@/lib/catalog";
+import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
 
 /**
  * Activity list from local seed-data.ts (source of truth).
@@ -45,10 +46,12 @@ export async function getUserDayStats(userId: string, date: string) {
   for (const c of real) {
     counts.set(c.protocolId, (counts.get(c.protocolId) ?? 0) + 1);
     if (c.durationMinutes && c.durationMinutes > 0) {
-      durationTotals.set(
-        c.protocolId,
-        (durationTotals.get(c.protocolId) ?? 0) + c.durationMinutes,
-      );
+      if (!isSunriseKeystoneProtocolId(c.protocolId)) {
+        durationTotals.set(
+          c.protocolId,
+          (durationTotals.get(c.protocolId) ?? 0) + c.durationMinutes,
+        );
+      }
     }
   }
   return {

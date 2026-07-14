@@ -106,6 +106,10 @@ export const users = pgTable("users", {
   isAdmin: boolean("is_admin").notNull().default(false),
   onboardingComplete: boolean("onboarding_complete").notNull().default(false),
   showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),
+  /** Magnetico sleep pad strength preference: 5 | 10 | 20 gauss */
+  magneticoGauss: integer("magnetico_gauss").notNull().default(10),
+  /** Bedroom sleep temperature preference (°F); 65°F floor */
+  sleepRoomTempF: integer("sleep_room_temp_f").notNull().default(65),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
@@ -250,6 +254,8 @@ export const dailyCompletions = pgTable("daily_completions", {
   completedOn: date("completed_on", { mode: "string" }).notNull(),
   timeOfDay: timeOfDayEnum("time_of_day"),
   durationMinutes: integer("duration_minutes"),
+  /** Optional variant (e.g. Magnetico gauss 5/10/20) */
+  variantValue: integer("variant_value"),
   /** Effective day boost when this row is a morning-light keystone log */
   sunriseBuffMultiplier: doublePrecision("sunrise_buff_multiplier"),
   pointsEarned: integer("points_earned").notNull(),

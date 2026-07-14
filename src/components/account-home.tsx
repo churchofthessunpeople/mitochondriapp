@@ -9,10 +9,6 @@ import {
 import type { AccountPanelUser } from "@/components/account-panel";
 import { FriendsClient } from "@/components/friends-client";
 import { HistoryList } from "@/components/history-list";
-import {
-  LeaderboardPanel,
-  type LeaderboardBoards,
-} from "@/components/leaderboard-panel";
 import { RemindersClient } from "@/components/reminders-client";
 import { logoutAction } from "@/lib/actions/auth";
 import {
@@ -47,7 +43,6 @@ type Section = NonNullable<AccountSection>;
 
 const TABS: { id: Section; label: string }[] = [
   { id: "history", label: "History" },
-  { id: "leaderboard", label: "Board" },
   { id: "friends", label: "Friends" },
   { id: "reminders", label: "Reminders" },
   { id: "profile", label: "Profile" },
@@ -58,8 +53,6 @@ type Props = {
   initialSection?: AccountSection;
   history: HistoryRow[];
   lifetimePoints: number;
-  leaderboards: LeaderboardBoards;
-  currentUserId: string;
   isAdmin?: boolean;
   friends: FriendRow[];
   reminders: ReminderRow[];
@@ -80,8 +73,6 @@ export function AccountHome({
   initialSection,
   history,
   lifetimePoints,
-  leaderboards,
-  currentUserId,
   isAdmin = false,
   friends,
   reminders,
@@ -123,7 +114,7 @@ export function AccountHome({
         <p className="mt-1.5 text-sm text-muted">
           {user.memberSinceLabel
             ? `Member since ${user.memberSinceLabel}.`
-            : "History, ranks, friends, and settings."}
+            : "History, friends, reminders, and settings."}
         </p>
       </div>
 
@@ -179,15 +170,6 @@ export function AccountHome({
               </a>
             </p>
           </div>
-        )}
-
-        {section === "leaderboard" && (
-          <LeaderboardPanel
-            compact
-            boards={leaderboards}
-            currentUserId={currentUserId}
-            onOpenFriends={() => select("friends")}
-          />
         )}
 
         {section === "friends" && (

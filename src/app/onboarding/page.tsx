@@ -32,7 +32,7 @@ export default async function OnboardingPage() {
       : protocols.slice(0, 10);
 
   return (
-    <div className="min-h-dvh pb-10">
+    <div className="min-h-dvh pb-[calc(2.5rem+var(--site-disclaimer-offset))]">
       <div className="flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
         <form action={logoutAction}>
           <button

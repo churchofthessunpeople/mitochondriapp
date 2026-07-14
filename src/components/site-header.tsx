@@ -26,13 +26,13 @@ export async function SiteHeader({
     active === "schedule" ||
     active === "place" ||
     active === "activities" ||
+    active === "leaderboard" ||
     active === "today" ||
     active === "home"
       ? "today"
       : active === "mitoversity" || active === "learn" || active === "kruseiversity"
         ? "mitoversity"
         : active === "history" ||
-            active === "leaderboard" ||
             active === "account"
           ? "account"
           : active;

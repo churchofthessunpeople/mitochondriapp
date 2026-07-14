@@ -1,4 +1,12 @@
 import type { Protocol } from "@/db/schema";
+import {
+  decodeSunriseEndOffset,
+  formatSunriseSkyLabel,
+} from "@/lib/sunrise-sky";
+import {
+  formatSunriseOffsetMinutes,
+  formatSunriseSessionOffsetMinutes,
+} from "@/lib/sunrise-timing";
 
 /**
  * Morning light tiers (best wins for the day).
@@ -8,12 +16,15 @@ export type SunriseTierId = "horizon" | "open_sky" | "outside";
 
 export type SunriseSkinExposure = "full" | "partial";
 export type SunriseSunglasses = "none" | "worn";
+export type SunriseSky =
+  import("@/lib/sunrise-sky").SunriseSky;
 
 /** Answers from the morning-light check-in that adjust the day boost. */
 export type SunriseModifiers = {
   grounded: boolean;
   skin: SunriseSkinExposure;
   sunglasses: SunriseSunglasses;
+  sky: SunriseSky;
 };
 
 export type SunriseTier = {
@@ -101,7 +112,7 @@ export function sunriseMultiplierForLog(
 }
 
 export function describeSunriseModifiers(modifiers: SunriseModifiers): string {
-  const parts: string[] = [];
+  const parts: string[] = [formatSunriseSkyLabel(modifiers.sky ?? "clear")];
   if (modifiers.grounded) parts.push("grounded");
   parts.push(modifiers.skin === "full" ? "mostly exposed skin" : "partial skin");
   parts.push(
@@ -192,6 +203,43 @@ export function formatSunriseMultiplier(mult: number): string {
   return `${s}×`;
 }
 
+/** Detail suffix for history/copy on morning-light keystone logs. */
+export function formatSunriseLogDetail(
+  protocolId: string,
+  multiplier: number | null | undefined,
+  startOffset?: number | null,
+  encodedEndOffset?: number | null,
+): string | null {
+  const tier = sunriseTierForProtocolId(protocolId);
+  if (!tier) return null;
+  const { endOffset, sky } = decodeSunriseEndOffset(encodedEndOffset ?? null);
+  const parts: string[] = [tier.shortLabel, formatSunriseSkyLabel(sky)];
+  if (startOffset != null && endOffset != null) {
+    parts.push(formatSunriseSessionOffsetMinutes(startOffset, endOffset));
+  } else if (startOffset != null) {
+    parts.push(formatSunriseOffsetMinutes(startOffset));
+  }
+  if (multiplier != null && multiplier > 1) {
+    parts.push(`${formatSunriseMultiplier(multiplier)} day boost`);
+  }
+  return parts.join(" · ");
+}
+
+export function isSunriseKeystoneProtocolId(protocolId: string): boolean {
+  return sunriseTierForProtocolId(protocolId) != null;
+}
+
+/** Morning-light keystones are logged via the daily check-in, not the catalog. */
+export function isCatalogSelectableProtocol(protocol: {
+  id?: string | null;
+}): boolean {
+  return !isSunriseKeystoneProtocol(protocol);
+}
+
+export function isCatalogSelectableProtocolId(protocolId: string): boolean {
+  return !isSunriseKeystoneProtocolId(protocolId);
+}
+
 export const DURATION_BLOCK_MINUTES = 15;
 
 /** Points for one log event, optionally scaled by duration and sunrise buff. */
@@ -211,11 +259,14 @@ export function pointsForLog(
     sunriseMultiplier?: number;
     /** @deprecated prefer sunriseMultiplier */
     sunriseBuffActive?: boolean;
+    /** Override catalog base points (e.g. Magnetico gauss rating) */
+    basePoints?: number;
   },
 ): number {
   let pts: number;
+  const base = opts?.basePoints ?? protocol.points;
   if (!protocol.durationEnabled || !durationMinutes || durationMinutes <= 0) {
-    pts = protocol.points;
+    pts = base;
   } else {
     const maxMin = Math.max(
       DURATION_BLOCK_MINUTES,
@@ -226,7 +277,7 @@ export function pointsForLog(
       maxMin,
     );
     const blocks = mins / DURATION_BLOCK_MINUTES;
-    pts = Math.max(1, Math.round(protocol.points * blocks));
+    pts = Math.max(1, Math.round(base * blocks));
   }
 
   const mult =

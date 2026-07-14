@@ -1,18 +1,19 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
+import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { userFavorites, userScheduleItems } from "@/db/schema";
+import { userFavorites, userScheduleItems, users } from "@/db/schema";
 import {
-  ensureCatalogSyncedToDb,
+  ensureProtocolInDb,
   getCatalogProtocolById,
 } from "@/lib/catalog";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isCatalogSelectableProtocolId } from "@/lib/scoring";
 import { ensurePermanentCompletions } from "@/lib/permanent-completions";
-import { revalidateApp } from "@/lib/revalidate-app";
-import { users } from "@/db/schema";
+import { revalidatePath } from "next/cache";
 
 async function requireUserId() {
   const session = await auth();
@@ -20,21 +21,24 @@ async function requireUserId() {
   return session.user.id;
 }
 
-function revalidateAvailable() {
-  revalidateApp();
-}
-
 /**
  * Toggle whether a protocol is available for this user ("via" list).
  * Stored in user_favorites. Removing also drops it from the schedule.
+ *
+ * Client already updates checklist state optimistically — do not revalidate
+ * the /app shell here (that was the main lag source).
  */
 export async function toggleFavoriteAction(protocolId: string) {
   const userId = await requireUserId();
 
-  await ensureCatalogSyncedToDb();
   if (!getCatalogProtocolById(protocolId)) {
     throw new Error("Activity not found");
   }
+  if (!isCatalogSelectableProtocolId(protocolId)) {
+    throw new Error("Morning light is logged each day from the sunrise check-in");
+  }
+  const inDb = await ensureProtocolInDb(protocolId);
+  if (!inDb) throw new Error("Activity not found");
 
   const [existing] = await db
     .select()
@@ -75,9 +79,11 @@ export async function toggleFavoriteAction(protocolId: string) {
         .limit(1);
       const completedOn = getTodayIsoForTimezone(u?.timezone || "UTC");
       await ensurePermanentCompletions(userId, completedOn);
+      after(() => {
+        revalidatePath("/history", "layout");
+      });
     }
   }
 
-  revalidateAvailable();
   return { favorited: !existing };
 }

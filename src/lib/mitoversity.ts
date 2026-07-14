@@ -410,6 +410,7 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     summary:
       "Thermoregulation at night: why a bedroom near 65 °F (18 °C) supports sleep onset, deep stages, and recovery—and how to tune it without over-chilling.",
     relatedProtocolIds: [
+      "cool-bedroom-sleep",
       "consistent-sleep-window",
       "dark-bedroom",
       "cold-thermogenesis",
@@ -437,7 +438,7 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "There is no separate thermostat checkbox—note cool-room success when you log “Circadian sleep window” or “True dark sleep environment” if both were met. Read “Fully dark sleep environment” (Light pillar) for the photon side of night. Use “Cold thermogenesis session” only for deliberate daytime cold exposure, not bedroom HVAC. Educational only; see a clinician for night sweats, fever, or insomnia unresponsive to basics.",
+        body: "Add “Cool bedroom sleep” to your available list — it auto-logs nightly. Pick your sleep temp on the checklist: 65°F earns 10 pts; each degree warmer on the thermostat costs 1 point. Pair with “True dark sleep environment” and “Circadian sleep window.” Use “Cold thermogenesis session” only for deliberate daytime cold exposure, not bedroom HVAC. Educational only; see a clinician for night sweats, fever, or insomnia unresponsive to basics.",
       },
     ],
   },

@@ -34,7 +34,8 @@ export function BottomNav() {
   // Admin / region only
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-[var(--header-bg)] pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 z-40 border-t border-border bg-[var(--header-bg)] pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"
+      style={{ bottom: "var(--site-disclaimer-offset)" }}
       aria-label="Main"
     >
       <div className="mx-auto flex max-w-lg justify-center px-3 py-2">

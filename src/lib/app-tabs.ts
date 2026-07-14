@@ -1,15 +1,16 @@
 /**
  * Bottom nav: Today · Mitoversity · Account.
- * Deep links like ?t=leaderboard open Account with that section.
+ * Deep links like ?t=leaderboard open Today with that section.
  * ?t=mitoversity opens the learn tab.
  */
 export const APP_TABS = ["schedule", "mitoversity", "account"] as const;
 
 export type AppTab = (typeof APP_TABS)[number];
 
+export type TodaySection = "checklist" | "place" | "catalog" | "leaderboard";
+
 export type AccountSection =
   | "history"
-  | "leaderboard"
   | "friends"
   | "reminders"
   | "profile"
@@ -21,12 +22,23 @@ export function isAppTab(value: string | null | undefined): value is AppTab {
   );
 }
 
+export function isTodaySection(
+  value: string | null | undefined,
+): value is TodaySection {
+  return (
+    value === "checklist" ||
+    value === "place" ||
+    value === "catalog" ||
+    value === "leaderboard" ||
+    value === "activities"
+  );
+}
+
 export function isAccountSection(
   value: string | null | undefined,
 ): value is NonNullable<AccountSection> {
   return (
     value === "history" ||
-    value === "leaderboard" ||
     value === "friends" ||
     value === "reminders" ||
     value === "profile"
@@ -37,7 +49,15 @@ export function tabFromSearchParam(
   raw: string | string[] | undefined,
 ): AppTab {
   const v = Array.isArray(raw) ? raw[0] : raw;
-  if (v === "place" || v === "activities" || v === "today") return "schedule";
+  if (
+    v === "place" ||
+    v === "activities" ||
+    v === "catalog" ||
+    v === "leaderboard" ||
+    v === "today"
+  ) {
+    return "schedule";
+  }
   // Legacy alias
   if (
     v === "learn" ||
@@ -50,6 +70,17 @@ export function tabFromSearchParam(
   }
   if (isAccountSection(v)) return "account";
   return isAppTab(v) ? v : "schedule";
+}
+
+/** Which Today section to open when landing via deep link */
+export function todaySectionFromSearchParam(
+  raw: string | string[] | undefined,
+): TodaySection | null {
+  const v = Array.isArray(raw) ? raw[0] : raw;
+  if (v === "leaderboard") return "leaderboard";
+  if (v === "place") return "place";
+  if (v === "catalog" || v === "activities") return "catalog";
+  return null;
 }
 
 /** Which Account card to open when landing via deep link */

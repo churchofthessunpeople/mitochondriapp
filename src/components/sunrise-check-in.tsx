@@ -13,16 +13,25 @@ import {
 import type { SunTimes } from "@/lib/sun";
 import { useToast } from "@/components/toast";
 
-const DAY_KEY = (date: string) => `mito-sunrise-missed:${date}`;
-const SESSION_KEY = (date: string) => `mito-sunrise-session:${date}`;
+const dayKey = (userId: string, date: string) =>
+  `mito-sunrise-missed:${userId}:${date}`;
+const sessionKey = (userId: string, date: string) =>
+  `mito-sunrise-session:${userId}:${date}`;
+
+/** Legacy keys (pre–per-user) — cleared so a new account is not blocked. */
+const legacyDayKey = (date: string) => `mito-sunrise-missed:${date}`;
+const legacySessionKey = (date: string) => `mito-sunrise-session:${date}`;
 
 type Props = {
+  userId: string;
   todayIso: string;
   /** Best multiplier today (1 = none) */
   sunriseMultiplier: number;
   allProtocols: Protocol[];
   sun: SunTimes | null;
   timeZone: string;
+  /** After onboarding — show even if this browser dismissed for another user */
+  forceOpen?: boolean;
   onLogged?: (multiplier: number) => void;
 };
 
@@ -30,11 +39,13 @@ type Props = {
  * Daily morning-light accountability with tier + modifier questions.
  */
 export function SunriseCheckIn({
+  userId,
   todayIso,
   sunriseMultiplier,
   allProtocols,
   sun,
   timeZone,
+  forceOpen = false,
   onLogged,
 }: Props) {
   const router = useRouter();
@@ -43,16 +54,29 @@ export function SunriseCheckIn({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    try {
+      localStorage.removeItem(legacyDayKey(todayIso));
+      sessionStorage.removeItem(legacySessionKey(todayIso));
+    } catch {
+      /* private mode */
+    }
+  }, [todayIso]);
+
+  useEffect(() => {
     if (sunriseMultiplier > 1) {
       setOpen(false);
       return;
     }
+    if (forceOpen) {
+      setOpen(true);
+      return;
+    }
     try {
-      if (localStorage.getItem(DAY_KEY(todayIso)) === "1") {
+      if (localStorage.getItem(dayKey(userId, todayIso)) === "1") {
         setOpen(false);
         return;
       }
-      if (sessionStorage.getItem(SESSION_KEY(todayIso)) === "1") {
+      if (sessionStorage.getItem(sessionKey(userId, todayIso)) === "1") {
         setOpen(false);
         return;
       }
@@ -60,11 +84,11 @@ export function SunriseCheckIn({
       /* private mode */
     }
     setOpen(true);
-  }, [todayIso, sunriseMultiplier]);
+  }, [userId, todayIso, sunriseMultiplier, forceOpen]);
 
   function dismissSession() {
     try {
-      sessionStorage.setItem(SESSION_KEY(todayIso), "1");
+      sessionStorage.setItem(sessionKey(userId, todayIso), "1");
     } catch {
       /* ignore */
     }
@@ -73,8 +97,8 @@ export function SunriseCheckIn({
 
   function dismissDay() {
     try {
-      localStorage.setItem(DAY_KEY(todayIso), "1");
-      sessionStorage.setItem(SESSION_KEY(todayIso), "1");
+      localStorage.setItem(dayKey(userId, todayIso), "1");
+      sessionStorage.setItem(sessionKey(userId, todayIso), "1");
     } catch {
       /* ignore */
     }
@@ -85,13 +109,19 @@ export function SunriseCheckIn({
     protocol: Protocol,
     tier: SunriseTier,
     modifiers: SunriseModifiers,
+    viewedAtStartIso: string,
+    viewedAtEndIso: string,
   ) {
     start(async () => {
       try {
-        const res = await logCompletionAction(protocol.id, { sunriseModifiers: modifiers });
+        const res = await logCompletionAction(protocol.id, {
+          sunriseModifiers: modifiers,
+          viewedAtStart: viewedAtStartIso,
+          viewedAtEnd: viewedAtEndIso,
+        });
         try {
-          sessionStorage.setItem(SESSION_KEY(todayIso), "1");
-          localStorage.removeItem(DAY_KEY(todayIso));
+          sessionStorage.setItem(sessionKey(userId, todayIso), "1");
+          localStorage.removeItem(dayKey(userId, todayIso));
         } catch {
           /* ignore */
         }

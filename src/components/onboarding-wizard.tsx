@@ -13,6 +13,7 @@ import {
   type ZipFormState,
 } from "@/lib/actions/region";
 import { ROUTES } from "@/lib/routes";
+import { isCatalogSelectableProtocol } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
 
 type Step = "welcome" | "location" | "activities" | "firstwin" | "done";
@@ -72,7 +73,7 @@ export function OnboardingWizard({
     start(async () => {
       try {
         await markOnboardingCompleteAction();
-        router.replace(ROUTES.home);
+        router.replace(`${ROUTES.home}?sunrise=1`);
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not finish setup");
@@ -89,7 +90,9 @@ export function OnboardingWizard({
   ];
   const stepIndex = steps.indexOf(step);
 
-  const winCandidates = starterProtocols.filter((p) => available.has(p.id)).slice(0, 4);
+  const winCandidates = starterProtocols
+    .filter((p) => available.has(p.id) && isCatalogSelectableProtocol(p))
+    .slice(0, 4);
 
   return (
     <div className="mx-auto max-w-lg px-4 py-8 sm:px-6">
@@ -252,7 +255,9 @@ export function OnboardingWizard({
           </p>
 
           <ul className="mt-5 max-h-[min(28rem,55vh)] space-y-2 overflow-y-auto pr-0.5">
-            {starterProtocols.map((p) => {
+            {starterProtocols
+              .filter(isCatalogSelectableProtocol)
+              .map((p) => {
               const on = available.has(p.id);
               return (
                 <li key={p.id}>
