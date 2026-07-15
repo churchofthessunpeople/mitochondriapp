@@ -1,8 +1,9 @@
 "use client";
 
+import { useAppContentOptional } from "@/components/app-content-context";
 import { format, parseISO } from "date-fns";
 import { Copy } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useToast } from "@/components/toast";
 import { getDayDetailAction } from "@/lib/actions/history";
 import { formatDayActivitiesCopy } from "@/lib/format-day-activities";
@@ -16,6 +17,11 @@ export function HistoryList({
   /** When set, day rows open an in-page card instead of navigating. */
   onSelectDay?: (date: string) => void;
 }) {
+  const content = useAppContentOptional();
+  const permanentIds = useMemo(
+    () => new Set(content?.permanentProtocolIds ?? []),
+    [content?.permanentProtocolIds],
+  );
   const { push } = useToast();
   const [copyingDate, setCopyingDate] = useState<string | null>(null);
   const [, startCopy] = useTransition();
@@ -25,7 +31,7 @@ export function HistoryList({
     startCopy(async () => {
       try {
         const detail = await getDayDetailAction(date);
-        const text = formatDayActivitiesCopy(date, detail);
+        const text = formatDayActivitiesCopy(date, detail, permanentIds);
         await navigator.clipboard.writeText(text);
         push("Activities copied");
       } catch {

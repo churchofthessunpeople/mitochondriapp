@@ -24,6 +24,7 @@ export const PROTOCOL_ARTICLE_IDS: Record<string, string> = {
   "reduce-nnemf-block": "reduce-nnemf-block",
   "magnetic-awareness": "earth-field-vs-geology",
   "phone-away-sleep": "phone-away-sleep",
+  "air-tube-headphones": "air-tube-headphones",
   "magnetico-sleep-pad": "magnetico-sleep-pad",
   "breaker-off-bedroom": "breaker-off-bedroom",
   "breaker-off-office": "breaker-off-office",

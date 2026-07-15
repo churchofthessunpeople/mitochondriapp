@@ -11,7 +11,7 @@ import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import { useAppContentOptional } from "@/components/app-content-context";
-import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isPermanentProtocol } from "@/lib/permanent-activities";
 import {
   LWM_PILLARS,
   PILLAR_ORDER,
@@ -135,7 +135,8 @@ export function ActivityCatalogExpand({
     onAvailableIdsChange?.([...next]);
     push(wasOn ? `Removed “${name}”` : `Added to checklist: ${name}`);
 
-    if (!wasOn && isPermanentProtocolId(protocolId)) {
+    const protocol = catalogProtocols.find((p) => p.id === protocolId);
+    if (!wasOn && protocol && isPermanentProtocol(protocol)) {
       onPermanentAutoLog?.({
         protocolId,
         count: 1,

@@ -45,7 +45,7 @@ import {
   SLEEP_ROOM_TEMP_OPTIONS,
   type SleepRoomTempF,
 } from "@/lib/sleep-room-temp";
-import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isPermanentProtocol } from "@/lib/permanent-activities";
 import {
   DURATION_BLOCK_MINUTES,
   formatSunriseMultiplier,
@@ -280,7 +280,7 @@ export function ScheduleDay({
   }
 
   const manualProtocols = useMemo(
-    () => protocols.filter((p) => !isPermanentProtocolId(p.id)),
+    () => protocols.filter((p) => !isPermanentProtocol(p)),
     [protocols],
   );
 
@@ -300,7 +300,7 @@ export function ScheduleDay({
   }, [manualProtocols, phase, localHour, counts]);
 
   const permanentProtocols = useMemo(
-    () => protocols.filter((p) => isPermanentProtocolId(p.id)),
+    () => protocols.filter((p) => isPermanentProtocol(p)),
     [protocols],
   );
 
@@ -380,14 +380,14 @@ export function ScheduleDay({
       const parts = [
         `${formatMagneticoGauss(magneticoGauss)} · ${formatMagneticoGaussMultiplier(magneticoGauss)} · ${pts} pts`,
       ];
-      if (isPermanentProtocolId(p.id)) parts.push("automatic daily");
+      if (isPermanentProtocol(p)) parts.push("automatic daily");
       return parts.join(" · ");
     }
     if (isSleepRoomTempProtocolId(p.id)) {
       const parts = [
         `${formatSleepRoomTemp(sleepRoomTempF)} · ${pointsForSleepRoomTemp(sleepRoomTempF)} pts`,
       ];
-      if (isPermanentProtocolId(p.id)) parts.push("automatic daily");
+      if (isPermanentProtocol(p)) parts.push("automatic daily");
       return parts.join(" · ");
     }
     if (isColdThermoProtocolId(p.id)) {
@@ -398,7 +398,7 @@ export function ScheduleDay({
     if (isSunriseKeystoneProtocol(p)) parts.push("Light keystone");
     else if (isWaterKeystoneId(p.id)) parts.push("Water keystone");
     else if (isMagnetismKeystoneId(p.id)) parts.push("Magnetism keystone");
-    if (isPermanentProtocolId(p.id)) parts.push("automatic daily");
+    if (isPermanentProtocol(p)) parts.push("automatic daily");
     if (p.durationEnabled) {
       parts.push(`${p.points} pts / 15 min`);
     }
@@ -452,7 +452,7 @@ export function ScheduleDay({
       return;
     }
     const count = counts[protocol.id] ?? 0;
-    if (isPermanentProtocolId(protocol.id)) {
+    if (isPermanentProtocol(protocol)) {
       runLog(protocol.id, async () => {
         try {
           if (count > 0) {
@@ -850,12 +850,12 @@ export function ScheduleDay({
               <span className="mt-0.5 block text-xs text-muted">
                 {protocolHint(p)}
                 {isDone
-                  ? isPermanentProtocolId(p.id)
+                  ? isPermanentProtocol(p)
                     ? " · logged · tap to skip tonight"
                     : p.durationEnabled && totalMins > 0
                       ? ` · ${totalMins} min`
                       : " · done"
-                  : isPermanentProtocolId(p.id)
+                  : isPermanentProtocol(p)
                     ? " · auto-logs daily"
                     : p.durationEnabled
                       ? ` · tap to set minutes`

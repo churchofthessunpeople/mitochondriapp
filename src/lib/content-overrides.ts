@@ -19,6 +19,7 @@ import { TIME_OF_DAY_META, TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 import type { TimeOfDay } from "@/db/schema";
 import { seedToProtocol } from "@/lib/catalog";
 import { getProtocolTeaser } from "@/lib/protocol-display";
+import { buildPermanentProtocolIds } from "@/lib/permanent-activities";
 
 export type OverrideMap = Map<string, unknown>;
 
@@ -306,6 +307,7 @@ export function mergeLwmPillars(overrides: OverrideMap): readonly LwmPillarMeta[
 
 export type AppContentBundle = {
   protocols: Protocol[];
+  permanentProtocolIds: string[];
   protocolMeta: Record<string, ProtocolMeta>;
   mitoEntries: MitoEntry[];
   categoryMeta: ReturnType<typeof mergeCategoryMeta>;
@@ -317,8 +319,10 @@ export type AppContentBundle = {
 
 export async function loadAppContent(): Promise<AppContentBundle> {
   const overrides = await loadContentOverrides();
+  const protocols = mergeProtocols(overrides);
   return {
-    protocols: mergeProtocols(overrides),
+    protocols,
+    permanentProtocolIds: buildPermanentProtocolIds(protocols),
     protocolMeta: mergeAllProtocolMeta(overrides),
     mitoEntries: mergeMitoEntries(overrides),
     categoryMeta: mergeCategoryMeta(overrides),

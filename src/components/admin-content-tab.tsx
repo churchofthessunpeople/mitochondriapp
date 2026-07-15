@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useTransition, type ReactNode } from "react";
+import { Search, X } from "lucide-react";
+import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import {
   createAdminMitoAction,
   createAdminProtocolAction,
@@ -42,6 +43,53 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 const inputClass = "field-input w-full rounded-xl px-3 py-2 text-sm";
+
+function matchesAdminSearch(
+  query: string,
+  ...parts: (string | number | boolean | null | undefined)[]
+): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const hay = parts
+    .filter((part) => part != null && part !== "")
+    .map((part) => String(part))
+    .join(" ")
+    .toLowerCase();
+  return hay.includes(q);
+}
+
+function AdminListSearch({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <div className="relative">
+      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+      <input
+        type="search"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="field-input w-full rounded-2xl py-2.5 pl-10 pr-10 text-sm"
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-foreground"
+          aria-label="Clear search"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+    </div>
+  );
+}
 
 type ConfirmRequest = {
   title: string;
@@ -118,6 +166,7 @@ export function AdminContentTab({
   const [selectedMitoId, setSelectedMitoId] = useState<string | null>(null);
   const [focusApplied, setFocusApplied] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmRequest | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   function runConfirm() {
     if (!confirm) return;
@@ -158,6 +207,19 @@ export function AdminContentTab({
     setFocusApplied(true);
   }, [initialFocus, focusApplied]);
 
+  useEffect(() => {
+    setSearchQuery("");
+  }, [section]);
+
+  const searchPlaceholder =
+    section === "activities"
+      ? "Search activities by name, id, or category…"
+      : section === "articles"
+        ? "Search articles by title, id, or pillar…"
+        : section === "categories"
+          ? "Search categories by id or label…"
+          : "";
+
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted">
@@ -189,6 +251,13 @@ export function AdminContentTab({
           </button>
         ))}
       </div>
+      {searchPlaceholder && (
+        <AdminListSearch
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder={searchPlaceholder}
+        />
+      )}
       {section === "activities" && (
         <ActivitiesSection
           pending={pending}
@@ -197,6 +266,7 @@ export function AdminContentTab({
           selected={selectedProtocolId}
           onSelect={setSelectedProtocolId}
           requestConfirm={setConfirm}
+          searchQuery={searchQuery}
         />
       )}
       {section === "articles" && (
@@ -207,10 +277,16 @@ export function AdminContentTab({
           selected={selectedMitoId}
           onSelect={setSelectedMitoId}
           requestConfirm={setConfirm}
+          searchQuery={searchQuery}
         />
       )}
       {section === "categories" && (
-        <CategoriesSection pending={pending} run={run} push={push} />
+        <CategoriesSection
+          pending={pending}
+          run={run}
+          push={push}
+          searchQuery={searchQuery}
+        />
       )}
       {section === "labels" && (
         <LabelsSection pending={pending} run={run} push={push} />
@@ -232,6 +308,7 @@ function ActivitiesSection({
   selected,
   onSelect,
   requestConfirm,
+  searchQuery,
 }: {
   pending: boolean;
   run: (fn: () => Promise<void>) => void;
@@ -239,6 +316,7 @@ function ActivitiesSection({
   selected: string | null;
   onSelect: (id: string | null) => void;
   requestConfirm: (req: ConfirmRequest) => void;
+  searchQuery: string;
 }) {
   const [list, setList] = useState<
     | {
@@ -290,6 +368,21 @@ function ActivitiesSection({
     };
   }, [selected, creating, push]);
 
+  const filteredList = useMemo(() => {
+    if (!list) return null;
+    return list.filter((p) =>
+      matchesAdminSearch(
+        searchQuery,
+        p.name,
+        p.id,
+        p.category,
+        p.points,
+        p.isCustom && "custom",
+        p.deleted && "deleted",
+      ),
+    );
+  }, [list, searchQuery]);
+
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="space-y-2">
@@ -312,7 +405,7 @@ function ActivitiesSection({
           Show deleted
         </label>
         <ul className="max-h-[28rem] space-y-2 overflow-y-auto">
-          {list?.map((p) => (
+          {filteredList?.map((p) => (
             <li key={p.id}>
               <button
                 type="button"
@@ -335,6 +428,9 @@ function ActivitiesSection({
             </li>
           ))}
         </ul>
+        {list && filteredList && filteredList.length === 0 && (
+          <p className="px-1 text-sm text-muted">No activities match your search.</p>
+        )}
       </div>
       {creating ? (
         <CreateProtocolForm
@@ -678,6 +774,7 @@ function ArticlesSection({
   selected,
   onSelect,
   requestConfirm,
+  searchQuery,
 }: {
   pending: boolean;
   run: (fn: () => Promise<void>) => void;
@@ -685,6 +782,7 @@ function ArticlesSection({
   selected: string | null;
   onSelect: (id: string | null) => void;
   requestConfirm: (req: ConfirmRequest) => void;
+  searchQuery: string;
 }) {
   const [list, setList] = useState<
     | {
@@ -735,6 +833,20 @@ function ArticlesSection({
     };
   }, [selected, creating, push]);
 
+  const filteredList = useMemo(() => {
+    if (!list) return null;
+    return list.filter((e) =>
+      matchesAdminSearch(
+        searchQuery,
+        e.title,
+        e.id,
+        e.pillar,
+        e.isCustom && "custom",
+        e.deleted && "deleted",
+      ),
+    );
+  }, [list, searchQuery]);
+
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="space-y-2">
@@ -757,7 +869,7 @@ function ArticlesSection({
           Show deleted
         </label>
         <ul className="max-h-[28rem] space-y-2 overflow-y-auto">
-          {list?.map((e) => (
+          {filteredList?.map((e) => (
             <li key={e.id}>
               <button
                 type="button"
@@ -780,6 +892,9 @@ function ArticlesSection({
             </li>
           ))}
         </ul>
+        {list && filteredList && filteredList.length === 0 && (
+          <p className="px-1 text-sm text-muted">No articles match your search.</p>
+        )}
       </div>
       {creating ? (
         <CreateMitoForm
@@ -1052,10 +1167,12 @@ function CategoriesSection({
   pending,
   run,
   push,
+  searchQuery,
 }: {
   pending: boolean;
   run: (fn: () => Promise<void>) => void;
   push: (m: string, t?: "err") => void;
+  searchQuery: string;
 }) {
   const [rows, setRows] = useState<
     | { id: ProtocolCategory; label: string; blurb: string; hasOverride: boolean }[]
@@ -1065,9 +1182,16 @@ function CategoriesSection({
     listAdminCategoryEditorsAction().then(setRows);
   }, []);
 
+  const filteredRows = useMemo(() => {
+    if (!rows) return null;
+    return rows.filter((row) =>
+      matchesAdminSearch(searchQuery, row.id, row.label, row.blurb),
+    );
+  }, [rows, searchQuery]);
+
   return (
     <div className="space-y-3">
-      {rows?.map((row) => (
+      {filteredRows?.map((row) => (
         <form
           key={row.id}
           className="glass space-y-2 rounded-2xl p-4"
@@ -1103,6 +1227,9 @@ function CategoriesSection({
           )}
         </form>
       ))}
+      {rows && filteredRows && filteredRows.length === 0 && (
+        <p className="text-sm text-muted">No categories match your search.</p>
+      )}
     </div>
   );
 }

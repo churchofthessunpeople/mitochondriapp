@@ -11,7 +11,7 @@ import {
 } from "@/lib/catalog";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { getUserDayStats } from "@/lib/data";
-import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isPermanentProtocolMerged } from "@/lib/permanent-activities";
 import { isCatalogSelectableProtocolId } from "@/lib/scoring";
 import { ensurePermanentCompletions } from "@/lib/permanent-completions";
 import { getUserStreak } from "@/lib/streaks";
@@ -88,7 +88,7 @@ export async function toggleFavoriteAction(
     return { favorited: false };
   } else {
     await db.insert(userFavorites).values({ userId, protocolId });
-    if (isPermanentProtocolId(protocolId)) {
+    if (await isPermanentProtocolMerged(protocolId)) {
       const [u] = await db
         .select({ timezone: users.timezone })
         .from(users)

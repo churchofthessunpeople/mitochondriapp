@@ -314,6 +314,17 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 61,
   }),
   p({
+    id: "air-tube-headphones",
+    name: "Air tube headphones for calls",
+    description:
+      "Use air-tube headphones for phone and video calls so the handset stays away from your head. Permanent: auto-logs daily while on your available list.",
+    points: 5,
+    category: "emf",
+    timeOfDay: "anytime",
+    permanent: true,
+    sortOrder: 57,
+  }),
+  p({
     id: "magnetico-sleep-pad",
     name: "Magnetico sleep pad",
     description:

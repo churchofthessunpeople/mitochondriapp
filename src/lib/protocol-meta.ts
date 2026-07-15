@@ -101,6 +101,10 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
     equipment: "none",
     how: "Phone out of the bedroom entirely, or on airplane mode and far from your head — not on the nightstand.\n\nSet up before bed so you are not reaching for it if you wake.",
   },
+  "air-tube-headphones": {
+    equipment: "required",
+    how: "For every phone or video call, use air-tube (hollow acoustic tube) headphones — not regular wired earbuds or Bluetooth buds pressed to your head.\n\nKeep the phone on the table or in a stand at arm's length; let sound travel through the tubes to your ears. Use speakerphone only if air tubes are unavailable.\n\nOnce on your available list this auto-logs daily; skip days with no calls or when traveling without your set.",
+  },
   "magnetico-sleep-pad": {
     equipment: "required",
     how: "Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nSet pad strength on the checklist: 5 G = 1.25×, 10 G = 1.5×, 20 G = 2× base points. Once on your available list this auto-logs nightly; tap to skip when traveling.",

@@ -11,7 +11,7 @@ import {
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
-import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isPermanentProtocol } from "@/lib/permanent-activities";
 import { isCatalogSelectableProtocol } from "@/lib/scoring";
 import { useToast } from "@/components/toast";
 import { ROUTES } from "@/lib/routes";
@@ -87,7 +87,8 @@ export function AvailablePicker({
     onAvailableIdsChange?.([...next]);
     push(wasOn ? `Removed “${name}”` : `Available: ${name}`);
 
-    if (!wasOn && isPermanentProtocolId(protocolId)) {
+    const protocol = catalogProtocols.find((p) => p.id === protocolId);
+    if (!wasOn && protocol && isPermanentProtocol(protocol)) {
       onPermanentAutoLog?.({
         protocolId,
         count: 1,
@@ -235,7 +236,7 @@ export function AvailablePicker({
                         </span>
                         <span className="mt-1 block text-[11px] text-muted">
                           {p.points} pts
-                          {isPermanentProtocolId(p.id) ? " · permanent" : ""}
+                          {isPermanentProtocol(p) ? " · permanent" : ""}
                           {on ? " · available to you" : ""}
                         </span>
                       </span>

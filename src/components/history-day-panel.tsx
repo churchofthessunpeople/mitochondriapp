@@ -1,5 +1,6 @@
 "use client";
 
+import { useAppContentOptional } from "@/components/app-content-context";
 import { format, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -85,6 +86,11 @@ function AggregatedRow({
 }
 
 export function HistoryDayPanel({ date }: { date: string }) {
+  const content = useAppContentOptional();
+  const permanentIds = useMemo(
+    () => new Set(content?.permanentProtocolIds ?? []),
+    [content?.permanentProtocolIds],
+  );
   const [rows, setRows] = useState<DayDetailRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -109,12 +115,12 @@ export function HistoryDayPanel({ date }: { date: string }) {
   const { grouped, streakRows } = useMemo(() => {
     if (!rows) return { grouped: null, streakRows: [] as DayDetailRow[] };
     const streakRows = rows.filter((r) => r.isStreakBonus);
-    const aggregated = aggregateDayActivities(rows, displayName);
+    const aggregated = aggregateDayActivities(rows, displayName, permanentIds);
     return {
       grouped: groupAggregatedBySection(aggregated),
       streakRows,
     };
-  }, [rows]);
+  }, [rows, permanentIds]);
 
   const total = rows?.reduce((s, r) => s + r.pointsEarned, 0) ?? 0;
 

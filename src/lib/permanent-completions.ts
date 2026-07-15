@@ -15,7 +15,7 @@ import {
   isMagneticoProtocolId,
   parseMagneticoGauss,
 } from "@/lib/magnetico";
-import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isPermanentProtocol, isPermanentProtocolMerged } from "@/lib/permanent-activities";
 import {
   isVariantProtocolId,
   variantBasePoints,
@@ -86,7 +86,11 @@ export async function ensurePermanentCompletions(
   completedOn: string,
 ): Promise<number> {
   const favoriteIds = await getUserFavoriteIds(userId);
-  const targets = [...favoriteIds].filter(isPermanentProtocolId);
+  const targets: string[] = [];
+  for (const id of favoriteIds) {
+    const row = await getMergedCatalogProtocolById(id);
+    if (row && isPermanentProtocol(row)) targets.push(id);
+  }
   if (targets.length === 0) return 0;
 
   await dedupeSingleLogCompletions(userId, completedOn);
@@ -192,7 +196,7 @@ export async function recordPermanentSkip(
   protocolId: string,
   completedOn: string,
 ): Promise<void> {
-  if (!isPermanentProtocolId(protocolId)) return;
+  if (!(await isPermanentProtocolMerged(protocolId))) return;
   await db
     .insert(userPermanentSkips)
     .values({ userId, protocolId, completedOn })

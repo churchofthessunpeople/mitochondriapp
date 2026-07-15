@@ -314,6 +314,40 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     ],
   },
   {
+    id: "air-tube-headphones",
+    title: "Air tube headphones for phone calls",
+    pillar: "magnetism",
+    summary:
+      "Why hollow acoustic-tube headsets keep RF and conducted fields farther from your brain than earbuds or holding the phone to your head.",
+    relatedProtocolIds: ["air-tube-headphones"],
+    sections: [
+      {
+        heading: "The problem with phone-at-ear habits",
+        body: "Cell phones are microwave radios held millimeters from the skull during long calls. Wired earbuds still put a cable and often a small driver near the ear; Bluetooth buds add a radio transmitter at the head. Lifestyle nnEMF frameworks treat chronic call exposure as worth reducing even when regulatory limits are met—especially for long or daily calls.",
+      },
+      {
+        heading: "What air-tube headphones do",
+        body: "Air-tube headsets place the speaker or driver down the cable—often chest or belt level—with hollow plastic or silicone tubes carrying sound to the earpieces. Your ears receive pressure waves through air, not wire or a local Bluetooth chip. The phone itself stays on the desk or in a stand at distance, which also lowers hand and trunk exposure compared with cradling the handset.",
+      },
+      {
+        heading: "How they differ from other options",
+        body: "Speakerphone is zero-gear and keeps distance but sacrifices privacy and clarity in noisy rooms. Standard wired earbuds route cable fields near the head. Bluetooth headsets trade a cable for a 2.4 GHz transmitter at the ear—often worse for nnEMF-focused users. Air tubes are the common compromise: private audio with the active electronics and phone farther from the brain.",
+      },
+      {
+        heading: "Practical setup",
+        body: "Buy a reputable air-tube model with a 3.5 mm plug or USB-C adapter for your phone. Keep calls on the table; use a simple stand if helpful. For video calls, the same rule applies—air tubes plus camera at arm's length beats laptop-on-lap with Bluetooth buds. Replace tubes if they crack or yellow; sound muffling often means the air path is compromised.",
+      },
+      {
+        heading: "Where Dr. Jack Kruse's teaching is specific",
+        body: "Kruse's nnEMF material stresses minimizing microwave sources at the head and coupling phone habits into the wider light–water–magnetism stack—especially for people who talk on the phone daily. Air-tube headsets appear frequently in community gear lists as a practical call-time mitigation, not a license to marathon screen time. Treat strong claims about quantified risk reduction as lifestyle framework, not a personal SAR measurement from this app.",
+      },
+      {
+        heading: "How this fits the app",
+        body: "Add “Air tube headphones for calls” to your available list if you own a set and commit to using them for calls. It auto-logs daily as a permanent Magnetism habit; skip on no-call days or when traveling without your headset. Pair with phone-away-from-bed, nnEMF reduction blocks, and breaker habits for a fuller field-hygiene day.",
+      },
+    ],
+  },
+  {
     id: "breaker-off-bedroom",
     title: "Bedroom breakers off overnight",
     pillar: "magnetism",

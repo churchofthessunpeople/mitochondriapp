@@ -13,7 +13,7 @@ import {
   ensurePermanentCompletions,
   recordPermanentSkip,
 } from "@/lib/permanent-completions";
-import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import { isPermanentProtocolMerged } from "@/lib/permanent-activities";
 import {
   isColdThermoProtocolId,
   OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
@@ -285,7 +285,7 @@ export async function logCompletionAction(
             eq(dailyCompletions.userId, userId),
           ),
         );
-      if (isPermanentProtocolId(protocolId)) {
+      if (await isPermanentProtocolMerged(protocolId)) {
         await recordPermanentSkip(userId, protocolId, completedOn);
       }
       const buff = await getSunriseBuffToday(userId, completedOn);
@@ -296,7 +296,7 @@ export async function logCompletionAction(
     }
   }
 
-  if (isPermanentProtocolId(protocolId)) {
+  if (await isPermanentProtocolMerged(protocolId)) {
     await clearPermanentSkip(userId, protocolId, completedOn);
   }
 
@@ -471,9 +471,9 @@ export async function removeOneCompletionAction(
       and(eq(dailyCompletions.id, row.id), eq(dailyCompletions.userId, userId)),
     );
 
-  if (isPermanentProtocolId(protocolId)) {
-    await recordPermanentSkip(userId, protocolId, completedOn);
-  }
+      if (await isPermanentProtocolMerged(protocolId)) {
+        await recordPermanentSkip(userId, protocolId, completedOn);
+      }
 
   const buff = await getSunriseBuffToday(userId, completedOn);
   await recomputeDayPoints(userId, completedOn, buff.multiplier);
@@ -492,7 +492,7 @@ export async function logPermanentTonightAction(
 ): Promise<CompletionResult> {
   const userId = await requireUser();
   const completedOn = await userToday(userId);
-  if (!isPermanentProtocolId(protocolId)) {
+  if (!(await isPermanentProtocolMerged(protocolId))) {
     return logCompletionAction(protocolId);
   }
   await clearPermanentSkip(userId, protocolId, completedOn);

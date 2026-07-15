@@ -1,5 +1,7 @@
 import { protocolAllowsMultiple } from "@/lib/completion-dedupe";
-import { isPermanentProtocolId } from "@/lib/permanent-activities";
+import {
+  isPermanentProtocolId,
+} from "@/lib/permanent-activities";
 import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
 
 export type DayActivityRow = {
@@ -36,8 +38,14 @@ export type AggregatedActivity = {
 /** Classify a logged activity for history display. */
 export function historySectionForActivity(
   protocolId: string | null | undefined,
+  permanentIds?: ReadonlySet<string>,
 ): HistorySectionId {
-  if (protocolId && isPermanentProtocolId(protocolId)) return "permanent";
+  if (
+    protocolId &&
+    (permanentIds?.has(protocolId) || isPermanentProtocolId(protocolId))
+  ) {
+    return "permanent";
+  }
   if (protocolId && isSunriseKeystoneProtocolId(protocolId)) return "sunrise";
   return "day";
 }
@@ -45,6 +53,7 @@ export function historySectionForActivity(
 export function aggregateDayActivities(
   rows: DayActivityRow[],
   displayName: (row: DayActivityRow) => string,
+  permanentIds?: ReadonlySet<string>,
 ): AggregatedActivity[] {
   const activities = rows.filter((r) => !r.isStreakBonus);
   const byProtocol = new Map<string, AggregatedActivity>();
@@ -74,7 +83,7 @@ export function aggregateDayActivities(
       totalMins: mins,
       totalPoints: pts,
       order: order++,
-      section: historySectionForActivity(r.protocolId),
+      section: historySectionForActivity(r.protocolId, permanentIds),
     });
   }
 

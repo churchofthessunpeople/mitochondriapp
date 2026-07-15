@@ -63,11 +63,12 @@ export function formatLine(
 export function formatDayActivitiesCopy(
   date: string,
   rows: DayActivityRow[],
+  permanentIds?: ReadonlySet<string>,
 ): string {
   const header = format(parseISO(date), "EEEE, MMMM d, yyyy");
   const streakRows = rows.filter((r) => r.isStreakBonus);
   const streakPoints = streakRows.reduce((s, r) => s + r.pointsEarned, 0);
-  const aggregated = aggregateDayActivities(rows, displayName);
+  const aggregated = aggregateDayActivities(rows, displayName, permanentIds);
   const grouped = groupAggregatedBySection(aggregated);
 
   if (aggregated.length === 0 && streakPoints === 0) {
