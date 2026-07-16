@@ -10,6 +10,11 @@
  */
 
 import { MITOVERSITY_PROTOCOL_GUIDES } from "@/lib/mitoversity-protocol-guides";
+import {
+  MAGNETICO_SLEEP_PAD_READING_LEVELS,
+  MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
+} from "@/lib/mitoversity-magnetico-sleep-pad";
+import type { MitoReadingLevels } from "@/lib/mitoversity-reading-levels";
 
 export type MitoPillar = "light" | "water" | "magnetism" | "support";
 
@@ -26,7 +31,10 @@ export type MitoEntry = {
   summary: string;
   /** Related catalog protocol ids */
   relatedProtocolIds?: string[];
+  /** Default sections when no reading level is selected (legacy / fallback). */
   sections: MitoEntrySection[];
+  /** Optional tiered content: simple, intermediate, advanced. */
+  readingLevels?: MitoReadingLevels;
 };
 
 export const MITO_PILLAR_LABEL: Record<MitoPillar, string> = {
@@ -128,8 +136,7 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     summary:
       "Why UVB at solar noon on skin is the natural vitamin D pathway, how it differs from morning eye light, and why this stack prefers sun over routine supplementation when latitude and season allow.",
     relatedProtocolIds: [
-      "midday-sun-skin",
-      "morning-natural-light",
+      "sun-exposure",
       "sunrise-horizon",
     ],
     sections: [
@@ -151,7 +158,7 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "Practical solar noon habit",
-        body: "Check solar noon on Place. When UV season allows (latitude band and season coach lines on Today hint at this), get outdoors with unprotected skin on arms, legs, or torso for a non-burning interval—often quoted in popular guides as roughly 10–20 minutes for lighter skin types at mid-latitudes in summer, shorter at high noon in strong sun or for darker melanin (which needs longer but tolerates more). Build gradually. Glass blocks UVB; windows do not count. Log “Pure / midday sun on skin” with duration; points scale from the 15-minute reference up to the cap. Pair with morning light keystones so the full Light arc is eyes + skin, not pills alone.",
+        body: "Check solar noon on Place. When UV season allows (latitude band and season coach lines on Today hint at this), get outdoors with unprotected skin on arms, legs, or torso for a non-burning interval—often quoted in popular guides as roughly 10–20 minutes for lighter skin types at mid-latitudes in summer, shorter at high noon in strong sun or for darker melanin (which needs longer but tolerates more). Build gradually. Glass blocks UVB; windows do not count. Log “Sun exposure” in the noon slot (10 am–2 pm) with duration, grounding, and skin answers. Pair with morning light keystones so the full Light arc is eyes + skin, not pills alone.",
       },
       {
         heading: "When supplements still belong",
@@ -163,7 +170,7 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "Log “Pure / midday sun on skin” near solar noon when season and latitude allow safe UV. Use morning light keystones separately for circadian boost. Read “Why morning outdoor light—and sunrise—matter” and Place’s solar noon line for timing. Mitoversity does not track 25(OH)D labs. Educational only—not medical advice; do not stop prescribed vitamin D without your doctor.",
+        body: "Log “Sun exposure” near solar noon when season and latitude allow safe UV. Use morning light keystones separately for circadian boost. Read “Why morning outdoor light—and sunrise—matter” and Place’s solar noon line for timing. Mitoversity does not track 25(OH)D labs. Educational only—not medical advice; do not stop prescribed vitamin D without your doctor.",
       },
     ],
   },
@@ -281,47 +288,15 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     title: "Magnetic sleep systems (Magnetico & dual-polar pads)",
     pillar: "magnetism",
     summary:
-      "Why sleep-time magnetism is discussed, how Magnetico’s under-mattress unidirectional design differs from dual-polar / top-of-bed pads, and where Kruse’s advice is specific.",
+      "Why sleep-time magnetism is discussed, how Magnetico’s under-mattress unidirectional design differs from dual-polar pads—choose your reading level below.",
     relatedProtocolIds: [
       "magnetico-sleep-pad",
       "phone-away-sleep",
       "dark-bedroom",
       "magnetic-awareness",
     ],
-    sections: [
-      {
-        heading: "Magnetism and the body (two natural sources)",
-        body: "Living cells are electromagnetic in character: charge separation, membrane potentials, and ion currents are core biology. Commercial education from Magnetico (magneticosleep.com) frames two natural magnetic sources available during life: (1) the brain—astrocyte cells (a large fraction of brain glia) generate pulsed electromagnetic activity; (2) the Earth—a largely steady geomagnetic field that, in their model, supports molecular and restorative chemistry. During sleep, their biomagnetic theory holds that brain-generated pulsed frequencies and the Earth’s steady field can work together in “magnetic resonance”—periods (often described as ~90–100 minute cycles while sleeping) when brain output matches tissue/organ frequencies, which they claim enhances repair chemistry, enzyme work, and immune readiness. That framing is product-side biomagnetic theory, not a measured clinical protocol in this app—but it explains why sleep is the window they target for whole-body magnetic supplementation.",
-      },
-      {
-        heading: "Why supplement Earth’s field at all?",
-        body: "Magnetico’s About Magnetism and Magnetism & Your Body pages argue two pressures against natural resonance: (1) long-term decline of Earth’s field strength—historically discussed from ~5 gauss-class estimates millennia ago down toward ~0.5 gauss (~50 µT) order today (they cite figures in the 70–90% loss range over ~4,000 years; independent geomagnetism agrees the field has varied and has weakened over recent centuries, while exact ancient multiplications are model-dependent); (2) modern artificial EMFs that can be stronger or higher-frequency than the brain’s restorative band and may interfere with quiet night recovery. Separately, Dr. Kyoichi Nakagawa (1950s onward) coined “magnetic field deficiency syndrome” and linked low ambient field exposure to aches and fatigue; Magnetico notes his patients often improved for roughly three weeks then plateaued—attributed by later bipolar analysis to not distinguishing north vs south pole effects. Mainstream sleep science still puts darkness, schedule, temperature, and low night light/noise first; magnetic pads are an optional environmental layer on top of that baseline.",
-      },
-      {
-        heading: "Biomagnetic theory: direction matters (N vs S hemisphere)",
-        body: "In Magnetico’s atomic story, raising field strength changes electron/proton velocity and valence-electron sharing depending on field direction; correct orientation is said to raise energy state and catalyze chemistry (including detoxification claims from their clinical observations). Critically, Earth’s field passes through the body in one direction: northern hemisphere surface field is treated as negative (−); southern hemisphere as positive (+). Most cell division and growth-hormone-rich recovery is described as concentrated in the first hours of sleep, so valence orientation of new cells would, in this model, track the polarity you sleep in. For North America / northern hemisphere, their requirement is a pure negative field that fully passes through the body—complementing local Earth polarity—not a patchwork of both poles. Southern-hemisphere users need the matching Earth-aligned polarity for that region. Field strength at the body must still be high enough after mattress spacing to matter; that is why magnet count and strength (Classic ~5 G, Core ~10 G, Super ~20 G class products on their site) are part of their design story.",
-      },
-      {
-        heading: "The bi-polar problem: dual-polar & top-of-bed pads",
-        body: "Any permanent magnet has both poles. Magnetico’s Bi-Polar Theory page argues that pads used on top of the mattress expose the sleeper to alternating negative (−) and return positive (+) fields around each magnet. Even “all north / negative face up” layouts still produce positive spikes between magnets when the pad is close to the body. That dual exposure is framed as an emergency-type stimulus: the brain and circulation respond (more EM drive and blood flow to the stimulated region)—similar in spirit to short-term magnetic or electroacupuncture responses (they cite work such as Dr. Saul Liss showing serotonin, beta-endorphin, and ACTH shifts with magnet-on-point stimulation). Initial relief can feel strong, but over weeks the model says vitality reserves deplete; many dual-polar brands advise 2–4 week breaks so people do not become fatigued. Bottom line of their critique: bi-polar and top-of-bed “negative-only” marketing still deliver mixed polarity at the body surface.",
-      },
-      {
-        heading: "Why Magnetico claims superiority over dual-polar pads",
-        body: "Magnetico’s design (Dr. Dean Bonlie lineage) places the pad under the mattress—between box spring and mattress, or over any non-magnetic spacer ≥ about 4 inches—not on top of the bed. At that distance, unwanted positive return spikes fall off so the field through the sleeper is described as pure unidirectional negative (northern hemisphere), closer to an Earth-type steady field than a checkerboard of +/−. Competitors that copy “all magnets negative-up” but still instruct top-of-bed use keep those positive spikes; if those same thin pads are moved under a thick mattress without enough magnet density, the usable field through the body collapses. Magnetico’s counter is denser / stronger magnet arrays so a meaningful field still penetrates after the 4″+ spacer—Classic, Core (+ optional Booster), and Super Sleep System (~5 / 10 / 20 gauss class marketing levels). Their “dare to compare” list: no unnatural alternating +/− whole-night exposure; field strong enough after under-mattress placement; long product history and satisfaction policy. Treat these as manufacturer claims about field geometry and use-case, not FDA-cleared medical outcomes. Practically: dual-polar top pads ≈ short-term stimulus + mixed polarity; Magnetico under-mattress ≈ continuous Earth-like unidirectional supplementation through the body.",
-      },
-      {
-        heading: "Sleep hygiene still comes first",
-        body: "Night is when circadian systems expect darkness and relative quiet. True dark, phone away from the head, cool room, and stable schedule support recovery with or without magnetic accessories. A pad does not replace outdoor light by day or darkness by night. Artificial RF/EMF in the bedroom (phones, routers) is a separate problem from static DC magnet arrays—reduce nnEMF and use magnetic sleep gear as independent levers if you use both.",
-      },
-      {
-        heading: "Where Dr. Jack Kruse’s teaching is specific",
-        body: "In Kruse’s public light–water–magnetism framework, sleep is when mitochondrial and redox recovery should not be fought by non-native EMFs, while beneficial magnetic context (Earth-oriented and engineered static fields) is part of place and night environment. He and communities around his work have specifically pointed to Magnetico-type under-mattress unidirectional systems—not generic dual-polar mattress toppers—as the sleep magnetic tool that matches their geomagnetic-supplementation story. Those product-level prescriptions and strong overnight mitochondrial claims are his teaching layer: not a measurement this app performs, and not a proven medical therapy.",
-      },
-      {
-        heading: "How this fits the app",
-        body: "Log “Magnetico sleep pad” when you slept the night on a Magnetico (or equivalent under-mattress unidirectional DC system). It counts toward the Magnetism pillar. Install per manufacturer guidance: under mattress / ≥4″ spacer, correct hemisphere polarity. Pair with phone-away-from-bed and a dark bedroom. Equipment is required—if you do not own a pad, leave it off your available list and use grounding / low-field outdoor hours instead.",
-      },
-    ],
+    sections: MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
+    readingLevels: MAGNETICO_SLEEP_PAD_READING_LEVELS,
   },
   {
     id: "mastic-gum-chewing",
@@ -482,7 +457,7 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "There is no separate rebounder checkbox yet—log “Mitochondrial movement” when you complete a rebound session (duration logging scales points). Add rebounding only to your available list if you own equipment; otherwise skip it and use walking or outdoor movement. Mitoversity keeps this article for users who already rebound or are deciding whether to buy a rebounder. Educational only—not medical advice for lymphedema, edema, or post-operative care.",
+        body: "Log “Rebounding” when you complete a session on your rebounder (duration scales points; each log asks full sunlight, outside, or indoors). Add it only to your available list if you own equipment — otherwise use Mitochondrial movement or walking. Mitoversity keeps this article for users who already rebound or are deciding whether to buy a rebounder. Educational only—not medical advice for lymphedema, edema, or post-operative care.",
       },
     ],
   },
@@ -529,6 +504,56 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       {
         heading: "How this fits the app",
         body: "Log “Cold thermogenesis session” with duration when you complete a plunge, cold shower block, or deliberate full-body cold exposure. Duration logging scales points from a 5-minute reference up to the 20-minute cap—ten minutes at goal intensity lands at roughly double the base reference. Use “Cold face / head immersion” for partial entry work on non-plunge days. Put cold habits on your available list only if you have safe access (plunge, lake, shower). This article’s 50 °F × 10 min target is educational guidance for progression, not a score gate the app enforces. Educational only—not medical advice.",
+      },
+    ],
+  },
+  {
+    id: "north-america-inclination-drop",
+    title: "North American inclination drop zones",
+    pillar: "magnetism",
+    summary:
+      "April 2026 synthesis of where vertical geomagnetic inclination is flattening fastest in North America — the 30–40°N · 80–95°W decay corridor and ten named decline zones from the Mississippi Valley to Churchill.",
+    relatedProtocolIds: [
+      "magnetic-awareness",
+      "barefoot-earth",
+      "magnetico-sleep-pad",
+      "low-d-hydration",
+      "deuterium-aware-meal",
+      "breaker-off-bedroom",
+      "phone-away-sleep",
+    ],
+    sections: [
+      {
+        heading: "What the inclination drop map claims",
+        body: "In the Northern Hemisphere, the vertical inclination vector—the dip of Earth's main field lines into the crust—is not uniform and is not static. Secular variation models (WMM and satellite missions) show regional differences in how fast inclination and total intensity change. In Kruse-community place teaching updated to April 2026, the steepest North American decline is drawn along a diagonal trough from the Canadian archipelago through the central and southeastern United States. A highlighted box from 30°N to 40°N latitude and 80°W to 95°W longitude is described as aligning with the Mississippi Valley and Appalachian foothills—putting large populations in a zone of accelerating vertical field flattening when combined with conductive soils, river drainage, and local geology. This app maps your ZIP against that educational framework; it does not compute a personal field decay rate.",
+      },
+      {
+        heading: "The 30–40°N · 80–95°W decay corridor",
+        body: "Inside this rectangle, Place will flag an inclination-drop context even if you are not within a named city radius. The lifestyle story binds three ideas: (1) weaker vertical magnetic torque at the surface, (2) conductive ground and water networks that change how artificial EM couples to the environment, and (3) deuterium-enriched surface waters in major river basins under a thinning shield. Mainstream geomagnetism confirms regional secular variation; the integrated mitochondrial hazard narrative is Kruse-framework synthesis—not something this app measures with a magnetometer on your block.",
+      },
+      {
+        heading: "Ten named decline zones (April 2026 list)",
+        body: "1) New Orleans — conducting delta on the ~90°W meridian. 2) Memphis — same longitude atop the Memphis Sand Aquifer and Mississippi funnel. 3) Minneapolis–St. Paul — crustal magnetic anomaly clash. 4) St. Louis — Missouri–Mississippi confluence node. 5) Chattanooga — Appalachian waveguide valley. 6) Miami — equatorial flattening edge near the SAA gradient. 7) Chicago — Great Lakes induction boundary. 8) Houston — saturated alluvial plain west of ~90°W. 9) Birmingham — iron-ore subsurface disruption. 10) Churchill, Manitoba — auroral oval descent with fastest continental intensity change rates in the teaching map. Each has a short hazard profile in Place when your ZIP falls within the zone radius.",
+      },
+      {
+        heading: "Conductive soils, rivers, and nnEMF coupling",
+        body: "The framework argues that as vertical native field pressure softens, highly conductive marsh, clay, delta, and saturated plain soils let stray anthropogenic frequencies bypass air impedance and couple more strongly to biological water matrices—especially when sleep lacks a restored vertical vector. Large rivers (Mississippi, Missouri, Tennessee systems) are treated as moving conductive loops whose secondary fields shift when the planetary electrodynamic circuit slows. Those mechanisms are presented in Kruse teaching; they are not validated here as quantified personal EMF doses.",
+      },
+      {
+        heading: "Deuterium and basin water",
+        body: "Memphis, Little Rock, and other Mississippi/Tennessee basin cities are singled out for aquifer and river deuterium loading in the same narrative—linking obesity epidemiology anecdotes to heavy surface-runoff water rather than deep artesian sources. Standard isotope hydrology already shows δD variability by latitude and water source; the jump to city-level obesity causation is framework-level. The app's Water pillar still recommends deuterium-aware meals and mineralized hydration without requiring acceptance of every basin claim.",
+      },
+      {
+        heading: "Mitigation if relocation is impossible",
+        body: "The April 2026 mitigation protocol for residents of these intersections: (1) Enforce a local vertical vector — sleep on high-gauss, unipolar static biomagnetic mattress pads designed to restore constant vertical magnetic torque (Magnetico-class systems in this app). (2) Isolate the water matrix — avoid Mississippi/Tennessee basin surface-runoff tap when you can; favor deep ancient artesian sources shielded from atmospheric ionization narratives. (3) Ground consciously — on conductive clay or delta soils (New Orleans, Houston), ground on raw earth during early morning hours and pair with native solar infrared. Log magnetism and water keystones when you practice them.",
+      },
+      {
+        heading: "Where Dr. Jack Kruse's teaching is specific",
+        body: "The April 2026 North American inclination drop map, the ten-city hazard ranking, tritium-first predictions for Churchill, lattice-lock language for Miami, and obesity–deuterium coupling for Memphis/Little Rock are Kruse-community place synthesis built on real geomagnetic secular variation and real isotope hydrology vocabulary. They are not NOAA products, clinical guidelines, or measurements performed by this app. Use them as place context for why sleep magnetism, nnEMF hygiene, grounding timing, and water source matter in the light–water–magnetism stack.",
+      },
+      {
+        heading: "How this fits the app",
+        body: "Set your ZIP on Today → Place. If you are inside the decay corridor or a named zone, Magnetism · three layers shows an Inclination drop zone row plus mitigation bullets. WMM inclination (when loaded) is separate—measured dip today, not projected decay. Pair this lesson with magnetosphere/SAA/deuterium and Earth field vs geology articles. Educational only—not relocation advice or medical risk assessment.",
       },
     ],
   },

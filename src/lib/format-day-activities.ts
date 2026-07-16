@@ -14,6 +14,21 @@ import { formatPoints } from "@/lib/utils";
 
 export type { DayActivityRow } from "@/lib/history-sections";
 
+/** e.g. 1 log, 3 logs */
+export function formatMultiLogCount(count: number): string {
+  if (count <= 0) return "";
+  return count === 1 ? "1 log" : `${count} logs`;
+}
+
+/** Today checklist subtitle for multi-log activities without a timer. */
+export function formatTodayMultiLogStatus(
+  pointsPerLog: number,
+  count: number,
+): string {
+  if (count <= 0) return "";
+  return `${formatPoints(pointsPerLog * count)} pts today · ${formatMultiLogCount(count)}`;
+}
+
 /** e.g. 45 min, 1h, 1h 15 min */
 export function formatLoggedMinutes(mins: number): string {
   if (mins <= 0) return "";
@@ -51,10 +66,14 @@ export function formatLine(
   name: string,
   totalMins: number,
   totalPoints: number,
+  logCount = 0,
 ): string {
   const pts = `${formatPoints(totalPoints)} pts`;
   if (totalMins > 0) {
     return `• ${name} (${formatLoggedMinutes(totalMins)}) — ${pts}`;
+  }
+  if (logCount > 0) {
+    return `• ${name} (${formatMultiLogCount(logCount)}) — ${pts}`;
   }
   return `• ${name} — ${pts}`;
 }
@@ -83,7 +102,9 @@ export function formatDayActivitiesCopy(
     if (lines.length > 0) lines.push("");
     lines.push(section.label);
     for (const item of items) {
-      lines.push(formatLine(item.name, item.totalMins, item.totalPoints));
+      lines.push(
+        formatLine(item.name, item.totalMins, item.totalPoints, item.logCount),
+      );
     }
   }
 

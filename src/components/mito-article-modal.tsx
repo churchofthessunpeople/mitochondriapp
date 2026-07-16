@@ -1,8 +1,69 @@
 "use client";
 
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import type { MitoEntry } from "@/lib/mitoversity";
 import { AdminEditButton } from "@/components/admin-edit-button";
+import {
+  MITO_READING_LEVEL_META,
+  getMitoSectionsForLevel,
+  mitoEntryHasReadingLevels,
+} from "@/lib/mitoversity-reading-levels";
+import { cn } from "@/lib/utils";
+
+function ArticleSections({
+  sections,
+}: {
+  sections: { heading: string; body: string }[];
+}) {
+  return (
+    <div className="space-y-4">
+      {sections.map((s) => (
+        <section key={s.heading} className="space-y-1.5">
+          <h4 className="text-sm font-semibold text-foreground">{s.heading}</h4>
+          <p className="text-sm leading-relaxed text-muted">{s.body}</p>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function ReadingLevelDropdown({
+  label,
+  subtitle,
+  defaultOpen,
+  sections,
+}: {
+  label: string;
+  subtitle: string;
+  defaultOpen?: boolean;
+  sections: { heading: string; body: string }[];
+}) {
+  return (
+    <details
+      open={defaultOpen}
+      className="group rounded-2xl border border-border bg-foreground/[0.02]"
+    >
+      <summary
+        className={cn(
+          "flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-3.5",
+          "marker:content-none [&::-webkit-details-marker]:hidden",
+        )}
+      >
+        <div className="min-w-0 text-left">
+          <p className="text-sm font-semibold text-foreground">{label}</p>
+          <p className="mt-0.5 text-xs text-muted">{subtitle}</p>
+        </div>
+        <ChevronDown
+          className="h-4 w-4 shrink-0 text-muted transition group-open:rotate-180"
+          strokeWidth={2.25}
+        />
+      </summary>
+      <div className="border-t border-border px-4 py-4">
+        <ArticleSections sections={sections} />
+      </div>
+    </details>
+  );
+}
 
 export function MitoArticleModal({
   entry,
@@ -17,6 +78,8 @@ export function MitoArticleModal({
   isAdmin?: boolean;
   onAdminEdit?: () => void;
 }) {
+  const hasLevels = mitoEntryHasReadingLevels(entry);
+
   return (
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center bg-black/55 p-3 sm:items-center sm:p-4"
@@ -58,16 +121,32 @@ export function MitoArticleModal({
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
           <p className="text-sm leading-relaxed text-muted">{entry.summary}</p>
-          <div className="mt-5 space-y-5">
-            {entry.sections.map((s) => (
-              <section key={s.heading} className="space-y-1.5">
-                <h3 className="text-sm font-semibold text-foreground">
-                  {s.heading}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted">{s.body}</p>
-              </section>
-            ))}
-          </div>
+
+          {hasLevels ? (
+            <div className="mt-5 space-y-3">
+              <p className="text-xs text-muted">
+                Expand a reading level — start with Simple if you are new to the
+                topic.
+              </p>
+              {MITO_READING_LEVEL_META.map((meta, index) => {
+                const sections = getMitoSectionsForLevel(entry, meta.id);
+                if (sections.length === 0) return null;
+                return (
+                  <ReadingLevelDropdown
+                    key={meta.id}
+                    label={meta.label}
+                    subtitle={meta.subtitle}
+                    defaultOpen={index === 0}
+                    sections={sections}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mt-5 space-y-5">
+              <ArticleSections sections={entry.sections} />
+            </div>
+          )}
         </div>
 
         <div className="shrink-0 border-t border-border px-4 py-3 sm:px-5">

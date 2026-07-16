@@ -24,6 +24,7 @@ import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import type { OpenAppSheet } from "@/lib/app-sheets";
 import type { TodaySection } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
+import { enrichPlaceMagnetismAction } from "@/lib/actions/place";
 import { ROUTES } from "@/lib/routes";
 import {
   formatSunriseMultiplier,
@@ -63,6 +64,7 @@ type Props = {
   isTravel?: boolean;
   travelUntil?: string | null;
   homePostalCode?: string | null;
+  travelPostalCode?: string | null;
   travelLabel?: string | null;
   magneticoGauss?: number;
   sleepRoomTempF?: number;
@@ -121,6 +123,7 @@ export function TodayHome({
   isTravel,
   travelUntil,
   homePostalCode,
+  travelPostalCode,
   travelLabel,
   magneticoGauss = 10,
   sleepRoomTempF = 65,
@@ -144,6 +147,66 @@ export function TodayHome({
   const [liveSunriseTierLabel, setLiveSunriseTierLabel] = useState(
     sunriseTierLabel ?? null,
   );
+  const [livePlaceFactors, setLivePlaceFactors] = useState(placeFactors);
+  const [placeMagnetismLoading, setPlaceMagnetismLoading] = useState(false);
+
+  useEffect(() => {
+    setLivePlaceFactors(placeFactors);
+  }, [placeFactors]);
+
+  useEffect(() => {
+    if (section !== "place" || !livePlaceFactors) return;
+    if (
+      livePlaceFactors.geomag?.source === "bgs-wmm" &&
+      livePlaceFactors.artificialEm
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+    setPlaceMagnetismLoading(true);
+    const zip = isTravel ? (travelPostalCode ?? postalCode) : postalCode;
+    enrichPlaceMagnetismAction(
+      livePlaceFactors.latitude,
+      livePlaceFactors.longitude,
+      livePlaceFactors.elevationM,
+      zip,
+    )
+      .then((enriched) => {
+        if (cancelled) return;
+        setLivePlaceFactors((prev) =>
+          prev
+            ? {
+                ...prev,
+                geomag: enriched.geomag,
+                artificialEm: enriched.artificialEm ?? prev.artificialEm,
+                elevationM: enriched.elevationM ?? prev.elevationM,
+                elevationLabel:
+                  enriched.elevationLabel ?? prev.elevationLabel,
+              }
+            : prev,
+        );
+      })
+      .catch(() => {
+        /* keep dipole baseline */
+      })
+      .finally(() => {
+        if (!cancelled) setPlaceMagnetismLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    section,
+    livePlaceFactors?.latitude,
+    livePlaceFactors?.longitude,
+    livePlaceFactors?.geomag?.source,
+    livePlaceFactors?.artificialEm,
+    postalCode,
+    isTravel,
+    travelPostalCode,
+  ]);
 
   useEffect(() => {
     if (initialSection) setSection(initialSection);
@@ -180,17 +243,7 @@ export function TodayHome({
 
   const onCompletionCountsChange = useCallback(
     (counts: Record<string, number>) => {
-      setLiveCounts((prev) => {
-        const pk = Object.keys(prev);
-        const nk = Object.keys(counts);
-        if (
-          pk.length === nk.length &&
-          pk.every((k) => prev[k] === counts[k])
-        ) {
-          return prev;
-        }
-        return counts;
-      });
+      setLiveCounts(counts);
     },
     [],
   );
@@ -421,6 +474,7 @@ export function TodayHome({
       <div role="tabpanel" className="min-h-[12rem]">
         {section === "checklist" && (
           <ScheduleDay
+            key={todayIso}
             protocols={availableProtocols}
             completionCounts={liveCounts}
             completionDurations={liveDurations}
@@ -494,7 +548,7 @@ export function TodayHome({
                 }
                 distanceKm={distanceKm}
                 timeZone={timeZone}
-                placeFactors={placeFactors}
+                placeFactors={livePlaceFactors}
                 phaseHint={phaseHint}
               />
             ) : (
@@ -506,6 +560,12 @@ export function TodayHome({
                 </p>
               </div>
             )}
+
+            {placeMagnetismLoading ? (
+              <p className="text-center text-xs text-muted">
+                Loading WMM magnetic field for your ZIP…
+              </p>
+            ) : null}
 
             <ZipForm
               currentZip={homePostalCode ?? postalCode}

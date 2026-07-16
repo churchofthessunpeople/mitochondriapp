@@ -7,7 +7,7 @@ import {
   computeSunriseMultiplier,
   describeSunriseModifiers,
   formatSunriseMultiplier,
-  SUNRISE_TIERS,
+  resolveSunriseTierOptions,
   type SunriseModifiers,
   type SunriseTier,
 } from "@/lib/scoring";
@@ -130,13 +130,10 @@ export function SunriseKeystoneDialog({
   onCancel,
   initialProtocol = null,
 }: Props) {
-  const tiersAvailable = useMemo(() => {
-    const byId = new Map(allProtocols.map((p) => [p.id, p]));
-    return SUNRISE_TIERS.map((tier) => ({
-      tier,
-      protocol: byId.get(tier.protocolId) ?? null,
-    })).filter((x) => x.protocol != null) as TierOption[];
-  }, [allProtocols]);
+  const tiersAvailable = useMemo(
+    () => resolveSunriseTierOptions(allProtocols) as TierOption[],
+    [allProtocols],
+  );
 
   const initialTier = useMemo(() => {
     if (!initialProtocol) return null;

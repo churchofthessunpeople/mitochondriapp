@@ -20,6 +20,7 @@ import {
   isProtocolDeleted,
 } from "@/lib/content-overrides";
 import { getProtocolTeaser } from "@/lib/protocol-display";
+import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
 
 export function seedToProtocol(seed: ProtocolSeed): Protocol {
   return {
@@ -51,11 +52,16 @@ export async function getMergedCatalogProtocolById(
   id: string,
 ): Promise<Protocol | undefined> {
   const overrides = await loadContentOverrides();
-  if (isProtocolDeleted(overrides, id)) return undefined;
+  // Morning-light keystones stay loggable even if removed from the catalog UI.
+  if (isProtocolDeleted(overrides, id) && !isSunriseKeystoneProtocolId(id)) {
+    return undefined;
+  }
 
   const seed = PROTOCOL_SEEDS.find((s) => s.id === id);
   if (seed) {
-    const merged = mergeProtocolSeed(seed, overrides);
+    const merged = isProtocolDeleted(overrides, id)
+      ? seed
+      : mergeProtocolSeed(seed, overrides);
     const allMeta = mergeAllProtocolMeta(overrides);
     const teaser = getProtocolTeaser(merged, allMeta);
     return seedToProtocol({ ...merged, description: teaser });

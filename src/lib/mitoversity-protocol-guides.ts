@@ -72,24 +72,24 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     ],
   },
   {
-    id: "morning-natural-light",
-    title: "Outdoor natural light (morning)",
+    id: "sun-exposure",
+    title: "Sun exposure by time of day",
     pillar: "light",
     summary:
-      "Daytime outdoor light without glass—extends the morning arc beyond the sunrise window.",
-    relatedProtocolIds: ["morning-natural-light"],
+      "One outdoor sun habit logged into morning, noon, or afternoon slots—with grounding, skin exposure, and duration.",
+    relatedProtocolIds: ["sun-exposure"],
     sections: [
       {
-        heading: "Beyond sunrise",
-        body: "Sunrise keystones front-load the day; ongoing outdoor natural light keeps melanopsin drive and outdoor time high through mid-morning. This habit is multi-log: several short outdoor stops add up.",
+        heading: "Why one activity, three slots",
+        body: "Morning, solar noon, and afternoon sun are different UV and circadian jobs. This app keeps one Sun exposure activity and routes each log into a clock slot: morning 6–10 am, noon 10 am–2 pm, afternoon 2–6 pm. Add more minutes to the same slot anytime during the day.",
       },
       {
-        heading: "Practice",
-        body: "Porch, yard, or walk without a window between you and the sky. Aim for open sky when possible. Pair with movement or grounding for a stacked Light/Magnetism morning.",
+        heading: "What you log",
+        body: "Session time (or pick the slot), whether you were barefoot on earth, how much skin was exposed, and duration. Quality slightly adjusts points; ZIP UV weighting is planned next so noon at high UV can score differently from winter mornings.",
       },
       {
         heading: "How this fits the app",
-        body: "Log each intentional outdoor natural-light block. It does not replace sunrise keystones for multiplier unlock but supports circadian lifestyle on days you miss dawn or want extra outdoor minutes.",
+        body: "Sunrise keystones remain separate—they unlock the day boost. Sun exposure is the daytime skin + outdoor light habit. Pair with Place solar noon and the solar-noon vitamin D lesson for context.",
       },
     ],
   },
@@ -405,7 +405,7 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
       },
       {
         heading: "Practice",
-        body: "Walk, jog, resistance work, or play outside in daylight. Log duration in 15-minute blocks. Rebounding counts here if you own a rebounder.",
+        body: "Walk, jog, resistance work, or play outside in daylight. Each log asks full sunlight, outside, or indoors, then duration in 15-minute blocks. Rebounding has its own activity if you own a rebounder.",
       },
       {
         heading: "Read next",

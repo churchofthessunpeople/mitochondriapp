@@ -20,6 +20,13 @@ import {
   parseColdThermoSkinTempF,
 } from "@/lib/cold-thermo-skin-temp";
 import {
+  encodeMovementSettingVariant,
+  isMovementSettingProtocolId,
+  movementSettingBasePoints,
+  parseMovementSetting,
+  type MovementSetting,
+} from "@/lib/movement-setting";
+import {
   isMagneticoProtocolId,
   parseMagneticoGauss,
 } from "@/lib/magnetico";
@@ -28,6 +35,13 @@ import {
   variantBasePoints,
 } from "@/lib/protocol-variants";
 import { parseSleepRoomTempF, isSleepRoomTempProtocolId } from "@/lib/sleep-room-temp";
+import {
+  encodeSunExposureVariant,
+  isSunExposureProtocolId,
+  sunExposureBasePoints,
+  timeOfDayForSunSlot,
+  type SunExposureLogInput,
+} from "@/lib/sun-exposure";
 import {
   effectiveSunriseBoostMultiplier,
   encodeSunriseEndOffset,
@@ -245,6 +259,10 @@ export async function logCompletionAction(
     viewedAt?: string;
     /** Optional skin surface temp (°F) for cold thermogenesis logs. */
     skinTempF?: number | null;
+    /** Daytime sun exposure dialog answers. */
+    sunExposure?: SunExposureLogInput;
+    /** Movement / exercise environment (sunlight, outside, indoors). */
+    movementSetting?: MovementSetting;
   },
 ): Promise<CompletionResult> {
   const userId = await requireUser();
@@ -255,6 +273,9 @@ export async function logCompletionAction(
   if (!protocol) throw new Error("Activity not found");
 
   const slot =
+    (isSunExposureProtocolId(protocolId) && options?.sunExposure
+      ? timeOfDayForSunSlot(options.sunExposure.slot)
+      : null) ??
     options?.timeOfDay ??
     protocol.lockedTimeOfDay ??
     protocol.timeOfDay ??
@@ -339,6 +360,19 @@ export async function logCompletionAction(
       options?.skinTempF ?? OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
     );
     basePoints = variantBasePoints(protocolId, variantValue, protocol.points);
+  } else if (isSunExposureProtocolId(protocolId)) {
+    const sun = options?.sunExposure;
+    if (!sun) throw new Error("Sun exposure details required");
+    variantValue = encodeSunExposureVariant(sun);
+    basePoints = sunExposureBasePoints(protocol.points, sun, {
+      slot: sun.slot,
+    });
+  } else if (isMovementSettingProtocolId(protocolId)) {
+    const setting = parseMovementSetting(
+      options?.movementSetting ?? "outside",
+    );
+    variantValue = encodeMovementSettingVariant(setting);
+    basePoints = movementSettingBasePoints(setting, protocol.points);
   } else if (isVariantProtocolId(protocolId)) {
     const [u] = await db
       .select({

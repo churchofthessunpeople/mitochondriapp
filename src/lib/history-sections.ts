@@ -1,4 +1,7 @@
-import { protocolAllowsMultiple } from "@/lib/completion-dedupe";
+import {
+  protocolAllowsMultiple,
+  protocolShowsLogCount,
+} from "@/lib/completion-dedupe";
 import {
   isPermanentProtocolId,
 } from "@/lib/permanent-activities";
@@ -31,6 +34,8 @@ export type AggregatedActivity = {
   name: string;
   totalMins: number;
   totalPoints: number;
+  /** Times logged for multi-log activities without a timer. */
+  logCount: number;
   order: number;
   section: HistorySectionId;
 };
@@ -68,11 +73,13 @@ export function aggregateDayActivities(
         : (r.durationMinutes ?? 0);
     const pts = r.pointsEarned;
     const allowsMultiple = protocolAllowsMultiple(r.protocolId);
+    const showsLogCount = protocolShowsLogCount(r.protocolId);
     const existing = byProtocol.get(key);
     if (existing) {
       if (allowsMultiple) {
         existing.totalMins += mins;
         existing.totalPoints += pts;
+        if (showsLogCount) existing.logCount += 1;
       }
       continue;
     }
@@ -82,6 +89,7 @@ export function aggregateDayActivities(
       name,
       totalMins: mins,
       totalPoints: pts,
+      logCount: showsLogCount ? 1 : 0,
       order: order++,
       section: historySectionForActivity(r.protocolId, permanentIds),
     });

@@ -29,13 +29,9 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
     equipment: "none",
     how: "Step outside in the morning even if trees, buildings, or heavy cloud limit the view.\n\nAny outdoor morning light to the eyes counts — porch, street, or trail. No glass between you and the sky if you can avoid it.",
   },
-  "morning-natural-light": {
+  "sun-exposure": {
     equipment: "none",
-    how: "Go outside for natural light without a window in between — porch, yard, or walk.\n\nAim for open sky when you can. Even a short outdoor stop before indoor work helps anchor the day.",
-  },
-  "midday-sun-skin": {
-    equipment: "none",
-    how: "Near solar noon (check Place for your location), get outdoors with skin exposed — arms, legs, or more if comfortable.\n\nStay within a non-burning window; build time gradually. Glass blocks UVB, so windows do not count.\n\nLog with minutes — each + adds 15 min, or set a custom duration.",
+    how: "Go outside without glass between you and the sky. When you log, pick the session time (or morning / noon / afternoon slot), whether you were grounded, how much skin was exposed, and how long.\n\nSlots: morning sun 6–10 am, noon sun 10 am–2 pm, afternoon sun 2–6 pm. You can add more minutes to the same slot later in the day.\n\nStay within a non-burning window; build time gradually. Sunrise keystones are separate — they unlock the day boost.",
   },
   "sunset-viewing": {
     equipment: "none",
@@ -119,11 +115,15 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "morning-movement": {
     equipment: "none",
-    how: "Zone 2 walk, resistance work, or play outside in daylight when possible — not only under gym fluorescents.\n\nLog minutes in 15-minute blocks (+) or set custom duration.",
+    how: "Zone 2 walk, resistance work, or play outside in daylight when possible — not only under gym fluorescents.\n\nEach log asks full sunlight, outside, or indoors, then minutes in 15-minute blocks.",
+  },
+  rebounding: {
+    equipment: "required",
+    how: "Use a stable mini-trampoline (rebounder) — not a toy trampoline. Soft bounces with both feet on the mat, knees slightly bent, posture tall.\n\nStart with 5–10 minutes and build toward 15. Morning outdoor rebounding stacks movement with daylight. Each log asks environment (sunlight / outside / indoors) and duration in 15-minute blocks.",
   },
   "mastic-gum": {
     equipment: "required",
-    how: "Use real Chios mastic resin or gum — not candy gum. Take a piece large enough to give real jaw resistance.\n\nChew actively on both sides of the jaw for about 15 minutes (or your logged duration). Switch sides if one fatigues. Stop if you have TMJ pain or jaw issues.",
+    how: "Use real Chios mastic resin or gum — not candy gum. Take a piece large enough to give real jaw resistance.\n\nChew actively on both sides of the jaw for about 15 minutes (or your logged duration). Each log asks indoors vs outside vs full sunlight. Stop if you have TMJ pain or jaw issues.",
   },
   "blue-light-hygiene": {
     equipment: "optional",

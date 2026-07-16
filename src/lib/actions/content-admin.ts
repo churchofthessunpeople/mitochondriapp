@@ -36,6 +36,7 @@ import {
 } from "@/lib/mitoversity";
 import { revalidateApp } from "@/lib/revalidate-app";
 import { protocolTeaserFromHowTo } from "@/lib/protocol-meta";
+import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
 import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 import { LWM_PILLARS } from "@/lib/lwm";
 import type { TimeOfDay } from "@/db/schema";
@@ -341,6 +342,11 @@ export async function deleteAdminProtocolAction(
   protocolId: string,
 ): Promise<void> {
   await requireAdmin();
+  if (isSunriseKeystoneProtocolId(protocolId)) {
+    throw new Error(
+      "Morning light tiers (horizon / open sky / outside) cannot be deleted — they power the daily sunrise check-in.",
+    );
+  }
   const overrides = await loadContentOverrides();
   const isCustom = isCustomProtocolId(overrides, protocolId);
 

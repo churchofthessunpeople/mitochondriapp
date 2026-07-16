@@ -17,6 +17,19 @@ import {
   parseSleepRoomTempF,
   pointsForSleepRoomTemp,
 } from "@/lib/sleep-room-temp";
+import {
+  decodeMovementSettingVariant,
+  formatMovementSettingLabel,
+  isMovementSettingProtocolId,
+  movementSettingBasePoints,
+  requiresMovementSetting,
+} from "@/lib/movement-setting";
+import {
+  decodeSunExposureVariant,
+  formatSunExposureLabel,
+  isSunExposureProtocolId,
+  sunExposureBasePoints,
+} from "@/lib/sun-exposure";
 
 /** Effective base points when a protocol log carries a variant (gauss, °F, etc.). */
 export function variantBasePoints(
@@ -39,6 +52,17 @@ export function variantBasePoints(
   if (isSleepRoomTempProtocolId(protocolId)) {
     return pointsForSleepRoomTemp(parseSleepRoomTempF(variantValue));
   }
+  if (isSunExposureProtocolId(protocolId)) {
+    const decoded = decodeSunExposureVariant(variantValue);
+    if (!decoded) return undefined;
+    return sunExposureBasePoints(catalogBase, decoded, { slot: decoded.slot });
+  }
+  const movementSetting =
+    isMovementSettingProtocolId(protocolId) &&
+    decodeMovementSettingVariant(variantValue);
+  if (movementSetting) {
+    return movementSettingBasePoints(movementSetting, catalogBase);
+  }
   return undefined;
 }
 
@@ -57,6 +81,12 @@ export function formatVariantLabel(
   if (isSleepRoomTempProtocolId(protocolId)) {
     return formatSleepRoomTemp(parseSleepRoomTempF(variantValue));
   }
+  if (isSunExposureProtocolId(protocolId)) {
+    return formatSunExposureLabel(variantValue);
+  }
+  if (isMovementSettingProtocolId(protocolId)) {
+    return formatMovementSettingLabel(variantValue);
+  }
   return null;
 }
 
@@ -70,3 +100,11 @@ export function isVariantProtocolId(protocolId: string): boolean {
 export function isPerLogVariantProtocolId(protocolId: string): boolean {
   return isColdThermoProtocolId(protocolId);
 }
+
+export function isMovementSettingVariantValue(
+  variantValue: unknown,
+): boolean {
+  return decodeMovementSettingVariant(variantValue) != null;
+}
+
+export { requiresMovementSetting };

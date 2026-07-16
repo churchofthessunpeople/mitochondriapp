@@ -30,6 +30,7 @@ describe("formatGeomagDisplay", () => {
       source: "bgs-wmm",
     });
     assert.equal(d.totalUtLabel, "48.0 µT");
+    assert.equal(d.totalGaussLabel, "0.48 G");
     assert.match(d.inclinationLabel, /down/);
     assert.match(d.declinationLabel, /E/);
   });

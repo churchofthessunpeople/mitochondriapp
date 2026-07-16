@@ -1,4 +1,5 @@
 import type { Protocol } from "@/db/schema";
+import { PROTOCOL_SEEDS } from "@/db/seed-data";
 import {
   decodeSunriseEndOffset,
   formatSunriseSkyLabel,
@@ -69,6 +70,40 @@ export const SUNRISE_TIERS: readonly SunriseTier[] = [
       "Outside in the morning with limited sky view (trees, streets, overcast). Up to 1.25× day boost.",
   },
 ] as const;
+
+export const SUNRISE_KEYSTONE_PROTOCOL_IDS = SUNRISE_TIERS.map(
+  (t) => t.protocolId,
+) as readonly string[];
+
+/**
+ * All three morning-light tiers for the check-in UI.
+ * Falls back to seed rows when a tier was deleted from the admin catalog,
+ * so the day-boost flow cannot lose open-sky / outside options.
+ */
+export function resolveSunriseTierOptions(
+  catalog: readonly Protocol[] = [],
+): { tier: SunriseTier; protocol: Protocol }[] {
+  const byId = new Map(catalog.map((p) => [p.id, p]));
+  const out: { tier: SunriseTier; protocol: Protocol }[] = [];
+  for (const tier of SUNRISE_TIERS) {
+    const fromCatalog = byId.get(tier.protocolId);
+    if (fromCatalog) {
+      out.push({ tier, protocol: fromCatalog });
+      continue;
+    }
+    const seed = PROTOCOL_SEEDS.find((s) => s.id === tier.protocolId);
+    if (!seed) continue;
+    out.push({
+      tier,
+      protocol: {
+        ...seed,
+        active: true,
+        createdAt: new Date(0),
+      },
+    });
+  }
+  return out;
+}
 
 /** Legacy protocol ids still count toward a tier if present in older DBs */
 const LEGACY_SUNRISE_PROTOCOL_TIER: Record<string, SunriseTierId> = {

@@ -312,6 +312,26 @@ export const contentOverrides = pgTable("content_overrides", {
   }),
 });
 
+/**
+ * Cached ZIP geocode + place enrichment (elevation, WMM geomag, artificial EM).
+ * Refreshed about once per month — shared across users at the same ZIP.
+ */
+export const zipPlaceCache = pgTable("zip_place_cache", {
+  postalCode: text("postal_code").primaryKey(),
+  latitude: doublePrecision("latitude").notNull(),
+  longitude: doublePrecision("longitude").notNull(),
+  placeName: text("place_name").notNull(),
+  state: text("state"),
+  stateAbbr: text("state_abbr"),
+  timezone: text("timezone").notNull(),
+  country: text("country").notNull().default("United States"),
+  countryCode: text("country_code").notNull().default("US"),
+  elevationM: doublePrecision("elevation_m"),
+  geomag: jsonb("geomag"),
+  artificialEm: jsonb("artificial_em"),
+  refreshedAt: timestamp("refreshed_at", { mode: "date" }).notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type Region = typeof regions.$inferSelect;
 export type Protocol = typeof protocols.$inferSelect;

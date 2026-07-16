@@ -9,6 +9,12 @@ const MULTI_LOG_IDS = new Set(
     .map((p) => p.id),
 );
 
+const MULTI_LOG_COUNT_IDS = new Set(
+  getCatalogProtocols()
+    .filter((p) => p.allowsMultiple && !p.durationEnabled)
+    .map((p) => p.id),
+);
+
 /**
  * Remove duplicate single-log rows (same user / protocol / day).
  * Keeps the earliest row. Multi-log activities are untouched.
@@ -65,4 +71,12 @@ export async function dedupeSingleLogCompletions(
 export function protocolAllowsMultiple(protocolId: string | null | undefined): boolean {
   if (!protocolId) return true;
   return MULTI_LOG_IDS.has(protocolId);
+}
+
+/** Multi-log activities without a timer — show how many times they were logged. */
+export function protocolShowsLogCount(
+  protocolId: string | null | undefined,
+): boolean {
+  if (!protocolId) return false;
+  return MULTI_LOG_COUNT_IDS.has(protocolId);
 }

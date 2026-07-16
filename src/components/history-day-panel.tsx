@@ -7,7 +7,11 @@ import {
   getDayDetailAction,
   type DayDetailRow,
 } from "@/lib/actions/history";
-import { displayName, formatLoggedMinutes } from "@/lib/format-day-activities";
+import {
+  displayName,
+  formatLoggedMinutes,
+  formatMultiLogCount,
+} from "@/lib/format-day-activities";
 import {
   aggregateDayActivities,
   groupAggregatedBySection,
@@ -67,10 +71,12 @@ function AggregatedRow({
   name,
   totalMins,
   totalPoints,
+  logCount,
 }: {
   name: string;
   totalMins: number;
   totalPoints: number;
+  logCount: number;
 }) {
   return (
     <li className="glass flex items-start justify-between gap-3 rounded-2xl p-4">
@@ -78,6 +84,8 @@ function AggregatedRow({
         <p className="font-medium">{name}</p>
         {totalMins > 0 ? (
           <p className="text-xs text-muted">{formatLoggedMinutes(totalMins)} logged</p>
+        ) : logCount > 0 ? (
+          <p className="text-xs text-muted">{formatMultiLogCount(logCount)}</p>
         ) : null}
       </div>
       <span className="font-semibold text-accent-2">+{totalPoints}</span>
@@ -160,6 +168,7 @@ export function HistoryDayPanel({ date }: { date: string }) {
                       name={item.name}
                       totalMins={item.totalMins}
                       totalPoints={item.totalPoints}
+                      logCount={item.logCount}
                     />
                   ))}
                 </ul>

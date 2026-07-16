@@ -26,6 +26,7 @@ export type GeomagField = {
 
 export type GeomagDisplay = GeomagField & {
   totalUtLabel: string;
+  totalGaussLabel: string;
   inclinationLabel: string;
   declinationLabel: string;
   summaryLine: string;
@@ -47,12 +48,14 @@ function formatDeg(deg: number, pos: string, neg: string): string {
 export function formatGeomagDisplay(g: GeomagField): GeomagDisplay {
   const totalUt = g.totalNt / 1000;
   const totalUtLabel = `${totalUt.toFixed(1)} µT`;
+  const totalGaussLabel = `${(totalUt / 100).toFixed(2)} G`;
   const inclinationLabel = formatDeg(g.inclinationDeg, "down", "up");
   const declinationLabel = formatDeg(g.declinationDeg, "E", "W");
-  const summaryLine = `${totalUtLabel} total · dip ${inclinationLabel} · decl ${declinationLabel}`;
+  const summaryLine = `${totalUtLabel} (${totalGaussLabel}) · dip ${inclinationLabel} · decl ${declinationLabel}`;
   return {
     ...g,
     totalUtLabel,
+    totalGaussLabel,
     inclinationLabel,
     declinationLabel,
     summaryLine,

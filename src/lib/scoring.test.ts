@@ -9,18 +9,19 @@ import {
   isSunriseProtocol,
   maxLogsPerDay,
   pointsForLog,
+  resolveSunriseTierOptions,
   streakBonusPoints,
   sunriseTierById,
   sunriseTierForProtocolId,
 } from "./scoring";
 
 const morning = {
-  id: "morning-natural-light",
+  id: "sun-exposure",
   points: 10,
   durationEnabled: true,
   referenceMinutes: 15,
   maxDurationMinutes: 60,
-  timeOfDay: "morning" as const,
+  timeOfDay: "anytime" as const,
   lockedTimeOfDay: null as null,
 };
 
@@ -125,6 +126,17 @@ describe("isSunriseKeystoneProtocol", () => {
     assert.equal(
       isSunriseKeystoneProtocol({ id: "barefoot-earth" }),
       false,
+    );
+  });
+});
+
+describe("resolveSunriseTierOptions", () => {
+  it("returns all three tiers even with empty catalog", () => {
+    const opts = resolveSunriseTierOptions([]);
+    assert.equal(opts.length, 3);
+    assert.deepEqual(
+      opts.map((o) => o.tier.id),
+      ["horizon", "open_sky", "outside"],
     );
   });
 });

@@ -5,8 +5,8 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { regions, users } from "@/db/schema";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
-import { findNearestRegion, geocodeUsZip } from "@/lib/geo";
-import { fetchElevationMeters } from "@/lib/place-factors";
+import { findNearestRegion } from "@/lib/geo";
+import { resolveZipPlaceData } from "@/lib/zip-place-cache";
 import { AUTH_RATE, consumeRateLimit, getClientIp } from "@/lib/rate-limit";
 import { listRegions } from "@/lib/regions";
 import { revalidateApp } from "@/lib/revalidate-app";
@@ -81,7 +81,8 @@ export async function setLocationFromZipAction(
   if (!zip) return { error: "Enter a US ZIP code." };
 
   try {
-    const place = await geocodeUsZip(zip);
+    const resolved = await resolveZipPlaceData(zip);
+    const place = resolved.geocode;
     const catalog = await listRegions();
     // Prefer US metros for US ZIPs so Dallas never snaps to Miami/El Salvador
     const nearest = findNearestRegion(
@@ -98,10 +99,7 @@ export async function setLocationFromZipAction(
       .filter(Boolean)
       .join(", ");
 
-    const elevationM = await fetchElevationMeters(
-      place.latitude,
-      place.longitude,
-    );
+    const elevationM = resolved.elevationM;
 
     const travel = String(formData.get("travel") ?? "") === "1";
     const days = Math.min(

@@ -80,6 +80,17 @@ export function RegionCard({
         </p>
       )}
 
+      {placeFactors?.inclinationZone && (
+        <p className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-foreground">
+          <span className="font-semibold text-amber-200/90">
+            Inclination drop context ·{" "}
+          </span>
+          {placeFactors.inclinationZone.summaryLine}. April 2026 Kruse-framework
+          place map from your ZIP — see Magnetism layers below and Mitoversity
+          for full zone profiles.
+        </p>
+      )}
+
       {/* One 3-col grid so sun + score columns share the same tracks */}
       <div className="mt-4 grid grid-cols-3 gap-2">
         <StatCell
@@ -156,7 +167,7 @@ export function RegionCard({
                 <>
                   <FactorRow
                     label="Main field"
-                    value={placeFactors.geomag.totalUtLabel}
+                    value={`${placeFactors.geomag.totalUtLabel} · ${placeFactors.geomag.totalGaussLabel}`}
                     detail={`${placeFactors.geomag.model} · Earth core field only (not phones/Wi‑Fi)`}
                   />
                   <FactorRow
@@ -170,6 +181,14 @@ export function RegionCard({
                     detail="Compass vs true north"
                   />
                 </>
+              )}
+              {placeFactors.inclinationZone && (
+                <FactorRow
+                  label="Inclination drop zone"
+                  value={placeFactors.inclinationZone.summaryLine}
+                  detail={placeFactors.inclinationZone.detailLine}
+                  highlight
+                />
               )}
               <FactorRow
                 label="Geology"
@@ -186,9 +205,27 @@ export function RegionCard({
             </ul>
             <p className="mt-2 text-[10px] leading-relaxed text-muted">
               Main field = WMM planetary model. Geology = magma systems.
-              Artificial EM = open-map infrastructure proxy (cells/masts/plants)
-              — not a personal exposure meter.
+              Inclination drop = April 2026 Kruse-framework regional synthesis
+              from your ZIP — not a live decay-rate sensor. Artificial EM =
+              open-map infrastructure proxy (cells/masts/plants) — not a
+              personal exposure meter.
             </p>
+            {placeFactors.inclinationZone && (
+              <div className="mt-3 rounded-2xl border border-accent/25 bg-accent/5 px-3 py-2.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+                  Mitigation · if relocation is impossible
+                </p>
+                <ul className="mt-2 list-inside list-disc space-y-1 text-[11px] leading-relaxed text-muted">
+                  {placeFactors.inclinationZone.mitigationLines.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-[10px] text-muted">
+                  Full zone profiles: Mitoversity · North American inclination
+                  drop zones.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -227,13 +264,20 @@ function FactorRow({
   label,
   value,
   detail,
+  highlight,
 }: {
   label: string;
   value: string;
   detail?: string;
+  highlight?: boolean;
 }) {
   return (
-    <li className="flex items-start justify-between gap-3 px-3 py-2.5 text-xs">
+    <li
+      className={cn(
+        "flex items-start justify-between gap-3 px-3 py-2.5 text-xs",
+        highlight && "bg-accent/5",
+      )}
+    >
       <span className="shrink-0 pt-0.5 text-muted">{label}</span>
       <div className="min-w-0 text-right">
         <p className="font-medium leading-snug text-foreground">{value}</p>

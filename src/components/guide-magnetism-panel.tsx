@@ -33,6 +33,12 @@ export function GuideMagnetismPanel() {
             meter or hazard alert.
           </li>
           <li>
+            <strong className="text-foreground">Inclination drop zones</strong> —
+            April 2026 NA map: decay corridor (30–40°N · 80–95°W) and ten
+            named decline metros from your ZIP. Kruse-framework education, not
+            a live decay sensor.
+          </li>
+          <li>
             <strong className="text-foreground">Artificial EM load</strong> —
             open-map proxy for cells/masts and nearby power plants (1–5). Not a
             personal RF/ELF reading.

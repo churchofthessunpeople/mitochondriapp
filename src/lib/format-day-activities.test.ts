@@ -3,6 +3,8 @@ import { describe, it } from "node:test";
 import {
   formatDayActivitiesCopy,
   formatLoggedMinutes,
+  formatMultiLogCount,
+  formatTodayMultiLogStatus,
 } from "./format-day-activities";
 
 describe("formatLoggedMinutes", () => {
@@ -10,6 +12,24 @@ describe("formatLoggedMinutes", () => {
     assert.equal(formatLoggedMinutes(45), "45 min");
     assert.equal(formatLoggedMinutes(60), "1h");
     assert.equal(formatLoggedMinutes(75), "1h 15 min");
+  });
+});
+
+describe("formatMultiLogCount", () => {
+  it("formats singular and plural log counts", () => {
+    assert.equal(formatMultiLogCount(1), "1 log");
+    assert.equal(formatMultiLogCount(3), "3 logs");
+    assert.equal(formatMultiLogCount(0), "");
+  });
+});
+
+describe("formatTodayMultiLogStatus", () => {
+  it("shows cumulative points and log count", () => {
+    assert.equal(
+      formatTodayMultiLogStatus(4, 3),
+      "12 pts today · 3 logs",
+    );
+    assert.equal(formatTodayMultiLogStatus(5, 1), "5 pts today · 1 log");
   });
 });
 
@@ -158,6 +178,34 @@ describe("formatDayActivitiesCopy", () => {
     assert.match(text, /Mastic gum/);
     assert.match(text, /Cool bedroom sleep/);
     assert.doesNotMatch(text, /Sunrise \/ early morning/);
+  });
+
+  it("shows log count for multi-log activities without a timer", () => {
+    const text = formatDayActivitiesCopy("2026-07-14", [
+      {
+        protocolName: "Deuterium-aware meal",
+        protocolId: "deuterium-aware-meal",
+        durationMinutes: null,
+        pointsEarned: 8,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Deuterium-aware meal",
+        protocolId: "deuterium-aware-meal",
+        durationMinutes: null,
+        pointsEarned: 8,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Deuterium-aware meal",
+        protocolId: "deuterium-aware-meal",
+        durationMinutes: null,
+        pointsEarned: 8,
+        isStreakBonus: false,
+      },
+    ]);
+
+    assert.match(text, /• Deuterium-aware meal \(3 logs\) — 24 pts/);
   });
 
   it("handles empty activity days", () => {

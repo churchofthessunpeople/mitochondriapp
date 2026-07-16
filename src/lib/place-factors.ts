@@ -5,6 +5,10 @@
 
 import { formatDistanceKm } from "@/lib/geo";
 import {
+  lookupInclinationDropZones,
+  type InclinationZoneContext,
+} from "@/lib/inclination-drop-zones";
+import {
   fetchArtificialEmQuick,
   type ArtificialEmSnapshot,
 } from "@/lib/artificial-em";
@@ -43,6 +47,11 @@ export type PlaceFactors = {
   geomag: GeomagDisplay | null;
   /** Infrastructure / artificial EM load proxy (cells, masts, plants). */
   artificialEm: ArtificialEmSnapshot | null;
+  /**
+   * April 2026 NA inclination-drop education zones (Kruse-framework place context).
+   * Null when ZIP is outside tracked zones and the decay corridor.
+   */
+  inclinationZone: InclinationZoneContext | null;
 };
 
 /** Latitude climate band (aligned with sun-score bands). */
@@ -162,6 +171,7 @@ export function buildPlaceFactors(opts: {
     geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest magma / volcanic system (geology score · GVP/USGS catalog)`,
     geomag: opts.geomag ?? null,
     artificialEm: opts.artificialEm ?? null,
+    inclinationZone: lookupInclinationDropZones(latitude, longitude),
   };
 }
 

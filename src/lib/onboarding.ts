@@ -8,7 +8,7 @@ export const STARTER_PROTOCOL_IDS = [
   "deuterium-aware-meal",
   "barefoot-earth",
   "magnetic-awareness",
-  "midday-sun-skin",
+  "sun-exposure",
   "sunset-viewing",
   "blue-light-hygiene",
   "dark-bedroom",

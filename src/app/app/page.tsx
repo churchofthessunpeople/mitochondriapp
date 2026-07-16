@@ -29,6 +29,8 @@ import {
   latitudeBand,
   sunPhaseHint,
 } from "@/lib/place-factors";
+import { geomagDipoleFallback, formatGeomagDisplay } from "@/lib/geomag";
+import { getZipPlaceCached } from "@/lib/zip-place-cache";
 import { seasonCoachLine } from "@/lib/checklist-order";
 import { getRegionById, listRegions } from "@/lib/regions";
 import {
@@ -131,7 +133,11 @@ export default async function AppPage({
       ? getSunTimesForLocalDay(new Date(), sunLat, sunLng, tz)
       : null;
 
-  // Sync place factors only — skip elevation/geomag network on first paint.
+  // Place factors — sync sun/geology; magnetism from shared ZIP cache when fresh.
+  const zipCached = loc.postalCode
+    ? await getZipPlaceCached(loc.postalCode)
+    : null;
+
   const placeFactors =
     sun && sunLat != null && sunLng != null
       ? buildPlaceFactors({
@@ -139,7 +145,11 @@ export default async function AppPage({
           longitude: sunLng,
           sun,
           timeZone: tz,
-          elevationM: loc.elevationM,
+          elevationM: zipCached?.elevationM ?? loc.elevationM,
+          geomag:
+            zipCached?.geomag ??
+            formatGeomagDisplay(geomagDipoleFallback(sunLat, sunLng)),
+          artificialEm: zipCached?.artificialEm ?? null,
         })
       : null;
 
@@ -244,6 +254,7 @@ export default async function AppPage({
       isTravel={loc.isTravel}
       travelUntil={loc.travelUntil}
       homePostalCode={userFlags?.postalCode ?? null}
+      travelPostalCode={userFlags?.travelPostalCode ?? null}
       travelLabel={userFlags?.travelPlaceLabel ?? null}
       magneticoGauss={fullUser.magneticoGauss ?? 10}
       sleepRoomTempF={fullUser.sleepRoomTempF ?? 65}

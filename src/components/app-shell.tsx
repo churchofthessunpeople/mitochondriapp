@@ -84,6 +84,7 @@ export type AppShellProps = {
   isTravel?: boolean;
   travelUntil?: string | null;
   homePostalCode?: string | null;
+  travelPostalCode?: string | null;
   travelLabel?: string | null;
   magneticoGauss?: number;
   sleepRoomTempF?: number;
@@ -144,6 +145,7 @@ export function AppShell({
   isTravel,
   travelUntil,
   homePostalCode,
+  travelPostalCode,
   travelLabel,
   magneticoGauss = 10,
   sleepRoomTempF = 65,
@@ -438,6 +440,7 @@ export function AppShell({
             isTravel={isTravel}
             travelUntil={travelUntil}
             homePostalCode={homePostalCode}
+            travelPostalCode={travelPostalCode}
             travelLabel={travelLabel}
             magneticoGauss={magneticoGauss}
             sleepRoomTempF={sleepRoomTempF}
