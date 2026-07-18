@@ -27,6 +27,7 @@ import {
   MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
 } from "@/lib/mitoversity-magnetico-sleep-pad";
 import type { MitoReadingLevels } from "@/lib/mitoversity-reading-levels";
+import { applyReadingLevels } from "@/lib/mitoversity-reading-level-builder";
 
 export type MitoPillar = "light" | "water" | "magnetism" | "support";
 
@@ -59,7 +60,7 @@ export const MITO_PILLAR_LABEL: Record<MitoPillar, string> = {
 /**
  * Curriculum entries. Add new objects here as the library grows.
  */
-export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
+export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
   {
     id: "sunrise-why",
     title: "Why morning outdoor light—and sunrise—matter",
@@ -821,6 +822,10 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
   },
   ...MITOVERSITY_PROTOCOL_GUIDES,
 ];
+
+/** All articles with Simple / Intermediate / Advanced reading tiers applied. */
+export const MITOVERSITY_ENTRIES: readonly MitoEntry[] =
+  RAW_MITOVERSITY_ENTRIES.map(applyReadingLevels);
 
 export function getMitoEntry(id: string): MitoEntry | undefined {
   return MITOVERSITY_ENTRIES.find((e) => e.id === id);

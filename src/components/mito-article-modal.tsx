@@ -30,19 +30,14 @@ function ArticleSections({
 function ReadingLevelDropdown({
   label,
   subtitle,
-  defaultOpen,
   sections,
 }: {
   label: string;
   subtitle: string;
-  defaultOpen?: boolean;
   sections: { heading: string; body: string }[];
 }) {
   return (
-    <details
-      open={defaultOpen}
-      className="group rounded-2xl border border-border bg-foreground/[0.02]"
-    >
+    <details className="group rounded-2xl border border-border bg-foreground/[0.02]">
       <summary
         className={cn(
           "flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-3.5",
@@ -125,10 +120,10 @@ export function MitoArticleModal({
           {hasLevels ? (
             <div className="mt-5 space-y-3">
               <p className="text-xs text-muted">
-                Expand a reading level — start with Simple if you are new to the
-                topic.
+                Choose a reading level below to expand — Simple if you are new
+                to the topic, Advanced for technical depth.
               </p>
-              {MITO_READING_LEVEL_META.map((meta, index) => {
+              {MITO_READING_LEVEL_META.map((meta) => {
                 const sections = getMitoSectionsForLevel(entry, meta.id);
                 if (sections.length === 0) return null;
                 return (
@@ -136,7 +131,6 @@ export function MitoArticleModal({
                     key={meta.id}
                     label={meta.label}
                     subtitle={meta.subtitle}
-                    defaultOpen={index === 0}
                     sections={sections}
                   />
                 );

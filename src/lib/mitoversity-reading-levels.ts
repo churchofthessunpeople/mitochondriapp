@@ -37,7 +37,7 @@ export function mitoEntryHasReadingLevels(
 ): boolean {
   const levels = entry.readingLevels;
   if (!levels) return false;
-  return MITO_READING_LEVEL_META.some(
+  return MITO_READING_LEVEL_META.every(
     (meta) => (levels[meta.id]?.sections.length ?? 0) > 0,
   );
 }
