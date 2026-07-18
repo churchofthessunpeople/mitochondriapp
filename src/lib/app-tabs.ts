@@ -7,7 +7,7 @@ export const APP_TABS = ["schedule", "mitoversity", "account"] as const;
 
 export type AppTab = (typeof APP_TABS)[number];
 
-export type TodaySection = "checklist" | "place" | "catalog" | "leaderboard";
+export type TodaySection = "checklist" | "place" | "leaderboard" | "catalog";
 
 export type AccountSection = "history" | "reminders" | "profile" | null;
 
@@ -69,7 +69,8 @@ export function todaySectionFromSearchParam(
   const v = Array.isArray(raw) ? raw[0] : raw;
   if (v === "leaderboard") return "leaderboard";
   if (v === "place") return "place";
-  if (v === "catalog" || v === "activities") return "catalog";
+  // Legacy catalog/activities deep links open the checklist (Edit activities lives there)
+  if (v === "catalog" || v === "activities") return "checklist";
   return null;
 }
 

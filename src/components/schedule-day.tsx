@@ -1,8 +1,9 @@
 "use client";
 
-import { Check, ChevronDown, Flame, Minus, Plus, Sun, Timer, X } from "lucide-react";
+import { Check, ChevronDown, Flame, Minus, Pencil, Plus, Sun, Timer, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import type { Protocol } from "@/db/schema";
+import { AddActivityDialog } from "@/components/add-activity-dialog";
 import {
   ProtocolHowToButton,
   ProtocolHowToDialog,
@@ -12,6 +13,7 @@ import {
   logPermanentTonightAction,
   removeOneCompletionAction,
 } from "@/lib/actions/completions";
+import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import { setMagneticoGaussAction } from "@/lib/actions/magnetico";
 import { setSleepRoomTempAction } from "@/lib/actions/sleep-room-temp";
 import { orderProtocolsForNow } from "@/lib/checklist-order";
@@ -83,7 +85,13 @@ type Props = {
   dateLabel: string;
   /** Hide stats, tips, and weekly summary — activity list only */
   compact?: boolean;
-  onExpandCatalog?: () => void;
+  /** Full catalog for Add Activity (not just checklist items) */
+  catalogProtocols?: Protocol[];
+  availableIds?: string[];
+  onAvailableIdsChange?: (ids: string[]) => void;
+  onPermanentAutoLog?: (snap: PermanentAutoLogSnap) => void;
+  isAdmin?: boolean;
+  onAdminEditContent?: (focus: string) => void;
   /** Hide duplicate date title when parent already shows it */
   hideTitle?: boolean;
   phase?: Phase;
@@ -193,7 +201,12 @@ export function ScheduleDay({
   streak: initialStreak,
   dateLabel,
   hideTitle = false,
-  onExpandCatalog,
+  catalogProtocols,
+  availableIds = [],
+  onAvailableIdsChange,
+  onPermanentAutoLog,
+  isAdmin = false,
+  onAdminEditContent,
   compact = false,
   phase = "day",
   localHour = 12,
@@ -229,6 +242,7 @@ export function ScheduleDay({
   }>({ open: false, initialProtocol: null });
   const [sunExposureFor, setSunExposureFor] = useState<Protocol | null>(null);
   const [movementFor, setMovementFor] = useState<Protocol | null>(null);
+  const [addActivityOpen, setAddActivityOpen] = useState(false);
   const [magneticoGauss, setMagneticoGauss] = useState<MagneticoGauss>(() =>
     parseMagneticoGauss(initialMagneticoGauss),
   );
@@ -725,6 +739,20 @@ export function ScheduleDay({
     );
   }
 
+  function renderAddActivityButton() {
+    if (!catalogProtocols?.length || !onAvailableIdsChange) return null;
+    return (
+      <button
+        type="button"
+        onClick={() => setAddActivityOpen(true)}
+        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-accent/40 bg-accent/5 px-3.5 py-2.5 text-sm font-semibold text-accent transition hover:border-accent/60 hover:bg-accent/10"
+      >
+        <Pencil className="h-4 w-4" strokeWidth={2.5} />
+        Edit activities
+      </button>
+    );
+  }
+
   function addOne(protocol: Protocol, durationMinutes?: number) {
     const count = counts[protocol.id] ?? 0;
     const prevMins = durations[protocol.id] ?? 0;
@@ -1135,25 +1163,18 @@ export function ScheduleDay({
       {protocols.length === 0 ? (
         <div className="space-y-5">
           {renderSunriseSection()}
+          {renderAddActivityButton()}
           <div className="glass rounded-3xl border border-dashed border-border p-6 text-center">
             <p className="font-medium">No activities on your list yet</p>
             <p className="mt-2 text-sm text-muted">
-              Expand the catalog below and toggle what you can actually do.
+              Tap Edit activities above to choose what you can actually do.
             </p>
-            {onExpandCatalog && (
-              <button
-                type="button"
-                onClick={onExpandCatalog}
-                className="btn-primary mt-4 inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
-              >
-                Browse catalog
-              </button>
-            )}
           </div>
         </div>
       ) : (
         <div className="space-y-5">
           {renderSunriseSection()}
+          {renderAddActivityButton()}
           {suggested.length > 0 && (
             <CollapsibleChecklistSection
               title="Suggested"
@@ -1342,6 +1363,18 @@ export function ScheduleDay({
           sunriseMultiplier={sunriseMult}
           onLog={(input, mins) => logSunExposure(sunExposureFor, input, mins)}
           onCancel={() => setSunExposureFor(null)}
+        />
+      ) : null}
+      {catalogProtocols?.length && onAvailableIdsChange ? (
+        <AddActivityDialog
+          open={addActivityOpen}
+          onClose={() => setAddActivityOpen(false)}
+          protocols={catalogProtocols}
+          availableIds={availableIds}
+          onAvailableIdsChange={onAvailableIdsChange}
+          onPermanentAutoLog={onPermanentAutoLog}
+          isAdmin={isAdmin}
+          onAdminEditContent={onAdminEditContent}
         />
       ) : null}
     </div>

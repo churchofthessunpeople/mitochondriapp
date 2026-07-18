@@ -5,13 +5,11 @@ import {
   ChevronUp,
   ClipboardList,
   Flame,
-  LayoutGrid,
   MapPin,
   Trophy,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
-import { ActivityCatalogExpand } from "@/components/activity-catalog-expand";
 import {
   LeaderboardPanel,
   type LeaderboardBoards,
@@ -84,7 +82,6 @@ const TABS: {
 }[] = [
   { id: "checklist", label: "Checklist", shortLabel: "Log", icon: ClipboardList },
   { id: "place", label: "Place", shortLabel: "Place", icon: MapPin },
-  { id: "catalog", label: "Catalog", shortLabel: "List", icon: LayoutGrid },
   {
     id: "leaderboard",
     label: "Leaderboard",
@@ -135,9 +132,10 @@ export function TodayHome({
   onAdminEditContent,
 }: Props) {
   const hasPlace = Boolean(placeLabel || region);
-  const [section, setSection] = useState<TodaySection>(
-    initialSection ?? (hasPlace ? "checklist" : "place"),
-  );
+  const [section, setSection] = useState<TodaySection>(() => {
+    if (initialSection === "catalog") return "checklist";
+    return initialSection ?? (hasPlace ? "checklist" : "place");
+  });
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [liveCounts, setLiveCounts] = useState(completionCounts);
   const [liveDurations, setLiveDurations] = useState(completionDurations ?? {});
@@ -209,20 +207,23 @@ export function TodayHome({
   ]);
 
   useEffect(() => {
+    if (initialSection === "catalog") {
+      setSection("checklist");
+      return;
+    }
     if (initialSection) setSection(initialSection);
   }, [initialSection]);
 
   function selectSection(next: TodaySection) {
-    setSection(next);
+    const resolved = next === "catalog" ? "checklist" : next;
+    setSection(resolved);
     try {
       const url =
-        next === "leaderboard"
+        resolved === "leaderboard"
           ? ROUTES.leaderboard
-          : next === "place"
+          : resolved === "place"
             ? "/app?t=place"
-            : next === "catalog"
-              ? "/app?t=catalog"
-              : ROUTES.home;
+            : ROUTES.home;
       window.history.replaceState(null, "", url);
     } catch {
       /* ignore */
@@ -484,7 +485,12 @@ export function TodayHome({
             todayIso={todayIso}
             hideTitle
             compact
-            onExpandCatalog={() => selectSection("catalog")}
+            catalogProtocols={catalogProtocols}
+            availableIds={availableIds}
+            onAvailableIdsChange={onAvailableIdsChange}
+            onPermanentAutoLog={onPermanentAutoLog}
+            isAdmin={isAdmin}
+            onAdminEditContent={onAdminEditContent}
             phase={phase}
             localHour={localHour}
             seasonLine={seasonLine}
@@ -585,27 +591,6 @@ export function TodayHome({
                 </button>
               </p>
             ) : null}
-          </div>
-        )}
-
-        {section === "catalog" && (
-          <div className="space-y-3">
-            <p className="text-sm text-muted">
-              Grouped by{" "}
-              <strong className="font-medium text-foreground">
-                Light · Water · Magnetism · Support
-              </strong>
-              . Toggle only what you can actually do.
-            </p>
-            <ActivityCatalogExpand
-              protocols={catalogProtocols}
-              availableIds={availableIds}
-              onAvailableIdsChange={onAvailableIdsChange}
-              onPermanentAutoLog={onPermanentAutoLog}
-              isAdmin={isAdmin}
-              onAdminEditContent={onAdminEditContent}
-              embedded
-            />
           </div>
         )}
 
