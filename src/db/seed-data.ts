@@ -109,7 +109,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "sun-exposure",
     name: "Sun exposure",
     description:
-      "Outdoor sun by time of day — morning (6–10), noon (10–2), or afternoon (2–6). Log time, grounding, skin exposure, and duration; add more minutes to the same slot anytime.",
+      "Outdoor sun by time of day — morning (sunrise–12), noon (12–4), or afternoon (4–sunset). Log the slot and add 15-minute blocks with +/−.",
     points: 8,
     category: "light",
     timeOfDay: "anytime",

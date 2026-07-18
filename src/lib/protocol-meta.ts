@@ -31,7 +31,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "sun-exposure": {
     equipment: "none",
-    how: "Go outside without glass between you and the sky. When you log, pick the session time (or morning / noon / afternoon slot), whether you were grounded, how much skin was exposed, and how long.\n\nSlots: morning sun 6–10 am, noon sun 10 am–2 pm, afternoon sun 2–6 pm. You can add more minutes to the same slot later in the day.\n\nStay within a non-burning window; build time gradually. Sunrise keystones are separate — they unlock the day boost.",
+    how: "Go outside without glass between you and the sky. Tap + and pick morning, noon, or afternoon sun — each tap adds 15 minutes in that slot.\n\nSlots: morning (sunrise–12 pm), noon (12–4 pm), afternoon (4 pm–sunset). Stay within a non-burning window; build time gradually. Sunrise keystones are separate — they unlock the day boost.",
   },
   "sunset-viewing": {
     equipment: "none",

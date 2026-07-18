@@ -1,11 +1,11 @@
 /**
- * Daytime sun exposure — one catalog activity, logged into clock slots
- * (morning / noon / afternoon) with grounded + skin modifiers.
- *
- * UV-by-ZIP weighting is stubbed for later (place UV index).
+ * Daytime sun exposure — logged into clock slots (morning / noon / afternoon)
+ * with duration in 15-minute blocks. UV-by-ZIP weighting is stubbed for later.
  */
 
 import type { TimeOfDay } from "@/db/schema";
+import { formatTimeInZone, type SunTimes } from "@/lib/sun";
+import { displayTimeToHm } from "@/lib/time-hm";
 
 export const SUN_EXPOSURE_PROTOCOL_ID = "sun-exposure";
 
@@ -16,16 +16,10 @@ export const SUN_EXPOSURE_LEGACY_IDS = [
 ] as const;
 
 export type SunExposureSlot = "morning" | "noon" | "afternoon";
-export type SunSkinExposure = "full" | "partial" | "minimal";
 
-export type SunExposureModifiers = {
-  grounded: boolean;
-  skin: SunSkinExposure;
-};
-
-export type SunExposureLogInput = SunExposureModifiers & {
+export type SunExposureLogInput = {
   slot: SunExposureSlot;
-  /** Local wall-clock HH:mm when the session started (optional UI). */
+  /** Local wall-clock HH:mm when the session started (optional, for future UV). */
   startHm?: string;
 };
 
@@ -41,54 +35,37 @@ export type SunExposureSlotDef = {
   timeOfDay: TimeOfDay;
 };
 
+/** Local noon boundary for the noon sun slot (12 pm). */
+export const SUN_EXPOSURE_NOON_START_HM = "12:00";
+/** Local start of the afternoon sun slot (4 pm). */
+export const SUN_EXPOSURE_AFTERNOON_START_HM = "16:00";
+
 export const SUN_EXPOSURE_SLOTS: readonly SunExposureSlotDef[] = [
   {
     id: "morning",
     label: "Morning sun",
-    clockLabel: "6–10 am",
+    clockLabel: "Sunrise – 12 pm",
     startHour: 6,
-    endHour: 10,
+    endHour: 12,
     timeOfDay: "morning",
   },
   {
     id: "noon",
     label: "Noon sun",
-    clockLabel: "10 am–2 pm",
-    startHour: 10,
-    endHour: 14,
+    clockLabel: "12 pm – 4 pm",
+    startHour: 12,
+    endHour: 16,
     timeOfDay: "afternoon",
   },
   {
     id: "afternoon",
     label: "Afternoon sun",
-    clockLabel: "2–6 pm",
-    startHour: 14,
+    clockLabel: "4 pm – sunset",
+    startHour: 16,
     endHour: 18,
     timeOfDay: "evening",
   },
 ] as const;
-
-export const SUN_SKIN_OPTIONS: {
-  id: SunSkinExposure;
-  label: string;
-  detail: string;
-}[] = [
-  {
-    id: "full",
-    label: "Lots of skin",
-    detail: "Arms + legs or more outdoors",
-  },
-  {
-    id: "partial",
-    label: "Some skin",
-    detail: "Face and forearms, or similar",
-  },
-  {
-    id: "minimal",
-    label: "Mostly covered",
-    detail: "Eyes to sky; little skin UV",
-  },
-];
 
 const SLOT_INDEX: Record<SunExposureSlot, number> = {
   morning: 0,
@@ -98,21 +75,9 @@ const SLOT_INDEX: Record<SunExposureSlot, number> = {
 
 const SLOT_BY_INDEX: SunExposureSlot[] = ["morning", "noon", "afternoon"];
 
-const SKIN_INDEX: Record<SunSkinExposure, number> = {
-  full: 0,
-  partial: 1,
-  minimal: 2,
-};
-
-const SKIN_BY_INDEX: SunSkinExposure[] = ["full", "partial", "minimal"];
-
-/** Pack slot + grounded + skin into variant_value (stable integer). */
+/** Pack slot into variant_value (legacy logs may carry extra modifier bits). */
 export function encodeSunExposureVariant(input: SunExposureLogInput): number {
-  const slot = SLOT_INDEX[input.slot] ?? 0;
-  const skin = SKIN_INDEX[input.skin] ?? 0;
-  const grounded = input.grounded ? 1 : 0;
-  // bits 0–1 slot, bit 2 grounded, bits 3–4 skin
-  return slot | (grounded << 2) | (skin << 3);
+  return SLOT_INDEX[input.slot] ?? 0;
 }
 
 export function decodeSunExposureVariant(
@@ -121,15 +86,9 @@ export function decodeSunExposureVariant(
   if (typeof variantValue !== "number" || !Number.isFinite(variantValue)) {
     return null;
   }
-  const v = Math.trunc(variantValue);
-  const slot = SLOT_BY_INDEX[v & 0b11];
-  const skin = SKIN_BY_INDEX[(v >> 3) & 0b11];
-  if (!slot || !skin) return null;
-  return {
-    slot,
-    grounded: ((v >> 2) & 1) === 1,
-    skin,
-  };
+  const slot = SLOT_BY_INDEX[Math.trunc(variantValue) & 0b11];
+  if (!slot) return null;
+  return { slot };
 }
 
 export function isSunExposureProtocolId(
@@ -148,22 +107,92 @@ export function timeOfDayForSunSlot(slot: SunExposureSlot): TimeOfDay {
   return sunExposureSlotDef(slot).timeOfDay;
 }
 
-/** Map local hour (0–23) to a sun slot. Outside 6–18 → nearest edge. */
-export function sunSlotFromLocalHour(hour: number): SunExposureSlot {
-  const h = ((hour % 24) + 24) % 24;
-  if (h >= 6 && h < 10) return "morning";
-  if (h >= 10 && h < 14) return "noon";
-  if (h >= 14 && h < 18) return "afternoon";
-  if (h < 6) return "morning";
-  return "afternoon";
+function hmToMinutes(hm: string): number | null {
+  const m = hm.match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  return Number(m[1]) * 60 + Number(m[2]);
 }
 
-/** Parse HH:mm → slot. */
-export function sunSlotFromLocalHm(hm: string): SunExposureSlot {
-  const [hStr] = hm.split(":");
-  const hour = Number(hStr);
-  if (!Number.isFinite(hour)) return "noon";
-  return sunSlotFromLocalHour(hour);
+function shortDisplayTime(hm: string): string {
+  const mins = hmToMinutes(hm);
+  if (mins == null) return hm;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const ap = h >= 12 ? "pm" : "am";
+  const h12 = h % 12 || 12;
+  return m === 0
+    ? `${h12} ${ap}`
+    : `${h12}:${String(m).padStart(2, "0")} ${ap}`;
+}
+
+export function sunriseHmFromSun(
+  sun: SunTimes | null | undefined,
+  timeZone: string,
+): string {
+  if (!sun?.sunrise) return "06:00";
+  return displayTimeToHm(formatTimeInZone(sun.sunrise, timeZone)) ?? "06:00";
+}
+
+export function sunsetHmFromSun(
+  sun: SunTimes | null | undefined,
+  timeZone: string,
+): string {
+  if (!sun?.sunset) return "18:00";
+  return displayTimeToHm(formatTimeInZone(sun.sunset, timeZone)) ?? "18:00";
+}
+
+/** Human-readable window for a slot (uses place sunrise/sunset when available). */
+export function sunExposureSlotClockLabel(
+  slot: SunExposureSlot,
+  sun?: SunTimes | null,
+  timeZone = "UTC",
+): string {
+  const rise = shortDisplayTime(sunriseHmFromSun(sun, timeZone));
+  const set = shortDisplayTime(sunsetHmFromSun(sun, timeZone));
+  switch (slot) {
+    case "morning":
+      return `${rise} – 12 pm`;
+    case "noon":
+      return "12 pm – 4 pm";
+    case "afternoon":
+      return `4 pm – ${set}`;
+  }
+}
+
+export type SunExposureSlotContext = {
+  sun?: SunTimes | null;
+  timeZone?: string;
+};
+
+/** Map local hour (0–23) to a sun slot. Outside daylight → nearest edge. */
+export function sunSlotFromLocalHour(
+  hour: number,
+  ctx?: SunExposureSlotContext,
+): SunExposureSlot {
+  const h = ((hour % 24) + 24) % 24;
+  const hm = `${String(h).padStart(2, "0")}:00`;
+  return sunSlotFromLocalHm(hm, ctx);
+}
+
+/** Parse HH:mm → slot using sunrise–12, 12–4, 4–sunset windows. */
+export function sunSlotFromLocalHm(
+  hm: string,
+  ctx?: SunExposureSlotContext,
+): SunExposureSlot {
+  const mins = hmToMinutes(hm);
+  if (mins == null) return "noon";
+
+  const tz = ctx?.timeZone ?? "UTC";
+  const noonStart = hmToMinutes(SUN_EXPOSURE_NOON_START_HM)!;
+  const afternoonStart = hmToMinutes(SUN_EXPOSURE_AFTERNOON_START_HM)!;
+  const sunriseMins = hmToMinutes(sunriseHmFromSun(ctx?.sun, tz))!;
+  const sunsetMins = hmToMinutes(sunsetHmFromSun(ctx?.sun, tz))!;
+
+  if (mins >= sunriseMins && mins < noonStart) return "morning";
+  if (mins >= noonStart && mins < afternoonStart) return "noon";
+  if (mins >= afternoonStart && mins < sunsetMins) return "afternoon";
+  if (mins < sunriseMins) return "morning";
+  return "afternoon";
 }
 
 export function formatSunExposureLabel(
@@ -174,28 +203,10 @@ export function formatSunExposureLabel(
   if (!decoded) return null;
   const def = sunExposureSlotDef(decoded.slot);
   const parts = [def.label];
-  if (decoded.grounded) parts.push("grounded");
-  if (decoded.skin === "full") parts.push("lots of skin");
-  else if (decoded.skin === "partial") parts.push("some skin");
-  else parts.push("covered");
   if (durationMinutes != null && durationMinutes > 0) {
     parts.push(`${durationMinutes} min`);
   }
   return parts.join(" · ");
-}
-
-/**
- * Quality multiplier on catalog base before duration scaling.
- * Full skin + grounded ≈ 1.0; covered / not grounded slightly less.
- */
-export function sunExposureQualityMultiplier(
-  modifiers: SunExposureModifiers,
-): number {
-  let m = 1;
-  if (!modifiers.grounded) m *= 0.9;
-  if (modifiers.skin === "partial") m *= 0.9;
-  if (modifiers.skin === "minimal") m *= 0.75;
-  return m;
 }
 
 /**
@@ -214,15 +225,13 @@ export function sunExposureUvFactor(_opts: {
 /** Effective base points for one sun-exposure log (before duration blocks). */
 export function sunExposureBasePoints(
   catalogBase: number,
-  modifiers: SunExposureModifiers,
   opts?: { slot?: SunExposureSlot; uvIndex?: number | null },
 ): number {
-  const quality = sunExposureQualityMultiplier(modifiers);
   const uv = sunExposureUvFactor({
     slot: opts?.slot ?? "noon",
     uvIndex: opts?.uvIndex,
   });
-  return Math.max(1, Math.round(catalogBase * quality * uv));
+  return Math.max(1, Math.round(catalogBase * uv));
 }
 
 export function remapSunExposureFavoriteId(protocolId: string): string {

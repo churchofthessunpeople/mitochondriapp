@@ -56,8 +56,11 @@ import {
 } from "@/lib/movement-setting";
 import {
   isSunExposureProtocolId,
+  SUN_EXPOSURE_SLOTS,
+  sunExposureSlotClockLabel,
   sunSlotFromLocalHm,
   type SunExposureLogInput,
+  type SunExposureSlot,
 } from "@/lib/sun-exposure";
 import { currentLocalHm } from "@/lib/sunrise-timing";
 import {
@@ -242,7 +245,7 @@ export function ScheduleDay({
     initialProtocol: Protocol | null;
   }>({ open: false, initialProtocol: null });
   const [choicePicker, setChoicePicker] = useState<{
-    kind: "magnetico" | "sleep";
+    kind: "magnetico" | "sleep" | "sunExposure";
     protocol: Protocol;
   } | null>(null);
   const [addActivityOpen, setAddActivityOpen] = useState(false);
@@ -338,6 +341,12 @@ export function ScheduleDay({
 
   const sunriseCatalog = allProtocols ?? protocols;
 
+  const suggestedSunSlot = useMemo(
+    () =>
+      sunSlotFromLocalHm(currentLocalHm(timeZone), { sun, timeZone }),
+    [sun, timeZone],
+  );
+
   const sunriseTierOptions = useMemo(
     () => resolveSunriseTierOptions(sunriseCatalog),
     [sunriseCatalog],
@@ -424,7 +433,7 @@ export function ScheduleDay({
       return `${formatColdThermoSkinTemp(coldThermoSkinTempF)} · ${base} pts / 15 min`;
     }
     if (isSunExposureProtocolId(p.id)) {
-      return `${p.points} pts / 15 min · morning · noon · afternoon`;
+      return `${p.points} pts / 15 min · ${SUN_EXPOSURE_SLOTS.map((s) => s.label.toLowerCase()).join(" · ")}`;
     }
     const parts: string[] = [`${p.points} pts`];
     if (isSunriseKeystoneProtocol(p)) parts.push("Light keystone");
@@ -707,17 +716,19 @@ export function ScheduleDay({
     );
   }
 
-  function defaultSunExposureInput(): SunExposureLogInput {
-    const startHm = currentLocalHm(timeZone);
+  function sunExposureInputForSlot(slot: SunExposureSlot): SunExposureLogInput {
     return {
-      slot: sunSlotFromLocalHm(startHm),
-      grounded: true,
-      skin: "full",
-      startHm,
+      slot,
+      startHm: currentLocalHm(timeZone),
     };
   }
 
-  function addOne(protocol: Protocol) {
+  function chooseSunExposureSlot(protocol: Protocol, slot: SunExposureSlot) {
+    setChoicePicker(null);
+    addOne(protocol, sunExposureInputForSlot(slot));
+  }
+
+  function addOne(protocol: Protocol, sunExposure?: SunExposureLogInput) {
     const count = counts[protocol.id] ?? 0;
     const prevMins = durations[protocol.id] ?? 0;
     const mins = protocol.durationEnabled ? DURATION_BLOCK_MINUTES : undefined;
@@ -733,7 +744,10 @@ export function ScheduleDay({
             ? coldThermoSkinTempF
             : undefined,
           sunExposure: isSunExposureProtocolId(protocol.id)
-            ? defaultSunExposureInput()
+            ? (sunExposure ??
+              sunExposureInputForSlot(
+                sunSlotFromLocalHm(currentLocalHm(timeZone), { sun, timeZone }),
+              ))
             : undefined,
           movementSetting: requiresMovementSetting(protocol)
             ? "outside"
@@ -859,12 +873,18 @@ export function ScheduleDay({
             <button
               type="button"
               disabled={rowBusy}
-              onClick={() => addOne(p)}
+              onClick={() =>
+                isSunExposureProtocolId(p.id)
+                  ? setChoicePicker({ kind: "sunExposure", protocol: p })
+                  : addOne(p)
+              }
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent transition hover:bg-accent/25 disabled:opacity-35"
               aria-label={
-                p.durationEnabled
-                  ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
-                  : `Add one ${p.name}`
+                isSunExposureProtocolId(p.id)
+                  ? `Log sun exposure — choose morning, noon, or afternoon`
+                  : p.durationEnabled
+                    ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                    : `Add one ${p.name}`
               }
             >
               <Plus className="h-4 w-4" strokeWidth={2.5} />
@@ -1108,7 +1128,9 @@ export function ScheduleDay({
                 <p className="mt-1 text-xs text-muted">
                   {choicePicker.kind === "magnetico"
                     ? "Tap your gauss rating"
-                    : "Tap your bedroom temperature"}
+                    : choicePicker.kind === "sleep"
+                      ? "Tap your bedroom temperature"
+                      : "Which sun window was this?"}
                 </p>
               </div>
               <button
@@ -1139,7 +1161,7 @@ export function ScheduleDay({
                     );
                   }}
                 />
-              ) : (
+              ) : choicePicker.kind === "sleep" ? (
                 <OptionListChoice
                   options={SLEEP_ROOM_TEMP_OPTIONS.map(
                     (t): ClickThroughOption => ({
@@ -1154,6 +1176,25 @@ export function ScheduleDay({
                     chooseSleepTemp(
                       choicePicker.protocol,
                       Number(id) as SleepRoomTempF,
+                    );
+                  }}
+                />
+              ) : (
+                <OptionListChoice
+                  options={SUN_EXPOSURE_SLOTS.map(
+                    (s): ClickThroughOption => ({
+                      id: s.id,
+                      title: s.label,
+                      subtitle: sunExposureSlotClockLabel(s.id, sun, timeZone),
+                      highlight: s.id === suggestedSunSlot,
+                    }),
+                  )}
+                  selectedId={suggestedSunSlot}
+                  disabled={busyId === choicePicker.protocol.id}
+                  onChoose={(id) => {
+                    chooseSunExposureSlot(
+                      choicePicker.protocol,
+                      id as SunExposureSlot,
                     );
                   }}
                 />

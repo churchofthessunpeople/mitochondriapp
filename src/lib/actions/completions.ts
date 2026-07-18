@@ -318,9 +318,7 @@ export async function logCompletionAction(
     const sun = options?.sunExposure;
     if (!sun) throw new Error("Sun exposure details required");
     variantValue = encodeSunExposureVariant(sun);
-    basePoints = sunExposureBasePoints(protocol.points, sun, {
-      slot: sun.slot,
-    });
+    basePoints = sunExposureBasePoints(protocol.points, { slot: sun.slot });
   } else if (isMovementSettingProtocolId(protocolId)) {
     const setting = parseMovementSetting(
       options?.movementSetting ?? "outside",

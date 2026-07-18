@@ -9,46 +9,40 @@ import {
 } from "@/lib/sun-exposure";
 
 describe("sunSlotFromLocalHour", () => {
-  it("maps clock windows", () => {
+  it("maps sunrise–12 / 12–4 / 4–sunset windows", () => {
     assert.equal(sunSlotFromLocalHour(6), "morning");
     assert.equal(sunSlotFromLocalHour(9), "morning");
-    assert.equal(sunSlotFromLocalHour(10), "noon");
+    assert.equal(sunSlotFromLocalHour(11), "morning");
+    assert.equal(sunSlotFromLocalHour(12), "noon");
     assert.equal(sunSlotFromLocalHour(13), "noon");
-    assert.equal(sunSlotFromLocalHour(14), "afternoon");
+    assert.equal(sunSlotFromLocalHour(15), "noon");
+    assert.equal(sunSlotFromLocalHour(16), "afternoon");
     assert.equal(sunSlotFromLocalHour(17), "afternoon");
   });
 });
 
 describe("sunSlotFromLocalHm", () => {
   it("parses HH:mm", () => {
-    assert.equal(sunSlotFromLocalHm("11:30"), "noon");
+    assert.equal(sunSlotFromLocalHm("11:30"), "morning");
     assert.equal(sunSlotFromLocalHm("07:05"), "morning");
+    assert.equal(sunSlotFromLocalHm("13:00"), "noon");
+    assert.equal(sunSlotFromLocalHm("16:30"), "afternoon");
   });
 });
 
 describe("encode/decode sun exposure variant", () => {
-  it("round-trips modifiers", () => {
-    const packed = encodeSunExposureVariant({
-      slot: "noon",
-      grounded: true,
-      skin: "partial",
-    });
-    assert.deepEqual(decodeSunExposureVariant(packed), {
-      slot: "noon",
-      grounded: true,
-      skin: "partial",
-    });
+  it("round-trips slot", () => {
+    const packed = encodeSunExposureVariant({ slot: "noon" });
+    assert.deepEqual(decodeSunExposureVariant(packed), { slot: "noon" });
+  });
+
+  it("reads slot from legacy packed values", () => {
+    assert.deepEqual(decodeSunExposureVariant(20), { slot: "morning" });
   });
 });
 
 describe("sunExposureBasePoints", () => {
-  it("reduces for covered / not grounded", () => {
-    const full = sunExposureBasePoints(8, { grounded: true, skin: "full" });
-    const covered = sunExposureBasePoints(8, {
-      grounded: false,
-      skin: "minimal",
-    });
-    assert.equal(full, 8);
-    assert.ok(covered < full);
+  it("uses full catalog base", () => {
+    assert.equal(sunExposureBasePoints(8, { slot: "noon" }), 8);
   });
 });

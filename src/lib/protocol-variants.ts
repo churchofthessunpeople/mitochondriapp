@@ -55,7 +55,7 @@ export function variantBasePoints(
   if (isSunExposureProtocolId(protocolId)) {
     const decoded = decodeSunExposureVariant(variantValue);
     if (!decoded) return undefined;
-    return sunExposureBasePoints(catalogBase, decoded, { slot: decoded.slot });
+    return sunExposureBasePoints(catalogBase, { slot: decoded.slot });
   }
   const movementSetting =
     isMovementSettingProtocolId(protocolId) &&
