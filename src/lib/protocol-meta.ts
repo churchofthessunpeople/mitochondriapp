@@ -61,9 +61,17 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
     equipment: "optional",
     how: "Unsweetened sparkling or carbonated mineral water — home carbonator or bottled, not sugary soda.\n\nUse as a hydration habit you actually enjoy and will repeat.",
   },
+  "baking-soda-water": {
+    equipment: "none",
+    how: "Use plain baking soda (sodium bicarbonate) — not baking powder.\n\nDissolve ¼ teaspoon in a full glass of water. Drink twice daily when following the full protocol. Take each dose at least 2 hours before or after meals so it does not neutralize stomach acid during digestion.\n\nLog each glass separately. Ask your clinician first if you have high blood pressure, heart failure, kidney disease, or sodium restrictions.",
+  },
   "hydration-timing": {
     equipment: "none",
     how: "Front-load hydration earlier in the day; taper large volumes in the last few hours before sleep.\n\nLog when you deliberately shifted timing — earlier glasses, less late chugging.",
+  },
+  "castor-oil-navel": {
+    equipment: "required",
+    how: "Use organic, cold-pressed castor oil from a reputable source (commercial grades have ricin removed — never use raw castor beans).\n\nClean and dry the navel. With a clean dropper, place 2–5 drops in the belly button. Optional: cover with a small soft cloth if you are lying down so sheets do not stain.\n\nTypical timing is before sleep; wash any residue the next morning if needed. Patch-test on the inner arm first. Stop for redness, itch, or discharge. Do not use if pregnant, with an umbilical hernia, or an open belly wound unless a clinician approves. External navel use only — do not drink castor oil as part of this habit.",
   },
   "deuterium-aware-meal": {
     equipment: "none",

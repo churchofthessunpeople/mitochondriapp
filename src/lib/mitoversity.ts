@@ -11,6 +11,14 @@
 
 import { MITOVERSITY_PROTOCOL_GUIDES } from "@/lib/mitoversity-protocol-guides";
 import {
+  BAKING_SODA_WATER_READING_LEVELS,
+  BAKING_SODA_WATER_SIMPLE_SECTIONS,
+} from "@/lib/mitoversity-baking-soda-water";
+import {
+  CASTOR_OIL_NAVEL_READING_LEVELS,
+  CASTOR_OIL_NAVEL_SIMPLE_SECTIONS,
+} from "@/lib/mitoversity-castor-oil-navel";
+import {
   MAGNETICO_SLEEP_PAD_READING_LEVELS,
   MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
 } from "@/lib/mitoversity-magnetico-sleep-pad";
@@ -282,6 +290,22 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
         body: "Log the catalog activity “Carbonated / sparkling water” when you drink unsweetened sparkling or carbonated mineral water. It sits under the Water pillar alongside mineralized hydration: prioritize clean source and minerals, then bubbles as an optional CO₂-rich form. Prefer unsweetened sparkling or natural mineral water over sugary sodas.",
       },
     ],
+  },
+  {
+    id: "baking-soda-water",
+    title: "Baking soda water (sodium bicarbonate)",
+    pillar: "water",
+    summary:
+      "¼ tsp bicarbonate in water twice daily (≥2 h from meals): alkaline buffer vs carbonated CO₂, carbonic anhydrase, MCG anti-inflammatory study, and Kruse proton/mitochondria framing.",
+    relatedProtocolIds: [
+      "baking-soda-water",
+      "carbonated-water",
+      "mineralized-water",
+      "hydration-timing",
+      "deuterium-aware-meal",
+    ],
+    sections: BAKING_SODA_WATER_SIMPLE_SECTIONS,
+    readingLevels: BAKING_SODA_WATER_READING_LEVELS,
   },
   {
     id: "magnetico-sleep-pad",
@@ -763,48 +787,17 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
   {
     id: "castor-oil-navel",
     title: "Castor oil in the belly button (navel)",
-    pillar: "support",
+    pillar: "water",
     summary:
-      "What castor oil is, the pechoti / nabhi tradition, what evidence does and does not support, safe use, and where Kruse-adjacent gut–lymph talk fits.",
+      "Why quality castor oil at the navel is discussed in water and gut-support teaching—ricinoleic acid, vagus and deuterium frames, castor vs DMSO safety, and how to log the habit.",
     relatedProtocolIds: [
-      "early-dinner",
-      "hydration-timing",
+      "castor-oil-navel",
       "deuterium-aware-meal",
+      "hydration-timing",
+      "early-dinner",
     ],
-    sections: [
-      {
-        heading: "What people are actually doing",
-        body: "The practice is simple: a few drops of cold-pressed castor oil (Ricinus communis) placed in the navel (belly button), sometimes with a gentle clockwise belly massage, then left for minutes to hours—often before sleep or on waking. In Ayurveda it appears among nabhi (navel) therapies; social media calls it the “pechoti” or belly-button oil method. Castor oil elsewhere in traditional medicine shows up as topical packs (abdomen, joints) and, when swallowed, as a strong laxative—that oral effect is not what this article describes. This lesson is external navel application only.",
-      },
-      {
-        heading: "What castor oil is chemically",
-        body: "Refined castor oil is rich in ricinoleic acid, an unusual hydroxylated fatty acid that gives the oil its thick feel and slow absorption on skin. Pharmacology texts know castor oil mainly as a stimulant laxative when ingested and as an emollient or occlusive topical. Raw castor beans contain ricin, a dangerous toxin; commercial cosmetic and food-grade castor oils are processed to remove ricin—buy reputable cold-pressed or USP/cosmetic grade products, never DIY from beans. Patch-test a dab on the inner arm before the navel.",
-      },
-      {
-        heading: "Why the navel at all?",
-        body: "Traditional frameworks treat the navel as a hub for vessels, fascia, and gut connectivity in the abdomen—not as a second mouth. Advocates claim faster “absorption” into circulation or lymph from the umbilical scar and surrounding skin. Mainstream dermatology treats the navel like other thin abdominal skin: some lipophilic molecules penetrate locally, but there is no robust clinical literature proving the navel is a privileged systemic port compared with applying the same oil to the wider abdomen. Plausible mechanisms for any felt benefit are mild local moisturization, massage of the gut area, relaxation ritual, and placebo/context—not magic plumbing through the umbilicus.",
-      },
-      {
-        heading: "Claims you will hear (and evidence quality)",
-        body: "Anecdotes and Ayurvedic texts cite help with bloating, constipation, cramps, skin glow, and “detox.” Rigorous RCTs on navel-only castor oil are essentially absent. Oral castor oil as laxative is evidence-based; abdominal castor oil packs have a long folk history but mixed modern trial data for pain and inflammation depending on condition. Separating traditions: external navel drops are low-risk for many healthy adults if hygiene is good; they are not a treatment for appendicitis, pregnancy complications, inflammatory bowel disease flares, or infections—see a clinician for those.",
-      },
-      {
-        heading: "Safe practice if you experiment",
-        body: "Use a clean dropper; 2–5 drops is a typical community dose. Warm the oil slightly in clean hands if desired. Lie down, apply, cover with a soft cloth if you fear staining sheets. Wash the navel next morning if residue remains to avoid odor or irritation. Stop if redness, itch, or discharge appears. Pregnant people, infants, and anyone with a surgical navel hernia or active belly wound should skip unless a qualified practitioner advises otherwise. Never confuse navel drops with drinking castor oil—oral doses are a different, much stronger intervention.",
-      },
-      {
-        heading: "Stacking with this app’s habits",
-        body: "Castor navel oil is a Support-pillar adjunct—like mastic gum chewing—not a Light, Water, or Magnetism keystone. It pairs logically with earlier last meal, daylight-aligned hydration, and deuterium-aware food choices if your goal is gut comfort within the wider mitochondrial lifestyle stack. It does not replace morning outdoor light, low-D hydration, grounding, or dark sleep. No catalog checkbox exists yet; track it in personal notes or adopt it as a private ritual outside points if you find it useful.",
-      },
-      {
-        heading: "Where Dr. Jack Kruse’s teaching is specific",
-        body: "Kruse’s public material centers light, water, magnetism, and cold more than nabhi oil, but overlapping communities discuss castor abdominal packs for lymphatic and liver support in the same lifestyle orbit. When forum posts tie navel castor to mitochondrial “detox,” treat that as community extension of older castor-pack folklore, not a cited Kruse protocol with trial data. His stack’s relevant lesson is: fix light and sleep first; topical belly oil is downstream garnish, not the spine.",
-      },
-      {
-        heading: "How this fits the app",
-        body: "Mitoversity documents the practice so users who hear about it from Ayurveda, podcasts, or forums can place it in context. Log core Water and Light habits in the catalog; consider castor navel oil experimental Support hygiene. Educational only—not medical advice for digestive disease, fertility, or skin infection.",
-      },
-    ],
+    sections: CASTOR_OIL_NAVEL_SIMPLE_SECTIONS,
+    readingLevels: CASTOR_OIL_NAVEL_READING_LEVELS,
   },
   ...MITOVERSITY_PROTOCOL_GUIDES,
 ];

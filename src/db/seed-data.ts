@@ -203,6 +203,17 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 51,
   }),
   p({
+    id: "baking-soda-water",
+    name: "Baking soda water",
+    description:
+      "¼ tsp plain baking soda (sodium bicarbonate) in a glass of water — twice daily, at least 2 hours away from meals. Alkaline buffer, not carbonated.",
+    points: 4,
+    category: "water_food",
+    timeOfDay: "anytime",
+    allowsMultiple: true,
+    sortOrder: 53,
+  }),
+  p({
     id: "hydration-timing",
     name: "Daylight-aligned hydration",
     description: "Hydrate earlier; taper late for sleep architecture.",
@@ -211,6 +222,16 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     timeOfDay: "anytime",
     allowsMultiple: true,
     sortOrder: 54,
+  }),
+  p({
+    id: "castor-oil-navel",
+    name: "Castor oil navel application",
+    description:
+      "Organic cold-pressed castor oil applied to the belly button (navel). Low-cost Support / Water adjunct — equipment required.",
+    points: 6,
+    category: "water_food",
+    timeOfDay: "evening",
+    sortOrder: 52,
   }),
   p({
     id: "deuterium-aware-meal",
