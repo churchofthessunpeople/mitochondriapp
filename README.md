@@ -41,8 +41,9 @@ Create `.env` / `.env.local`:
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `AUTH_URL` | **Local only:** `http://localhost:3000`. On Vercel leave unset (or set your real prod URL) — never point prod at localhost |
 | `OPENCELLID_API_KEY` | Optional. OpenCelliD token for cell density; OSM masts/plants still work without it |
-| `RESEND_API_KEY` | Optional email |
+| `RESEND_API_KEY` | Required in production for password-reset email |
 | `EMAIL_FROM` | Optional from address |
+| `ALLOW_DEV_RESET_URL` | Local only: set `true` to return reset links when Resend is unset |
 
 ```bash
 npm run db:setup   # schema migrations (safe to re-run)
@@ -61,6 +62,19 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run test` | Unit tests (sun times, scoring) |
 | `npm run db:setup` | Apply SQL migrations |
 | `npm run db:seed` | Seed catalog |
+| `npm run admin:promote -- <username>` | Grant `is_admin` (needs `DATABASE_URL`) |
+
+### Admin access
+
+Admin is **only** the database `is_admin` flag — not usernames, not a browser cookie alone.
+Promote yourself from a machine that already has your Neon `DATABASE_URL` (that credential is the real key):
+
+```bash
+npm run admin:promote -- yourusername
+npm run admin:promote -- yourusername --revoke
+```
+
+A “key file on this PC” does not work well for a hosted web app: the server cannot read files on your laptop, and anything checked only in the browser can be copied. DB credentials (or a one-time promote script using them) are the right control.
 
 ## Health
 

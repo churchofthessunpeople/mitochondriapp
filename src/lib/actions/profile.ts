@@ -1,11 +1,20 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { DUMMY_PASSWORD_HASH } from "@/lib/dummy-password-hash";
+import {
+  AUTH_RATE,
+  consumeRateLimit,
+  getClientIp,
+} from "@/lib/rate-limit";
 import { revalidateApp } from "@/lib/revalidate-app";
+
+export type ProfileFormState = { error?: string; success?: string };
 
 async function uid() {
   const s = await auth();
@@ -14,10 +23,39 @@ async function uid() {
 }
 
 export async function updateRecoveryEmailAction(
-  _p: { error?: string; success?: string },
+  _p: ProfileFormState,
   formData: FormData,
-) {
+): Promise<ProfileFormState> {
   const userId = await uid();
+  const ip = await getClientIp();
+  const limit = await consumeRateLimit(
+    `email-change:ip:${ip}`,
+    AUTH_RATE.emailChange.limit,
+    AUTH_RATE.emailChange.windowMs,
+  );
+  if (!limit.ok) {
+    return {
+      error: `Too many recovery email changes. Try again in ${limit.retryAfterSec}s.`,
+    };
+  }
+
+  const currentPassword = String(formData.get("currentPassword") ?? "");
+  if (!currentPassword) {
+    return { error: "Enter your current password" };
+  }
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const hash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
+  const valid = await bcrypt.compare(currentPassword, hash);
+  if (!user?.passwordHash || !valid) {
+    return { error: "Current password is incorrect." };
+  }
+
   const raw = String(formData.get("email") ?? "").trim().toLowerCase();
   if (raw && !z.string().email().safeParse(raw).success) {
     return { error: "Invalid email" };
@@ -31,9 +69,9 @@ export async function updateRecoveryEmailAction(
 }
 
 export async function updateTimezoneAction(
-  _p: { error?: string; success?: string },
+  _p: ProfileFormState,
   formData: FormData,
-) {
+): Promise<ProfileFormState> {
   const userId = await uid();
   const tz = String(formData.get("timezone") ?? "UTC").trim() || "UTC";
   try {
@@ -64,10 +102,6 @@ export async function toggleLeaderboardVisibilityFormAction() {
     .where(eq(users.id, userId))
     .limit(1);
   await updateLeaderboardVisibilityAction(!(row?.show ?? true));
-}
-
-export async function saveRecoveryEmailFormAction(formData: FormData) {
-  await updateRecoveryEmailAction({}, formData);
 }
 
 export async function saveTimezoneFormAction(formData: FormData) {

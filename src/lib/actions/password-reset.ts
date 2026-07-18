@@ -71,24 +71,61 @@ export async function requestPasswordResetAction(
     const from =
       process.env.EMAIL_FROM?.trim() ||
       "Mitochondriapp <onboarding@resend.dev>";
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: [email],
-        subject: "Reset your Mitochondriapp password",
-        text: `Reset link (1 hour): ${url}`,
-        html: `<p><a href="${url}">Reset your password</a> (expires in 1 hour).</p>`,
-      }),
-    });
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from,
+          to: [email],
+          subject: "Reset your Mitochondriapp password",
+          text: `Reset link (1 hour): ${url}`,
+          html: `<p><a href="${url}">Reset your password</a> (expires in 1 hour).</p>`,
+        }),
+      });
+      if (!res.ok) {
+        console.error(
+          "[password-reset] Resend failed",
+          res.status,
+          await res.text().catch(() => ""),
+        );
+        await db
+          .delete(verificationTokens)
+          .where(eq(verificationTokens.identifier, identifier));
+        return {
+          error: "Could not send reset email. Try again later.",
+        };
+      }
+    } catch (e) {
+      console.error("[password-reset] Resend error", e);
+      await db
+        .delete(verificationTokens)
+        .where(eq(verificationTokens.identifier, identifier));
+      return {
+        error: "Could not send reset email. Try again later.",
+      };
+    }
     return { success: generic };
   }
 
-  console.info("[password-reset]", url);
+  const isProd = process.env.NODE_ENV === "production";
+  if (isProd && process.env.ALLOW_DEV_RESET_URL !== "true") {
+    console.error(
+      "[password-reset] RESEND_API_KEY missing — refusing to issue reset",
+    );
+    await db
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.identifier, identifier));
+    return {
+      error:
+        "Password reset email is not configured (RESEND_API_KEY missing). Contact the site owner.",
+    };
+  }
+  // Local / explicitly allowed: surface link for testing only (never log in prod)
+  console.info("[password-reset] Dev reset issued for user", user.id);
   return { success: `${generic} Dev link: ${url}` };
 }
 

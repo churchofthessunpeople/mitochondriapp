@@ -1,7 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { revalidateApp } from "@/lib/revalidate-app";
 import { z } from "zod";
 import { redirect } from "next/navigation";
@@ -16,6 +16,7 @@ import {
   getClientIp,
 } from "@/lib/rate-limit";
 import { ROUTES } from "@/lib/routes";
+import { getUsernameConflictError } from "@/lib/username-availability";
 import { usernameSchema } from "@/lib/username";
 
 export type AccountFormState = {
@@ -121,14 +122,11 @@ export async function updateUsernameAction(
     return { error: "That is already your username." };
   }
 
-  const [taken] = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(and(eq(users.username, username), ne(users.id, userId)))
-    .limit(1);
-
-  if (taken) {
-    return { error: "That username is already taken." };
+  const usernameConflict = await getUsernameConflictError(username, {
+    excludeUserId: userId,
+  });
+  if (usernameConflict) {
+    return { error: usernameConflict };
   }
 
   await db

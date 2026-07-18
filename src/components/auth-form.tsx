@@ -68,7 +68,7 @@ export function AuthForm({
         <p className="mt-2 text-sm text-muted">
           {mode === "login"
             ? "Sign in with your username to log today’s protocols."
-            : "Pick a username and password — no email required."}
+            : "Pick a unique username and password — no email required."}
         </p>
       </div>
 
@@ -178,7 +178,7 @@ export function AuthForm({
           >
             {generatedHint
               ? "Strong password generated — copy it somewhere safe before creating your account."
-              : "Username: 3–24 characters, start with a letter. Password: 8+ with a letter and a number, or use Generate strong."}
+              : "Username: 3–24 characters, unique, and at least 75% different from existing ones. Password: 8+ with a letter and a number, or use Generate strong."}
           </p>
         )}
 

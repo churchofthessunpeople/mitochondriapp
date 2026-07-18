@@ -700,39 +700,10 @@ export function ScheduleDay({
                       ]
                         .filter(Boolean)
                         .join(" · ")
-                    : "Tap a tier below or open to set skin, eyes, and timing"}
+                    : "Tap to choose tier, skin, eyes, and timing"}
                 </span>
               </span>
             </button>
-          </div>
-          <div
-            className="flex flex-wrap items-center gap-1.5 pl-1"
-            role="group"
-            aria-label="Morning light tier"
-          >
-            <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
-              Tier
-            </span>
-            {sunriseTierOptions.map(({ tier, protocol }) => {
-              const active = loggedSunriseTier?.id === tier.id;
-              return (
-                <button
-                  key={tier.id}
-                  type="button"
-                  disabled={rowBusy}
-                  onClick={() => openSunriseDialog(protocol)}
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-xs font-semibold transition",
-                    active
-                      ? "bg-accent text-on-accent"
-                      : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
-                    tier.id === "horizon" && !active && "border-accent/30",
-                  )}
-                >
-                  {tier.shortLabel} · {formatSunriseMultiplier(tier.multiplier)}
-                </button>
-              );
-            })}
           </div>
         </div>
       </CollapsibleChecklistSection>

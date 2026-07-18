@@ -2,16 +2,19 @@
 
 import { ChevronRight, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  MITO_PILLAR_LABEL,
-  MITOVERSITY_ENTRIES,
-  type MitoEntry,
-  type MitoPillar,
-} from "@/lib/mitoversity";
+import type { MitoEntry, MitoPillar } from "@/lib/mitoversity";
 import { useAppContentOptional } from "@/components/app-content-context";
 import { AdminEditButton } from "@/components/admin-edit-button";
 import { MitoArticleModal } from "@/components/mito-article-modal";
 import { cn } from "@/lib/utils";
+
+/** Local labels — avoid importing the full mitoversity catalog module on the client. */
+const MITO_PILLAR_LABEL: Record<MitoPillar, string> = {
+  light: "Light",
+  water: "Water",
+  magnetism: "Magnetism",
+  support: "Support",
+};
 
 const PILLAR_FILTERS: { id: MitoPillar | "all"; label: string }[] = [
   { id: "all", label: "All" },
@@ -35,7 +38,8 @@ export function MitoversityHome({
   onAdminEditContent?: (focus: string) => void;
 }) {
   const content = useAppContentOptional();
-  const allEntries = content?.mitoEntries ?? [...MITOVERSITY_ENTRIES];
+  // Entries come from the server AppContent bundle (not a client re-import of the catalog).
+  const allEntries = content?.mitoEntries ?? [];
   const intro =
     content?.mitoversityIntro ??
     "Stand-alone explainers on light, water, magnetism, and support habits for mitochondrial lifestyle tracking. Where a claim is specific to Dr. Jack Kruse's public teaching, it is cited as such.";

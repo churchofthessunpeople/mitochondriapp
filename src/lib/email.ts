@@ -169,9 +169,9 @@ export async function sendVerificationEmail(
   const from = debug.from;
 
   if (!apiKey) {
-    console.info("[email] RESEND_API_KEY missing. Verify URL:", verifyUrl);
     const isProd = process.env.NODE_ENV === "production";
     if (isProd && process.env.ALLOW_DEV_VERIFY_URL !== "true") {
+      console.error("[email] RESEND_API_KEY missing — refusing verify link");
       return {
         ok: false,
         message:

@@ -13,7 +13,7 @@ import {
 } from "@/lib/magnetico";
 import { getCatalogProtocolById } from "@/lib/catalog";
 import { isSunriseKeystoneProtocol, pointsForLog } from "@/lib/scoring";
-import { getSunriseBuffToday } from "@/lib/actions/completions";
+import { getSunriseBuffToday } from "@/lib/sunrise-buff";
 
 async function requireUserId() {
   const session = await auth();

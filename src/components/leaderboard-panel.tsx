@@ -1,22 +1,57 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  LeaderboardTable,
-  type LeaderboardRow,
-} from "@/components/leaderboard-table";
+import { LeaderboardTable } from "@/components/leaderboard-table";
 import { getLeaderboardsAction } from "@/lib/actions/leaderboards";
+import {
+  leaderboardCacheDay,
+  type LeaderboardBoards,
+} from "@/lib/leaderboards";
 import { cn } from "@/lib/utils";
 
-export type LeaderboardBoards = {
-  week: LeaderboardRow[];
-  month: LeaderboardRow[];
-  allTime: LeaderboardRow[];
-};
+export type { LeaderboardBoards };
 
 type BoardKey = keyof LeaderboardBoards;
 
-const EMPTY: LeaderboardBoards = { week: [], month: [], allTime: [] };
+const EMPTY: LeaderboardBoards = {
+  day: [],
+  week: [],
+  month: [],
+  allTime: [],
+};
+
+const CLIENT_CACHE_KEY = "mito-leaderboards-v4";
+const CLIENT_DAY_KEY = "mito-leaderboards-day";
+
+function readClientCache(): LeaderboardBoards | null {
+  try {
+    const day = sessionStorage.getItem(CLIENT_DAY_KEY);
+    if (day !== leaderboardCacheDay()) return null;
+    const raw = sessionStorage.getItem(CLIENT_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as LeaderboardBoards;
+    if (
+      !parsed?.day ||
+      !parsed?.week ||
+      !parsed?.month ||
+      !parsed?.allTime
+    ) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeClientCache(boards: LeaderboardBoards) {
+  try {
+    sessionStorage.setItem(CLIENT_DAY_KEY, leaderboardCacheDay());
+    sessionStorage.setItem(CLIENT_CACHE_KEY, JSON.stringify(boards));
+  } catch {
+    /* private mode / quota */
+  }
+}
 
 const TABS: {
   key: BoardKey;
@@ -25,21 +60,27 @@ const TABS: {
   empty: string;
 }[] = [
   {
+    key: "day",
+    label: "Yesterday",
+    blurb: "Previous UTC day — full closed totals.",
+    empty: "No points logged yesterday.",
+  },
+  {
     key: "week",
     label: "Week",
-    blurb: "All points this week.",
+    blurb: "Last 7 closed UTC days (through yesterday).",
     empty: "No weekly points yet.",
   },
   {
     key: "month",
     label: "Month",
-    blurb: "Last 30 days.",
+    blurb: "Last 30 closed UTC days (through yesterday).",
     empty: "No monthly points yet.",
   },
   {
     key: "allTime",
     label: "All time",
-    blurb: "Lifetime totals.",
+    blurb: "Lifetime totals through yesterday.",
     empty: "Leaderboard is empty.",
   },
 ];
@@ -49,13 +90,13 @@ export function LeaderboardPanel({
   currentUserId,
   compact,
 }: {
-  /** Optional prefetched boards; when omitted, loads on mount. */
+  /** Optional prefetched boards; when omitted, loads on mount (daily-cached). */
   boards?: LeaderboardBoards | null;
   currentUserId: string;
   /** Hide page title when nested under Account tabs */
   compact?: boolean;
 }) {
-  const [tab, setTab] = useState<BoardKey>("week");
+  const [tab, setTab] = useState<BoardKey>("day");
   const [boards, setBoards] = useState<LeaderboardBoards>(
     initialBoards ?? EMPTY,
   );
@@ -66,13 +107,24 @@ export function LeaderboardPanel({
     if (initialBoards) {
       setBoards(initialBoards);
       setLoading(false);
+      writeClientCache(initialBoards);
       return;
     }
+
+    const fromSession = readClientCache();
+    if (fromSession) {
+      setBoards(fromSession);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     getLeaderboardsAction()
       .then((next) => {
-        if (!cancelled) setBoards(next);
+        if (cancelled) return;
+        setBoards(next);
+        writeClientCache(next);
       })
       .catch(() => {
         if (!cancelled) setBoards(EMPTY);
@@ -96,7 +148,7 @@ export function LeaderboardPanel({
             Leaderboard
           </h1>
           <p className="mt-1.5 text-sm text-muted">
-            One timeframe at a time · multi-logs are capped
+            One timeframe at a time · ranks refresh once a day
           </p>
         </div>
       )}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   DisplayNameForm,
   PasswordForm,
+  RecoveryEmailForm,
   UsernameForm,
 } from "@/components/account-forms";
 import type { AccountPanelUser } from "@/components/account-panel";
@@ -11,7 +12,6 @@ import { HistoryList } from "@/components/history-list";
 import { RemindersClient } from "@/components/reminders-client";
 import { logoutAction } from "@/lib/actions/auth";
 import {
-  saveRecoveryEmailFormAction,
   saveTimezoneFormAction,
   toggleLeaderboardVisibilityFormAction,
 } from "@/lib/actions/profile";
@@ -176,31 +176,7 @@ export function AccountHome({
             <DisplayNameForm initialDisplayName={displayName} />
             <UsernameForm initialUsername={user.username} />
             <PasswordForm />
-
-            <section className="glass rounded-3xl p-5">
-              <h2 className="font-semibold">Recovery email</h2>
-              <p className="mt-1 text-xs text-muted">
-                Optional. Password reset only.
-              </p>
-              <form
-                action={saveRecoveryEmailFormAction}
-                className="mt-3 space-y-3"
-              >
-                <input
-                  name="email"
-                  type="email"
-                  defaultValue={user.email ?? ""}
-                  placeholder="you@example.com"
-                  className="field-input w-full rounded-2xl px-4 py-3 text-sm"
-                />
-                <button
-                  type="submit"
-                  className="btn-primary h-11 rounded-2xl px-5 text-sm font-semibold"
-                >
-                  Save email
-                </button>
-              </form>
-            </section>
+            <RecoveryEmailForm initialEmail={user.email ?? null} />
 
             <section className="glass rounded-3xl p-5">
               <h2 className="font-semibold">Timezone</h2>

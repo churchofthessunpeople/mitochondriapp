@@ -15,6 +15,7 @@ import {
   getClientIp,
 } from "@/lib/rate-limit";
 import { ROUTES } from "@/lib/routes";
+import { getUsernameConflictError } from "@/lib/username-availability";
 import { usernameSchema } from "@/lib/username";
 
 /**
@@ -102,16 +103,9 @@ export async function registerAction(
       };
     }
 
-    const [existing] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.username, username))
-      .limit(1);
-
-    if (existing) {
-      return {
-        error: "That username is taken. Try another or sign in.",
-      };
+    const usernameConflict = await getUsernameConflictError(username);
+    if (usernameConflict) {
+      return { error: usernameConflict };
     }
 
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);
@@ -150,12 +144,7 @@ export async function registerAction(
   } catch (error) {
     if (isAuthRedirectError(error)) throw error;
     console.error("[registerAction]", error);
-    return {
-      error:
-        error instanceof Error
-          ? `Registration failed: ${error.message}`
-          : "Registration failed. Check server logs.",
-    };
+    return { error: "Registration failed. Please try again." };
   }
 }
 

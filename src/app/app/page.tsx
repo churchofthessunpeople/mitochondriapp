@@ -12,7 +12,7 @@ import {
   tabFromSearchParam,
   todaySectionFromSearchParam,
 } from "@/lib/app-tabs";
-import { ensureAdminFlagSynced } from "@/lib/admin";
+import { getIsAdminForUserId } from "@/lib/admin";
 import { loadAppContent } from "@/lib/content-overrides";
 import { scheduleCatalogSync } from "@/lib/catalog-sync";
 import {
@@ -38,7 +38,7 @@ import {
   redirectIfNeedsOnboarding,
 } from "@/lib/require-onboarding";
 import { ensurePermanentCompletions } from "@/lib/permanent-completions";
-import { getSunriseBuffToday } from "@/lib/actions/completions";
+import { getSunriseBuffToday } from "@/lib/sunrise-buff";
 import { getUserStreak } from "@/lib/streaks";
 import { formatTimeInZone, getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 import { displayTimeToHm, shiftHm } from "@/lib/time-hm";
@@ -81,7 +81,7 @@ export default async function AppPage({
         .where(eq(users.id, userId))
         .limit(1)
         .then((r) => r[0] ?? null),
-      ensureAdminFlagSynced(userId),
+      getIsAdminForUserId(userId),
     ]);
 
   // FK sync never blocks first paint — runs after the response is sent.

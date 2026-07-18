@@ -16,11 +16,11 @@ export async function GET() {
       ts: new Date().toISOString(),
     });
   } catch (e) {
+    console.error("[health] db check failed", e);
     return NextResponse.json(
       {
         ok: false,
         db: false,
-        error: e instanceof Error ? e.message : "db error",
         ms: Date.now() - started,
       },
       { status: 503 },

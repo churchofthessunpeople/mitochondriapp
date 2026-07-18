@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/admin";
 import { generateStrongPassword } from "@/lib/generate-password";
 import { validateNewPassword } from "@/lib/password";
 import { revalidateApp } from "@/lib/revalidate-app";
+import { getUsernameConflictError } from "@/lib/username-availability";
 import { usernameSchema } from "@/lib/username";
 import { db } from "@/db";
 import {
@@ -321,12 +322,10 @@ export async function updateAdminUserAction(input: {
   if (data.username !== undefined && data.username.trim()) {
     const uname = usernameSchema.parse(data.username);
     if (uname !== existing.username) {
-      const [taken] = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.username, uname))
-        .limit(1);
-      if (taken) throw new Error("Username already taken");
+      const conflict = await getUsernameConflictError(uname, {
+        excludeUserId: data.userId,
+      });
+      if (conflict) throw new Error(conflict);
       patch.username = uname;
     }
   }

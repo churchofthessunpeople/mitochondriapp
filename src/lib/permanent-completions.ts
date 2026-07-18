@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import {
   dailyCompletions,
@@ -8,14 +8,17 @@ import {
 } from "@/db/schema";
 import {
   ensureProtocolInDb,
-  getMergedCatalogProtocolById,
+  getMergedCatalogProtocols,
 } from "@/lib/catalog";
 import { getUserFavoriteIds } from "@/lib/favorites";
 import {
   isMagneticoProtocolId,
   parseMagneticoGauss,
 } from "@/lib/magnetico";
-import { isPermanentProtocol, isPermanentProtocolMerged } from "@/lib/permanent-activities";
+import {
+  isPermanentProtocol,
+  isPermanentProtocolMerged,
+} from "@/lib/permanent-activities";
 import {
   isVariantProtocolId,
   variantBasePoints,
@@ -85,59 +88,63 @@ export async function ensurePermanentCompletions(
   userId: string,
   completedOn: string,
 ): Promise<number> {
-  const favoriteIds = await getUserFavoriteIds(userId);
-  const targets: string[] = [];
-  for (const id of favoriteIds) {
-    const row = await getMergedCatalogProtocolById(id);
-    if (row && isPermanentProtocol(row)) targets.push(id);
-  }
+  const [favoriteIds, catalog] = await Promise.all([
+    getUserFavoriteIds(userId),
+    getMergedCatalogProtocols(),
+  ]);
+
+  const byId = new Map(catalog.map((p) => [p.id, p]));
+  const targets = [...favoriteIds].filter((id) => {
+    const row = byId.get(id);
+    return row != null && isPermanentProtocol(row) && !row.allowsMultiple;
+  });
   if (targets.length === 0) return 0;
 
   await dedupeSingleLogCompletions(userId, completedOn);
-
   await Promise.all(targets.map((id) => ensureProtocolInDb(id)));
 
-  const variantPrefs = targets.some(isVariantProtocolId)
-    ? await userVariantPreferences(userId)
-    : null;
+  const [skippedRows, existingRows, buffBefore, variantPrefs] =
+    await Promise.all([
+      db
+        .select({ protocolId: userPermanentSkips.protocolId })
+        .from(userPermanentSkips)
+        .where(
+          and(
+            eq(userPermanentSkips.userId, userId),
+            eq(userPermanentSkips.completedOn, completedOn),
+            inArray(userPermanentSkips.protocolId, targets),
+          ),
+        ),
+      db
+        .select({ protocolId: dailyCompletions.protocolId })
+        .from(dailyCompletions)
+        .where(
+          and(
+            eq(dailyCompletions.userId, userId),
+            eq(dailyCompletions.completedOn, completedOn),
+            eq(dailyCompletions.isStreakBonus, false),
+            inArray(dailyCompletions.protocolId, targets),
+          ),
+        ),
+      sunriseMultiplierForDay(userId, completedOn),
+      targets.some(isVariantProtocolId)
+        ? userVariantPreferences(userId)
+        : Promise.resolve(null),
+    ]);
+
+  const skipped = new Set(skippedRows.map((r) => r.protocolId));
+  const existing = new Set(existingRows.map((r) => r.protocolId));
 
   let inserted = 0;
   let streakAwarded = false;
 
   for (const protocolId of targets) {
-    const protocol = await getMergedCatalogProtocolById(protocolId);
-    if (!protocol || protocol.allowsMultiple) continue;
-
-    const [skipped] = await db
-      .select()
-      .from(userPermanentSkips)
-      .where(
-        and(
-          eq(userPermanentSkips.userId, userId),
-          eq(userPermanentSkips.protocolId, protocolId),
-          eq(userPermanentSkips.completedOn, completedOn),
-        ),
-      )
-      .limit(1);
-    if (skipped) continue;
-
-    const existing = await db
-      .select({ id: dailyCompletions.id })
-      .from(dailyCompletions)
-      .where(
-        and(
-          eq(dailyCompletions.userId, userId),
-          eq(dailyCompletions.protocolId, protocolId),
-          eq(dailyCompletions.completedOn, completedOn),
-          eq(dailyCompletions.isStreakBonus, false),
-        ),
-      )
-      .limit(1);
-    if (existing.length > 0) continue;
+    if (skipped.has(protocolId) || existing.has(protocolId)) continue;
+    const protocol = byId.get(protocolId);
+    if (!protocol) continue;
 
     const slot: TimeOfDay | null =
       protocol.lockedTimeOfDay ?? protocol.timeOfDay ?? null;
-    const buffBefore = await sunriseMultiplierForDay(userId, completedOn);
     const multForThisLog = isSunriseKeystoneProtocol(protocol)
       ? 1
       : buffBefore;
@@ -169,6 +176,7 @@ export async function ensurePermanentCompletions(
       isStreakBonus: false,
     });
     inserted += 1;
+    existing.add(protocolId);
 
     if (!streakAwarded && !(await hasStreakBonusToday(userId, completedOn))) {
       const { current } = await getUserStreak(userId, completedOn);

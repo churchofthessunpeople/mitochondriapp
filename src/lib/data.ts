@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, sql, sum } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lte, sql, sum } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users } from "@/db/schema";
@@ -122,16 +122,39 @@ export async function getDayDetail(userId: string, date: string) {
 
 type LeaderboardOpts = {
   limit?: number;
+  /** Inclusive lower bound (YYYY-MM-DD) */
   fromDate?: string;
+  /** Inclusive upper bound (YYYY-MM-DD) — use yesterday so daily caches exclude in-progress today */
+  toDate?: string;
+  /** Exact calendar day (YYYY-MM-DD) */
+  onDate?: string;
   userIds?: string[];
 };
+
+function utcDateOffset(daysFromToday: number): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + daysFromToday);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Last fully closed UTC day (excludes in-progress today). */
+function leaderboardThroughDate(): string {
+  return utcDateOffset(-1);
+}
 
 export async function getLeaderboardPeriod(opts: LeaderboardOpts = {}) {
   const limit = opts.limit ?? 25;
   try {
     const conditions = [eq(users.showOnLeaderboard, true)];
-    if (opts.fromDate) {
-      conditions.push(gte(dailyCompletions.completedOn, opts.fromDate));
+    if (opts.onDate) {
+      conditions.push(eq(dailyCompletions.completedOn, opts.onDate));
+    } else {
+      if (opts.fromDate) {
+        conditions.push(gte(dailyCompletions.completedOn, opts.fromDate));
+      }
+      if (opts.toDate) {
+        conditions.push(lte(dailyCompletions.completedOn, opts.toDate));
+      }
     }
     if (opts.userIds && opts.userIds.length > 0) {
       conditions.push(inArray(dailyCompletions.userId, opts.userIds));
@@ -165,25 +188,39 @@ export async function getLeaderboardPeriod(opts: LeaderboardOpts = {}) {
   }
 }
 
+/** Lifetime through yesterday (UTC) — excludes today's in-progress logs. */
 export async function getLeaderboard(limit = 20) {
-  return getLeaderboardPeriod({ limit });
-}
-
-export async function getWeeklyLeaderboard(limit = 20) {
-  const from = new Date();
-  from.setDate(from.getDate() - 7);
   return getLeaderboardPeriod({
     limit,
-    fromDate: from.toISOString().slice(0, 10),
+    toDate: leaderboardThroughDate(),
   });
 }
 
-export async function getMonthlyLeaderboard(limit = 20) {
-  const from = new Date();
-  from.setDate(from.getDate() - 30);
+/** Closed UTC day (yesterday) — fits daily-cached boards. */
+export async function getDailyLeaderboard(limit = 20) {
   return getLeaderboardPeriod({
     limit,
-    fromDate: from.toISOString().slice(0, 10),
+    onDate: leaderboardThroughDate(),
+  });
+}
+
+/** Last 7 closed UTC days ending yesterday. */
+export async function getWeeklyLeaderboard(limit = 20) {
+  const toDate = leaderboardThroughDate();
+  return getLeaderboardPeriod({
+    limit,
+    fromDate: utcDateOffset(-7),
+    toDate,
+  });
+}
+
+/** Last 30 closed UTC days ending yesterday. */
+export async function getMonthlyLeaderboard(limit = 20) {
+  const toDate = leaderboardThroughDate();
+  return getLeaderboardPeriod({
+    limit,
+    fromDate: utcDateOffset(-30),
+    toDate,
   });
 }
 

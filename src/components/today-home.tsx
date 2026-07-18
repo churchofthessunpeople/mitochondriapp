@@ -8,16 +8,22 @@ import {
   MapPin,
   Trophy,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
-import {
-  LeaderboardPanel,
-  type LeaderboardBoards,
-} from "@/components/leaderboard-panel";
+import type { LeaderboardBoards } from "@/components/leaderboard-panel";
 import { LwmStrip } from "@/components/lwm-strip";
 import { RegionCard } from "@/components/region-card";
 import { ScheduleDay } from "@/components/schedule-day";
 import { ZipForm } from "@/components/zip-form";
+
+const LeaderboardPanel = dynamic(
+  () =>
+    import("@/components/leaderboard-panel").then((m) => ({
+      default: m.LeaderboardPanel,
+    })),
+  { ssr: false },
+);
 import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import type { OpenAppSheet } from "@/lib/app-sheets";
 import type { TodaySection } from "@/lib/app-tabs";
@@ -595,11 +601,16 @@ export function TodayHome({
         )}
 
         {section === "leaderboard" && currentUserId && (
-          <LeaderboardPanel
-            compact
-            boards={leaderboards ?? null}
-            currentUserId={currentUserId}
-          />
+          <div className="space-y-3">
+            <LeaderboardPanel
+              compact
+              boards={leaderboards ?? null}
+              currentUserId={currentUserId}
+            />
+            <p className="text-center text-[11px] text-muted">
+              Ranks refresh once a day
+            </p>
+          </div>
         )}
       </div>
     </div>

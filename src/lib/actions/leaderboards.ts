@@ -1,18 +1,14 @@
 "use server";
 
+import { auth } from "@/auth";
 import {
-  getLeaderboard,
-  getMonthlyLeaderboard,
-  getWeeklyLeaderboard,
-} from "@/lib/data";
-import type { LeaderboardBoards } from "@/components/leaderboard-panel";
+  loadCachedLeaderboardBoards,
+  type LeaderboardBoards,
+} from "@/lib/leaderboards";
 
-/** Lazy-loaded when the user opens the Leaderboard tab. */
+/** Lazy-loaded when the user opens the Leaderboard tab (daily server cache). */
 export async function getLeaderboardsAction(): Promise<LeaderboardBoards> {
-  const [week, month, allTime] = await Promise.all([
-    getWeeklyLeaderboard(25),
-    getMonthlyLeaderboard(25),
-    getLeaderboard(25),
-  ]);
-  return { week, month, allTime };
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+  return loadCachedLeaderboardBoards();
 }

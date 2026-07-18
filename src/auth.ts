@@ -109,7 +109,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           token.name = row.displayName ?? row.username;
         } catch {
-          // keep token on DB blips
+          // Fail closed: do not keep a session we cannot re-validate
+          // (password reset / admin reset must not linger across DB outages).
+          return { ...token, sub: undefined };
         }
       }
 

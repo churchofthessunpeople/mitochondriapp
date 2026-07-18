@@ -68,9 +68,10 @@ export function AdminPanel({
       <div className="glass rounded-3xl p-6 text-center">
         <h2 className="text-lg font-semibold">Admin only</h2>
         <p className="mt-2 text-sm text-muted">
-          Set <code className="text-accent">is_admin</code> on your user or add
-          your username to{" "}
-          <code className="text-accent">ADMIN_USERNAMES</code>.
+          Admin access requires the{" "}
+          <code className="text-accent">is_admin</code> flag. From a machine with{" "}
+          <code className="text-accent">DATABASE_URL</code>:{" "}
+          <code className="text-accent">npm run admin:promote -- yourusername</code>
         </p>
       </div>
     );

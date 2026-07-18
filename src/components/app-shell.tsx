@@ -1,27 +1,16 @@
 "use client";
 
 import { CalendarCheck, GraduationCap, Shield, User } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
-import {
-  AccountHome,
-  type HistoryRow,
-  type ReminderRow,
-} from "@/components/account-home";
+import type { HistoryRow, ReminderRow } from "@/components/account-home";
 import type { AccountPanelUser } from "@/components/account-panel";
-import { AdminPanel } from "@/components/admin-panel";
 import { AppContentProvider } from "@/components/app-content-context";
 import type { AppContentBundle } from "@/lib/content-overrides";
 import { AppSheet } from "@/components/app-sheet";
-import { GuideLightPanel } from "@/components/guide-light-panel";
-import { GuideMagnetismPanel } from "@/components/guide-magnetism-panel";
-import { GuideWaterPanel } from "@/components/guide-water-panel";
-import { HistoryDayPanel } from "@/components/history-day-panel";
-import { MitoversityHome } from "@/components/mitoversity-home";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
-import { RegionBrowsePanel } from "@/components/region-browse-panel";
-import { ScoringGuidePanel } from "@/components/scoring-guide-panel";
 import { SunriseCheckIn } from "@/components/sunrise-check-in";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TodayHome } from "@/components/today-home";
@@ -32,6 +21,70 @@ import { ROUTES } from "@/lib/routes";
 import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
 import { cn } from "@/lib/utils";
+
+const AccountHome = dynamic(
+  () =>
+    import("@/components/account-home").then((m) => ({
+      default: m.AccountHome,
+    })),
+  { ssr: false },
+);
+const AdminPanel = dynamic(
+  () =>
+    import("@/components/admin-panel").then((m) => ({
+      default: m.AdminPanel,
+    })),
+  { ssr: false },
+);
+const MitoversityHome = dynamic(
+  () =>
+    import("@/components/mitoversity-home").then((m) => ({
+      default: m.MitoversityHome,
+    })),
+  { ssr: false },
+);
+const GuideLightPanel = dynamic(
+  () =>
+    import("@/components/guide-light-panel").then((m) => ({
+      default: m.GuideLightPanel,
+    })),
+  { ssr: false },
+);
+const GuideWaterPanel = dynamic(
+  () =>
+    import("@/components/guide-water-panel").then((m) => ({
+      default: m.GuideWaterPanel,
+    })),
+  { ssr: false },
+);
+const GuideMagnetismPanel = dynamic(
+  () =>
+    import("@/components/guide-magnetism-panel").then((m) => ({
+      default: m.GuideMagnetismPanel,
+    })),
+  { ssr: false },
+);
+const HistoryDayPanel = dynamic(
+  () =>
+    import("@/components/history-day-panel").then((m) => ({
+      default: m.HistoryDayPanel,
+    })),
+  { ssr: false },
+);
+const RegionBrowsePanel = dynamic(
+  () =>
+    import("@/components/region-browse-panel").then((m) => ({
+      default: m.RegionBrowsePanel,
+    })),
+  { ssr: false },
+);
+const ScoringGuidePanel = dynamic(
+  () =>
+    import("@/components/scoring-guide-panel").then((m) => ({
+      default: m.ScoringGuidePanel,
+    })),
+  { ssr: false },
+);
 
 const NAV: {
   id: AppTab;

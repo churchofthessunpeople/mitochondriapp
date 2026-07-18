@@ -450,7 +450,7 @@ UI offers sun-relative presets when sun times known.
 
 ## 11. Admin
 
-- **Access:** `users.is_admin` **or** username in `ADMIN_USERNAMES` env (synced on login)  
+- **Access:** `users.is_admin` only. Promote with `npm run admin:promote -- <username>` (requires `DATABASE_URL`). Reserved usernames cannot be registered/claimed; they do not grant admin.  
 - **In-page Admin sheet** (`admin-panel.tsx`):
 
 | Tab / zone | Capabilities |

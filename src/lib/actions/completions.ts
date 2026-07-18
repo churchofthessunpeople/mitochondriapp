@@ -13,6 +13,7 @@ import {
   ensurePermanentCompletions,
   recordPermanentSkip,
 } from "@/lib/permanent-completions";
+import { getSunriseBuffToday } from "@/lib/sunrise-buff";
 import { isPermanentProtocolMerged } from "@/lib/permanent-activities";
 import {
   isColdThermoProtocolId,
@@ -55,14 +56,12 @@ import {
 import { getUserSunriseForDate } from "@/lib/sunrise-timing-server";
 import { revalidatePath } from "next/cache";
 import {
-  bestSunriseMultiplier,
   isSunriseKeystoneProtocol,
   isSunriseKeystoneProtocolId,
   pointsForLog,
   streakBonusPoints,
   sunriseTierForProtocolId,
   type SunriseModifiers,
-  type SunriseTier,
 } from "@/lib/scoring";
 import { getUserStreak, hasStreakBonusToday } from "@/lib/streaks";
 
@@ -137,51 +136,6 @@ async function daySnapshot(
     sunriseTierLabel: buff.tier?.shortLabel ?? null,
     sunriseBuffActive: buff.multiplier > 1,
   };
-}
-
-export type SunriseBuffState = {
-  multiplier: number;
-  tier: SunriseTier | null;
-};
-
-/** Best morning-light tier logged today (non-streak). */
-export async function getSunriseBuffToday(
-  userId: string,
-  completedOn: string,
-): Promise<SunriseBuffState> {
-  try {
-    const rows = await db
-      .select({
-        protocolId: dailyCompletions.protocolId,
-        sunriseBuffMultiplier: dailyCompletions.sunriseBuffMultiplier,
-      })
-      .from(dailyCompletions)
-      .where(
-        and(
-          eq(dailyCompletions.userId, userId),
-          eq(dailyCompletions.completedOn, completedOn),
-          eq(dailyCompletions.isStreakBonus, false),
-        ),
-      );
-
-    return bestSunriseMultiplier(
-      rows.map((r) => ({
-        protocolId: r.protocolId,
-        multiplier: r.sunriseBuffMultiplier,
-      })),
-    );
-  } catch {
-    return { multiplier: 1, tier: null };
-  }
-}
-
-/** @deprecated use getSunriseBuffToday */
-export async function hasSunriseBuffToday(
-  userId: string,
-  completedOn: string,
-): Promise<boolean> {
-  const b = await getSunriseBuffToday(userId, completedOn);
-  return b.multiplier > 1;
 }
 
 /**
@@ -555,5 +509,3 @@ export async function logPermanentTonightAction(
 
   return logCompletionAction(protocolId);
 }
-
-export { ensurePermanentCompletions };

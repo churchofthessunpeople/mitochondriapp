@@ -2,15 +2,11 @@
  * Permanent activities — once on the user's available list, auto-log each day
  * until removed or skipped for a specific night.
  *
- * Base flags live in seed-data.ts; admin overrides can promote/demote via
- * content_overrides (`permanent: true/false` on protocol patches).
+ * Base flags live in seed-data.ts (ids mirrored in seed-permanent-ids.ts for
+ * client-safe imports); admin overrides can promote/demote via content_overrides.
  */
 
-import { PROTOCOL_SEEDS } from "@/db/seed-data";
-
-const SEED_PERMANENT_IDS = new Set(
-  PROTOCOL_SEEDS.filter((s) => s.permanent).map((s) => s.id),
-);
+import { SEED_PERMANENT_ID_SET } from "@/db/seed-permanent-ids";
 
 export type CatalogProtocol = {
   id: string;
@@ -19,14 +15,14 @@ export type CatalogProtocol = {
 
 /** @deprecated Prefer isPermanentProtocol when you have the merged row. */
 export function isPermanentProtocolId(id: string): boolean {
-  return SEED_PERMANENT_IDS.has(id);
+  return SEED_PERMANENT_ID_SET.has(id);
 }
 
 /** Uses merged catalog row (includes admin overrides). */
 export function isPermanentProtocol(p: CatalogProtocol): boolean {
   if (p.permanent === true) return true;
   if (p.permanent === false) return false;
-  return SEED_PERMANENT_IDS.has(p.id);
+  return SEED_PERMANENT_ID_SET.has(p.id);
 }
 
 export function buildPermanentProtocolIds(
@@ -44,5 +40,5 @@ export async function isPermanentProtocolMerged(
 }
 
 export function getPermanentProtocolIds(): readonly string[] {
-  return [...SEED_PERMANENT_IDS];
+  return [...SEED_PERMANENT_ID_SET];
 }
