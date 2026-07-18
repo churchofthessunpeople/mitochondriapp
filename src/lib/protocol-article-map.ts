@@ -33,6 +33,7 @@ export const PROTOCOL_ARTICLE_IDS: Record<string, string> = {
   rebounding: "rebounding-lymphatic",
   "mastic-gum": "mastic-gum-chewing",
   "blue-light-hygiene": "blue-light-hygiene",
+  "screen-light-hygiene": "screen-light-hygiene",
   "dark-bedroom": "true-dark-bedroom",
   "cool-bedroom-sleep": "cool-sleep-65",
   "consistent-sleep-window": "consistent-sleep-window",

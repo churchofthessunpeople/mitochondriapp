@@ -137,6 +137,10 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
     equipment: "optional",
     how: "After sunset, dim screens, use warm bulbs, or wear blue blockers if needed.\n\nLower brightness and color temperature through the evening so light matches winding down.",
   },
+  "screen-light-hygiene": {
+    equipment: "optional",
+    how: "Remove as much blue light from your screens as possible every evening.\n\nPhones/tablets: enable Night Shift (Apple) or Night Light / Eye comfort (Android) — schedule at sunset, set warmth to maximum, and lower brightness.\n\nComputers: enable Night Light (Windows) or Night Shift (Mac), or install IRIS (iris-tech.com) or f.lux for stronger red-shift and per-monitor control.\n\nApply to every screen you use after dark. Log when your evening device use ran with warm-screen settings active. Pair with Evening blue-light hygiene for room lighting and glasses.",
+  },
   "dark-bedroom": {
     equipment: "optional",
     how: "Make the room pitch-black: blackout curtains, eye mask, tape over standby LEDs, cover charger lights.\n\nYou should not see your hand in front of your face when lights are out.",

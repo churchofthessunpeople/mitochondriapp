@@ -419,7 +419,7 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     pillar: "light",
     summary:
       "Dim screens, warm bulbs, and blue blockers after sunset—protect melatonin timing.",
-    relatedProtocolIds: ["blue-light-hygiene"],
+    relatedProtocolIds: ["blue-light-hygiene", "screen-light-hygiene"],
     sections: [
       {
         heading: "Evening spectrum",
@@ -431,7 +431,7 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
       },
       {
         heading: "Stacking",
-        body: "Sunset viewing → blue-light hygiene → true dark bedroom is the Light pillar night arc.",
+        body: "Sunset viewing → screen light hygiene (Night Shift / IRIS) → evening blue-light hygiene → true dark bedroom is the Light pillar night arc.",
       },
     ],
   },

@@ -19,6 +19,10 @@ import {
   CASTOR_OIL_NAVEL_SIMPLE_SECTIONS,
 } from "@/lib/mitoversity-castor-oil-navel";
 import {
+  SCREEN_LIGHT_HYGIENE_READING_LEVELS,
+  SCREEN_LIGHT_HYGIENE_SIMPLE_SECTIONS,
+} from "@/lib/mitoversity-screen-light-hygiene";
+import {
   MAGNETICO_SLEEP_PAD_READING_LEVELS,
   MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
 } from "@/lib/mitoversity-magnetico-sleep-pad";
@@ -306,6 +310,22 @@ export const MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     ],
     sections: BAKING_SODA_WATER_SIMPLE_SECTIONS,
     readingLevels: BAKING_SODA_WATER_READING_LEVELS,
+  },
+  {
+    id: "screen-light-hygiene",
+    title: "Screen light hygiene (Night mode, IRIS, f.lux)",
+    pillar: "light",
+    summary:
+      "Strip blue from phones and computers after sunset—Night Shift, Night Light, IRIS, or f.lux—and how that differs from broader evening blue-light hygiene.",
+    relatedProtocolIds: [
+      "screen-light-hygiene",
+      "blue-light-hygiene",
+      "sunset-viewing",
+      "dark-bedroom",
+      "phone-away-sleep",
+    ],
+    sections: SCREEN_LIGHT_HYGIENE_SIMPLE_SECTIONS,
+    readingLevels: SCREEN_LIGHT_HYGIENE_READING_LEVELS,
   },
   {
     id: "magnetico-sleep-pad",

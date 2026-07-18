@@ -421,6 +421,16 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 40,
   }),
   p({
+    id: "screen-light-hygiene",
+    name: "Screen light hygiene",
+    description:
+      "Strip blue from phone, tablet, and computer screens — Night Shift / Night Light at max warmth, or IRIS or f.lux on desktops.",
+    points: 6,
+    category: "light",
+    timeOfDay: "evening",
+    sortOrder: 39,
+  }),
+  p({
     id: "dark-bedroom",
     name: "True dark sleep environment",
     description:
