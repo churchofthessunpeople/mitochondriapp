@@ -9,4 +9,5 @@ export type AccountPanelUser = {
   timezone: string | null;
   showOnLeaderboard: boolean;
   memberSinceLabel: string | null;
+  displayNameChangeBlockedUntilLabel: string | null;
 };

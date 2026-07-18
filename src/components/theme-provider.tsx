@@ -9,11 +9,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useServerInsertedHTML } from "@/lib/server-inserted-html";
 import {
   applyTheme,
   DEFAULT_THEME,
   getStoredTheme,
   THEME_STORAGE_KEY,
+  themeInitScript,
   type Theme,
 } from "@/lib/theme";
 
@@ -27,6 +29,11 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(DEFAULT_THEME);
+
+  // Inject before paint via SSR stream — avoids React 19 script-in-component warning.
+  useServerInsertedHTML(() => (
+    <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+  ));
 
   useEffect(() => {
     const initial = getStoredTheme();

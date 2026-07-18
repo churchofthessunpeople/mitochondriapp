@@ -98,6 +98,47 @@ export function aggregateDayActivities(
   return [...byProtocol.values()].sort((a, b) => a.order - b.order);
 }
 
+/** Sum activity totals across multiple days (e.g. weekly copy). */
+export function aggregatePeriodActivities(
+  rows: DayActivityRow[],
+  displayName: (row: DayActivityRow) => string,
+  permanentIds?: ReadonlySet<string>,
+): AggregatedActivity[] {
+  const activities = rows.filter((r) => !r.isStreakBonus);
+  const byProtocol = new Map<string, AggregatedActivity>();
+  let order = 0;
+
+  for (const r of activities) {
+    const name = displayName(r);
+    const key = r.protocolId ?? `name:${name}`;
+    const mins =
+      r.protocolId && isSunriseKeystoneProtocolId(r.protocolId)
+        ? 0
+        : (r.durationMinutes ?? 0);
+    const pts = r.pointsEarned;
+    const showsLogCount = protocolShowsLogCount(r.protocolId);
+    const existing = byProtocol.get(key);
+    if (existing) {
+      existing.totalMins += mins;
+      existing.totalPoints += pts;
+      if (showsLogCount) existing.logCount += 1;
+      continue;
+    }
+
+    byProtocol.set(key, {
+      key,
+      name,
+      totalMins: mins,
+      totalPoints: pts,
+      logCount: showsLogCount ? 1 : 0,
+      order: order++,
+      section: historySectionForActivity(r.protocolId, permanentIds),
+    });
+  }
+
+  return [...byProtocol.values()].sort((a, b) => a.order - b.order);
+}
+
 export function groupAggregatedBySection(
   items: AggregatedActivity[],
 ): Map<HistorySectionId, AggregatedActivity[]> {

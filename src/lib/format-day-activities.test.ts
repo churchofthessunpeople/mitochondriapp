@@ -5,6 +5,7 @@ import {
   formatLoggedMinutes,
   formatMultiLogCount,
   formatTodayMultiLogStatus,
+  formatWeekActivitiesCopy,
 } from "./format-day-activities";
 
 describe("formatLoggedMinutes", () => {
@@ -219,5 +220,44 @@ describe("formatDayActivitiesCopy", () => {
     ]);
     assert.match(text, /• Streak bonus — 2 pts/);
     assert.match(text, /Total: 2 pts/);
+  });
+});
+
+describe("formatWeekActivitiesCopy", () => {
+  it("sums timed and count activities across days", () => {
+    const text = formatWeekActivitiesCopy("Week total · Sun–Sun", [
+      {
+        protocolName: "Barefoot earth",
+        protocolId: "barefoot-earth",
+        durationMinutes: 15,
+        pointsEarned: 5,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Barefoot earth",
+        protocolId: "barefoot-earth",
+        durationMinutes: 20,
+        pointsEarned: 6,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Deuterium-aware meal",
+        protocolId: "deuterium-aware-meal",
+        durationMinutes: null,
+        pointsEarned: 8,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Deuterium-aware meal",
+        protocolId: "deuterium-aware-meal",
+        durationMinutes: null,
+        pointsEarned: 8,
+        isStreakBonus: false,
+      },
+    ]);
+
+    assert.match(text, /• Barefoot earth \(35 min\) — 11 pts/);
+    assert.match(text, /• Deuterium-aware meal \(2 logs\) — 16 pts/);
+    assert.match(text, /Total: 27 pts · 35 min logged/);
   });
 });

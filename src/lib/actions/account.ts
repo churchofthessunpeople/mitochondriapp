@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
 import { revalidateApp } from "@/lib/revalidate-app";
+import { updateTag } from "next/cache";
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
@@ -16,8 +17,11 @@ import {
   getClientIp,
 } from "@/lib/rate-limit";
 import { ROUTES } from "@/lib/routes";
-import { getUsernameConflictError } from "@/lib/username-availability";
-import { usernameSchema } from "@/lib/username";
+import { getDisplayNameConflictError } from "@/lib/display-name-availability";
+import {
+  displayNameChangeBlockedUntil,
+  formatDisplayNameChangeRetry,
+} from "@/lib/display-name-policy";
 
 export type AccountFormState = {
   error?: string;
@@ -61,82 +65,62 @@ export async function updateDisplayNameAction(
 
   const displayName = parsed.data.displayName.trim();
 
+  const [user] = await db
+    .select({
+      displayName: users.displayName,
+      createdAt: users.createdAt,
+      displayNameChangedAt: users.displayNameChangedAt,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  if (!user) {
+    return { error: "Account not found." };
+  }
+
+  if (displayName === (user.displayName?.trim() ?? "")) {
+    return { error: "That is already your display name." };
+  }
+
+  const blockedUntil = displayNameChangeBlockedUntil(user);
+  if (blockedUntil) {
+    return {
+      error: `You can change your display name again on ${formatDisplayNameChangeRetry(blockedUntil)}.`,
+    };
+  }
+
+  const nameConflict = await getDisplayNameConflictError(displayName, {
+    excludeUserId: userId,
+  });
+  if (nameConflict) {
+    return { error: nameConflict };
+  }
+
   await db
     .update(users)
     .set({
       displayName,
       name: displayName,
+      displayNameChangedAt: new Date(),
     })
     .where(eq(users.id, userId));
 
   revalidateApp();
+  updateTag("leaderboards");
 
   return { success: "Display name updated." };
 }
 
 export async function updateUsernameAction(
   _prev: AccountFormState,
-  formData: FormData,
+  _formData: FormData,
 ): Promise<AccountFormState> {
-  const userId = await requireUserId();
-  const ip = await getClientIp();
-
-  const limit = await consumeRateLimit(
-    `username-change:ip:${ip}`,
-    AUTH_RATE.emailChange.limit,
-    AUTH_RATE.emailChange.windowMs,
-  );
-  if (!limit.ok) {
-    return {
-      error: `Too many username change attempts. Try again in ${limit.retryAfterSec}s.`,
-    };
-  }
-
-  const usernameParsed = usernameSchema.safeParse(formData.get("username"));
-  if (!usernameParsed.success) {
-    return {
-      error: usernameParsed.error.issues[0]?.message ?? "Invalid username",
-    };
-  }
-  const username = usernameParsed.data;
-
-  const currentPassword = String(formData.get("currentPassword") ?? "");
-  if (!currentPassword) {
-    return { error: "Enter your current password" };
-  }
-
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-
-  const hash = user?.passwordHash ?? DUMMY_PASSWORD_HASH;
-  const valid = await bcrypt.compare(currentPassword, hash);
-
-  if (!user?.passwordHash || !valid) {
-    return { error: "Current password is incorrect." };
-  }
-
-  if (username === user.username) {
-    return { error: "That is already your username." };
-  }
-
-  const usernameConflict = await getUsernameConflictError(username, {
-    excludeUserId: userId,
-  });
-  if (usernameConflict) {
-    return { error: usernameConflict };
-  }
-
-  await db
-    .update(users)
-    .set({ username })
-    .where(eq(users.id, userId));
-
-  revalidateApp();
-
-  return { success: "Username updated. Use it next time you sign in." };
+  await requireUserId();
+  return {
+    error:
+      "Usernames are permanent after signup. Update your display name instead, or contact support if you need help.",
+  };
 }
 
 export async function updatePasswordAction(

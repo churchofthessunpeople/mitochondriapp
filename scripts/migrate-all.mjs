@@ -53,6 +53,7 @@ await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_timezone text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_until text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS magnetico_gauss integer NOT NULL DEFAULT 10`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS sleep_room_temp_f integer NOT NULL DEFAULT 65`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name_changed_at timestamp`;
 
 // Regions (lifestyle environment scores)
 await sql`

@@ -22,6 +22,10 @@ import {
 } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
+import {
+  displayNameChangeBlockedUntil,
+  formatDisplayNameChangeRetry,
+} from "@/lib/display-name-policy";
 import { haversineKm } from "@/lib/geo";
 import { effectiveLocation } from "@/lib/location-effective";
 import {
@@ -213,6 +217,17 @@ export default async function AppPage({
         year: "numeric",
       }).format(fullUser.createdAt)
     : null;
+  const displayNameChangeBlockedUntilLabel = fullUser.createdAt
+    ? (() => {
+        const blockedUntil = displayNameChangeBlockedUntil({
+          createdAt: fullUser.createdAt,
+          displayNameChangedAt: fullUser.displayNameChangedAt ?? null,
+        });
+        return blockedUntil
+          ? formatDisplayNameChangeRetry(blockedUntil)
+          : null;
+      })()
+    : null;
 
   const morningLightLogged = hasMorningLightLoggedToday(
     Object.fromEntries(dayStats.completionCounts),
@@ -267,6 +282,7 @@ export default async function AppPage({
         timezone: fullUser.timezone,
         showOnLeaderboard: fullUser.showOnLeaderboard,
         memberSinceLabel,
+        displayNameChangeBlockedUntilLabel,
       }}
       history={history}
       lifetimePoints={lifetimePoints}

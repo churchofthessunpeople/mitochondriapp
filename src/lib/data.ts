@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, lte, sql, sum } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lt, lte, sql, sum } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users } from "@/db/schema";
@@ -120,6 +120,41 @@ export async function getDayDetail(userId: string, date: string) {
   }
 }
 
+export async function getCompletionsForUserDateRange(
+  userId: string,
+  fromDate: string,
+  toDateExclusive: string,
+) {
+  try {
+    const { getCatalogProtocolById } = await import("@/lib/catalog");
+    const rows = await db
+      .select({
+        completion: dailyCompletions,
+        protocol: protocols,
+      })
+      .from(dailyCompletions)
+      .leftJoin(protocols, eq(protocols.id, dailyCompletions.protocolId))
+      .where(
+        and(
+          eq(dailyCompletions.userId, userId),
+          gte(dailyCompletions.completedOn, fromDate),
+          lt(dailyCompletions.completedOn, toDateExclusive),
+        ),
+      )
+      .orderBy(asc(dailyCompletions.completedOn), desc(dailyCompletions.createdAt));
+
+    return rows.map((r) => {
+      const fromCatalog = getCatalogProtocolById(r.completion.protocolId);
+      return {
+        completion: r.completion,
+        protocol: fromCatalog ?? r.protocol,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 type LeaderboardOpts = {
   limit?: number;
   /** Inclusive lower bound (YYYY-MM-DD) */
@@ -140,6 +175,16 @@ function utcDateOffset(daysFromToday: number): string {
 /** Last fully closed UTC day (excludes in-progress today). */
 function leaderboardThroughDate(): string {
   return utcDateOffset(-1);
+}
+
+/** Public leaderboard label: chosen display name, else login username. Points stay on userId. */
+function leaderboardPlayerLabel(
+  displayName: string | null,
+  username: string,
+): string {
+  const chosen = displayName?.trim();
+  if (chosen) return chosen;
+  return username || "Mitochondriac";
 }
 
 export async function getLeaderboardPeriod(opts: LeaderboardOpts = {}) {
@@ -178,8 +223,7 @@ export async function getLeaderboardPeriod(opts: LeaderboardOpts = {}) {
     return rows.map((r, index) => ({
       rank: index + 1,
       userId: r.userId,
-      name: r.name || r.username || "Mitochondriac",
-      username: r.username,
+      name: leaderboardPlayerLabel(r.name, r.username),
       totalPoints: r.totalPoints ?? 0,
       totalActions: r.totalActions ?? 0,
     }));

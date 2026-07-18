@@ -31,5 +31,10 @@ export async function getUsernameConflictError(
     ...listReservedUsernames(),
   ];
 
-  return usernameConflictMessage(candidate, existing);
+  return usernameConflictMessage(candidate, existing, {
+    taken:
+      "That username is taken. Choose another that is at least 75% different from existing usernames.",
+    similar:
+      "That username is too similar to an existing one. Choose another that is at least 75% different.",
+  });
 }

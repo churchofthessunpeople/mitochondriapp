@@ -5,17 +5,50 @@ import { format, parseISO } from "date-fns";
 import { Copy } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import { useToast } from "@/components/toast";
-import { getDayDetailAction } from "@/lib/actions/history";
+import { getDayDetailAction, getPreviousWeekCopyAction } from "@/lib/actions/history";
 import { formatDayActivitiesCopy } from "@/lib/format-day-activities";
+import { getPreviousWeekRange } from "@/lib/week-range";
 import { cn, formatPoints } from "@/lib/utils";
+
+function WeekCopyBar({
+  weekShortLabel,
+  copyingWeek,
+  onCopy,
+}: {
+  weekShortLabel: string;
+  copyingWeek: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <p className="text-xs text-muted">
+        Previous week · Sun–Sun · {weekShortLabel}
+      </p>
+      <button
+        type="button"
+        onClick={onCopy}
+        disabled={copyingWeek}
+        className={cn(
+          "inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-xs font-semibold text-muted transition hover:border-accent/40 hover:text-accent disabled:opacity-50",
+          copyingWeek && "animate-pulse",
+        )}
+      >
+        <Copy className="h-3.5 w-3.5" strokeWidth={2.25} />
+        {copyingWeek ? "Copying…" : "Copy last week"}
+      </button>
+    </div>
+  );
+}
 
 export function HistoryList({
   rows,
   onSelectDay,
+  timeZone = "UTC",
 }: {
   rows: { date: string; points: number; count: number }[];
   /** When set, day rows open an in-page card instead of navigating. */
   onSelectDay?: (date: string) => void;
+  timeZone?: string;
 }) {
   const content = useAppContentOptional();
   const permanentIds = useMemo(
@@ -24,7 +57,21 @@ export function HistoryList({
   );
   const { push } = useToast();
   const [copyingDate, setCopyingDate] = useState<string | null>(null);
+  const [copyingWeek, setCopyingWeek] = useState(false);
   const [, startCopy] = useTransition();
+
+  const previousWeek = useMemo(
+    () => getPreviousWeekRange(timeZone),
+    [timeZone],
+  );
+  const weekShortLabel = useMemo(() => {
+    const start = format(parseISO(previousWeek.start), "MMM d");
+    const end = format(
+      parseISO(previousWeek.endExclusive),
+      "MMM d",
+    );
+    return `${start} – ${end}`;
+  }, [previousWeek]);
 
   function copyDay(date: string) {
     setCopyingDate(date);
@@ -42,10 +89,32 @@ export function HistoryList({
     });
   }
 
+  function copyPreviousWeek() {
+    setCopyingWeek(true);
+    startCopy(async () => {
+      try {
+        const { text } = await getPreviousWeekCopyAction(timeZone);
+        await navigator.clipboard.writeText(text);
+        push("Last week copied");
+      } catch {
+        push("Could not copy last week", "err");
+      } finally {
+        setCopyingWeek(false);
+      }
+    });
+  }
+
   if (rows.length === 0) {
     return (
-      <div className="glass rounded-3xl px-6 py-12 text-center text-sm text-muted">
-        No history yet. Log today&apos;s protocols to start.
+      <div className="space-y-4">
+        <WeekCopyBar
+          weekShortLabel={weekShortLabel}
+          copyingWeek={copyingWeek}
+          onCopy={copyPreviousWeek}
+        />
+        <div className="glass rounded-3xl px-6 py-12 text-center text-sm text-muted">
+          No history yet. Log today&apos;s protocols to start.
+        </div>
       </div>
     );
   }
@@ -54,6 +123,12 @@ export function HistoryList({
 
   return (
     <div className="space-y-3">
+      <WeekCopyBar
+        weekShortLabel={weekShortLabel}
+        copyingWeek={copyingWeek}
+        onCopy={copyPreviousWeek}
+      />
+
       {rows.map((row) => {
         const width = Math.max(8, Math.round((row.points / maxPoints) * 100));
         const copying = copyingDate === row.date;

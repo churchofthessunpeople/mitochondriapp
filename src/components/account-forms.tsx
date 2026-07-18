@@ -5,7 +5,6 @@ import type { AccountFormState } from "@/lib/actions/account";
 import {
   updateDisplayNameAction,
   updatePasswordAction,
-  updateUsernameAction,
 } from "@/lib/actions/account";
 import {
   updateRecoveryEmailAction,
@@ -56,18 +55,25 @@ function AccountSection({
 
 export function DisplayNameForm({
   initialDisplayName,
+  changeBlockedUntilLabel,
 }: {
   initialDisplayName: string;
+  changeBlockedUntilLabel?: string | null;
 }) {
   const [state, formAction, pending] = useActionState(
     updateDisplayNameAction,
     {},
   );
+  const locked = Boolean(changeBlockedUntilLabel);
 
   return (
     <AccountSection
       title="Display name"
-      description="Shown on the leaderboard and in your account."
+      description={
+        locked
+          ? `Shown on the leaderboard when set; otherwise your username appears. You can change it again on ${changeBlockedUntilLabel}.`
+          : "Shown on the leaderboard when set; otherwise your username appears. You can change this once every 30 days after your first week on the app."
+      }
     >
       <form action={formAction} className="space-y-4">
         <label className="block space-y-1.5">
@@ -78,13 +84,14 @@ export function DisplayNameForm({
             minLength={2}
             maxLength={40}
             defaultValue={initialDisplayName}
-            className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
+            disabled={locked}
+            className="field-input w-full rounded-2xl px-4 py-3 text-[15px] disabled:cursor-not-allowed disabled:opacity-60"
           />
         </label>
         <FormMessage state={state} />
         <button
           type="submit"
-          disabled={pending}
+          disabled={pending || locked}
           className="btn-primary flex h-11 w-full items-center justify-center rounded-2xl text-sm font-semibold transition hover:opacity-90 disabled:opacity-60 sm:w-auto sm:px-6"
         >
           {pending ? "Saving..." : "Save name"}
@@ -94,59 +101,15 @@ export function DisplayNameForm({
   );
 }
 
-export function UsernameForm({ initialUsername }: { initialUsername: string }) {
-  const [state, formAction, pending] = useActionState(updateUsernameAction, {});
-  const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (state.success) {
-      const el = formRef.current?.querySelector<HTMLInputElement>(
-        'input[name="currentPassword"]',
-      );
-      if (el) el.value = "";
-    }
-  }, [state.success]);
-
+export function UsernameSection({ username }: { username: string }) {
   return (
     <AccountSection
       title="Username"
-      description="Used to sign in. Must be unique and at least 75% different from other usernames. Confirm with your current password."
+      description="Used to sign in. Permanent after signup — choose carefully at registration."
     >
-      <form ref={formRef} action={formAction} className="space-y-4">
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground/80">Username</span>
-          <input
-            name="username"
-            required
-            minLength={3}
-            maxLength={24}
-            defaultValue={initialUsername}
-            autoComplete="username"
-            pattern="[A-Za-z][A-Za-z0-9_]*"
-            className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
-          />
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground/80">
-            Current password
-          </span>
-          <input
-            name="currentPassword"
-            type="password"
-            required
-            autoComplete="current-password"
-            className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
-          />
-        </label>
-        <FormMessage state={state} />
-        <button
-          type="submit"
-          disabled={pending}
-          className="btn-primary flex h-11 w-full items-center justify-center rounded-2xl text-sm font-semibold transition hover:opacity-90 disabled:opacity-60 sm:w-auto sm:px-6"
-        >
-          {pending ? "Saving..." : "Save username"}
-        </button>
-      </form>
+      <p className="rounded-2xl border border-border bg-foreground/[0.03] px-4 py-3 font-mono text-[15px] text-foreground">
+        {username}
+      </p>
     </AccountSection>
   );
 }

@@ -107,6 +107,8 @@ export const users = pgTable("users", {
   isAdmin: boolean("is_admin").notNull().default(false),
   onboardingComplete: boolean("onboarding_complete").notNull().default(false),
   showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),
+  /** Last successful display name change (for monthly cooldown). */
+  displayNameChangedAt: timestamp("display_name_changed_at", { mode: "date" }),
   /** Magnetico sleep pad strength preference: 5 | 10 | 20 gauss */
   magneticoGauss: integer("magnetico_gauss").notNull().default(10),
   /** Bedroom sleep temperature preference (°F); 65°F floor */

@@ -15,19 +15,31 @@ describe("username similarity", () => {
   it("rejects near-duplicates under the 75% rule", () => {
     assert.ok(usernameDissimilarity("alice", "alice1") < 0.75);
     assert.match(
-      usernameConflictMessage("alice1", ["alice"]) ?? "",
+      usernameConflictMessage("alice1", ["alice"], {
+        taken: "taken",
+        similar: "too similar",
+      }) ?? "",
       /too similar/i,
     );
   });
 
   it("allows clearly different names", () => {
     assert.ok(usernameDissimilarity("alice", "sunwalker") >= 0.75);
-    assert.equal(usernameConflictMessage("sunwalker", ["alice"]), null);
+    assert.equal(
+      usernameConflictMessage("sunwalker", ["alice"], {
+        taken: "taken",
+        similar: "similar",
+      }),
+      null,
+    );
   });
 
   it("prompts for a dissimilar name when exact match exists", () => {
     assert.match(
-      usernameConflictMessage("alice", ["alice"]) ?? "",
+      usernameConflictMessage("alice", ["alice"], {
+        taken: "That username is taken. Choose another that is at least 75% different.",
+        similar: "similar",
+      }) ?? "",
       /taken.*75%/i,
     );
   });

@@ -2,7 +2,14 @@
 
 import { auth } from "@/auth";
 import { dedupeSingleLogCompletions } from "@/lib/completion-dedupe";
-import { getDayDetail } from "@/lib/data";
+import {
+  getActiveProtocols,
+  getCompletionsForUserDateRange,
+  getDayDetail,
+} from "@/lib/data";
+import { formatWeekActivitiesCopy } from "@/lib/format-day-activities";
+import { buildPermanentProtocolIds } from "@/lib/permanent-activities";
+import { getPreviousWeekRange } from "@/lib/week-range";
 
 export type DayDetailRow = {
   id: string;
@@ -26,6 +33,12 @@ export async function getDayDetailAction(
   await dedupeSingleLogCompletions(session.user.id, date);
 
   const rows = await getDayDetail(session.user.id, date);
+  return mapCompletionRows(rows);
+}
+
+function mapCompletionRows(
+  rows: Awaited<ReturnType<typeof getCompletionsForUserDateRange>>,
+): DayDetailRow[] {
   return rows.map(({ completion, protocol }) => ({
     id: completion.id,
     pointsEarned: completion.pointsEarned,
@@ -37,4 +50,30 @@ export async function getDayDetailAction(
     protocolName: protocol?.name ?? null,
     protocolId: completion.protocolId,
   }));
+}
+
+export async function getPreviousWeekCopyAction(
+  timeZone: string,
+): Promise<{ text: string; weekLabel: string }> {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const week = getPreviousWeekRange(timeZone);
+  const [rows, protocols] = await Promise.all([
+    getCompletionsForUserDateRange(
+      session.user.id,
+      week.start,
+      week.endExclusive,
+    ),
+    getActiveProtocols(),
+  ]);
+  const permanentIds = new Set(buildPermanentProtocolIds(protocols));
+
+  const text = formatWeekActivitiesCopy(
+    `Week total · ${week.label}`,
+    mapCompletionRows(rows),
+    permanentIds,
+  );
+
+  return { text, weekLabel: week.label };
 }

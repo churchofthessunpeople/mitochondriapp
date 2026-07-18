@@ -5,7 +5,7 @@ import {
   DisplayNameForm,
   PasswordForm,
   RecoveryEmailForm,
-  UsernameForm,
+  UsernameSection,
 } from "@/components/account-forms";
 import type { AccountPanelUser } from "@/components/account-panel";
 import { HistoryList } from "@/components/history-list";
@@ -87,7 +87,7 @@ export function AccountHome({
     }
   }
 
-  const displayName = user.displayName || user.name || user.username || "";
+  const displayName = user.displayName ?? user.name ?? "";
 
   return (
     <div className="space-y-5">
@@ -145,6 +145,7 @@ export function AccountHome({
             </p>
             <HistoryList
               rows={history}
+              timeZone={user.timezone ?? "UTC"}
               onSelectDay={
                 onOpenSheet
                   ? (date) => onOpenSheet({ id: "historyDay", date })
@@ -173,8 +174,11 @@ export function AccountHome({
 
         {section === "profile" && (
           <div className="space-y-5">
-            <DisplayNameForm initialDisplayName={displayName} />
-            <UsernameForm initialUsername={user.username} />
+            <DisplayNameForm
+              initialDisplayName={displayName}
+              changeBlockedUntilLabel={user.displayNameChangeBlockedUntilLabel}
+            />
+            <UsernameSection username={user.username} />
             <PasswordForm />
             <RecoveryEmailForm initialEmail={user.email ?? null} />
 

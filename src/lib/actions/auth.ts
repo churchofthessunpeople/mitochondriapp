@@ -15,6 +15,7 @@ import {
   getClientIp,
 } from "@/lib/rate-limit";
 import { ROUTES } from "@/lib/routes";
+import { getDisplayNameConflictError } from "@/lib/display-name-availability";
 import { getUsernameConflictError } from "@/lib/username-availability";
 import { usernameSchema } from "@/lib/username";
 
@@ -109,15 +110,21 @@ export async function registerAction(
     }
 
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);
-    const displayName =
-      parsed.data.displayName?.trim() ||
-      username;
+    const chosenDisplay = parsed.data.displayName?.trim() || null;
+
+    if (chosenDisplay) {
+      const displayConflict = await getDisplayNameConflictError(chosenDisplay);
+      if (displayConflict) {
+        return { error: displayConflict };
+      }
+    }
 
     await db.insert(users).values({
       username,
       email: null,
-      name: displayName,
-      displayName,
+      name: chosenDisplay ?? username,
+      displayName: chosenDisplay,
+      displayNameChangedAt: chosenDisplay ? new Date() : null,
       passwordHash,
       emailVerified: new Date(),
       sessionVersion: 0,

@@ -33,7 +33,7 @@ export async function loadCachedLeaderboardBoards(): Promise<LeaderboardBoards> 
       ]);
       return { day: dayBoard, week, month, allTime };
     },
-    ["leaderboards-v4-closed-days", day],
+    ["leaderboards-v6-label-fallback", day],
     { revalidate: 86_400, tags: ["leaderboards"] },
   )();
 }

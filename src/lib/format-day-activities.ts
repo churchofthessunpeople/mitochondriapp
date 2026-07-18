@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import {
   aggregateDayActivities,
+  aggregatePeriodActivities,
   groupAggregatedBySection,
   HISTORY_SECTIONS,
   type DayActivityRow,
@@ -127,4 +128,54 @@ export function formatDayActivitiesCopy(
   }
 
   return `${header}\n${lines.join("\n")}`;
+}
+
+/** Plain-text weekly totals (Sunday–Sunday) for clipboard. */
+export function formatWeekActivitiesCopy(
+  weekLabel: string,
+  rows: DayActivityRow[],
+  permanentIds?: ReadonlySet<string>,
+): string {
+  const streakRows = rows.filter((r) => r.isStreakBonus);
+  const streakPoints = streakRows.reduce((s, r) => s + r.pointsEarned, 0);
+  const aggregated = aggregatePeriodActivities(rows, displayName, permanentIds);
+  const grouped = groupAggregatedBySection(aggregated);
+
+  if (aggregated.length === 0 && streakPoints === 0) {
+    return `${weekLabel}\n(no activities logged)`;
+  }
+
+  const lines: string[] = [];
+
+  for (const section of HISTORY_SECTIONS) {
+    const items = grouped.get(section.id) ?? [];
+    if (items.length === 0) continue;
+    if (lines.length > 0) lines.push("");
+    lines.push(section.label);
+    for (const item of items) {
+      lines.push(
+        formatLine(item.name, item.totalMins, item.totalPoints, item.logCount),
+      );
+    }
+  }
+
+  if (streakPoints > 0) {
+    if (lines.length > 0) lines.push("");
+    lines.push(`• Streak bonus — ${formatPoints(streakPoints)} pts`);
+  }
+
+  const activityPoints = aggregated.reduce((s, row) => s + row.totalPoints, 0);
+  const totalPoints = activityPoints + streakPoints;
+  const totalMins = aggregated.reduce((s, row) => s + row.totalMins, 0);
+
+  lines.push("");
+  if (totalMins > 0) {
+    lines.push(
+      `Total: ${formatPoints(totalPoints)} pts · ${formatLoggedMinutes(totalMins)} logged`,
+    );
+  } else {
+    lines.push(`Total: ${formatPoints(totalPoints)} pts`);
+  }
+
+  return `${weekLabel}\n${lines.join("\n")}`;
 }

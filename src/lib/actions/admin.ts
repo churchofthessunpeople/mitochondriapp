@@ -6,7 +6,9 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/admin";
 import { generateStrongPassword } from "@/lib/generate-password";
 import { validateNewPassword } from "@/lib/password";
+import { updateTag } from "next/cache";
 import { revalidateApp } from "@/lib/revalidate-app";
+import { getDisplayNameConflictError } from "@/lib/display-name-availability";
 import { getUsernameConflictError } from "@/lib/username-availability";
 import { usernameSchema } from "@/lib/username";
 import { db } from "@/db";
@@ -314,8 +316,13 @@ export async function updateAdminUserAction(input: {
     } else if (data.displayName.length < 2) {
       throw new Error("Display name must be at least 2 characters");
     } else {
+      const conflict = await getDisplayNameConflictError(data.displayName, {
+        excludeUserId: data.userId,
+      });
+      if (conflict) throw new Error(conflict);
       patch.displayName = data.displayName;
       patch.name = data.displayName;
+      patch.displayNameChangedAt = new Date();
     }
   }
 
@@ -360,6 +367,9 @@ export async function updateAdminUserAction(input: {
   if (Object.keys(patch).length === 0) return;
 
   await db.update(users).set(patch).where(eq(users.id, data.userId));
+  if (patch.displayName !== undefined || patch.username !== undefined) {
+    updateTag("leaderboards");
+  }
   revalidateApp();
 }
 

@@ -20,7 +20,7 @@ const EMPTY: LeaderboardBoards = {
   allTime: [],
 };
 
-const CLIENT_CACHE_KEY = "mito-leaderboards-v4";
+const CLIENT_CACHE_KEY = "mito-leaderboards-v6";
 const CLIENT_DAY_KEY = "mito-leaderboards-day";
 
 function readClientCache(): LeaderboardBoards | null {

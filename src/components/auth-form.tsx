@@ -104,7 +104,7 @@ export function AuthForm({
               name="displayName"
               minLength={2}
               maxLength={40}
-              placeholder="Shown on the leaderboard"
+              placeholder="Shown on the leaderboard (optional)"
               className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
             />
           </label>
@@ -178,7 +178,7 @@ export function AuthForm({
           >
             {generatedHint
               ? "Strong password generated — copy it somewhere safe before creating your account."
-              : "Username: 3–24 characters, unique, and at least 75% different from existing ones. Password: 8+ with a letter and a number, or use Generate strong."}
+              : "Username is permanent after signup (3–24 characters, unique). Display name can be changed later. Password: 8+ with a letter and a number, or use Generate strong."}
           </p>
         )}
 
