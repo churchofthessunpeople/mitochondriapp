@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, Flame, Minus, Pencil, Plus, Sun, Timer, X } from "lucide-react";
+import { Check, ChevronDown, Flame, Minus, Pencil, Plus, Sun, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import type { Protocol } from "@/db/schema";
 import { AddActivityDialog } from "@/components/add-activity-dialog";
@@ -25,12 +25,9 @@ import {
   OptionListChoice,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
-import { MovementSettingDialog } from "@/components/movement-setting-dialog";
 import { SunriseKeystoneDialog } from "@/components/sunrise-keystone-dialog";
-import { SunExposureDialog } from "@/components/sun-exposure-dialog";
 import {
   coldThermoSkinTempBasePoints,
-  COLD_THERMO_SKIN_TEMP_OPTIONS,
   formatColdThermoSkinTemp,
   isColdThermoProtocolId,
   OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
@@ -56,17 +53,17 @@ import {
 import { isPermanentProtocol } from "@/lib/permanent-activities";
 import {
   requiresMovementSetting,
-  type MovementSetting,
 } from "@/lib/movement-setting";
 import {
   isSunExposureProtocolId,
+  sunSlotFromLocalHm,
   type SunExposureLogInput,
 } from "@/lib/sun-exposure";
+import { currentLocalHm } from "@/lib/sunrise-timing";
 import {
   DURATION_BLOCK_MINUTES,
   formatSunriseMultiplier,
   isSunriseKeystoneProtocol,
-  pointsForLog,
   resolveSunriseTierOptions,
   SUNRISE_TIERS,
   type SunriseModifiers,
@@ -239,22 +236,15 @@ export function ScheduleDay({
   const [sunriseTierLabel, setSunriseTierLabel] = useState(initialTierLabel);
   const [coldThermoSkinTempF, setColdThermoSkinTempF] =
     useState<ColdThermoSkinTempF>(OPTIMAL_COLD_THERMO_SKIN_TEMP_F);
-  const [durationFor, setDurationFor] = useState<Protocol | null>(null);
   const [howToFor, setHowToFor] = useState<Protocol | null>(null);
-  const [durationMins, setDurationMins] = useState(15);
   const [sunriseDialog, setSunriseDialog] = useState<{
     open: boolean;
     initialProtocol: Protocol | null;
   }>({ open: false, initialProtocol: null });
-  const [sunExposureFor, setSunExposureFor] = useState<Protocol | null>(null);
-  const [movementFor, setMovementFor] = useState<Protocol | null>(null);
   const [choicePicker, setChoicePicker] = useState<{
     kind: "magnetico" | "sleep";
     protocol: Protocol;
   } | null>(null);
-  const [durationStep, setDurationStep] = useState<"skin" | "minutes">(
-    "minutes",
-  );
   const [addActivityOpen, setAddActivityOpen] = useState(false);
   const [magneticoGauss, setMagneticoGauss] = useState<MagneticoGauss>(() =>
     parseMagneticoGauss(initialMagneticoGauss),
@@ -531,97 +521,9 @@ export function ScheduleDay({
     });
   }
 
-  function openDurationDialog(protocol: Protocol) {
-    if (isSunExposureProtocolId(protocol.id)) {
-      setSunExposureFor(protocol);
-      return;
-    }
-    setDurationStep(
-      isColdThermoProtocolId(protocol.id) ? "skin" : "minutes",
-    );
-    if (requiresMovementSetting(protocol)) {
-      setMovementFor(protocol);
-      return;
-    }
-    setDurationFor(protocol);
-    setDurationMins(DURATION_BLOCK_MINUTES);
-  }
-
-  function logMovement(
-    protocol: Protocol,
-    setting: MovementSetting,
-    durationMinutes: number,
-  ) {
-    const count = counts[protocol.id] ?? 0;
-    const prevMins = durations[protocol.id] ?? 0;
-    bumpCounts({ protocolId: protocol.id, delta: 1 });
-    bumpDurations({ protocolId: protocol.id, delta: durationMinutes });
-    setMovementFor(null);
-    runLog(protocol.id, async () => {
-      try {
-        const res = await logCompletionAction(protocol.id, {
-          durationMinutes,
-          movementSetting: setting,
-        });
-        applySnap({ ...res, protocolId: protocol.id });
-        if (res.action === "added") {
-          const extra =
-            res.streakBonus && res.streakBonus > 0
-              ? ` · +${res.streakBonus} streak`
-              : "";
-          push(`+${durationMinutes} min · +${res.points} pts${extra}`);
-        }
-      } catch (e) {
-        bumpCounts({ protocolId: protocol.id, delta: 0, absolute: count });
-        bumpDurations({
-          protocolId: protocol.id,
-          delta: 0,
-          absolute: prevMins,
-        });
-        push(e instanceof Error ? e.message : "Could not log", "err");
-      }
-    });
-  }
-
-  function logSunExposure(
-    protocol: Protocol,
-    input: SunExposureLogInput,
-    durationMinutes: number,
-  ) {
-    const count = counts[protocol.id] ?? 0;
-    const prevMins = durations[protocol.id] ?? 0;
-    bumpCounts({ protocolId: protocol.id, delta: 1 });
-    bumpDurations({ protocolId: protocol.id, delta: durationMinutes });
-    setSunExposureFor(null);
-    runLog(protocol.id, async () => {
-      try {
-        const res = await logCompletionAction(protocol.id, {
-          durationMinutes,
-          sunExposure: input,
-        });
-        applySnap({ ...res, protocolId: protocol.id });
-        if (res.action === "added") {
-          const extra =
-            res.streakBonus && res.streakBonus > 0
-              ? ` · +${res.streakBonus} streak`
-              : "";
-          push(`+${durationMinutes} min · +${res.points} pts${extra}`);
-        }
-      } catch (e) {
-        bumpCounts({ protocolId: protocol.id, delta: 0, absolute: count });
-        bumpDurations({
-          protocolId: protocol.id,
-          delta: 0,
-          absolute: prevMins,
-        });
-        push(e instanceof Error ? e.message : "Could not log", "err");
-      }
-    });
-  }
-
   function toggleSingle(protocol: Protocol) {
     if (protocol.durationEnabled && (counts[protocol.id] ?? 0) === 0) {
-      openDurationDialog(protocol);
+      addOne(protocol);
       return;
     }
     const count = counts[protocol.id] ?? 0;
@@ -805,24 +707,36 @@ export function ScheduleDay({
     );
   }
 
-  function addOne(protocol: Protocol, durationMinutes?: number) {
+  function defaultSunExposureInput(): SunExposureLogInput {
+    const startHm = currentLocalHm(timeZone);
+    return {
+      slot: sunSlotFromLocalHm(startHm),
+      grounded: true,
+      skin: "full",
+      startHm,
+    };
+  }
+
+  function addOne(protocol: Protocol) {
     const count = counts[protocol.id] ?? 0;
     const prevMins = durations[protocol.id] ?? 0;
-    const mins =
-      protocol.durationEnabled && durationMinutes == null
-        ? DURATION_BLOCK_MINUTES
-        : durationMinutes;
+    const mins = protocol.durationEnabled ? DURATION_BLOCK_MINUTES : undefined;
     bumpCounts({ protocolId: protocol.id, delta: 1 });
     if (mins) {
       bumpDurations({ protocolId: protocol.id, delta: mins });
     }
-    setDurationFor(null);
     runLog(protocol.id, async () => {
       try {
         const res = await logCompletionAction(protocol.id, {
           durationMinutes: mins,
           skinTempF: isColdThermoProtocolId(protocol.id)
             ? coldThermoSkinTempF
+            : undefined,
+          sunExposure: isSunExposureProtocolId(protocol.id)
+            ? defaultSunExposureInput()
+            : undefined,
+          movementSetting: requiresMovementSetting(protocol)
+            ? "outside"
             : undefined,
         });
         applySnap({ ...res, protocolId: protocol.id });
@@ -891,8 +805,8 @@ export function ScheduleDay({
                 : "border-border text-muted",
             )}
           >
-            {p.durationEnabled ? (
-              <Timer className="h-4 w-4" strokeWidth={2.5} />
+            {p.durationEnabled && totalMins > 0 ? (
+              <span className="text-sm font-bold tabular-nums">{totalMins}</span>
             ) : showsMultiLogCount(p) && count > 0 ? (
               <span className="text-sm font-bold tabular-nums">{count}</span>
             ) : (
@@ -921,11 +835,9 @@ export function ScheduleDay({
                     {protocolHint(p)}
                     {p.durationEnabled && totalMins > 0
                       ? ` · ${totalMins} min today`
-                      : isSunExposureProtocolId(p.id)
-                        ? " · log morning / noon / afternoon"
-                        : p.durationEnabled
-                          ? ` · + adds ${DURATION_BLOCK_MINUTES} min`
-                          : ""}
+                      : p.durationEnabled
+                        ? ` · +/− ${DURATION_BLOCK_MINUTES} min`
+                        : ""}
                   </>
                 )}
             </span>
@@ -944,38 +856,15 @@ export function ScheduleDay({
             >
               <Minus className="h-4 w-4" strokeWidth={2.5} />
             </button>
-            {p.durationEnabled ? (
-              <button
-                type="button"
-                disabled={rowBusy}
-                onClick={() => openDurationDialog(p)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted transition hover:border-accent/40 hover:text-accent disabled:opacity-35"
-                aria-label={
-                  isSunExposureProtocolId(p.id)
-                    ? `Log sun exposure session`
-                    : `Set custom minutes for ${p.name}`
-                }
-              >
-                <Timer className="h-4 w-4" strokeWidth={2.5} />
-              </button>
-            ) : null}
             <button
               type="button"
               disabled={rowBusy}
-              onClick={() =>
-                isSunExposureProtocolId(p.id) || requiresMovementSetting(p)
-                  ? openDurationDialog(p)
-                  : addOne(p)
-              }
+              onClick={() => addOne(p)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent transition hover:bg-accent/25 disabled:opacity-35"
               aria-label={
-                isSunExposureProtocolId(p.id)
-                  ? `Log sun exposure session`
-                  : requiresMovementSetting(p)
-                    ? `Log ${p.name} session`
-                    : p.durationEnabled
-                      ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
-                      : `Add one ${p.name}`
+                p.durationEnabled
+                  ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                  : `Add one ${p.name}`
               }
             >
               <Plus className="h-4 w-4" strokeWidth={2.5} />
@@ -1032,7 +921,7 @@ export function ScheduleDay({
                   : isPermanentProtocol(p)
                     ? " · auto-logs daily · tap to log"
                     : p.durationEnabled
-                      ? ` · tap to set minutes`
+                      ? ` · tap to add ${DURATION_BLOCK_MINUTES} min`
                       : ""}
               </span>
             </span>
@@ -1210,96 +1099,6 @@ export function ScheduleDay({
         onClose={() => setHowToFor(null)}
       />
 
-      {durationFor && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
-          <div className="glass w-full max-w-sm rounded-3xl p-5">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="font-semibold">{durationFor.name}</p>
-                <p className="mt-1 text-xs text-muted">
-                  {durationStep === "skin"
-                    ? "Skin surface temperature — one option at a time"
-                    : `${durationFor.points} pts per ${DURATION_BLOCK_MINUTES} min — choose a duration`}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDurationFor(null)}
-                className="rounded-lg p-1 text-muted"
-                aria-label="Close"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            {durationStep === "skin" &&
-            isColdThermoProtocolId(durationFor.id) ? (
-              <div className="mt-4">
-                <OptionListChoice
-                  options={COLD_THERMO_SKIN_TEMP_OPTIONS.map(
-                    (t): ClickThroughOption => ({
-                      id: String(t),
-                      title: formatColdThermoSkinTemp(t),
-                      subtitle: `${coldThermoSkinTempBasePoints(t, durationFor.points)} base pts / ${DURATION_BLOCK_MINUTES} min`,
-                      highlight: t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
-                    }),
-                  )}
-                  selectedId={String(coldThermoSkinTempF)}
-                  onChoose={(id) => {
-                    setColdThermoSkinTempF(Number(id) as ColdThermoSkinTempF);
-                    setDurationStep("minutes");
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="mt-4 space-y-3">
-                {isColdThermoProtocolId(durationFor.id) ? (
-                  <button
-                    type="button"
-                    onClick={() => setDurationStep("skin")}
-                    className="text-xs font-medium text-muted hover:text-foreground"
-                  >
-                    Skin {formatColdThermoSkinTemp(coldThermoSkinTempF)} — change
-                  </button>
-                ) : null}
-                <OptionListChoice
-                  options={[
-                    DURATION_BLOCK_MINUTES,
-                    DURATION_BLOCK_MINUTES * 2,
-                    DURATION_BLOCK_MINUTES * 3,
-                    DURATION_BLOCK_MINUTES * 4,
-                    durationFor.maxDurationMinutes,
-                  ]
-                    .filter((v, i, a) => v > 0 && a.indexOf(v) === i)
-                    .sort((a, b) => a - b)
-                    .map(
-                      (m): ClickThroughOption => ({
-                        id: String(m),
-                        title: `${m} minutes`,
-                        subtitle: `≈ ${pointsForLog(durationFor, m, {
-                          sunriseMultiplier: isSunriseKeystoneProtocol(
-                            durationFor,
-                          )
-                            ? 1
-                            : sunriseMult,
-                          basePoints: coldThermoLogBase(durationFor),
-                        })} pts this log`,
-                        highlight: m === DURATION_BLOCK_MINUTES,
-                      }),
-                    )}
-                  selectedId={String(durationMins)}
-                  disabled={busyId === durationFor.id}
-                  onChoose={(id) => {
-                    const mins = Number(id);
-                    setDurationMins(mins);
-                    addOne(durationFor, mins);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {choicePicker && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
           <div className="glass w-full max-w-sm rounded-3xl p-5">
@@ -1373,25 +1172,6 @@ export function ScheduleDay({
           initialProtocol={sunriseDialog.initialProtocol}
           onLog={logSunriseKeystone}
           onCancel={closeSunriseDialog}
-        />
-      ) : null}
-      {movementFor ? (
-        <MovementSettingDialog
-          protocol={movementFor}
-          pending={busyId === movementFor.id}
-          sunriseMultiplier={sunriseMult}
-          onLog={(setting, mins) => logMovement(movementFor, setting, mins)}
-          onCancel={() => setMovementFor(null)}
-        />
-      ) : null}
-      {sunExposureFor ? (
-        <SunExposureDialog
-          protocol={sunExposureFor}
-          timeZone={timeZone}
-          pending={busyId === sunExposureFor.id}
-          sunriseMultiplier={sunriseMult}
-          onLog={(input, mins) => logSunExposure(sunExposureFor, input, mins)}
-          onCancel={() => setSunExposureFor(null)}
         />
       ) : null}
       {catalogProtocols?.length && onAvailableIdsChange ? (
