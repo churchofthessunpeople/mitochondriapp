@@ -54,6 +54,10 @@ await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_until text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS magnetico_gauss integer NOT NULL DEFAULT 10`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS sleep_room_temp_f integer NOT NULL DEFAULT 65`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name_changed_at timestamp`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_guest boolean NOT NULL DEFAULT false`;
+// Existing rows get true (skip tutorial); new inserts use DEFAULT false.
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS tutorial_complete boolean NOT NULL DEFAULT true`;
+await sql`ALTER TABLE users ALTER COLUMN tutorial_complete SET DEFAULT false`;
 
 // Regions (lifestyle environment scores)
 await sql`

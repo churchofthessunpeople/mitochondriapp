@@ -65,6 +65,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.displayName ?? user.username,
           image: user.image,
           sessionVersion: user.sessionVersion,
+          isGuest: user.isGuest,
         };
       },
     }),
@@ -79,6 +80,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             : 0;
         token.email = user.email;
         token.name = user.name;
+        token.isGuest =
+          "isGuest" in user && typeof user.isGuest === "boolean"
+            ? user.isGuest
+            : false;
       }
 
       if (token.sub) {
@@ -89,6 +94,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               emailVerified: users.emailVerified,
               username: users.username,
               displayName: users.displayName,
+              isGuest: users.isGuest,
             })
             .from(users)
             .where(eq(users.id, token.sub))
@@ -108,6 +114,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           token.name = row.displayName ?? row.username;
+          token.isGuest = row.isGuest;
         } catch {
           // Fail closed: do not keep a session we cannot re-validate
           // (password reset / admin reset must not linger across DB outages).
@@ -127,6 +134,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub;
         if (typeof token.email === "string") session.user.email = token.email;
         if (typeof token.name === "string") session.user.name = token.name;
+        session.user.isGuest = Boolean(token.isGuest);
       }
       return session;
     },

@@ -3,15 +3,12 @@
 import { Check, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useOptimistic, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { Protocol } from "@/db/schema";
 import { logCompletionAction } from "@/lib/actions/completions";
 import { markOnboardingCompleteAction } from "@/lib/actions/onboarding";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
-import {
-  setLocationFromZipAction,
-  type ZipFormState,
-} from "@/lib/actions/region";
+import { setLocationFromZipAction } from "@/lib/actions/region";
 import { ROUTES } from "@/lib/routes";
 import { isCatalogSelectableProtocol } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
@@ -35,35 +32,68 @@ export function OnboardingWizard({
   const [step, setStep] = useState<Step>("welcome");
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
-
-  const [available, setAvailable] = useOptimistic(
-    new Set(initialAvailableIds),
-    (current: Set<string>, protocolId: string) => {
-      const next = new Set(current);
-      if (next.has(protocolId)) next.delete(protocolId);
-      else next.add(protocolId);
-      return next;
-    },
+  /** Durable selection — useOptimistic was reverting to empty props after each toggle. */
+  const [available, setAvailable] = useState(
+    () => new Set(initialAvailableIds),
   );
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [zip, setZip] = useState(currentZip ?? "");
+  const [zipError, setZipError] = useState<string | null>(null);
+  const [zipSuccess, setZipSuccess] = useState<string | null>(null);
+  const [locationPending, setLocationPending] = useState(false);
 
-  const [zipState, zipAction, zipPending] = useActionState(
-    setLocationFromZipAction,
-    {} as ZipFormState,
-  );
-
-  useEffect(() => {
-    if (zipState.success && step === "location") {
-      // Stay on step so they see success; they advance with Next
+  function continueFromLocation() {
+    setZipError(null);
+    const trimmed = zip.trim();
+    if (!trimmed) {
+      setStep("activities");
+      return;
     }
-  }, [zipState.success, step]);
 
-  function toggleActivity(id: string) {
+    setLocationPending(true);
     start(async () => {
       try {
-        setAvailable(id);
+        const fd = new FormData();
+        fd.set("zip", trimmed);
+        const result = await setLocationFromZipAction({}, fd);
+        if (result.error) {
+          setZipError(result.error);
+          setZipSuccess(null);
+          return;
+        }
+        setZipSuccess(result.success ?? `Located ${result.placeLabel ?? trimmed}.`);
+        setStep("activities");
+      } catch (e) {
+        setZipError(e instanceof Error ? e.message : "Could not save location");
+      } finally {
+        setLocationPending(false);
+      }
+    });
+  }
+
+  function toggleActivity(id: string) {
+    setError(null);
+    const wasOn = available.has(id);
+    setAvailable((prev) => {
+      const next = new Set(prev);
+      if (wasOn) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setTogglingId(id);
+    start(async () => {
+      try {
         await toggleFavoriteAction(id);
       } catch (e) {
+        setAvailable((prev) => {
+          const next = new Set(prev);
+          if (wasOn) next.add(id);
+          else next.delete(id);
+          return next;
+        });
         setError(e instanceof Error ? e.message : "Could not update");
+      } finally {
+        setTogglingId(null);
       }
     });
   }
@@ -185,32 +215,37 @@ export function OnboardingWizard({
           </p>
 
           <div className="glass mt-6 rounded-3xl p-5">
-            <form action={zipAction} className="flex flex-col gap-3 sm:flex-row">
+            <label className="block space-y-1.5">
+              <span className="text-sm font-medium text-foreground/80">
+                US ZIP code
+              </span>
               <input
                 name="zip"
                 inputMode="numeric"
                 autoComplete="postal-code"
                 placeholder="e.g. 33101"
-                defaultValue={currentZip ?? ""}
+                value={zip}
+                onChange={(e) => {
+                  setZip(e.target.value);
+                  setZipError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    continueFromLocation();
+                  }
+                }}
                 maxLength={10}
-                required
-                className="field-input flex-1 rounded-2xl px-4 py-3 text-[15px]"
+                disabled={locationPending}
+                className="field-input w-full rounded-2xl px-4 py-3 text-[15px] disabled:opacity-60"
               />
-              <button
-                type="submit"
-                disabled={zipPending}
-                className="btn-primary h-12 shrink-0 rounded-2xl px-5 text-sm font-semibold disabled:opacity-60"
-              >
-                {zipPending ? "Looking up…" : "Use ZIP"}
-              </button>
-            </form>
-            {zipState.error && (
-              <p className="mt-3 text-sm text-red-400">{zipState.error}</p>
+            </label>
+            {zipError && (
+              <p className="mt-3 text-sm text-red-400">{zipError}</p>
             )}
-            {(zipState.success || placeLabel) && (
+            {(zipSuccess || placeLabel) && !zipError && (
               <p className="mt-3 rounded-2xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm text-accent">
-                {zipState.success ||
-                  `Located ${placeLabel}. Sun times ready.`}
+                {zipSuccess || `Located ${placeLabel}. Sun times ready.`}
               </p>
             )}
           </div>
@@ -218,18 +253,22 @@ export function OnboardingWizard({
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
-              onClick={() => setStep("activities")}
-              className="btn-primary inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-sm font-semibold"
+              disabled={locationPending}
+              onClick={continueFromLocation}
+              className="btn-primary inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl text-sm font-semibold disabled:opacity-60"
             >
-              {(zipState.success || currentZip || placeLabel)
-                ? "Continue"
-                : "Continue with location"}
-              <ChevronRight className="h-4 w-4" />
+              {locationPending
+                ? "Saving location…"
+                : zip.trim()
+                  ? "Continue"
+                  : "Continue without ZIP"}
+              {!locationPending && <ChevronRight className="h-4 w-4" />}
             </button>
             <button
               type="button"
+              disabled={locationPending}
               onClick={() => setStep("activities")}
-              className="btn-secondary inline-flex h-12 flex-1 items-center justify-center rounded-2xl text-sm font-semibold"
+              className="btn-secondary inline-flex h-12 flex-1 items-center justify-center rounded-2xl text-sm font-semibold disabled:opacity-60"
             >
               Skip for now
             </button>
@@ -263,13 +302,14 @@ export function OnboardingWizard({
                 <li key={p.id}>
                   <button
                     type="button"
-                    disabled={pending}
+                    disabled={togglingId === p.id}
                     onClick={() => toggleActivity(p.id)}
                     className={cn(
                       "flex w-full items-start gap-3 rounded-2xl border px-3.5 py-3 text-left transition",
                       on
                         ? "border-accent/40 bg-accent/10"
                         : "border-border bg-card hover:border-accent/25",
+                      togglingId === p.id && "opacity-70",
                     )}
                   >
                     <span

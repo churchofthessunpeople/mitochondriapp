@@ -100,6 +100,7 @@ export function AddActivityDialog({
   const [howToFor, setHowToFor] = useState<Protocol | null>(null);
   const [notOnOpen, setNotOnOpen] = useState(false);
   const [onListOpen, setOnListOpen] = useState(false);
+  const [permanentOpen, setPermanentOpen] = useState(false);
 
   const catalogProtocols = useMemo(
     () =>
@@ -125,6 +126,7 @@ export function AddActivityDialog({
       setQuery("");
       setNotOnOpen(false);
       setOnListOpen(false);
+      setPermanentOpen(false);
     }
   }, [open]);
 
@@ -135,18 +137,39 @@ export function AddActivityDialog({
     return `${p.name} ${p.description}`.toLowerCase().includes(q);
   };
 
+  const regularCatalog = useMemo(
+    () => catalogProtocols.filter((p) => !isPermanentProtocol(p)),
+    [catalogProtocols],
+  );
+
+  const permanentCatalog = useMemo(
+    () => catalogProtocols.filter((p) => isPermanentProtocol(p)),
+    [catalogProtocols],
+  );
+
   const notOnList = useMemo(
     () =>
-      catalogProtocols.filter((p) => !available.has(p.id) && matchesQuery(p)),
+      regularCatalog.filter((p) => !available.has(p.id) && matchesQuery(p)),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- matchesQuery uses q
-    [catalogProtocols, available, q],
+    [regularCatalog, available, q],
   );
 
   const onList = useMemo(
     () =>
-      catalogProtocols.filter((p) => available.has(p.id) && matchesQuery(p)),
+      regularCatalog.filter((p) => available.has(p.id) && matchesQuery(p)),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- matchesQuery uses q
-    [catalogProtocols, available, q],
+    [regularCatalog, available, q],
+  );
+
+  const permanentList = useMemo(
+    () => permanentCatalog.filter((p) => matchesQuery(p)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- matchesQuery uses q
+    [permanentCatalog, q],
+  );
+
+  const permanentOnCount = useMemo(
+    () => permanentList.filter((p) => available.has(p.id)).length,
+    [permanentList, available],
   );
 
   function toggle(protocolId: string, name: string) {
@@ -265,8 +288,8 @@ export function AddActivityDialog({
                 Edit activities
               </p>
               <p className="mt-1 text-xs text-muted">
-                Expand a section to add activities or remove them from your
-                checklist.
+                Daily activities and permanent habits each have their own
+                section — expand to add or remove.
               </p>
             </div>
             <button
@@ -304,7 +327,7 @@ export function AddActivityDialog({
             <CollapsibleList
               title="Not on your list"
               count={notOnList.length}
-              subtitle="Tap an activity to add it to today’s checklist"
+              subtitle="Daily checklist activities you can add"
               open={notOnOpen}
               onToggle={() => setNotOnOpen((v) => !v)}
             >
@@ -337,6 +360,32 @@ export function AddActivityDialog({
               ) : (
                 <ul className="space-y-2">
                   {onList.map((p) => renderRow(p, "remove"))}
+                </ul>
+              )}
+            </CollapsibleList>
+
+            <CollapsibleList
+              title="Permanent"
+              count={permanentList.length}
+              subtitle={
+                permanentOnCount > 0
+                  ? `${permanentOnCount} on your list · auto-log each day while enabled`
+                  : "Habits that auto-log each day once added"
+              }
+              open={permanentOpen}
+              onToggle={() => setPermanentOpen((v) => !v)}
+            >
+              {permanentList.length === 0 ? (
+                <p className="px-2 py-4 text-center text-sm text-muted">
+                  {q
+                    ? "No matching permanent habits."
+                    : "No permanent habits in the catalog."}
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {permanentList.map((p) =>
+                    renderRow(p, available.has(p.id) ? "remove" : "add"),
+                  )}
                 </ul>
               )}
             </CollapsibleList>

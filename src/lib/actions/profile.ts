@@ -27,6 +27,16 @@ export async function updateRecoveryEmailAction(
   formData: FormData,
 ): Promise<ProfileFormState> {
   const userId = await uid();
+
+  const [guestRow] = await db
+    .select({ isGuest: users.isGuest })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (guestRow?.isGuest) {
+    return { error: "Save an account first to add a recovery email." };
+  }
+
   const ip = await getClientIp();
   const limit = await consumeRateLimit(
     `email-change:ip:${ip}`,

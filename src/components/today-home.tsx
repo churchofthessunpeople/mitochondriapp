@@ -78,6 +78,9 @@ type Props = {
   onOpenSheet?: OpenAppSheet;
   isAdmin?: boolean;
   onAdminEditContent?: (focus: string) => void;
+  isGuest?: boolean;
+  /** Tour can force Checklist / Place while the coachmark is running */
+  tourSection?: TodaySection | null;
 };
 
 const TABS: {
@@ -136,12 +139,28 @@ export function TodayHome({
   onOpenSheet,
   isAdmin = false,
   onAdminEditContent,
+  isGuest = false,
+  tourSection = null,
 }: Props) {
   const hasPlace = Boolean(placeLabel || region);
+  const sectionTabs = useMemo(
+    () =>
+      isGuest ? TABS.filter((t) => t.id !== "leaderboard") : TABS,
+    [isGuest],
+  );
   const [section, setSection] = useState<TodaySection>(() => {
     if (initialSection === "catalog") return "checklist";
+    if (isGuest && initialSection === "leaderboard") {
+      return hasPlace ? "checklist" : "place";
+    }
     return initialSection ?? (hasPlace ? "checklist" : "place");
   });
+
+  useEffect(() => {
+    if (!tourSection) return;
+    if (tourSection === "leaderboard" && isGuest) return;
+    setSection(tourSection === "catalog" ? "checklist" : tourSection);
+  }, [tourSection, isGuest]);
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [liveCounts, setLiveCounts] = useState(completionCounts);
   const [liveDurations, setLiveDurations] = useState(completionDurations ?? {});
@@ -221,6 +240,7 @@ export function TodayHome({
   }, [initialSection]);
 
   function selectSection(next: TodaySection) {
+    if (isGuest && next === "leaderboard") return;
     const resolved = next === "catalog" ? "checklist" : next;
     setSection(resolved);
     try {
@@ -308,12 +328,30 @@ export function TodayHome({
 
   return (
     <div className="space-y-3">
+      {isGuest && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3">
+          <p className="min-w-0 flex-1 text-sm text-foreground/90">
+            Guest mode — save an account to keep history and join the
+            leaderboard.
+          </p>
+          {onOpenSheet && (
+            <button
+              type="button"
+              onClick={() => onOpenSheet({ id: "convertGuest" })}
+              className="btn-primary shrink-0 rounded-xl px-3 py-2 text-xs font-semibold"
+            >
+              Save progress
+            </button>
+          )}
+        </div>
+      )}
+
       <div
         className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-foreground/[0.03] p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="tablist"
         aria-label="Today sections"
       >
-        {TABS.map((t) => {
+        {sectionTabs.map((t) => {
           const active = section === t.id;
           const Icon = t.icon;
           return (
@@ -322,6 +360,13 @@ export function TodayHome({
               type="button"
               role="tab"
               aria-selected={active}
+              data-tour={
+                t.id === "place"
+                  ? "today-tab-place"
+                  : t.id === "checklist"
+                    ? "today-tab-checklist"
+                    : undefined
+              }
               onClick={() => selectSection(t.id)}
               className={cn(
                 "flex min-w-0 flex-1 shrink-0 flex-col items-center gap-0.5 rounded-xl px-2 py-2 transition sm:flex-row sm:gap-2 sm:px-3 sm:py-2.5",
@@ -341,7 +386,10 @@ export function TodayHome({
       </div>
 
       {section === "checklist" && (
-        <div className="rounded-2xl border border-border bg-foreground/[0.02]">
+        <div
+          className="rounded-2xl border border-border bg-foreground/[0.02]"
+          data-tour="today-overview"
+        >
           <button
             type="button"
             onClick={() => setOverviewOpen((o) => !o)}
@@ -515,7 +563,7 @@ export function TodayHome({
         )}
 
         {section === "place" && (
-          <div className="space-y-4">
+          <div className="space-y-4" data-tour="place-panel">
             <p className="text-sm text-muted">
               <strong className="font-medium text-foreground">Light</strong>{" "}
               environment (sun times, latitude) and{" "}
@@ -600,7 +648,7 @@ export function TodayHome({
           </div>
         )}
 
-        {section === "leaderboard" && currentUserId && (
+        {section === "leaderboard" && currentUserId && !isGuest && (
           <div className="space-y-3">
             <LeaderboardPanel
               compact

@@ -1,13 +1,22 @@
 import { asc, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { dailyCompletions } from "@/db/schema";
+import { dailyCompletions, users } from "@/db/schema";
 import { getCatalogProtocolById } from "@/lib/catalog";
 
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
+  }
+
+  const [row] = await db
+    .select({ isGuest: users.isGuest })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+  if (row?.isGuest) {
+    return new Response("Save an account to export history", { status: 403 });
   }
 
   const rows = await db

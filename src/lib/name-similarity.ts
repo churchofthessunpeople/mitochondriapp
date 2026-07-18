@@ -1,5 +1,8 @@
-/** Usernames: reject when more than 25% similar (must be ≥75% different). */
-export const MIN_USERNAME_DISSIMILARITY = 0.75;
+/**
+ * Reject when more than 90% similar (must be ≥10% different).
+ * Same bar for usernames and display names.
+ */
+export const MIN_USERNAME_DISSIMILARITY = 0.1;
 
 /** Display names: reject only when more than 90% similar (allows Steve → Steve Sermons). */
 export const MIN_DISPLAY_NAME_DISSIMILARITY = 0.1;

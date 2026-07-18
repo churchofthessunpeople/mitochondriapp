@@ -55,6 +55,15 @@ export async function updateDisplayNameAction(
 ): Promise<AccountFormState> {
   const userId = await requireUserId();
 
+  const [guestRow] = await db
+    .select({ isGuest: users.isGuest })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (guestRow?.isGuest) {
+    return { error: "Save an account first to set a display name." };
+  }
+
   const parsed = profileSchema.safeParse({
     displayName: formData.get("displayName"),
   });
@@ -128,6 +137,16 @@ export async function updatePasswordAction(
   formData: FormData,
 ): Promise<AccountFormState> {
   const userId = await requireUserId();
+
+  const [guestRow] = await db
+    .select({ isGuest: users.isGuest })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  if (guestRow?.isGuest) {
+    return { error: "Save an account first to set a password." };
+  }
+
   const ip = await getClientIp();
 
   const limit = await consumeRateLimit(

@@ -62,9 +62,9 @@ export default async function AppPage({
   await redirectIfNeedsOnboarding(session.user.id);
 
   const params = await searchParams;
-  const initialTab = tabFromSearchParam(params.t);
-  const initialAccountSection = accountSectionFromSearchParam(params.t);
-  const initialTodaySection = todaySectionFromSearchParam(params.t);
+  let initialTab = tabFromSearchParam(params.t);
+  let initialAccountSection = accountSectionFromSearchParam(params.t);
+  let initialTodaySection = todaySectionFromSearchParam(params.t);
   const initialMitoLesson = mitoLessonFromSearchParam(params.lesson);
   const initialOpenAdmin =
     (Array.isArray(params.t) ? params.t[0] : params.t) === "admin";
@@ -93,6 +93,13 @@ export default async function AppPage({
   const allProtocols = appContent.protocols;
 
   if (!fullUser) redirect(ROUTES.login);
+
+  const isGuest = Boolean(fullUser.isGuest);
+  if (isGuest) {
+    if (initialTab === "account") initialTab = "schedule";
+    initialAccountSection = null;
+    if (initialTodaySection === "leaderboard") initialTodaySection = "checklist";
+  }
 
   const loc = effectiveLocation({
     ...userFlags!,
@@ -295,6 +302,8 @@ export default async function AppPage({
       }))}
       reminderSunPresets={reminderSunPresets}
       appContent={appContent}
+      isGuest={isGuest}
+      tutorialComplete={Boolean(fullUser.tutorialComplete)}
     />
   );
 }

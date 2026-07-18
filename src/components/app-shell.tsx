@@ -1,13 +1,14 @@
 "use client";
 
-import { CalendarCheck, GraduationCap, Shield, User } from "lucide-react";
+import { CalendarCheck, GraduationCap, Shield, UserRoundPlus, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import type { HistoryRow, ReminderRow } from "@/components/account-home";
 import type { AccountPanelUser } from "@/components/account-panel";
 import { AppContentProvider } from "@/components/app-content-context";
+import { AppTutorial } from "@/components/app-tutorial";
 import type { AppContentBundle } from "@/lib/content-overrides";
 import { AppSheet } from "@/components/app-sheet";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
@@ -16,11 +17,20 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { TodayHome } from "@/components/today-home";
 import type { AccountSection, AppTab, TodaySection } from "@/lib/app-tabs";
 import type { AppSheet as AppSheetState } from "@/lib/app-sheets";
+import type { TourStep } from "@/lib/app-tour";
 import type { PlaceFactors } from "@/lib/place-factors";
 import { ROUTES } from "@/lib/routes";
 import type { SunTimes } from "@/lib/sun";
 import type { WeeklySummary } from "@/lib/weekly";
 import { cn } from "@/lib/utils";
+
+const ConvertGuestPanel = dynamic(
+  () =>
+    import("@/components/convert-guest-panel").then((m) => ({
+      default: m.ConvertGuestPanel,
+    })),
+  { ssr: false },
+);
 
 const AccountHome = dynamic(
   () =>
@@ -161,6 +171,8 @@ export type AppShellProps = {
     afterSunrise?: string | null;
   };
   appContent: AppContentBundle;
+  isGuest?: boolean;
+  tutorialComplete?: boolean;
 };
 
 /**
@@ -214,11 +226,23 @@ export function AppShell({
   reminders,
   reminderSunPresets,
   appContent,
+  isGuest = false,
+  tutorialComplete = true,
 }: AppShellProps) {
-  const [tab, setTabState] = useState<AppTab>(initialTab);
+  const guestSafeInitialTab: AppTab =
+    isGuest && initialTab === "account" ? "schedule" : initialTab;
+  const guestSafeTodaySection: TodaySection | null =
+    isGuest && initialTodaySection === "leaderboard"
+      ? "checklist"
+      : initialTodaySection;
+
+  const [tab, setTabState] = useState<AppTab>(guestSafeInitialTab);
   const [sheet, setSheet] = useState<AppSheetState | null>(
-    initialOpenAdmin && isAdmin ? { id: "admin" } : null,
+    initialOpenAdmin && isAdmin && !isGuest ? { id: "admin" } : null,
   );
+  const [showTutorial, setShowTutorial] = useState(!tutorialComplete);
+  const [tourTodaySection, setTourTodaySection] =
+    useState<TodaySection | null>(null);
   const [adminContentFocus, setAdminContentFocus] = useState<string | null>(
     null,
   );
@@ -265,26 +289,38 @@ export function AppShell({
     }
   }, [availableIds, dayPoints, streak, dateLabel]);
 
-  const setTab = useCallback((next: AppTab) => {
-    setSheet(null);
-    setTabState(next);
-    try {
-      const url =
-        next === "schedule"
-          ? ROUTES.home
-          : next === "mitoversity"
-            ? ROUTES.mitoversity
-            : ROUTES.account;
-      window.history.replaceState(null, "", url);
-    } catch {
-      /* ignore */
-    }
-    try {
-      window.scrollTo({ top: 0, behavior: "auto" });
-    } catch {
-      window.scrollTo(0, 0);
-    }
-  }, []);
+  const navItems = useMemo(
+    () => (isGuest ? NAV.filter((item) => item.id !== "account") : NAV),
+    [isGuest],
+  );
+
+  const setTab = useCallback(
+    (next: AppTab) => {
+      if (isGuest && next === "account") {
+        setSheet({ id: "convertGuest" });
+        return;
+      }
+      setSheet(null);
+      setTabState(next);
+      try {
+        const url =
+          next === "schedule"
+            ? ROUTES.home
+            : next === "mitoversity"
+              ? ROUTES.mitoversity
+              : ROUTES.account;
+        window.history.replaceState(null, "", url);
+      } catch {
+        /* ignore */
+      }
+      try {
+        window.scrollTo({ top: 0, behavior: "auto" });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+    },
+    [isGuest],
+  );
 
   const openSheet = useCallback((next: AppSheetState) => {
     setSheet(next);
@@ -310,9 +346,36 @@ export function AppShell({
     setAdminContentFocus(null);
   }, []);
 
+  const prepareTourStep = useCallback(
+    (step: TourStep) => {
+      setSheet(null);
+      if (step.appTab) {
+        setTabState(step.appTab);
+      }
+      if (step.todaySection) {
+        setTourTodaySection(step.todaySection);
+      } else {
+        setTourTodaySection(null);
+      }
+    },
+    [],
+  );
+
   return (
     <AppContentProvider content={appContent}>
     <div className="min-h-screen pb-[calc(6rem+var(--site-disclaimer-offset))] md:pb-[calc(4rem+var(--site-disclaimer-offset))]">
+      {showTutorial && (
+        <AppTutorial
+          isGuest={isGuest}
+          onDone={() => {
+            setShowTutorial(false);
+            setTab("schedule");
+            setTourTodaySection("checklist");
+          }}
+          onPrepareStep={prepareTourStep}
+        />
+      )}
+
       <SunriseCheckIn
         userId={currentUserId}
         todayIso={todayIso}
@@ -321,7 +384,8 @@ export function AppShell({
         allProtocols={allProtocols}
         sun={sun}
         timeZone={timeZone}
-        forceOpen={forceSunriseCheckIn}
+        paused={showTutorial}
+        forceOpen={forceSunriseCheckIn && !showTutorial}
         onLogged={(mult) => {
           setMorningLightDone(true);
           setSunriseMultiplier(mult);
@@ -350,10 +414,17 @@ export function AppShell({
 
           <div className="flex items-center gap-1 sm:gap-2">
             <nav className="hidden items-center gap-1 md:flex">
-              {NAV.map((item) => (
+              {navItems.map((item) => (
                 <button
                   key={item.id}
                   type="button"
+                  data-tour={
+                    item.id === "mitoversity"
+                      ? "nav-mitoversity"
+                      : item.id === "schedule"
+                        ? "nav-today"
+                        : undefined
+                  }
                   onClick={() => setTab(item.id)}
                   className={cn(
                     "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
@@ -365,7 +436,22 @@ export function AppShell({
                   {item.label}
                 </button>
               ))}
-              {isAdmin && (
+              {isGuest && (
+                <button
+                  type="button"
+                  data-tour="nav-save-progress"
+                  onClick={() => openSheet({ id: "convertGuest" })}
+                  className={cn(
+                    "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
+                    sheet?.id === "convertGuest"
+                      ? "bg-foreground/10 text-foreground"
+                      : "text-muted hover:bg-foreground/5 hover:text-foreground",
+                  )}
+                >
+                  Save progress
+                </button>
+              )}
+              {isAdmin && !isGuest && (
                 <button
                   type="button"
                   onClick={() => openSheet({ id: "admin" })}
@@ -465,6 +551,16 @@ export function AppShell({
           </AppSheet>
         )}
 
+        {sheet?.id === "convertGuest" && (
+          <AppSheet
+            title="Save your progress"
+            subtitle="Create a username to keep history and unlock the leaderboard"
+            onClose={closeSheet}
+          >
+            <ConvertGuestPanel />
+          </AppSheet>
+        )}
+
         {!sheet && tab === "schedule" && (
           <TodayHome
             dateLabel={dateLabel}
@@ -497,24 +593,26 @@ export function AppShell({
             travelLabel={travelLabel}
             magneticoGauss={magneticoGauss}
             sleepRoomTempF={sleepRoomTempF}
-            initialSection={initialTodaySection}
+            initialSection={guestSafeTodaySection}
             leaderboards={leaderboards}
             currentUserId={currentUserId}
             onOpenSheet={openSheet}
-            isAdmin={isAdmin}
+            isAdmin={isAdmin && !isGuest}
             onAdminEditContent={openAdminContent}
+            isGuest={isGuest}
+            tourSection={tourTodaySection}
           />
         )}
 
         {!sheet && tab === "mitoversity" && (
           <MitoversityHome
             initialEntryId={initialMitoLesson}
-            isAdmin={isAdmin}
+            isAdmin={isAdmin && !isGuest}
             onAdminEditContent={openAdminContent}
           />
         )}
 
-        {!sheet && tab === "account" && (
+        {!sheet && tab === "account" && !isGuest && (
           <AccountHome
             user={accountUser}
             initialSection={accountSection}
@@ -534,12 +632,19 @@ export function AppShell({
         aria-label="Main"
       >
         <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">
-          {NAV.map(({ id, label, shortLabel, icon: Icon }) => {
+          {navItems.map(({ id, label, shortLabel, icon: Icon }) => {
             const active = tab === id && !sheet;
             return (
               <li key={id} className="flex-1">
                 <button
                   type="button"
+                  data-tour={
+                    id === "mitoversity"
+                      ? "nav-mitoversity"
+                      : id === "schedule"
+                        ? "nav-today"
+                        : undefined
+                  }
                   onClick={() => setTab(id)}
                   className={cn(
                     "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
@@ -553,7 +658,26 @@ export function AppShell({
               </li>
             );
           })}
-          {isAdmin && (
+          {isGuest && (
+            <li className="flex-1">
+              <button
+                type="button"
+                data-tour="nav-save-progress"
+                onClick={() => openSheet({ id: "convertGuest" })}
+                className={cn(
+                  "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
+                  sheet?.id === "convertGuest"
+                    ? "text-accent"
+                    : "text-muted hover:text-foreground",
+                )}
+                aria-label="Save progress"
+              >
+                <UserRoundPlus className="h-5 w-5" />
+                Save
+              </button>
+            </li>
+          )}
+          {isAdmin && !isGuest && (
             <li className="flex-1">
               <button
                 type="button"

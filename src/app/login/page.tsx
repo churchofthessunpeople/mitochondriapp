@@ -4,7 +4,11 @@ import { ThemeToggle } from "@/components/theme-toggle";
 export const metadata = { title: "Sign in" };
 
 type Props = {
-  searchParams: Promise<{ verify?: string; passwordUpdated?: string }>;
+  searchParams: Promise<{
+    verify?: string;
+    passwordUpdated?: string;
+    guestError?: string;
+  }>;
 };
 
 export default async function LoginPage({ searchParams }: Props) {
@@ -12,6 +16,10 @@ export default async function LoginPage({ searchParams }: Props) {
   let banner: string | undefined;
   if (params.passwordUpdated) {
     banner = "Password updated. Sign in with your username and new password.";
+  } else if (params.guestError === "rate") {
+    banner = "Too many guest starts from this network. Try again later, or create an account.";
+  } else if (params.guestError) {
+    banner = "Could not start guest mode. Try again or create an account.";
   }
 
   return (

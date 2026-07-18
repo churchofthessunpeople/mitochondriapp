@@ -4,16 +4,19 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      isGuest?: boolean;
     } & DefaultSession["user"];
   }
 
   interface User {
     sessionVersion?: number;
+    isGuest?: boolean;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     sv?: number;
+    isGuest?: boolean;
   }
 }

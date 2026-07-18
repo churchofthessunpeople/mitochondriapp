@@ -132,7 +132,7 @@ const DEFAULT_SECTIONS_OPEN: Record<ChecklistSectionId, boolean> = {
   suggested: true,
   available: true,
   performed: true,
-  permanent: false,
+  permanent: true,
 };
 
 function CollapsibleChecklistSection({
@@ -143,6 +143,7 @@ function CollapsibleChecklistSection({
   open,
   onToggle,
   children,
+  tourId,
 }: {
   title: string;
   count: number;
@@ -151,9 +152,10 @@ function CollapsibleChecklistSection({
   open: boolean;
   onToggle: () => void;
   children: ReactNode;
+  tourId?: string;
 }) {
   return (
-    <section className="space-y-2">
+    <section className="space-y-2" data-tour={tourId}>
       <button
         type="button"
         onClick={onToggle}
@@ -657,6 +659,7 @@ export function ScheduleDay({
         accent
         open={sectionsOpen.morningLight}
         onToggle={() => toggleSection("morningLight")}
+        tourId="morning-light"
       >
         <div className="space-y-1.5">
           <div className="flex items-stretch gap-1.5">
@@ -715,12 +718,21 @@ export function ScheduleDay({
     return (
       <button
         type="button"
+        data-tour="edit-activities"
         onClick={() => setAddActivityOpen(true)}
         className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-accent/40 bg-accent/5 px-3.5 py-2.5 text-sm font-semibold text-accent transition hover:border-accent/60 hover:bg-accent/10"
       >
         <Pencil className="h-4 w-4" strokeWidth={2.5} />
         Edit activities
       </button>
+    );
+  }
+
+  function renderEmptyHint(copy: string) {
+    return (
+      <p className="rounded-2xl border border-dashed border-border px-3.5 py-3 text-xs leading-relaxed text-muted">
+        {copy}
+      </p>
     );
   }
 
@@ -1131,65 +1143,80 @@ export function ScheduleDay({
         </>
       )}
 
-      {protocols.length === 0 ? (
-        <div className="space-y-5">
-          {renderSunriseSection()}
-          {renderAddActivityButton()}
-          <div className="glass rounded-3xl border border-dashed border-border p-6 text-center">
-            <p className="font-medium">No activities on your list yet</p>
-            <p className="mt-2 text-sm text-muted">
-              Tap Edit activities above to choose what you can actually do.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-5">
-          {renderSunriseSection()}
-          {renderAddActivityButton()}
-          {suggested.length > 0 && (
-            <CollapsibleChecklistSection
-              title="Suggested"
-              count={suggested.length}
-              accent
-              open={sectionsOpen.suggested}
-              onToggle={() => toggleSection("suggested")}
-            >
-              <ul className="space-y-2">{suggested.map(renderRow)}</ul>
-            </CollapsibleChecklistSection>
+      <div className="space-y-5">
+        {renderSunriseSection()}
+        {renderAddActivityButton()}
+
+        <CollapsibleChecklistSection
+          title="Suggested"
+          count={suggested.length}
+          accent
+          open={sectionsOpen.suggested}
+          onToggle={() => toggleSection("suggested")}
+          tourId="section-suggested"
+        >
+          {suggested.length > 0 ? (
+            <ul className="space-y-2">{suggested.map(renderRow)}</ul>
+          ) : (
+            renderEmptyHint(
+              protocols.length === 0
+                ? "Add activities to see phase-timed suggestions here."
+                : "Nothing fits this sun phase right now — check Available below.",
+            )
           )}
-          {available.length > 0 && (
-            <CollapsibleChecklistSection
-              title="Available"
-              count={available.length}
-              open={sectionsOpen.available}
-              onToggle={() => toggleSection("available")}
-            >
-              <ul className="space-y-2">{available.map(renderRow)}</ul>
-            </CollapsibleChecklistSection>
+        </CollapsibleChecklistSection>
+
+        <CollapsibleChecklistSection
+          title="Available"
+          count={available.length}
+          open={sectionsOpen.available}
+          onToggle={() => toggleSection("available")}
+          tourId="section-available"
+        >
+          {available.length > 0 ? (
+            <ul className="space-y-2">{available.map(renderRow)}</ul>
+          ) : (
+            renderEmptyHint(
+              protocols.length === 0
+                ? "Tap Edit activities to build your list."
+                : "All remaining activities are suggested above, or already performed.",
+            )
           )}
-          {performed.length > 0 && (
-            <CollapsibleChecklistSection
-              title="Performed"
-              count={performed.length}
-              open={sectionsOpen.performed}
-              onToggle={() => toggleSection("performed")}
-            >
-              <ul className="space-y-2">{performed.map(renderRow)}</ul>
-            </CollapsibleChecklistSection>
+        </CollapsibleChecklistSection>
+
+        <CollapsibleChecklistSection
+          title="Performed"
+          count={performed.length}
+          open={sectionsOpen.performed}
+          onToggle={() => toggleSection("performed")}
+          tourId="section-performed"
+        >
+          {performed.length > 0 ? (
+            <ul className="space-y-2">{performed.map(renderRow)}</ul>
+          ) : (
+            renderEmptyHint(
+              "Logged activities for today show up here once you check them off.",
+            )
           )}
-          {permanentProtocols.length > 0 && (
-            <CollapsibleChecklistSection
-              title="Permanent"
-              count={permanentProtocols.length}
-              subtitle="On your available list — logged each day. Tap to skip tonight if needed."
-              open={sectionsOpen.permanent}
-              onToggle={() => toggleSection("permanent")}
-            >
-              <ul className="space-y-2">{permanentProtocols.map(renderRow)}</ul>
-            </CollapsibleChecklistSection>
+        </CollapsibleChecklistSection>
+
+        <CollapsibleChecklistSection
+          title="Permanent"
+          count={permanentProtocols.length}
+          subtitle="On your available list — logged each day. Tap to skip tonight if needed."
+          open={sectionsOpen.permanent}
+          onToggle={() => toggleSection("permanent")}
+          tourId="section-permanent"
+        >
+          {permanentProtocols.length > 0 ? (
+            <ul className="space-y-2">{permanentProtocols.map(renderRow)}</ul>
+          ) : (
+            renderEmptyHint(
+              "Add a permanent habit (like cool bedroom sleep) via Edit activities — it auto-logs each day.",
+            )
           )}
-        </div>
-      )}
+        </CollapsibleChecklistSection>
+      </div>
 
       <ProtocolHowToDialog
         protocol={howToFor}

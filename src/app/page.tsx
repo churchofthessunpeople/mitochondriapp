@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/auth";
+import { GuestStartButton } from "@/components/guest-start-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ROUTES } from "@/lib/routes";
 import { redirect } from "next/navigation";
@@ -62,14 +63,15 @@ export default async function HomePage() {
           >
             Create account
           </Link>
+          <GuestStartButton className="btn-secondary flex h-12 w-full items-center justify-center rounded-2xl text-[15px] font-semibold transition active:scale-[0.98] hover:bg-foreground/5" />
           <Link
             href={ROUTES.login}
-            className="btn-secondary flex h-12 w-full items-center justify-center rounded-2xl text-[15px] font-semibold transition active:scale-[0.98] hover:bg-foreground/5"
+            className="flex h-11 w-full items-center justify-center rounded-2xl text-sm font-medium text-muted transition hover:text-foreground"
           >
             Sign in
           </Link>
-          <p className="pt-2 text-center text-xs text-muted">
-            Username signup · firelight theme · points & streaks
+          <p className="pt-1 text-center text-xs text-muted">
+            Guest mode keeps today&apos;s progress — save an account anytime
           </p>
         </div>
       </main>

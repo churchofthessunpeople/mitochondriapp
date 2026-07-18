@@ -20,7 +20,7 @@ export async function getDisplayNameConflictError(
 ): Promise<string | null> {
   const trimmed = candidate.trim();
   if (isReservedUsername(trimmed)) {
-    return "That display name is not available.";
+    return "Display name: that name is not available.";
   }
 
   const rows = options?.excludeUserId
@@ -47,9 +47,9 @@ export async function getDisplayNameConflictError(
     existing,
     {
       taken:
-        "That display name is taken. Choose another that is less than 90% similar to existing names.",
+        "Display name: already taken. Choose another that is less than 90% similar to existing names.",
       similar:
-        "That display name is too similar to an existing one (must be less than 90% similar).",
+        "Display name: too similar to an existing name (must be less than 90% similar).",
     },
     MIN_DISPLAY_NAME_DISSIMILARITY,
   );

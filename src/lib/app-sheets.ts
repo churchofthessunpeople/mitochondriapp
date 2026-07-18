@@ -6,6 +6,7 @@ export type AppSheet =
   | { id: "admin" }
   | { id: "guideLight" }
   | { id: "guideWater" }
-  | { id: "guideMagnetism" };
+  | { id: "guideMagnetism" }
+  | { id: "convertGuest" };
 
 export type OpenAppSheet = (sheet: AppSheet) => void;

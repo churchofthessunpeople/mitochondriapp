@@ -115,6 +115,8 @@ export async function getClientIp(): Promise<string> {
 export const AUTH_RATE = {
   login: { limit: 10, windowMs: 15 * 60 * 1000 },
   register: { limit: 5, windowMs: 60 * 60 * 1000 },
+  /** Guest account creation — tighter than register to limit DB spam. */
+  guest: { limit: 8, windowMs: 60 * 60 * 1000 },
   passwordChange: { limit: 5, windowMs: 15 * 60 * 1000 },
   emailChange: { limit: 5, windowMs: 15 * 60 * 1000 },
   verifyResend: { limit: 3, windowMs: 60 * 60 * 1000 },

@@ -105,7 +105,11 @@ export const users = pgTable("users", {
   /** ISO date YYYY-MM-DD when travel mode expires (inclusive) */
   travelUntil: text("travel_until"),
   isAdmin: boolean("is_admin").notNull().default(false),
+  /** Anonymous try-before-signup account; can convert to a real username later. */
+  isGuest: boolean("is_guest").notNull().default(false),
   onboardingComplete: boolean("onboarding_complete").notNull().default(false),
+  /** First-run click-through tutorial dismissed. */
+  tutorialComplete: boolean("tutorial_complete").notNull().default(false),
   showOnLeaderboard: boolean("show_on_leaderboard").notNull().default(true),
   /** Last successful display name change (for monthly cooldown). */
   displayNameChangedAt: timestamp("display_name_changed_at", { mode: "date" }),

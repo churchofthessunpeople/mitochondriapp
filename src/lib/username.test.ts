@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  MIN_USERNAME_DISSIMILARITY,
+  nameConflictMessage,
+} from "@/lib/name-similarity";
+import {
   usernameConflictMessage,
   usernameDissimilarity,
   usernameSimilarity,
@@ -12,13 +16,26 @@ describe("username similarity", () => {
     assert.equal(usernameDissimilarity("alice", "Alice"), 0);
   });
 
-  it("rejects near-duplicates under the 75% rule", () => {
-    assert.ok(usernameDissimilarity("alice", "alice1") < 0.75);
-    assert.match(
-      usernameConflictMessage("alice1", ["alice"], {
+  it("allows short distinct names under the 90% rule", () => {
+    assert.ok(usernameSimilarity("smm", "ssm") < 0.9);
+    assert.equal(
+      usernameConflictMessage("smm", ["ssm"], {
         taken: "taken",
         similar: "too similar",
-      }) ?? "",
+      }),
+      null,
+    );
+  });
+
+  it("rejects near-identical usernames under the 90% rule", () => {
+    assert.ok(usernameSimilarity("christopher", "christophe") > 0.9);
+    assert.match(
+      nameConflictMessage(
+        "christophe",
+        ["christopher"],
+        { taken: "taken", similar: "too similar" },
+        MIN_USERNAME_DISSIMILARITY,
+      ) ?? "",
       /too similar/i,
     );
   });
@@ -34,13 +51,14 @@ describe("username similarity", () => {
     );
   });
 
-  it("prompts for a dissimilar name when exact match exists", () => {
+  it("prompts when an exact match exists", () => {
     assert.match(
       usernameConflictMessage("alice", ["alice"], {
-        taken: "That username is taken. Choose another that is at least 75% different.",
+        taken:
+          "Username: already taken. Choose another that is less than 90% similar to existing usernames.",
         similar: "similar",
       }) ?? "",
-      /taken.*75%/i,
+      /Username:.*taken.*90%/i,
     );
   });
 });

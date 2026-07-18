@@ -34,6 +34,8 @@ type Props = {
   timeZone: string;
   /** After onboarding — show even if this browser dismissed for another user */
   forceOpen?: boolean;
+  /** Hold closed (e.g. while the first-run tour is active). */
+  paused?: boolean;
   onLogged?: (multiplier: number) => void;
 };
 
@@ -49,6 +51,7 @@ export function SunriseCheckIn({
   sun,
   timeZone,
   forceOpen = false,
+  paused = false,
   onLogged,
 }: Props) {
   const router = useRouter();
@@ -66,6 +69,10 @@ export function SunriseCheckIn({
   }, [todayIso]);
 
   useEffect(() => {
+    if (paused) {
+      setOpen(false);
+      return;
+    }
     if (morningLightLogged || sunriseMultiplier > 1) {
       setOpen(false);
       return;
@@ -87,7 +94,14 @@ export function SunriseCheckIn({
       /* private mode */
     }
     setOpen(true);
-  }, [userId, todayIso, sunriseMultiplier, morningLightLogged, forceOpen]);
+  }, [
+    userId,
+    todayIso,
+    sunriseMultiplier,
+    morningLightLogged,
+    forceOpen,
+    paused,
+  ]);
 
   function dismissSession() {
     try {

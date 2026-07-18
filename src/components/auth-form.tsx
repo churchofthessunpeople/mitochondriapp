@@ -3,8 +3,9 @@
 import { Copy, Eye, EyeOff, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useState } from "react";
 import type { AuthFormState } from "@/lib/actions/auth";
+import { GuestStartButton } from "@/components/guest-start-button";
 import { loginAction, registerAction } from "@/lib/actions/auth";
 import { generateStrongPassword } from "@/lib/generate-password";
 import { ROUTES } from "@/lib/routes";
@@ -21,27 +22,22 @@ export function AuthForm({
 }) {
   const action = mode === "login" ? loginAction : registerAction;
   const [state, formAction, pending] = useActionState(action, {});
-  const passwordRef = useRef<HTMLInputElement>(null);
+  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [generatedHint, setGeneratedHint] = useState(false);
 
-  function applyPassword(value: string) {
-    const input = passwordRef.current;
-    if (!input) return;
-    input.value = value;
+  function handleGeneratePassword() {
+    setPassword(generateStrongPassword());
+    setShowPassword(true);
     setGeneratedHint(true);
   }
 
-  function handleGeneratePassword() {
-    applyPassword(generateStrongPassword());
-    setShowPassword(true);
-  }
-
   async function handleCopyPassword() {
-    const value = passwordRef.current?.value;
-    if (!value) return;
+    if (!password) return;
     try {
-      await navigator.clipboard.writeText(value);
+      await navigator.clipboard.writeText(password);
       setGeneratedHint(true);
     } catch {
       /* ignore — user can still copy manually */
@@ -90,6 +86,8 @@ export function AuthForm({
             placeholder="e.g. solarmike"
             pattern="[A-Za-z][A-Za-z0-9_]*"
             title="Start with a letter; letters, numbers, underscores only"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
           />
         </label>
@@ -105,6 +103,8 @@ export function AuthForm({
               minLength={2}
               maxLength={40}
               placeholder="Shown on the leaderboard (optional)"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
               className="field-input w-full rounded-2xl px-4 py-3 text-[15px]"
             />
           </label>
@@ -128,7 +128,6 @@ export function AuthForm({
           </div>
           <div className="flex gap-2">
             <input
-              ref={passwordRef}
               name="password"
               type={showPassword ? "text" : "password"}
               required
@@ -140,6 +139,8 @@ export function AuthForm({
               placeholder={
                 mode === "register" ? "At least 8 characters" : "••••••••"
               }
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="field-input min-w-0 flex-1 rounded-2xl px-4 py-3 text-[15px]"
             />
             {mode === "register" && (
@@ -198,11 +199,14 @@ export function AuthForm({
       </form>
 
       {mode === "login" && (
-        <p className="mt-4 text-center text-sm">
-          <Link href="/forgot-password" className="text-accent hover:underline">
-            Forgot password?
-          </Link>
-        </p>
+        <div className="mt-4 space-y-3 text-center text-sm">
+          <p>
+            <Link href="/forgot-password" className="text-accent hover:underline">
+              Forgot password?
+            </Link>
+          </p>
+          <GuestStartButton className="text-muted underline-offset-2 hover:text-foreground hover:underline" />
+        </div>
       )}
 
       <p className="mt-6 text-center text-sm text-muted">
