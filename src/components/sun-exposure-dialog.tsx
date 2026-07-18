@@ -4,7 +4,7 @@ import { ArrowLeft, Sun } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  ClickThroughChoice,
+  OptionListChoice,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import { currentLocalHm } from "@/lib/sunrise-timing";
@@ -203,11 +203,11 @@ export function SunExposureDialog({
               <span className="font-medium text-foreground">
                 {slotDef.label}
               </span>{" "}
-              ({slotDef.clockLabel}). Browse and choose a slot below.
+              ({slotDef.clockLabel}). Tap your slot below.
             </p>
-            <ClickThroughChoice
+            <OptionListChoice
               options={slotOptions}
-              preferredId={slot}
+              selectedId={slot}
               disabled={pending}
               onChoose={(id) => {
                 const s = SUN_EXPOSURE_SLOTS.find((x) => x.id === id);
@@ -223,9 +223,9 @@ export function SunExposureDialog({
 
         {step === "grounded" && (
           <div className="mt-4">
-            <ClickThroughChoice
+            <OptionListChoice
               options={groundedOptions}
-              preferredId={grounded ? "yes" : "no"}
+              selectedId={grounded ? "yes" : "no"}
               disabled={pending}
               onChoose={(id) => {
                 setGrounded(id === "yes");
@@ -237,9 +237,9 @@ export function SunExposureDialog({
 
         {step === "skin" && (
           <div className="mt-4">
-            <ClickThroughChoice
+            <OptionListChoice
               options={skinOptions}
-              preferredId={skin}
+              selectedId={skin}
               disabled={pending}
               onChoose={(id) => {
                 setSkin(id as SunSkinExposure);
@@ -264,15 +264,10 @@ export function SunExposureDialog({
                 for now.
               </p>
             </div>
-            <ClickThroughChoice
+            <OptionListChoice
               options={durationOptions}
-              preferredId={String(durationMins)}
+              selectedId={String(durationMins)}
               disabled={pending}
-              chooseLabel={
-                pending
-                  ? "Logging…"
-                  : `Log · ${slotDef.label}`
-              }
               onChoose={(id) => {
                 const mins = Number(id);
                 setDurationMins(mins);
@@ -280,8 +275,7 @@ export function SunExposureDialog({
               }}
             />
             <p className="text-center text-xs text-accent">
-              Preview ≈ {previewPts} pts at {durationMins} min (browse options
-              for other lengths)
+              Preview ≈ {previewPts} pts at {durationMins} min
             </p>
           </div>
         )}

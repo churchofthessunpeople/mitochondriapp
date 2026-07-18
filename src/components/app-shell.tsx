@@ -1,6 +1,5 @@
 "use client";
 
-import { CalendarCheck, GraduationCap, Shield, UserRoundPlus, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -99,18 +98,16 @@ const ScoringGuidePanel = dynamic(
 const NAV: {
   id: AppTab;
   label: string;
-  /** Shorter label for bottom nav */
+  /** Shorter label for compact layouts */
   shortLabel?: string;
-  icon: typeof CalendarCheck;
 }[] = [
-  { id: "schedule", label: "Today", icon: CalendarCheck },
+  { id: "schedule", label: "Today" },
   {
     id: "mitoversity",
     label: "Mitoversity",
     shortLabel: "Learn",
-    icon: GraduationCap,
   },
-  { id: "account", label: "Account", icon: User },
+  { id: "account", label: "Account" },
 ];
 
 const CACHE_KEY = "mitochondriapp-shell-v1";
@@ -363,7 +360,7 @@ export function AppShell({
 
   return (
     <AppContentProvider content={appContent}>
-    <div className="min-h-screen pb-[calc(6rem+var(--site-disclaimer-offset))] md:pb-[calc(4rem+var(--site-disclaimer-offset))]">
+    <div className="min-h-screen pb-[calc(3rem+var(--site-disclaimer-offset))]">
       {showTutorial && (
         <AppTutorial
           isGuest={isGuest}
@@ -396,53 +393,81 @@ export function AppShell({
         className="sticky top-0 z-40 border-b border-border backdrop-blur-xl"
         style={{ background: "var(--header-bg)" }}
       >
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
-          <button
-            type="button"
-            onClick={() => setTab("schedule")}
-            className="flex shrink-0 items-center text-left"
-            aria-label="Today"
-          >
-            <Image
-              src="/icons/app-icon.jpg"
-              alt="Mitochondriapp"
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-lg object-cover ring-1 ring-border"
-            />
-          </button>
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-center px-2 sm:h-16 sm:px-6">
+          <div className="flex items-center justify-center gap-0.5 sm:gap-2">
+            <nav
+              className="flex items-center gap-0.5 sm:gap-1"
+              aria-label="Primary left"
+            >
+              {navItems
+                .filter((item) => item.id !== "account")
+                .map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    data-tour={
+                      item.id === "mitoversity"
+                        ? "nav-mitoversity"
+                        : item.id === "schedule"
+                          ? "nav-today"
+                          : undefined
+                    }
+                    onClick={() => setTab(item.id)}
+                    className={cn(
+                      "shrink-0 rounded-full px-2 py-1.5 text-xs transition sm:px-3 sm:text-sm",
+                      tab === item.id && !sheet
+                        ? "bg-foreground/10 text-foreground"
+                        : "text-muted hover:bg-foreground/5 hover:text-foreground",
+                    )}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+            </nav>
 
-          <div className="flex items-center gap-1 sm:gap-2">
-            <nav className="hidden items-center gap-1 md:flex">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  data-tour={
-                    item.id === "mitoversity"
-                      ? "nav-mitoversity"
-                      : item.id === "schedule"
-                        ? "nav-today"
-                        : undefined
-                  }
-                  onClick={() => setTab(item.id)}
-                  className={cn(
-                    "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
-                    tab === item.id && !sheet
-                      ? "bg-foreground/10 text-foreground"
-                      : "text-muted hover:bg-foreground/5 hover:text-foreground",
-                  )}
-                >
-                  {item.label}
-                </button>
-              ))}
+            <button
+              type="button"
+              onClick={() => setTab("schedule")}
+              className="mx-1 flex shrink-0 items-center sm:mx-2"
+              aria-label="Today home"
+            >
+              <Image
+                src="/icons/app-icon.jpg"
+                alt="Mitochondriapp"
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-[0.65rem] object-cover ring-1 ring-border sm:h-10 sm:w-10"
+              />
+            </button>
+
+            <nav
+              className="flex items-center gap-0.5 sm:gap-1"
+              aria-label="Primary right"
+            >
+              {navItems
+                .filter((item) => item.id === "account")
+                .map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setTab(item.id)}
+                    className={cn(
+                      "shrink-0 rounded-full px-2 py-1.5 text-xs transition sm:px-3 sm:text-sm",
+                      tab === item.id && !sheet
+                        ? "bg-foreground/10 text-foreground"
+                        : "text-muted hover:bg-foreground/5 hover:text-foreground",
+                    )}
+                  >
+                    {item.label}
+                  </button>
+                ))}
               {isGuest && (
                 <button
                   type="button"
                   data-tour="nav-save-progress"
                   onClick={() => openSheet({ id: "convertGuest" })}
                   className={cn(
-                    "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
+                    "shrink-0 rounded-full px-2 py-1.5 text-xs transition sm:px-3 sm:text-sm",
                     sheet?.id === "convertGuest"
                       ? "bg-foreground/10 text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground",
@@ -456,7 +481,7 @@ export function AppShell({
                   type="button"
                   onClick={() => openSheet({ id: "admin" })}
                   className={cn(
-                    "shrink-0 rounded-full px-3 py-1.5 text-sm transition",
+                    "shrink-0 rounded-full px-2 py-1.5 text-xs transition sm:px-3 sm:text-sm",
                     sheet?.id === "admin"
                       ? "bg-foreground/10 text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground",
@@ -465,8 +490,8 @@ export function AppShell({
                   Admin
                 </button>
               )}
+              <ThemeToggle size="sm" className="shrink-0" />
             </nav>
-            <ThemeToggle size="sm" className="ml-1 shrink-0" />
           </div>
         </div>
       </header>
@@ -625,78 +650,6 @@ export function AppShell({
           />
         )}
       </main>
-
-      <nav
-        className="fixed inset-x-0 z-40 border-t border-border bg-[var(--header-bg)] pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur-xl md:hidden"
-        style={{ bottom: "var(--site-disclaimer-offset)" }}
-        aria-label="Main"
-      >
-        <ul className="mx-auto flex max-w-lg items-stretch justify-around px-1 pt-1">
-          {navItems.map(({ id, label, shortLabel, icon: Icon }) => {
-            const active = tab === id && !sheet;
-            return (
-              <li key={id} className="flex-1">
-                <button
-                  type="button"
-                  data-tour={
-                    id === "mitoversity"
-                      ? "nav-mitoversity"
-                      : id === "schedule"
-                        ? "nav-today"
-                        : undefined
-                  }
-                  onClick={() => setTab(id)}
-                  className={cn(
-                    "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
-                    active ? "text-accent" : "text-muted hover:text-foreground",
-                  )}
-                  aria-label={label}
-                >
-                  <Icon className="h-5 w-5" />
-                  {shortLabel ?? label}
-                </button>
-              </li>
-            );
-          })}
-          {isGuest && (
-            <li className="flex-1">
-              <button
-                type="button"
-                data-tour="nav-save-progress"
-                onClick={() => openSheet({ id: "convertGuest" })}
-                className={cn(
-                  "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
-                  sheet?.id === "convertGuest"
-                    ? "text-accent"
-                    : "text-muted hover:text-foreground",
-                )}
-                aria-label="Save progress"
-              >
-                <UserRoundPlus className="h-5 w-5" />
-                Save
-              </button>
-            </li>
-          )}
-          {isAdmin && !isGuest && (
-            <li className="flex-1">
-              <button
-                type="button"
-                onClick={() => openSheet({ id: "admin" })}
-                className={cn(
-                  "flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-[10px] font-medium transition",
-                  sheet?.id === "admin"
-                    ? "text-accent"
-                    : "text-muted hover:text-foreground",
-                )}
-                aria-label="Admin"
-              >
-                <Shield className="h-5 w-5" />
-                Admin
-              </button>
-            </li>
-          )}
-        </ul>
-      </nav>
     </div>
     </AppContentProvider>
   );

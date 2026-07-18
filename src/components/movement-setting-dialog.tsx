@@ -4,7 +4,7 @@ import { ArrowLeft, Footprints } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  ClickThroughChoice,
+  OptionListChoice,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
@@ -133,9 +133,9 @@ export function MovementSettingDialog({
 
         {step === "setting" ? (
           <div className="mt-4">
-            <ClickThroughChoice
+            <OptionListChoice
               options={settingOptions}
-              preferredId={setting}
+              selectedId={setting}
               disabled={pending}
               onChoose={(id) => {
                 setSetting(id as MovementSetting);
@@ -145,11 +145,10 @@ export function MovementSettingDialog({
           </div>
         ) : (
           <div className="mt-4 space-y-3">
-            <ClickThroughChoice
+            <OptionListChoice
               options={durationOptions}
-              preferredId={String(durationMins)}
+              selectedId={String(durationMins)}
               disabled={pending}
-              chooseLabel={pending ? "Logging…" : "Log this duration"}
               onChoose={(id) => {
                 const mins = Number(id);
                 setDurationMins(mins);

@@ -33,32 +33,49 @@ function FormMessage({
   return null;
 }
 
+import { AccountExpandCard } from "@/components/account-expand-card";
+
+export type AccountExpandProps = {
+  expanded: boolean;
+  onToggle: () => void;
+};
+
 function AccountSection({
+  id,
   title,
   description,
+  expanded,
+  onToggle,
   children,
 }: {
+  id: string;
   title: string;
   description: string;
+  expanded: boolean;
+  onToggle: () => void;
   children: React.ReactNode;
 }) {
   return (
-    <section className="glass rounded-3xl p-5 sm:p-6">
-      <h2 className="text-lg font-semibold tracking-tight text-foreground">
-        {title}
-      </h2>
-      <p className="mt-1 text-sm text-muted">{description}</p>
-      <div className="mt-5">{children}</div>
-    </section>
+    <AccountExpandCard
+      id={id}
+      title={title}
+      subtitle={description}
+      expanded={expanded}
+      onToggle={onToggle}
+    >
+      {children}
+    </AccountExpandCard>
   );
 }
 
 export function DisplayNameForm({
   initialDisplayName,
   changeBlockedUntilLabel,
+  expand,
 }: {
   initialDisplayName: string;
   changeBlockedUntilLabel?: string | null;
+  expand: AccountExpandProps;
 }) {
   const [state, formAction, pending] = useActionState(
     updateDisplayNameAction,
@@ -68,12 +85,15 @@ export function DisplayNameForm({
 
   return (
     <AccountSection
+      id="display-name"
       title="Display name"
       description={
         locked
           ? `Shown on the leaderboard when set; otherwise your username appears. You can change it again on ${changeBlockedUntilLabel}.`
           : "Shown on the leaderboard when set; otherwise your username appears. You can change this once every 30 days after your first week on the app."
       }
+      expanded={expand.expanded}
+      onToggle={expand.onToggle}
     >
       <form action={formAction} className="space-y-4">
         <label className="block space-y-1.5">
@@ -101,11 +121,20 @@ export function DisplayNameForm({
   );
 }
 
-export function UsernameSection({ username }: { username: string }) {
+export function UsernameSection({
+  username,
+  expand,
+}: {
+  username: string;
+  expand: AccountExpandProps;
+}) {
   return (
     <AccountSection
+      id="username"
       title="Username"
       description="Used to sign in. Permanent after signup — choose carefully at registration."
+      expanded={expand.expanded}
+      onToggle={expand.onToggle}
     >
       <p className="rounded-2xl border border-border bg-foreground/[0.03] px-4 py-3 font-mono text-[15px] text-foreground">
         {username}
@@ -116,8 +145,10 @@ export function UsernameSection({ username }: { username: string }) {
 
 export function RecoveryEmailForm({
   initialEmail,
+  expand,
 }: {
   initialEmail: string | null;
+  expand: AccountExpandProps;
 }) {
   const [state, formAction, pending] = useActionState(
     updateRecoveryEmailAction,
@@ -136,8 +167,11 @@ export function RecoveryEmailForm({
 
   return (
     <AccountSection
+      id="recovery-email"
       title="Recovery email"
       description="Optional. Used only for password reset. Confirm with your current password."
+      expanded={expand.expanded}
+      onToggle={expand.onToggle}
     >
       <form ref={formRef} action={formAction} className="space-y-4">
         <label className="block space-y-1.5">
@@ -176,7 +210,7 @@ export function RecoveryEmailForm({
   );
 }
 
-export function PasswordForm() {
+export function PasswordForm({ expand }: { expand: AccountExpandProps }) {
   const [state, formAction, pending] = useActionState(updatePasswordAction, {});
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -188,8 +222,11 @@ export function PasswordForm() {
 
   return (
     <AccountSection
+      id="password"
       title="Password"
       description="At least 8 characters with a letter and a number. Changing password signs you out everywhere."
+      expanded={expand.expanded}
+      onToggle={expand.onToggle}
     >
       <form ref={formRef} action={formAction} className="space-y-4">
         <label className="block space-y-1.5">

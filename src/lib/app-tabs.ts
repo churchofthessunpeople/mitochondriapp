@@ -79,7 +79,8 @@ export function accountSectionFromSearchParam(
   raw: string | string[] | undefined,
 ): AccountSection {
   const v = Array.isArray(raw) ? raw[0] : raw;
-  if (isAccountSection(v) && v !== "profile") return v;
+  if (v === "history") return "history";
+  if (v === "reminders") return "profile";
   return null;
 }
 

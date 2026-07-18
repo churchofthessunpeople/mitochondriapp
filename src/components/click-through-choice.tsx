@@ -12,7 +12,67 @@ export type ClickThroughOption = {
   highlight?: boolean;
 };
 
-type Props = {
+type ListProps = {
+  options: readonly ClickThroughOption[];
+  selectedId?: string;
+  onChoose: (id: string) => void;
+  disabled?: boolean;
+  className?: string;
+  footer?: ReactNode;
+};
+
+/** Full list of options — tap one to choose (no Next/Previous). */
+export function OptionListChoice({
+  options,
+  selectedId,
+  onChoose,
+  disabled = false,
+  className,
+  footer,
+}: ListProps) {
+  if (options.length === 0) return null;
+
+  return (
+    <div className={cn("flex flex-col gap-2", className)}>
+      {options.map((option) => {
+        const selected = selectedId === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            disabled={disabled}
+            onClick={() => onChoose(option.id)}
+            className={cn(
+              "rounded-2xl border px-4 py-3 text-left transition disabled:opacity-60",
+              selected
+                ? "border-accent/40 bg-accent/10 hover:bg-accent/15"
+                : "border-border bg-foreground/[0.02] hover:border-accent/30",
+            )}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <span className="text-sm font-semibold text-foreground">
+                {option.title}
+              </span>
+              {option.badge ? (
+                <span className="shrink-0 rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold text-accent">
+                  {option.badge}
+                </span>
+              ) : null}
+            </div>
+            {option.subtitle ? (
+              <p className="mt-1 text-xs leading-relaxed text-muted">
+                {option.subtitle}
+              </p>
+            ) : null}
+          </button>
+        );
+      })}
+      {footer}
+    </div>
+  );
+}
+
+type CarouselProps = {
   options: readonly ClickThroughOption[];
   /** Prefer starting on this option id when present */
   preferredId?: string;
@@ -35,7 +95,7 @@ export function ClickThroughChoice({
   chooseLabel = "Choose this",
   className,
   footer,
-}: Props) {
+}: CarouselProps) {
   const startIndex = (() => {
     if (!preferredId) return 0;
     const i = options.findIndex((o) => o.id === preferredId);

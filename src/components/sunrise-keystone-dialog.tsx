@@ -4,7 +4,7 @@ import { ArrowLeft, Sun } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  ClickThroughChoice,
+  OptionListChoice,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
@@ -336,8 +336,7 @@ export function SunriseKeystoneDialog({
   const subtitle =
     step === "tier" ? (
       <>
-        First light sets the day. Browse each sky view, then choose the one that
-        fits.
+        First light sets the day. Tap the sky view that fits.
         {riseLabel ? (
           <>
             {" "}
@@ -355,7 +354,7 @@ export function SunriseKeystoneDialog({
     ) : step === "sky" ? (
       <>
         Clear skies need 30 min for full points and boost; cloudier skies need
-        longer. One option at a time — choose when it matches.
+        longer.
       </>
     ) : step === "grounded" ? (
       <>Barefoot contact with earth can raise your day boost.</>
@@ -416,9 +415,9 @@ export function SunriseKeystoneDialog({
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-5 sm:px-6 sm:pb-6">
           {step === "tier" ? (
-            <ClickThroughChoice
+            <OptionListChoice
               options={tierOptions}
-              preferredId="horizon"
+              selectedId={selected?.tier.id ?? "horizon"}
               disabled={pending}
               onChoose={pickTier}
               footer={
@@ -459,9 +458,9 @@ export function SunriseKeystoneDialog({
           ) : null}
 
           {step === "sky" && selected ? (
-            <ClickThroughChoice
+            <OptionListChoice
               options={skyOptions}
-              preferredId={modifiers.sky}
+              selectedId={modifiers.sky}
               disabled={pending}
               onChoose={(id) => {
                 setModifiers((m) => ({
@@ -474,9 +473,9 @@ export function SunriseKeystoneDialog({
           ) : null}
 
           {step === "grounded" && selected ? (
-            <ClickThroughChoice
+            <OptionListChoice
               options={groundedOptions}
-              preferredId={modifiers.grounded ? "yes" : "no"}
+              selectedId={modifiers.grounded ? "yes" : "no"}
               disabled={pending}
               onChoose={(id) => {
                 setModifiers((m) => ({ ...m, grounded: id === "yes" }));
@@ -486,9 +485,9 @@ export function SunriseKeystoneDialog({
           ) : null}
 
           {step === "skin" && selected ? (
-            <ClickThroughChoice
+            <OptionListChoice
               options={skinOptions}
-              preferredId={modifiers.skin}
+              selectedId={modifiers.skin}
               disabled={pending}
               onChoose={(id) => {
                 setModifiers((m) => ({
@@ -501,9 +500,9 @@ export function SunriseKeystoneDialog({
           ) : null}
 
           {step === "sunglasses" && selected ? (
-            <ClickThroughChoice
+            <OptionListChoice
               options={sunglassesOptions}
-              preferredId={modifiers.sunglasses}
+              selectedId={modifiers.sunglasses}
               disabled={pending}
               onChoose={(id) => {
                 setModifiers((m) => ({

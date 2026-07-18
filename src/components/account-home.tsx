@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   DisplayNameForm,
   PasswordForm,
   RecoveryEmailForm,
   UsernameSection,
 } from "@/components/account-forms";
+import { AccountExpandCard } from "@/components/account-expand-card";
 import type { AccountPanelUser } from "@/components/account-panel";
 import { HistoryList } from "@/components/history-list";
-import { RemindersClient } from "@/components/reminders-client";
 import { logoutAction } from "@/lib/actions/auth";
 import {
   saveTimezoneFormAction,
@@ -31,11 +31,21 @@ export type HistoryRow = { date: string; points: number; count: number };
 
 type Section = NonNullable<AccountSection>;
 
-const TABS: { id: Section; label: string }[] = [
-  { id: "history", label: "History" },
-  { id: "reminders", label: "Reminders" },
+const TABS: {
+  id: Section;
+  label: string;
+  disabled?: boolean;
+}[] = [
   { id: "profile", label: "Profile" },
+  { id: "history", label: "History" },
+  { id: "reminders", label: "Reminders", disabled: true },
 ];
+
+function resolveInitialSection(initialSection?: AccountSection): Section {
+  if (initialSection === "history") return "history";
+  if (initialSection === "reminders") return "profile";
+  return "profile";
+}
 
 type Props = {
   user: AccountPanelUser;
@@ -54,7 +64,7 @@ type Props = {
 };
 
 /**
- * Account: header + tab row + one content panel (no expand cards / stray links).
+ * Account: tab row + collapsible sections (all collapsed by default).
  */
 export function AccountHome({
   user,
@@ -62,25 +72,40 @@ export function AccountHome({
   history,
   lifetimePoints,
   isAdmin = false,
-  reminders,
-  reminderSunPresets,
   onOpenSheet,
 }: Props) {
-  const [section, setSection] = useState<Section>(
-    initialSection && initialSection !== null ? initialSection : "history",
+  const [section, setSection] = useState<Section>(() =>
+    resolveInitialSection(initialSection),
   );
+  const [openCards, setOpenCards] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (initialSection) setSection(initialSection);
+    if (initialSection) {
+      setSection(resolveInitialSection(initialSection));
+    }
   }, [initialSection]);
 
+  const cardExpand = useCallback(
+    (id: string) => ({
+      expanded: openCards[id] ?? false,
+      onToggle: () =>
+        setOpenCards((prev) => ({ ...prev, [id]: !(prev[id] ?? false) })),
+    }),
+    [openCards],
+  );
+
   function select(next: Section) {
+    if (next === "reminders") return;
     setSection(next);
     try {
       window.history.replaceState(
         null,
         "",
-        next === "history" ? ROUTES.account : `/app?t=${next}`,
+        next === "profile" || next === "history"
+          ? next === "profile"
+            ? ROUTES.account
+            : `${ROUTES.account}?t=history`
+          : ROUTES.account,
       );
     } catch {
       /* ignore */
@@ -101,11 +126,10 @@ export function AccountHome({
         <p className="mt-1.5 text-sm text-muted">
           {user.memberSinceLabel
             ? `Member since ${user.memberSinceLabel}.`
-            : "History, reminders, and settings."}
+            : "Settings and activity history."}
         </p>
       </div>
 
-      {/* Tab row under header */}
       <div
         className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-foreground/[0.03] p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="tablist"
@@ -119,75 +143,92 @@ export function AccountHome({
               type="button"
               role="tab"
               aria-selected={active}
+              aria-disabled={t.disabled || undefined}
+              disabled={t.disabled}
               onClick={() => select(t.id)}
               className={cn(
                 "min-w-0 flex-1 shrink-0 rounded-xl px-2.5 py-2.5 text-center text-xs font-semibold transition sm:px-3 sm:text-sm",
-                active
-                  ? "bg-accent text-on-accent shadow-sm"
-                  : "text-muted hover:text-foreground",
+                t.disabled
+                  ? "cursor-not-allowed opacity-40"
+                  : active
+                    ? "bg-accent text-on-accent shadow-sm"
+                    : "text-muted hover:text-foreground",
               )}
             >
               {t.label}
+              {t.disabled ? (
+                <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  Soon
+                </span>
+              ) : null}
             </button>
           );
         })}
       </div>
 
-      <div role="tabpanel" className="min-h-[12rem]">
+      <div role="tabpanel" className="min-h-[12rem] space-y-3">
         {section === "history" && (
-          <div className="space-y-4">
-            <p className="text-sm text-muted">
-              Lifetime{" "}
-              <span className="font-medium text-foreground">
-                {formatPoints(lifetimePoints)} pts
-              </span>{" "}
-              · last 45 days
-            </p>
-            <HistoryList
-              rows={history}
-              timeZone={user.timezone ?? "UTC"}
-              onSelectDay={
-                onOpenSheet
-                  ? (date) => onOpenSheet({ id: "historyDay", date })
-                  : undefined
-              }
-            />
-            <p className="text-center text-sm">
-              <a href={ROUTES.exportCsv} className="text-accent hover:underline">
+          <>
+            <AccountExpandCard
+              id="activity-history"
+              title="Activity history"
+              subtitle={`${formatPoints(lifetimePoints)} pts lifetime · last 45 days`}
+              expanded={cardExpand("activity-history").expanded}
+              onToggle={cardExpand("activity-history").onToggle}
+            >
+              <HistoryList
+                rows={history}
+                timeZone={user.timezone ?? "UTC"}
+                onSelectDay={
+                  onOpenSheet
+                    ? (date) => onOpenSheet({ id: "historyDay", date })
+                    : undefined
+                }
+              />
+            </AccountExpandCard>
+
+            <AccountExpandCard
+              id="export-data"
+              title="Export data"
+              subtitle="Download all logs as CSV"
+              expanded={cardExpand("export-data").expanded}
+              onToggle={cardExpand("export-data").onToggle}
+            >
+              <a
+                href={ROUTES.exportCsv}
+                className="btn-secondary inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-semibold"
+              >
                 Export all logs (CSV)
               </a>
-            </p>
-          </div>
-        )}
-
-        {section === "reminders" && (
-          <div className="space-y-3">
-            <p className="text-sm text-muted">
-              Browser notifications · sun-relative presets when ZIP is set.
-            </p>
-            <RemindersClient
-              initial={reminders}
-              sunPresets={reminderSunPresets}
-            />
-          </div>
+            </AccountExpandCard>
+          </>
         )}
 
         {section === "profile" && (
-          <div className="space-y-5">
+          <>
             <DisplayNameForm
               initialDisplayName={displayName}
               changeBlockedUntilLabel={user.displayNameChangeBlockedUntilLabel}
+              expand={cardExpand("display-name")}
             />
-            <UsernameSection username={user.username} />
-            <PasswordForm />
-            <RecoveryEmailForm initialEmail={user.email ?? null} />
+            <UsernameSection
+              username={user.username}
+              expand={cardExpand("username")}
+            />
+            <PasswordForm expand={cardExpand("password")} />
+            <RecoveryEmailForm
+              initialEmail={user.email ?? null}
+              expand={cardExpand("recovery-email")}
+            />
 
-            <section className="glass rounded-3xl p-5">
-              <h2 className="font-semibold">Timezone</h2>
-              <p className="mt-1 text-xs text-muted">
-                Calendar day for streaks (IANA name).
-              </p>
-              <form action={saveTimezoneFormAction} className="mt-3 space-y-3">
+            <AccountExpandCard
+              id="timezone"
+              title="Timezone"
+              subtitle="Calendar day for streaks (IANA name)"
+              expanded={cardExpand("timezone").expanded}
+              onToggle={cardExpand("timezone").onToggle}
+            >
+              <form action={saveTimezoneFormAction} className="space-y-3">
                 <input
                   name="timezone"
                   defaultValue={user.timezone ?? "UTC"}
@@ -201,14 +242,20 @@ export function AccountHome({
                   Save timezone
                 </button>
               </form>
-            </section>
+            </AccountExpandCard>
 
-            <section className="glass rounded-3xl p-5">
-              <h2 className="font-semibold">Leaderboard visibility</h2>
-              <form
-                action={toggleLeaderboardVisibilityFormAction}
-                className="mt-3"
-              >
+            <AccountExpandCard
+              id="leaderboard-visibility"
+              title="Leaderboard visibility"
+              subtitle={
+                user.showOnLeaderboard
+                  ? "You appear on public boards"
+                  : "Hidden from public boards"
+              }
+              expanded={cardExpand("leaderboard-visibility").expanded}
+              onToggle={cardExpand("leaderboard-visibility").onToggle}
+            >
+              <form action={toggleLeaderboardVisibilityFormAction}>
                 <button
                   type="submit"
                   className="btn-secondary h-11 rounded-2xl px-5 text-sm font-semibold"
@@ -218,29 +265,42 @@ export function AccountHome({
                     : "Show me on public boards"}
                 </button>
               </form>
-            </section>
+            </AccountExpandCard>
 
-            <div className="flex flex-wrap gap-2 text-sm">
-              {isAdmin && onOpenSheet ? (
-                <button
-                  type="button"
-                  onClick={() => onOpenSheet({ id: "admin" })}
+            <AccountExpandCard
+              id="tools"
+              title="Tools"
+              subtitle="Export and admin shortcuts"
+              expanded={cardExpand("tools").expanded}
+              onToggle={cardExpand("tools").onToggle}
+            >
+              <div className="flex flex-wrap gap-2 text-sm">
+                {isAdmin && onOpenSheet ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenSheet({ id: "admin" })}
+                    className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
+                  >
+                    Admin
+                  </button>
+                ) : null}
+                <a
+                  href={ROUTES.exportCsv}
                   className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
                 >
-                  Admin
-                </button>
-              ) : null}
-              <a
-                href={ROUTES.exportCsv}
-                className="rounded-full border border-border px-3 py-1.5 text-muted hover:text-foreground"
-              >
-                Export CSV
-              </a>
-            </div>
+                  Export CSV
+                </a>
+              </div>
+            </AccountExpandCard>
 
-            <section className="glass rounded-3xl p-5">
-              <h2 className="text-lg font-semibold tracking-tight">Session</h2>
-              <form action={logoutAction} className="mt-4">
+            <AccountExpandCard
+              id="session"
+              title="Session"
+              subtitle="Sign out on this device"
+              expanded={cardExpand("session").expanded}
+              onToggle={cardExpand("session").onToggle}
+            >
+              <form action={logoutAction}>
                 <button
                   type="submit"
                   className="btn-secondary flex h-11 w-full items-center justify-center rounded-2xl text-sm font-semibold sm:w-auto sm:px-6"
@@ -248,8 +308,8 @@ export function AccountHome({
                   Log out
                 </button>
               </form>
-            </section>
-          </div>
+            </AccountExpandCard>
+          </>
         )}
       </div>
     </div>

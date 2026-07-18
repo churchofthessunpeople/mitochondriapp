@@ -22,7 +22,7 @@ import {
   isWaterKeystoneId,
 } from "@/lib/lwm";
 import {
-  ClickThroughChoice,
+  OptionListChoice,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import { MovementSettingDialog } from "@/components/movement-setting-dialog";
@@ -1224,7 +1224,7 @@ export function ScheduleDay({
             {durationStep === "skin" &&
             isColdThermoProtocolId(durationFor.id) ? (
               <div className="mt-4">
-                <ClickThroughChoice
+                <OptionListChoice
                   options={COLD_THERMO_SKIN_TEMP_OPTIONS.map(
                     (t): ClickThroughOption => ({
                       id: String(t),
@@ -1233,7 +1233,7 @@ export function ScheduleDay({
                       highlight: t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
                     }),
                   )}
-                  preferredId={String(coldThermoSkinTempF)}
+                  selectedId={String(coldThermoSkinTempF)}
                   onChoose={(id) => {
                     setColdThermoSkinTempF(Number(id) as ColdThermoSkinTempF);
                     setDurationStep("minutes");
@@ -1251,7 +1251,7 @@ export function ScheduleDay({
                     Skin {formatColdThermoSkinTemp(coldThermoSkinTempF)} — change
                   </button>
                 ) : null}
-                <ClickThroughChoice
+                <OptionListChoice
                   options={[
                     DURATION_BLOCK_MINUTES,
                     DURATION_BLOCK_MINUTES * 2,
@@ -1276,13 +1276,8 @@ export function ScheduleDay({
                         highlight: m === DURATION_BLOCK_MINUTES,
                       }),
                     )}
-                  preferredId={String(durationMins)}
+                  selectedId={String(durationMins)}
                   disabled={busyId === durationFor.id}
-                  chooseLabel={
-                    busyId === durationFor.id
-                      ? "Logging…"
-                      : "Log this duration"
-                  }
                   onChoose={(id) => {
                     const mins = Number(id);
                     setDurationMins(mins);
@@ -1303,8 +1298,8 @@ export function ScheduleDay({
                 <p className="font-semibold">{choicePicker.protocol.name}</p>
                 <p className="mt-1 text-xs text-muted">
                   {choicePicker.kind === "magnetico"
-                    ? "Choose gauss rating — one option at a time"
-                    : "Choose bedroom temperature — one option at a time"}
+                    ? "Tap your gauss rating"
+                    : "Tap your bedroom temperature"}
                 </p>
               </div>
               <button
@@ -1318,7 +1313,7 @@ export function ScheduleDay({
             </div>
             <div className="mt-4">
               {choicePicker.kind === "magnetico" ? (
-                <ClickThroughChoice
+                <OptionListChoice
                   options={MAGNETICO_GAUSS_OPTIONS.map(
                     (g): ClickThroughOption => ({
                       id: String(g),
@@ -1327,7 +1322,7 @@ export function ScheduleDay({
                       highlight: g === magneticoGauss,
                     }),
                   )}
-                  preferredId={String(magneticoGauss)}
+                  selectedId={String(magneticoGauss)}
                   onChoose={(id) => {
                     chooseMagneticoGauss(
                       choicePicker.protocol,
@@ -1343,7 +1338,7 @@ export function ScheduleDay({
                           setChoicePicker(null);
                           skipPermanentTonight(protocol);
                         }}
-                        className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
+                        className="btn-secondary mt-2 h-11 rounded-2xl text-sm font-semibold"
                       >
                         Skip tonight
                       </button>
@@ -1351,7 +1346,7 @@ export function ScheduleDay({
                   }
                 />
               ) : (
-                <ClickThroughChoice
+                <OptionListChoice
                   options={SLEEP_ROOM_TEMP_OPTIONS.map(
                     (t): ClickThroughOption => ({
                       id: String(t),
@@ -1360,7 +1355,7 @@ export function ScheduleDay({
                       highlight: t === 65,
                     }),
                   )}
-                  preferredId={String(sleepRoomTempF)}
+                  selectedId={String(sleepRoomTempF)}
                   onChoose={(id) => {
                     chooseSleepTemp(
                       choicePicker.protocol,
@@ -1376,7 +1371,7 @@ export function ScheduleDay({
                           setChoicePicker(null);
                           skipPermanentTonight(protocol);
                         }}
-                        className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
+                        className="btn-secondary mt-2 h-11 rounded-2xl text-sm font-semibold"
                       >
                         Skip tonight
                       </button>
