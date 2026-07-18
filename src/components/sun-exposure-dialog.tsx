@@ -3,6 +3,10 @@
 import { ArrowLeft, Sun } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
+import {
+  ClickThroughChoice,
+  type ClickThroughOption,
+} from "@/components/click-through-choice";
 import { currentLocalHm } from "@/lib/sunrise-timing";
 import {
   DURATION_BLOCK_MINUTES,
@@ -18,7 +22,6 @@ import {
   type SunExposureSlot,
   type SunSkinExposure,
 } from "@/lib/sun-exposure";
-import { cn } from "@/lib/utils";
 
 type Step = "time" | "grounded" | "skin" | "duration";
 
@@ -31,39 +34,9 @@ type Props = {
   onCancel: () => void;
 };
 
-function ChoiceButton({
-  title,
-  subtitle,
-  selected,
-  onClick,
-}: {
-  title: string;
-  subtitle?: string;
-  selected?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-2xl border px-4 py-3 text-left transition",
-        selected
-          ? "border-accent/40 bg-accent/10"
-          : "border-border bg-foreground/[0.02] hover:border-accent/30",
-      )}
-    >
-      <span className="text-sm font-semibold text-foreground">{title}</span>
-      {subtitle ? (
-        <p className="mt-1 text-xs leading-relaxed text-muted">{subtitle}</p>
-      ) : null}
-    </button>
-  );
-}
-
 /**
  * Daytime sun exposure: time → grounded → skin → duration.
- * Logs into morning / noon / afternoon slots (additive minutes per slot).
+ * Multi-choice steps show one option at a time.
  */
 export function SunExposureDialog({
   protocol,
@@ -103,6 +76,59 @@ export function SunExposureDialog({
     DURATION_BLOCK_MINUTES * 3,
     Math.min(maxMins, DURATION_BLOCK_MINUTES * 4),
   ].filter((m, i, arr) => m <= maxMins && arr.indexOf(m) === i);
+
+  const slotOptions: ClickThroughOption[] = useMemo(
+    () =>
+      SUN_EXPOSURE_SLOTS.map((s) => ({
+        id: s.id,
+        title: s.label,
+        subtitle: s.clockLabel,
+        highlight: s.id === slot,
+      })),
+    [slot],
+  );
+
+  const groundedOptions: ClickThroughOption[] = useMemo(
+    () => [
+      {
+        id: "yes",
+        title: "Yes — barefoot on earth",
+        subtitle: "Soil, grass, sand, or stone",
+        highlight: true,
+      },
+      {
+        id: "no",
+        title: "No — not grounded",
+        subtitle: "Shoes, pavement, or indoors patio",
+      },
+    ],
+    [],
+  );
+
+  const skinOptions: ClickThroughOption[] = useMemo(
+    () =>
+      SUN_SKIN_OPTIONS.map((opt) => ({
+        id: opt.id,
+        title: opt.label,
+        subtitle: opt.detail,
+        highlight: opt.id === "full",
+      })),
+    [],
+  );
+
+  const durationOptions: ClickThroughOption[] = useMemo(
+    () =>
+      durationChoices.map((m) => ({
+        id: String(m),
+        title: `${m} minutes`,
+        subtitle: `≈ ${pointsForLog(protocol, m, {
+          sunriseMultiplier,
+          basePoints,
+        })} pts this log`,
+        highlight: m === DURATION_BLOCK_MINUTES,
+      })),
+    [durationChoices, protocol, sunriseMultiplier, basePoints],
+  );
 
   function goBack() {
     if (step === "grounded") setStep("time");
@@ -173,57 +199,36 @@ export function SunExposureDialog({
               />
             </label>
             <p className="text-xs text-muted">
-              Logs into{" "}
+              Suggested slot:{" "}
               <span className="font-medium text-foreground">
                 {slotDef.label}
               </span>{" "}
-              ({slotDef.clockLabel}). You can add more time to the same slot
-              later.
+              ({slotDef.clockLabel}). Browse and choose a slot below.
             </p>
-            <div className="grid gap-2">
-              {SUN_EXPOSURE_SLOTS.map((s) => (
-                <ChoiceButton
-                  key={s.id}
-                  title={s.label}
-                  subtitle={s.clockLabel}
-                  selected={slot === s.id}
-                  onClick={() => {
-                    setSlotOverride(s.id);
-                    const mid = s.startHour + 1;
-                    setStartHm(
-                      `${String(mid).padStart(2, "0")}:00`,
-                    );
-                  }}
-                />
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() => setStep("grounded")}
-              className="btn-primary h-11 w-full rounded-2xl text-sm font-semibold"
-            >
-              Continue
-            </button>
+            <ClickThroughChoice
+              options={slotOptions}
+              preferredId={slot}
+              disabled={pending}
+              onChoose={(id) => {
+                const s = SUN_EXPOSURE_SLOTS.find((x) => x.id === id);
+                if (!s) return;
+                setSlotOverride(s.id);
+                const mid = s.startHour + 1;
+                setStartHm(`${String(mid).padStart(2, "0")}:00`);
+                setStep("grounded");
+              }}
+            />
           </div>
         )}
 
         {step === "grounded" && (
-          <div className="mt-4 space-y-3">
-            <ChoiceButton
-              title="Yes — barefoot on earth"
-              subtitle="Soil, grass, sand, or stone"
-              selected={grounded}
-              onClick={() => {
-                setGrounded(true);
-                setStep("skin");
-              }}
-            />
-            <ChoiceButton
-              title="No — not grounded"
-              subtitle="Shoes, pavement, or indoors patio"
-              selected={!grounded}
-              onClick={() => {
-                setGrounded(false);
+          <div className="mt-4">
+            <ClickThroughChoice
+              options={groundedOptions}
+              preferredId={grounded ? "yes" : "no"}
+              disabled={pending}
+              onChoose={(id) => {
+                setGrounded(id === "yes");
                 setStep("skin");
               }}
             />
@@ -231,19 +236,16 @@ export function SunExposureDialog({
         )}
 
         {step === "skin" && (
-          <div className="mt-4 space-y-3">
-            {SUN_SKIN_OPTIONS.map((opt) => (
-              <ChoiceButton
-                key={opt.id}
-                title={opt.label}
-                subtitle={opt.detail}
-                selected={skin === opt.id}
-                onClick={() => {
-                  setSkin(opt.id);
-                  setStep("duration");
-                }}
-              />
-            ))}
+          <div className="mt-4">
+            <ClickThroughChoice
+              options={skinOptions}
+              preferredId={skin}
+              disabled={pending}
+              onChoose={(id) => {
+                setSkin(id as SunSkinExposure);
+                setStep("duration");
+              }}
+            />
           </div>
         )}
 
@@ -262,52 +264,25 @@ export function SunExposureDialog({
                 for now.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {durationChoices.map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setDurationMins(m)}
-                  className={cn(
-                    "rounded-full px-3 py-1.5 text-xs font-semibold transition",
-                    durationMins === m
-                      ? "bg-accent text-on-accent"
-                      : "border border-border text-muted",
-                  )}
-                >
-                  {m} min
-                </button>
-              ))}
-            </div>
-            <label className="block text-xs text-muted">
-              Minutes
-              <input
-                type="number"
-                min={1}
-                max={maxMins}
-                value={durationMins}
-                onChange={(e) =>
-                  setDurationMins(
-                    Math.min(
-                      maxMins,
-                      Math.max(1, Number(e.target.value) || 1),
-                    ),
-                  )
-                }
-                className="field-input mt-1 w-full rounded-xl px-3 py-2 text-sm"
-              />
-            </label>
-            <p className="text-xs text-accent">≈ {previewPts} pts this log</p>
-            <button
-              type="button"
+            <ClickThroughChoice
+              options={durationOptions}
+              preferredId={String(durationMins)}
               disabled={pending}
-              onClick={() => onLog(input, durationMins)}
-              className="btn-primary h-11 w-full rounded-2xl text-sm font-semibold disabled:opacity-50"
-            >
-              {pending
-                ? "Logging…"
-                : `Log ${durationMins} min · ${slotDef.label}`}
-            </button>
+              chooseLabel={
+                pending
+                  ? "Logging…"
+                  : `Log · ${slotDef.label}`
+              }
+              onChoose={(id) => {
+                const mins = Number(id);
+                setDurationMins(mins);
+                onLog(input, mins);
+              }}
+            />
+            <p className="text-center text-xs text-accent">
+              Preview ≈ {previewPts} pts at {durationMins} min (browse options
+              for other lengths)
+            </p>
           </div>
         )}
       </div>

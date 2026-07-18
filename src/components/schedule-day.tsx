@@ -21,6 +21,10 @@ import {
   isMagnetismKeystoneId,
   isWaterKeystoneId,
 } from "@/lib/lwm";
+import {
+  ClickThroughChoice,
+  type ClickThroughOption,
+} from "@/components/click-through-choice";
 import { MovementSettingDialog } from "@/components/movement-setting-dialog";
 import { SunriseKeystoneDialog } from "@/components/sunrise-keystone-dialog";
 import { SunExposureDialog } from "@/components/sun-exposure-dialog";
@@ -244,6 +248,13 @@ export function ScheduleDay({
   }>({ open: false, initialProtocol: null });
   const [sunExposureFor, setSunExposureFor] = useState<Protocol | null>(null);
   const [movementFor, setMovementFor] = useState<Protocol | null>(null);
+  const [choicePicker, setChoicePicker] = useState<{
+    kind: "magnetico" | "sleep";
+    protocol: Protocol;
+  } | null>(null);
+  const [durationStep, setDurationStep] = useState<"skin" | "minutes">(
+    "minutes",
+  );
   const [addActivityOpen, setAddActivityOpen] = useState(false);
   const [magneticoGauss, setMagneticoGauss] = useState<MagneticoGauss>(() =>
     parseMagneticoGauss(initialMagneticoGauss),
@@ -436,38 +447,86 @@ export function ScheduleDay({
     return parts.join(" · ");
   }
 
-  function setGauss(next: MagneticoGauss) {
-    const prev = magneticoGauss;
-    if (next === prev) return;
-    setMagneticoGauss(next);
-    start(async () => {
+  function skipPermanentTonight(protocol: Protocol) {
+    const count = counts[protocol.id] ?? 0;
+    if (count <= 0) return;
+    runLog(protocol.id, async () => {
       try {
-        const res = await setMagneticoGaussAction(next);
-        setMagneticoGauss(res.gauss);
-        setDayPoints(res.dayPoints);
-        onStatsChange?.({ dayPoints: res.dayPoints, streak });
-        push(`Magnetico set to ${formatMagneticoGauss(res.gauss)}`);
+        bumpCounts({ protocolId: protocol.id, delta: -1 });
+        const res = await removeOneCompletionAction(protocol.id);
+        applySnap({ ...res, protocolId: protocol.id, count: 0 });
+        push(`Skipped tonight — ${protocol.name}`);
       } catch (e) {
-        setMagneticoGauss(prev);
-        push(e instanceof Error ? e.message : "Could not update gauss", "err");
+        bumpCounts({ protocolId: protocol.id, delta: 0, absolute: count });
+        push(e instanceof Error ? e.message : "Could not update", "err");
       }
     });
   }
 
-  function setSleepTemp(next: SleepRoomTempF) {
+  function chooseMagneticoGauss(protocol: Protocol, next: MagneticoGauss) {
+    const prev = magneticoGauss;
+    const wasLogged = (countsRef.current[protocol.id] ?? 0) > 0;
+    setMagneticoGauss(next);
+    setChoicePicker(null);
+    setBusyId(protocol.id);
+    start(async () => {
+      try {
+        const res = await setMagneticoGaussAction(next);
+        setMagneticoGauss(res.gauss);
+        if (!wasLogged) {
+          bumpCounts({ protocolId: protocol.id, delta: 1 });
+          const logged = await logPermanentTonightAction(protocol.id);
+          applySnap({ ...logged, protocolId: protocol.id });
+          push(
+            `${formatMagneticoGauss(res.gauss)} · logged · +${logged.points} pts`,
+          );
+        } else {
+          setDayPoints(res.dayPoints);
+          onStatsChange?.({ dayPoints: res.dayPoints, streak });
+          push(`Magnetico set to ${formatMagneticoGauss(res.gauss)}`);
+        }
+      } catch (e) {
+        setMagneticoGauss(prev);
+        if (!wasLogged) {
+          bumpCounts({ protocolId: protocol.id, delta: 0, absolute: 0 });
+        }
+        push(e instanceof Error ? e.message : "Could not update gauss", "err");
+      } finally {
+        setBusyId(null);
+      }
+    });
+  }
+
+  function chooseSleepTemp(protocol: Protocol, next: SleepRoomTempF) {
     const prev = sleepRoomTempF;
-    if (next === prev) return;
+    const wasLogged = (countsRef.current[protocol.id] ?? 0) > 0;
     setSleepRoomTempF(next);
+    setChoicePicker(null);
+    setBusyId(protocol.id);
     start(async () => {
       try {
         const res = await setSleepRoomTempAction(next);
         setSleepRoomTempF(res.tempF);
-        setDayPoints(res.dayPoints);
-        onStatsChange?.({ dayPoints: res.dayPoints, streak });
-        push(`Sleep temp set to ${formatSleepRoomTemp(res.tempF)}`);
+        if (!wasLogged) {
+          bumpCounts({ protocolId: protocol.id, delta: 1 });
+          const logged = await logPermanentTonightAction(protocol.id);
+          applySnap({ ...logged, protocolId: protocol.id });
+          push(
+            `${formatSleepRoomTemp(res.tempF)} · logged · +${logged.points} pts`,
+          );
+        } else {
+          setDayPoints(res.dayPoints);
+          onStatsChange?.({ dayPoints: res.dayPoints, streak });
+          push(`Sleep temp set to ${formatSleepRoomTemp(res.tempF)}`);
+        }
       } catch (e) {
         setSleepRoomTempF(prev);
+        if (!wasLogged) {
+          bumpCounts({ protocolId: protocol.id, delta: 0, absolute: 0 });
+        }
         push(e instanceof Error ? e.message : "Could not update temp", "err");
+      } finally {
+        setBusyId(null);
       }
     });
   }
@@ -477,6 +536,9 @@ export function ScheduleDay({
       setSunExposureFor(protocol);
       return;
     }
+    setDurationStep(
+      isColdThermoProtocolId(protocol.id) ? "skin" : "minutes",
+    );
     if (requiresMovementSetting(protocol)) {
       setMovementFor(protocol);
       return;
@@ -563,6 +625,17 @@ export function ScheduleDay({
       return;
     }
     const count = counts[protocol.id] ?? 0;
+
+    // Magnetico / cool bedroom: pick setting by opening the activity (no row bars).
+    if (isMagneticoProtocolId(protocol.id)) {
+      setChoicePicker({ kind: "magnetico", protocol });
+      return;
+    }
+    if (isSleepRoomTempProtocolId(protocol.id)) {
+      setChoicePicker({ kind: "sleep", protocol });
+      return;
+    }
+
     if (isPermanentProtocol(protocol)) {
       runLog(protocol.id, async () => {
         try {
@@ -913,38 +986,6 @@ export function ScheduleDay({
             </button>
           </div>
           </div>
-          {isColdThermoProtocolId(p.id) && (
-            <div
-              className="flex flex-wrap items-center gap-1.5 pl-1"
-              role="group"
-              aria-label="Skin surface temperature"
-            >
-              <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
-                Skin
-              </span>
-              {COLD_THERMO_SKIN_TEMP_OPTIONS.map((t) => {
-                const active = coldThermoSkinTempF === t;
-                const base = coldThermoSkinTempBasePoints(t, p.points);
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    disabled={rowBusy}
-                    onClick={() => setColdThermoSkinTempF(t)}
-                    className={cn(
-                      "rounded-full px-2.5 py-1 text-xs font-semibold transition",
-                      active
-                        ? "bg-accent text-on-accent"
-                        : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
-                      t === 50 && !active && "border-accent/30",
-                    )}
-                  >
-                    {t}°F · {base} base
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </li>
       );
     }
@@ -1004,70 +1045,6 @@ export function ScheduleDay({
             className="self-center"
           />
         </div>
-        {isMagneticoProtocolId(p.id) && (
-          <div
-            className="flex flex-wrap items-center gap-1.5 pl-1"
-            role="group"
-            aria-label="Magnetico gauss rating"
-          >
-            <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
-              Gauss
-            </span>
-            {MAGNETICO_GAUSS_OPTIONS.map((g) => {
-              const active = magneticoGauss === g;
-              const pts = pointsForMagneticoGauss(g, p.points);
-              const mult = formatMagneticoGaussMultiplier(g);
-              return (
-                <button
-                  key={g}
-                  type="button"
-                  disabled={rowBusy}
-                  onClick={() => setGauss(g)}
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-xs font-semibold transition",
-                    active
-                      ? "bg-accent text-on-accent"
-                      : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
-                  )}
-                >
-                  {g} G · {mult} · {pts} pts
-                </button>
-              );
-            })}
-          </div>
-        )}
-        {isSleepRoomTempProtocolId(p.id) && (
-          <div
-            className="flex flex-wrap items-center gap-1.5 pl-1"
-            role="group"
-            aria-label="Bedroom sleep temperature"
-          >
-            <span className="mr-1 text-[10px] uppercase tracking-wider text-muted">
-              Temp
-            </span>
-            {SLEEP_ROOM_TEMP_OPTIONS.map((t) => {
-              const active = sleepRoomTempF === t;
-              const pts = pointsForSleepRoomTemp(t);
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  disabled={rowBusy}
-                  onClick={() => setSleepTemp(t)}
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-xs font-semibold transition",
-                    active
-                      ? "bg-accent text-on-accent"
-                      : "border border-border text-muted hover:border-accent/40 hover:text-foreground",
-                    t === 65 && !active && "border-accent/30",
-                  )}
-                >
-                  {t}°F · {pts} pts
-                </button>
-              );
-            })}
-          </div>
-        )}
       </li>
     );
   }
@@ -1230,8 +1207,9 @@ export function ScheduleDay({
               <div>
                 <p className="font-semibold">{durationFor.name}</p>
                 <p className="mt-1 text-xs text-muted">
-                  {durationFor.points} pts per {DURATION_BLOCK_MINUTES} min — set
-                  a custom duration
+                  {durationStep === "skin"
+                    ? "Skin surface temperature — one option at a time"
+                    : `${durationFor.points} pts per ${DURATION_BLOCK_MINUTES} min — choose a duration`}
                 </p>
               </div>
               <button
@@ -1243,92 +1221,170 @@ export function ScheduleDay({
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {[
-                DURATION_BLOCK_MINUTES,
-                DURATION_BLOCK_MINUTES * 2,
-                DURATION_BLOCK_MINUTES * 3,
-                DURATION_BLOCK_MINUTES * 4,
-                durationFor.maxDurationMinutes,
-              ]
-                .filter((v, i, a) => v > 0 && a.indexOf(v) === i)
-                .sort((a, b) => a - b)
-                .map((m) => (
+            {durationStep === "skin" &&
+            isColdThermoProtocolId(durationFor.id) ? (
+              <div className="mt-4">
+                <ClickThroughChoice
+                  options={COLD_THERMO_SKIN_TEMP_OPTIONS.map(
+                    (t): ClickThroughOption => ({
+                      id: String(t),
+                      title: formatColdThermoSkinTemp(t),
+                      subtitle: `${coldThermoSkinTempBasePoints(t, durationFor.points)} base pts / ${DURATION_BLOCK_MINUTES} min`,
+                      highlight: t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
+                    }),
+                  )}
+                  preferredId={String(coldThermoSkinTempF)}
+                  onChoose={(id) => {
+                    setColdThermoSkinTempF(Number(id) as ColdThermoSkinTempF);
+                    setDurationStep("minutes");
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="mt-4 space-y-3">
+                {isColdThermoProtocolId(durationFor.id) ? (
                   <button
-                    key={m}
                     type="button"
-                    onClick={() => setDurationMins(m)}
-                    className={cn(
-                      "rounded-full px-3 py-1.5 text-sm",
-                      durationMins === m
-                        ? "bg-accent text-on-accent"
-                        : "border border-border text-muted",
-                    )}
+                    onClick={() => setDurationStep("skin")}
+                    className="text-xs font-medium text-muted hover:text-foreground"
                   >
-                    {m} min
+                    Skin {formatColdThermoSkinTemp(coldThermoSkinTempF)} — change
                   </button>
-                ))}
-            </div>
-            <label className="mt-4 block text-xs text-muted">
-              Minutes
-              <input
-                type="number"
-                min={1}
-                max={durationFor.maxDurationMinutes}
-                value={durationMins}
-                onChange={(e) => setDurationMins(Number(e.target.value) || 1)}
-                className="field-input mt-1 w-full rounded-xl px-3 py-2 text-sm"
-              />
-            </label>
-            {isColdThermoProtocolId(durationFor.id) && (
-              <div
-                className="mt-4 flex flex-wrap items-center gap-1.5"
-                role="group"
-                aria-label="Skin surface temperature"
-              >
-                <span className="mr-1 w-full text-[10px] uppercase tracking-wider text-muted">
-                  Skin temp
-                </span>
-                {COLD_THERMO_SKIN_TEMP_OPTIONS.map((t) => {
-                  const active = coldThermoSkinTempF === t;
-                  const base = coldThermoSkinTempBasePoints(t, durationFor.points);
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setColdThermoSkinTempF(t)}
-                      className={cn(
-                        "rounded-full px-2.5 py-1 text-xs font-semibold transition",
-                        active
-                          ? "bg-accent text-on-accent"
-                          : "border border-border text-muted",
-                        t === 50 && !active && "border-accent/30",
-                      )}
-                    >
-                      {t}°F · {base}
-                    </button>
-                  );
-                })}
+                ) : null}
+                <ClickThroughChoice
+                  options={[
+                    DURATION_BLOCK_MINUTES,
+                    DURATION_BLOCK_MINUTES * 2,
+                    DURATION_BLOCK_MINUTES * 3,
+                    DURATION_BLOCK_MINUTES * 4,
+                    durationFor.maxDurationMinutes,
+                  ]
+                    .filter((v, i, a) => v > 0 && a.indexOf(v) === i)
+                    .sort((a, b) => a - b)
+                    .map(
+                      (m): ClickThroughOption => ({
+                        id: String(m),
+                        title: `${m} minutes`,
+                        subtitle: `≈ ${pointsForLog(durationFor, m, {
+                          sunriseMultiplier: isSunriseKeystoneProtocol(
+                            durationFor,
+                          )
+                            ? 1
+                            : sunriseMult,
+                          basePoints: coldThermoLogBase(durationFor),
+                        })} pts this log`,
+                        highlight: m === DURATION_BLOCK_MINUTES,
+                      }),
+                    )}
+                  preferredId={String(durationMins)}
+                  disabled={busyId === durationFor.id}
+                  chooseLabel={
+                    busyId === durationFor.id
+                      ? "Logging…"
+                      : "Log this duration"
+                  }
+                  onChoose={(id) => {
+                    const mins = Number(id);
+                    setDurationMins(mins);
+                    addOne(durationFor, mins);
+                  }}
+                />
               </div>
             )}
-            <p className="mt-2 text-xs text-accent">
-              ≈{" "}
-              {pointsForLog(durationFor, durationMins, {
-                sunriseMultiplier: isSunriseKeystoneProtocol(durationFor)
-                  ? 1
-                  : sunriseMult,
-                basePoints: coldThermoLogBase(durationFor),
-              })}{" "}
-              pts this log
-            </p>
-            <button
-              type="button"
-              disabled={busyId === durationFor.id}
-              onClick={() => addOne(durationFor, durationMins)}
-              className="btn-primary mt-4 h-11 w-full rounded-2xl text-sm font-semibold"
-            >
-              Log {durationMins} min
-            </button>
+          </div>
+        </div>
+      )}
+
+      {choicePicker && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
+          <div className="glass w-full max-w-sm rounded-3xl p-5">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="font-semibold">{choicePicker.protocol.name}</p>
+                <p className="mt-1 text-xs text-muted">
+                  {choicePicker.kind === "magnetico"
+                    ? "Choose gauss rating — one option at a time"
+                    : "Choose bedroom temperature — one option at a time"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setChoicePicker(null)}
+                className="rounded-lg p-1 text-muted"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mt-4">
+              {choicePicker.kind === "magnetico" ? (
+                <ClickThroughChoice
+                  options={MAGNETICO_GAUSS_OPTIONS.map(
+                    (g): ClickThroughOption => ({
+                      id: String(g),
+                      title: formatMagneticoGauss(g),
+                      subtitle: `${formatMagneticoGaussMultiplier(g)} · ${pointsForMagneticoGauss(g, choicePicker.protocol.points)} pts`,
+                      highlight: g === magneticoGauss,
+                    }),
+                  )}
+                  preferredId={String(magneticoGauss)}
+                  onChoose={(id) => {
+                    chooseMagneticoGauss(
+                      choicePicker.protocol,
+                      Number(id) as MagneticoGauss,
+                    );
+                  }}
+                  footer={
+                    (counts[choicePicker.protocol.id] ?? 0) > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const protocol = choicePicker.protocol;
+                          setChoicePicker(null);
+                          skipPermanentTonight(protocol);
+                        }}
+                        className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
+                      >
+                        Skip tonight
+                      </button>
+                    ) : null
+                  }
+                />
+              ) : (
+                <ClickThroughChoice
+                  options={SLEEP_ROOM_TEMP_OPTIONS.map(
+                    (t): ClickThroughOption => ({
+                      id: String(t),
+                      title: formatSleepRoomTemp(t),
+                      subtitle: `${pointsForSleepRoomTemp(t)} pts`,
+                      highlight: t === 65,
+                    }),
+                  )}
+                  preferredId={String(sleepRoomTempF)}
+                  onChoose={(id) => {
+                    chooseSleepTemp(
+                      choicePicker.protocol,
+                      Number(id) as SleepRoomTempF,
+                    );
+                  }}
+                  footer={
+                    (counts[choicePicker.protocol.id] ?? 0) > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const protocol = choicePicker.protocol;
+                          setChoicePicker(null);
+                          skipPermanentTonight(protocol);
+                        }}
+                        className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
+                      >
+                        Skip tonight
+                      </button>
+                    ) : null
+                  }
+                />
+              )}
+            </div>
           </div>
         </div>
       )}

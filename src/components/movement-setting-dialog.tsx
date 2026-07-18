@@ -4,12 +4,15 @@ import { ArrowLeft, Footprints } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
+  ClickThroughChoice,
+  type ClickThroughOption,
+} from "@/components/click-through-choice";
+import {
   MOVEMENT_SETTING_OPTIONS,
   movementSettingBasePoints,
   type MovementSetting,
 } from "@/lib/movement-setting";
 import { DURATION_BLOCK_MINUTES, pointsForLog } from "@/lib/scoring";
-import { cn } from "@/lib/utils";
 
 type Step = "setting" | "duration";
 
@@ -21,38 +24,9 @@ type Props = {
   onCancel: () => void;
 };
 
-function ChoiceButton({
-  title,
-  subtitle,
-  selected,
-  onClick,
-}: {
-  title: string;
-  subtitle?: string;
-  selected?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-2xl border px-4 py-3 text-left transition",
-        selected
-          ? "border-accent/40 bg-accent/10"
-          : "border-border bg-foreground/[0.02] hover:border-accent/30",
-      )}
-    >
-      <span className="text-sm font-semibold text-foreground">{title}</span>
-      {subtitle ? (
-        <p className="mt-1 text-xs leading-relaxed text-muted">{subtitle}</p>
-      ) : null}
-    </button>
-  );
-}
-
 /**
- * Movement / exercise: environment (sunlight / outside / indoors) → duration.
+ * Movement / exercise: environment → duration.
+ * Multi-choice steps show one option at a time.
  */
 export function MovementSettingDialog({
   protocol,
@@ -82,6 +56,31 @@ export function MovementSettingDialog({
     DURATION_BLOCK_MINUTES * 3,
     Math.min(maxMins, DURATION_BLOCK_MINUTES * 4),
   ].filter((m, i, arr) => m <= maxMins && arr.indexOf(m) === i);
+
+  const settingOptions: ClickThroughOption[] = useMemo(
+    () =>
+      MOVEMENT_SETTING_OPTIONS.map((opt) => ({
+        id: opt.id,
+        title: opt.label,
+        subtitle: `${opt.detail} · ${movementSettingBasePoints(opt.id, protocol.points)} pts / ${DURATION_BLOCK_MINUTES} min`,
+        highlight: opt.id === "full_sunlight",
+      })),
+    [protocol.points],
+  );
+
+  const durationOptions: ClickThroughOption[] = useMemo(
+    () =>
+      durationChoices.map((m) => ({
+        id: String(m),
+        title: `${m} minutes`,
+        subtitle: `≈ ${pointsForLog(protocol, m, {
+          sunriseMultiplier,
+          basePoints,
+        })} pts this log`,
+        highlight: m === DURATION_BLOCK_MINUTES,
+      })),
+    [durationChoices, protocol, sunriseMultiplier, basePoints],
+  );
 
   function goBack() {
     if (step === "duration") setStep("setting");
@@ -133,75 +132,33 @@ export function MovementSettingDialog({
         </div>
 
         {step === "setting" ? (
-          <div className="mt-4 space-y-2">
-            {MOVEMENT_SETTING_OPTIONS.map((opt) => (
-              <ChoiceButton
-                key={opt.id}
-                title={opt.label}
-                subtitle={`${opt.detail} · ${movementSettingBasePoints(opt.id, protocol.points)} pts / 15 min`}
-                selected={setting === opt.id}
-                onClick={() => setSetting(opt.id)}
-              />
-            ))}
-            <button
-              type="button"
-              onClick={() => setStep("duration")}
-              className="btn-primary mt-2 h-11 w-full rounded-2xl text-sm font-semibold"
-            >
-              Next — set duration
-            </button>
+          <div className="mt-4">
+            <ClickThroughChoice
+              options={settingOptions}
+              preferredId={setting}
+              disabled={pending}
+              onChoose={(id) => {
+                setSetting(id as MovementSetting);
+                setStep("duration");
+              }}
+            />
           </div>
         ) : (
-          <div className="mt-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted">
-              Duration
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {durationChoices.map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setDurationMins(m)}
-                  className={cn(
-                    "rounded-full px-3 py-1.5 text-sm",
-                    durationMins === m
-                      ? "bg-accent text-on-accent"
-                      : "border border-border text-muted",
-                  )}
-                >
-                  {m} min
-                </button>
-              ))}
-            </div>
-            <label className="mt-4 block text-xs text-muted">
-              Minutes
-              <input
-                type="number"
-                min={1}
-                max={maxMins}
-                value={durationMins}
-                onChange={(e) =>
-                  setDurationMins(
-                    Math.min(
-                      maxMins,
-                      Math.max(1, Number(e.target.value) || 1),
-                    ),
-                  )
-                }
-                className="field-input mt-1 w-full rounded-xl px-3 py-2 text-sm"
-              />
-            </label>
-            <p className="mt-3 text-xs text-accent">
-              ≈ {previewPts} pts this log
-            </p>
-            <button
-              type="button"
+          <div className="mt-4 space-y-3">
+            <ClickThroughChoice
+              options={durationOptions}
+              preferredId={String(durationMins)}
               disabled={pending}
-              onClick={() => onLog(setting, durationMins)}
-              className="btn-primary mt-4 h-11 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
-            >
-              Log {durationMins} min
-            </button>
+              chooseLabel={pending ? "Logging…" : "Log this duration"}
+              onChoose={(id) => {
+                const mins = Number(id);
+                setDurationMins(mins);
+                onLog(setting, mins);
+              }}
+            />
+            <p className="text-center text-xs text-accent">
+              Preview ≈ {previewPts} pts at {durationMins} min
+            </p>
           </div>
         )}
       </div>
