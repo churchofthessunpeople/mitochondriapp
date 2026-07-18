@@ -637,19 +637,15 @@ export function ScheduleDay({
     }
 
     if (isPermanentProtocol(protocol)) {
+      if (count > 0) {
+        return;
+      }
       runLog(protocol.id, async () => {
         try {
-          if (count > 0) {
-            bumpCounts({ protocolId: protocol.id, delta: -1 });
-            const res = await removeOneCompletionAction(protocol.id);
-            applySnap({ ...res, protocolId: protocol.id, count: 0 });
-            push(`Skipped tonight — ${protocol.name}`);
-          } else {
-            bumpCounts({ protocolId: protocol.id, delta: 1 });
-            const res = await logPermanentTonightAction(protocol.id);
-            applySnap({ ...res, protocolId: protocol.id });
-            push(`Logged tonight · +${res.points} pts`);
-          }
+          bumpCounts({ protocolId: protocol.id, delta: 1 });
+          const res = await logPermanentTonightAction(protocol.id);
+          applySnap({ ...res, protocolId: protocol.id });
+          push(`Logged tonight · +${res.points} pts`);
         } catch (e) {
           bumpCounts({ protocolId: protocol.id, delta: 0, absolute: count });
           push(e instanceof Error ? e.message : "Could not update", "err");
@@ -992,17 +988,19 @@ export function ScheduleDay({
 
     return (
       <li key={p.id} className="space-y-1.5">
-        <div className="flex items-stretch gap-1.5">
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-2xl border px-3.5 py-3",
+            isDone
+              ? "border-accent/40 bg-accent/10"
+              : "border-border bg-card",
+          )}
+        >
           <button
             type="button"
             disabled={rowBusy}
             onClick={() => toggleSingle(p)}
-            className={cn(
-              "flex min-w-0 flex-1 items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition disabled:opacity-60",
-              isDone
-                ? "border-accent/40 bg-accent/10"
-                : "border-border bg-card hover:border-accent/30",
-            )}
+            className="flex min-w-0 flex-1 items-center gap-3 text-left transition disabled:opacity-60"
           >
             <span
               className={cn(
@@ -1027,23 +1025,35 @@ export function ScheduleDay({
                 {protocolHint(p)}
                 {isDone
                   ? isPermanentProtocol(p)
-                    ? " · logged · tap to skip tonight"
+                    ? " · logged tonight"
                     : p.durationEnabled && totalMins > 0
                       ? ` · ${totalMins} min`
                       : " · done"
                   : isPermanentProtocol(p)
-                    ? " · auto-logs daily"
+                    ? " · auto-logs daily · tap to log"
                     : p.durationEnabled
                       ? ` · tap to set minutes`
                       : ""}
               </span>
             </span>
           </button>
-          <ProtocolHowToButton
-            protocol={p}
-            onClick={() => setHowToFor(p)}
-            className="self-center"
-          />
+          <div className="flex shrink-0 items-center gap-1">
+            {isPermanentProtocol(p) && isDone ? (
+              <button
+                type="button"
+                disabled={rowBusy}
+                onClick={() => skipPermanentTonight(p)}
+                className="inline-flex h-8 items-center justify-center rounded-xl border border-border/80 px-2 text-[10px] font-semibold text-muted transition hover:border-red-400/40 hover:text-red-400 disabled:opacity-50 sm:h-9 sm:px-2.5 sm:text-[11px]"
+              >
+                Skip
+              </button>
+            ) : null}
+            <ProtocolHowToButton
+              protocol={p}
+              onClick={() => setHowToFor(p)}
+              size="sm"
+            />
+          </div>
         </div>
       </li>
     );
@@ -1329,21 +1339,6 @@ export function ScheduleDay({
                       Number(id) as MagneticoGauss,
                     );
                   }}
-                  footer={
-                    (counts[choicePicker.protocol.id] ?? 0) > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const protocol = choicePicker.protocol;
-                          setChoicePicker(null);
-                          skipPermanentTonight(protocol);
-                        }}
-                        className="btn-secondary mt-2 h-11 rounded-2xl text-sm font-semibold"
-                      >
-                        Skip tonight
-                      </button>
-                    ) : null
-                  }
                 />
               ) : (
                 <OptionListChoice
@@ -1362,21 +1357,6 @@ export function ScheduleDay({
                       Number(id) as SleepRoomTempF,
                     );
                   }}
-                  footer={
-                    (counts[choicePicker.protocol.id] ?? 0) > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const protocol = choicePicker.protocol;
-                          setChoicePicker(null);
-                          skipPermanentTonight(protocol);
-                        }}
-                        className="btn-secondary mt-2 h-11 rounded-2xl text-sm font-semibold"
-                      >
-                        Skip tonight
-                      </button>
-                    ) : null
-                  }
                 />
               )}
             </div>
