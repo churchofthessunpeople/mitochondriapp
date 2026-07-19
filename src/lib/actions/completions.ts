@@ -63,6 +63,7 @@ import {
   sunriseTierForProtocolId,
   type SunriseModifiers,
 } from "@/lib/scoring";
+import { syncStreakBadges } from "@/lib/streak-badges";
 import { getUserStreak, hasStreakBonusToday } from "@/lib/streaks";
 
 async function requireUser() {
@@ -409,6 +410,10 @@ export async function logCompletionAction(
       streak = await getUserStreak(userId, completedOn);
     }
   }
+  await syncStreakBadges(
+    userId,
+    Math.max(streak.current, streak.best),
+  );
 
   scheduleHistoryRevalidate();
   const stats = await getUserDayStats(userId, completedOn);

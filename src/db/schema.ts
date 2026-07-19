@@ -308,6 +308,23 @@ export const userReminders = pgTable(
   (table) => [unique("user_reminder_time_uidx").on(table.userId, table.localTime)],
 );
 
+/** Permanent streak milestone badges (week / month / year). */
+export const userBadges = pgTable(
+  "user_badges",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    badgeKey: text("badge_key").notNull(),
+    /** Longest streak length when the badge was earned */
+    streakDays: integer("streak_days").notNull(),
+    earnedAt: timestamp("earned_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.badgeKey] }),
+  ],
+);
+
 /** Admin-editable descriptor overrides (merged over TS seed defaults at read time). */
 export const contentOverrides = pgTable("content_overrides", {
   key: text("key").primaryKey(),
@@ -346,5 +363,6 @@ export type UserScheduleItem = typeof userScheduleItems.$inferSelect;
 export type DailyCompletion = typeof dailyCompletions.$inferSelect;
 export type Friendship = typeof friendships.$inferSelect;
 export type UserReminder = typeof userReminders.$inferSelect;
+export type UserBadge = typeof userBadges.$inferSelect;
 export type TimeOfDay = (typeof timeOfDayEnum.enumValues)[number];
 export type ProtocolCategory = (typeof categoryEnum.enumValues)[number];

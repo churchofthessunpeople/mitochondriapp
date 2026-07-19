@@ -6,7 +6,6 @@ import {
 } from "@/lib/cold-thermo-skin-temp";
 import {
   formatMagneticoGauss,
-  formatMagneticoGaussMultiplier,
   isMagneticoProtocolId,
   parseMagneticoGauss,
   pointsForMagneticoGauss,
@@ -73,7 +72,7 @@ export function formatVariantLabel(
 ): string | null {
   if (isMagneticoProtocolId(protocolId)) {
     const gauss = parseMagneticoGauss(variantValue);
-    return `${formatMagneticoGauss(gauss)} · ${formatMagneticoGaussMultiplier(gauss)}`;
+    return `${formatMagneticoGauss(gauss)} · ${pointsForMagneticoGauss(gauss, catalogBase)} pts`;
   }
   if (isColdThermoProtocolId(protocolId)) {
     return formatColdThermoSkinTemp(parseColdThermoSkinTempF(variantValue));

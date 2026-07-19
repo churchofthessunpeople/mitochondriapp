@@ -1,4 +1,4 @@
-/** Magnetico sleep pad — catalog base × gauss strength multiplier. */
+/** Magnetico sleep pad — flat points by gauss strength (no multipliers). */
 
 export const MAGNETICO_PROTOCOL_ID = "magnetico-sleep-pad";
 
@@ -8,11 +8,11 @@ export type MagneticoGauss = (typeof MAGNETICO_GAUSS_OPTIONS)[number];
 
 export const DEFAULT_MAGNETICO_GAUSS: MagneticoGauss = 10;
 
-/** Strength multiplier on catalog base points. */
-export const MAGNETICO_GAUSS_MULTIPLIERS: Record<MagneticoGauss, number> = {
-  5: 1.25,
-  10: 1.5,
-  20: 2,
+/** Flat points by pad strength — multipliers are reserved for sunlight day boost. */
+export const MAGNETICO_GAUSS_POINTS: Record<MagneticoGauss, number> = {
+  5: 10,
+  10: 25,
+  20: 50,
 };
 
 export function isMagneticoProtocolId(id: string): boolean {
@@ -25,34 +25,22 @@ export function parseMagneticoGauss(value: unknown): MagneticoGauss {
   return DEFAULT_MAGNETICO_GAUSS;
 }
 
-export function magneticoGaussMultiplier(gauss: MagneticoGauss): number {
-  return MAGNETICO_GAUSS_MULTIPLIERS[gauss];
-}
-
-/** Final points: catalog base × gauss strength multiplier. */
+/** Points for the selected gauss rating (catalog base ignored). */
 export function pointsForMagneticoGauss(
   gauss: MagneticoGauss,
-  catalogBase = 10,
+  _catalogBase = 10,
 ): number {
-  return Math.max(
-    1,
-    Math.round(catalogBase * magneticoGaussMultiplier(gauss)),
-  );
+  void _catalogBase;
+  return MAGNETICO_GAUSS_POINTS[gauss];
 }
 
 export function formatMagneticoGauss(gauss: MagneticoGauss): string {
   return `${gauss} G`;
 }
 
-export function formatMagneticoGaussMultiplier(gauss: MagneticoGauss): string {
-  const m = magneticoGaussMultiplier(gauss);
-  const s = Number.isInteger(m) ? String(m) : String(m);
-  return `${s}×`;
-}
-
 export function formatMagneticoLogDetail(
   gauss: MagneticoGauss,
   catalogBase = 10,
 ): string {
-  return `${formatMagneticoGauss(gauss)} · ${formatMagneticoGaussMultiplier(gauss)} · ${pointsForMagneticoGauss(gauss, catalogBase)} pts`;
+  return `${formatMagneticoGauss(gauss)} · ${pointsForMagneticoGauss(gauss, catalogBase)} pts`;
 }

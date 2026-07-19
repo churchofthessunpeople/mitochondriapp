@@ -33,6 +33,7 @@ import {
   pointsForLog,
   streakBonusPoints,
 } from "@/lib/scoring";
+import { syncStreakBadges } from "@/lib/streak-badges";
 import { hasStreakBonusToday, getUserStreak } from "@/lib/streaks";
 import { dedupeSingleLogCompletions } from "@/lib/completion-dedupe";
 
@@ -194,6 +195,14 @@ export async function ensurePermanentCompletions(
         streakAwarded = true;
       }
     }
+  }
+
+  if (inserted > 0) {
+    const streak = await getUserStreak(userId, completedOn);
+    await syncStreakBadges(
+      userId,
+      Math.max(streak.current, streak.best),
+    );
   }
 
   return inserted;

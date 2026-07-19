@@ -339,8 +339,8 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "magnetico-sleep-pad",
     name: "Magnetico sleep pad",
     description:
-      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Choose 5 / 10 / 20 gauss — 1.25× / 1.5× / 2× on base points. Permanent: auto-logs nightly while on your available list.",
-    points: 10,
+      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Choose 5 / 10 / 20 gauss — 10 / 25 / 50 pts. Permanent: auto-logs nightly while on your available list.",
+    points: 25,
     category: "emf",
     timeOfDay: "night",
     lockedTimeOfDay: "night",

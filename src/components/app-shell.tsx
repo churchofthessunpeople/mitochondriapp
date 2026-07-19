@@ -6,6 +6,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import type { HistoryRow, ReminderRow } from "@/components/account-home";
 import type { AccountPanelUser } from "@/components/account-panel";
+import type { StreakBadgeView } from "@/components/level-progress";
+import type { LevelProgress } from "@/lib/levels";
 import { AppContentProvider } from "@/components/app-content-context";
 import { AppTutorial } from "@/components/app-tutorial";
 import type { AppContentBundle } from "@/lib/content-overrides";
@@ -159,6 +161,8 @@ export type AppShellProps = {
   initialOpenAdmin?: boolean;
   history: HistoryRow[];
   lifetimePoints: number;
+  levelProgress: LevelProgress;
+  streakBadges: StreakBadgeView[];
   leaderboards?: LeaderboardBoards | null;
   reminders: ReminderRow[];
   reminderSunPresets?: {
@@ -219,6 +223,8 @@ export function AppShell({
   initialOpenAdmin = false,
   history,
   lifetimePoints,
+  levelProgress,
+  streakBadges,
   leaderboards,
   reminders,
   reminderSunPresets,
@@ -597,6 +603,7 @@ export function AppShell({
             completionDurations={completionDurations}
             dayPoints={dayPoints}
             streak={streak}
+            lifetimePoints={lifetimePoints}
             placeLabel={placeLabel}
             postalCode={postalCode}
             region={region}
@@ -643,6 +650,8 @@ export function AppShell({
             initialSection={accountSection}
             history={history}
             lifetimePoints={lifetimePoints}
+            levelProgress={levelProgress}
+            streakBadges={streakBadges}
             isAdmin={isAdmin}
             reminders={reminders}
             reminderSunPresets={reminderSunPresets}

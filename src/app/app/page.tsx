@@ -42,7 +42,13 @@ import {
   redirectIfNeedsOnboarding,
 } from "@/lib/require-onboarding";
 import { ensurePermanentCompletions } from "@/lib/permanent-completions";
+import { levelFromXp } from "@/lib/levels";
 import { getSunriseBuffToday } from "@/lib/sunrise-buff";
+import {
+  badgeStatusList,
+  listUserBadges,
+  syncStreakBadges,
+} from "@/lib/streak-badges";
 import { getUserStreak } from "@/lib/streaks";
 import { formatTimeInZone, getSunTimesForLocalDay, sunPhase } from "@/lib/sun";
 import { displayTimeToHm, shiftHm } from "@/lib/time-hm";
@@ -134,6 +140,22 @@ export default async function AppPage({
     db.select().from(userReminders).where(eq(userReminders.userId, userId)),
     listRegions(),
   ]);
+
+  // Backfill streak badges for history that pre-dates the badge table
+  await syncStreakBadges(userId, Math.max(streak.current, streak.best));
+  const streakBadges = badgeStatusList(await listUserBadges(userId)).map(
+    (b) => ({
+      key: b.key,
+      label: b.label,
+      shortLabel: b.shortLabel,
+      days: b.days,
+      description: b.description,
+      earned: b.earned,
+      earnedAt: b.earnedAt ? b.earnedAt.toISOString() : null,
+      streakDays: b.streakDays,
+    }),
+  );
+  const levelProgress = levelFromXp(lifetimePoints);
 
   const hasCoords = loc.latitude != null && loc.longitude != null;
   const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
@@ -293,6 +315,8 @@ export default async function AppPage({
       }}
       history={history}
       lifetimePoints={lifetimePoints}
+      levelProgress={levelProgress}
+      streakBadges={streakBadges}
       leaderboards={null}
       reminders={reminderRows.map((r) => ({
         id: r.id,

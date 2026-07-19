@@ -111,7 +111,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "magnetico-sleep-pad": {
     equipment: "required",
-    how: "Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nSet pad strength on the checklist: 5 G = 1.25×, 10 G = 1.5×, 20 G = 2× base points. Once on your available list this auto-logs nightly; tap to skip when traveling.",
+    how: "Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nSet pad strength on the checklist: 5 G = 10 pts, 10 G = 25 pts, 20 G = 50 pts. Day boost multipliers come from morning sunlight only. Once on your available list this auto-logs nightly; tap to skip when traveling.",
   },
   "breaker-off-bedroom": {
     equipment: "optional",

@@ -35,7 +35,6 @@ import {
 } from "@/lib/cold-thermo-skin-temp";
 import {
   formatMagneticoGauss,
-  formatMagneticoGaussMultiplier,
   isMagneticoProtocolId,
   MAGNETICO_GAUSS_OPTIONS,
   parseMagneticoGauss,
@@ -416,7 +415,7 @@ export function ScheduleDay({
     if (isMagneticoProtocolId(p.id)) {
       const pts = pointsForMagneticoGauss(magneticoGauss, p.points);
       const parts = [
-        `${formatMagneticoGauss(magneticoGauss)} · ${formatMagneticoGaussMultiplier(magneticoGauss)} · ${pts} pts`,
+        `${formatMagneticoGauss(magneticoGauss)} · ${pts} pts`,
       ];
       if (isPermanentProtocol(p)) parts.push("automatic daily");
       return parts.join(" · ");
@@ -1149,7 +1148,7 @@ export function ScheduleDay({
                     (g): ClickThroughOption => ({
                       id: String(g),
                       title: formatMagneticoGauss(g),
-                      subtitle: `${formatMagneticoGaussMultiplier(g)} · ${pointsForMagneticoGauss(g, choicePicker.protocol.points)} pts`,
+                      subtitle: `${pointsForMagneticoGauss(g)} pts`,
                       highlight: g === magneticoGauss,
                     }),
                   )}

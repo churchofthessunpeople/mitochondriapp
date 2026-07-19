@@ -187,6 +187,16 @@ await sql`
   )
 `;
 
+await sql`
+  CREATE TABLE IF NOT EXISTS user_badges (
+    user_id text NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    badge_key text NOT NULL,
+    streak_days integer NOT NULL,
+    earned_at timestamp NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, badge_key)
+  )
+`;
+
 console.log("Schema OK. Seeding protocols...");
 const seed = spawnSync("npx", ["tsx", "src/db/seed.ts"], {
   stdio: "inherit",

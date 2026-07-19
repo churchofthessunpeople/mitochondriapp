@@ -21,8 +21,9 @@
     "db:migrate-favorites": "node scripts/migrate-favorites.mjs",
     "db:migrate-display-name": "node scripts/migrate-display-name-changed-at.mjs",
     "db:migrate-guest": "node scripts/migrate-guest.mjs",
+    "db:migrate-badges": "node scripts/migrate-badges.mjs",
     "email:probe": "node scripts/probe-email.mjs",
-    "test": "tsx --test src/lib/sun.test.ts src/lib/scoring.test.ts src/lib/geomag.test.ts src/lib/artificial-em.test.ts src/lib/magnetico.test.ts src/lib/cold-thermo-skin-temp.test.ts src/lib/inclination-drop-zones.test.ts src/lib/format-day-activities.test.ts src/lib/sun-exposure.test.ts src/lib/zip-place-cache.test.ts src/lib/username.test.ts src/lib/display-name.test.ts src/lib/display-name-policy.test.ts src/lib/week-range.test.ts"
+    "test": "tsx --test src/lib/sun.test.ts src/lib/scoring.test.ts src/lib/geomag.test.ts src/lib/artificial-em.test.ts src/lib/magnetico.test.ts src/lib/cold-thermo-skin-temp.test.ts src/lib/inclination-drop-zones.test.ts src/lib/format-day-activities.test.ts src/lib/sun-exposure.test.ts src/lib/zip-place-cache.test.ts src/lib/username.test.ts src/lib/display-name.test.ts src/lib/display-name-policy.test.ts src/lib/week-range.test.ts src/lib/levels.test.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",

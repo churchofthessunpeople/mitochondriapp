@@ -10,6 +10,11 @@ import {
 import { AccountExpandCard } from "@/components/account-expand-card";
 import type { AccountPanelUser } from "@/components/account-panel";
 import { HistoryList } from "@/components/history-list";
+import {
+  LevelProgressBar,
+  StreakBadgeStrip,
+  type StreakBadgeView,
+} from "@/components/level-progress";
 import { logoutAction } from "@/lib/actions/auth";
 import {
   saveTimezoneFormAction,
@@ -17,6 +22,7 @@ import {
 } from "@/lib/actions/profile";
 import type { AccountSection } from "@/lib/app-tabs";
 import type { OpenAppSheet } from "@/lib/app-sheets";
+import type { LevelProgress } from "@/lib/levels";
 import { ROUTES } from "@/lib/routes";
 import { cn, formatPoints } from "@/lib/utils";
 
@@ -52,6 +58,8 @@ type Props = {
   initialSection?: AccountSection;
   history: HistoryRow[];
   lifetimePoints: number;
+  levelProgress: LevelProgress;
+  streakBadges: StreakBadgeView[];
   isAdmin?: boolean;
   reminders: ReminderRow[];
   reminderSunPresets?: {
@@ -71,6 +79,8 @@ export function AccountHome({
   initialSection,
   history,
   lifetimePoints,
+  levelProgress,
+  streakBadges,
   isAdmin = false,
   onOpenSheet,
 }: Props) {
@@ -206,6 +216,19 @@ export function AccountHome({
 
         {section === "profile" && (
           <>
+            <div className="rounded-2xl border border-border bg-foreground/[0.03] px-4 py-4">
+              <LevelProgressBar progress={levelProgress} />
+              <div className="mt-4">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">
+                  Streak badges
+                </p>
+                <p className="mt-1 text-[11px] text-muted">
+                  Earned once for longest streak milestones — kept forever.
+                </p>
+                <StreakBadgeStrip badges={streakBadges} className="mt-3" />
+              </div>
+            </div>
+
             <DisplayNameForm
               initialDisplayName={displayName}
               changeBlockedUntilLabel={user.displayNameChangeBlockedUntilLabel}

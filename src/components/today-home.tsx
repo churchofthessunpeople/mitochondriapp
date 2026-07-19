@@ -24,11 +24,13 @@ const LeaderboardPanel = dynamic(
     })),
   { ssr: false },
 );
+import { LevelProgressBar } from "@/components/level-progress";
 import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import type { OpenAppSheet } from "@/lib/app-sheets";
 import type { TodaySection } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
 import { enrichPlaceMagnetismAction } from "@/lib/actions/place";
+import { formatLevelLabel, levelFromXp } from "@/lib/levels";
 import { ROUTES } from "@/lib/routes";
 import {
   formatSunriseMultiplier,
@@ -51,6 +53,7 @@ type Props = {
   completionDurations?: Record<string, number>;
   dayPoints: number;
   streak: { current: number; best: number };
+  lifetimePoints: number;
   placeLabel: string | null;
   postalCode: string | null;
   region: Region | null;
@@ -112,6 +115,7 @@ export function TodayHome({
   completionDurations,
   dayPoints,
   streak,
+  lifetimePoints,
   placeLabel,
   postalCode,
   region,
@@ -166,6 +170,10 @@ export function TodayHome({
   const [liveDurations, setLiveDurations] = useState(completionDurations ?? {});
   const [livePoints, setLivePoints] = useState(dayPoints);
   const [liveStreak, setLiveStreak] = useState(streak);
+  const levelProgress = useMemo(
+    () => levelFromXp(lifetimePoints - dayPoints + livePoints),
+    [lifetimePoints, dayPoints, livePoints],
+  );
   const [liveSunriseMult, setLiveSunriseMult] = useState(sunriseMultiplier);
   const [liveSunriseTierLabel, setLiveSunriseTierLabel] = useState(
     sunriseTierLabel ?? null,
@@ -411,6 +419,10 @@ export function TodayHome({
                   )}
                   {liveStreak.current}d streak
                 </span>
+                <span aria-hidden>·</span>
+                <span className="tabular-nums">
+                  {formatLevelLabel(levelProgress.level)}
+                </span>
                 {!overviewOpen && (
                   <>
                     <span aria-hidden>·</span>
@@ -434,7 +446,7 @@ export function TodayHome({
               </p>
               <p className="truncate text-xs text-muted">{placeSummary}</p>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <div className="rounded-xl border border-border bg-foreground/[0.03] px-3 py-2 text-center">
                   <p className="text-[10px] uppercase tracking-wider text-muted">
                     Points
@@ -454,7 +466,17 @@ export function TodayHome({
                     {liveStreak.current}d
                   </p>
                 </div>
+                <div className="rounded-xl border border-border bg-foreground/[0.03] px-3 py-2 text-center">
+                  <p className="text-[10px] uppercase tracking-wider text-muted">
+                    Level
+                  </p>
+                  <p className="mt-0.5 text-sm font-semibold tabular-nums">
+                    {levelProgress.level}
+                  </p>
+                </div>
               </div>
+
+              <LevelProgressBar progress={levelProgress} compact />
 
               <LwmStrip
                 completionCounts={liveCounts}
