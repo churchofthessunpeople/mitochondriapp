@@ -6,7 +6,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import type { HistoryRow, ReminderRow } from "@/components/account-home";
 import type { AccountPanelUser } from "@/components/account-panel";
+import { AchievementCelebration } from "@/components/achievement-celebration";
 import type { StreakBadgeView } from "@/components/level-progress";
+import type { PendingCelebrations } from "@/lib/achievements";
 import type { LevelProgress } from "@/lib/levels";
 import { AppContentProvider } from "@/components/app-content-context";
 import { AppTutorial } from "@/components/app-tutorial";
@@ -163,6 +165,8 @@ export type AppShellProps = {
   lifetimePoints: number;
   levelProgress: LevelProgress;
   streakBadges: StreakBadgeView[];
+  /** Unseen level/badge wins — shown before sunrise check-in */
+  pendingCelebrations?: PendingCelebrations | null;
   leaderboards?: LeaderboardBoards | null;
   reminders: ReminderRow[];
   reminderSunPresets?: {
@@ -225,6 +229,7 @@ export function AppShell({
   lifetimePoints,
   levelProgress,
   streakBadges,
+  pendingCelebrations = null,
   leaderboards,
   reminders,
   reminderSunPresets,
@@ -244,6 +249,9 @@ export function AppShell({
     initialOpenAdmin && isAdmin && !isGuest ? { id: "admin" } : null,
   );
   const [showTutorial, setShowTutorial] = useState(!tutorialComplete);
+  const [celebration, setCelebration] = useState<PendingCelebrations | null>(
+    pendingCelebrations,
+  );
   const [tourTodaySection, setTourTodaySection] =
     useState<TodaySection | null>(null);
   const [adminContentFocus, setAdminContentFocus] = useState<string | null>(
@@ -262,6 +270,13 @@ export function AppShell({
   useEffect(() => {
     setMorningLightDone(morningLightLogged);
   }, [morningLightLogged]);
+
+  useEffect(() => {
+    setCelebration(pendingCelebrations);
+  }, [pendingCelebrations]);
+
+  const showCelebration = celebration != null;
+  const holdSunrise = showTutorial || showCelebration;
 
   useEffect(() => {
     setSunriseMultiplier(initialSunriseMult);
@@ -379,6 +394,14 @@ export function AppShell({
         />
       )}
 
+      {celebration ? (
+        <AchievementCelebration
+          pending={celebration}
+          paused={showTutorial}
+          onDone={() => setCelebration(null)}
+        />
+      ) : null}
+
       <SunriseCheckIn
         userId={currentUserId}
         todayIso={todayIso}
@@ -387,8 +410,8 @@ export function AppShell({
         allProtocols={allProtocols}
         sun={sun}
         timeZone={timeZone}
-        paused={showTutorial}
-        forceOpen={forceSunriseCheckIn && !showTutorial}
+        paused={holdSunrise}
+        forceOpen={forceSunriseCheckIn && !holdSunrise}
         onLogged={(mult) => {
           setMorningLightDone(true);
           setSunriseMultiplier(mult);

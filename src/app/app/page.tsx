@@ -42,6 +42,10 @@ import {
   redirectIfNeedsOnboarding,
 } from "@/lib/require-onboarding";
 import { ensurePermanentCompletions } from "@/lib/permanent-completions";
+import {
+  hasPendingCelebrations,
+  resolvePendingCelebrations,
+} from "@/lib/achievements";
 import { levelFromXp } from "@/lib/levels";
 import { getSunriseBuffToday } from "@/lib/sunrise-buff";
 import {
@@ -156,6 +160,13 @@ export default async function AppPage({
     }),
   );
   const levelProgress = levelFromXp(lifetimePoints);
+  const pendingCelebrations = await resolvePendingCelebrations(
+    userId,
+    lifetimePoints,
+  );
+  const initialCelebrations = hasPendingCelebrations(pendingCelebrations)
+    ? pendingCelebrations
+    : null;
 
   const hasCoords = loc.latitude != null && loc.longitude != null;
   const sunLat = hasCoords ? loc.latitude! : (region?.latitude ?? null);
@@ -317,6 +328,7 @@ export default async function AppPage({
       lifetimePoints={lifetimePoints}
       levelProgress={levelProgress}
       streakBadges={streakBadges}
+      pendingCelebrations={initialCelebrations}
       leaderboards={null}
       reminders={reminderRows.map((r) => ({
         id: r.id,

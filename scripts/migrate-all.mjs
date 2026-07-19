@@ -58,6 +58,7 @@ await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_guest boolean NOT NULL D
 // Existing rows get true (skip tutorial); new inserts use DEFAULT false.
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS tutorial_complete boolean NOT NULL DEFAULT true`;
 await sql`ALTER TABLE users ALTER COLUMN tutorial_complete SET DEFAULT false`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS celebrated_level integer NOT NULL DEFAULT 0`;
 
 // Regions (lifestyle environment scores)
 await sql`
@@ -193,8 +194,15 @@ await sql`
     badge_key text NOT NULL,
     streak_days integer NOT NULL,
     earned_at timestamp NOT NULL DEFAULT now(),
+    celebrated_at timestamp,
     PRIMARY KEY (user_id, badge_key)
   )
+`;
+await sql`ALTER TABLE user_badges ADD COLUMN IF NOT EXISTS celebrated_at timestamp`;
+await sql`
+  UPDATE user_badges
+  SET celebrated_at = earned_at
+  WHERE celebrated_at IS NULL
 `;
 
 console.log("Schema OK. Seeding protocols...");

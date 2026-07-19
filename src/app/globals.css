@@ -202,3 +202,90 @@ html.light ::selection {
 .site-disclaimer {
   padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
 }
+
+/* Achievement celebration (morning popup) */
+@keyframes achievement-pop-in {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes achievement-icon-pop {
+  0% {
+    transform: scale(0.4) rotate(-12deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.12) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes achievement-item-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes achievement-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+.achievement-pop-in {
+  animation: achievement-pop-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.achievement-icon {
+  animation: achievement-icon-pop 560ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+.achievement-item {
+  animation: achievement-item-in 420ms ease-out both;
+}
+
+.achievement-burst {
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      color-mix(in srgb, var(--accent) 35%, transparent),
+      transparent 55%
+    );
+  animation: achievement-burst 900ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-pop-in,
+  .achievement-icon,
+  .achievement-item,
+  .achievement-burst {
+    animation: none !important;
+  }
+}

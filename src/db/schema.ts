@@ -117,6 +117,11 @@ export const users = pgTable("users", {
   magneticoGauss: integer("magnetico_gauss").notNull().default(10),
   /** Bedroom sleep temperature preference (°F); 65°F floor */
   sleepRoomTempF: integer("sleep_room_temp_f").notNull().default(65),
+  /**
+   * Last level shown in the achievement celebration popup.
+   * 0 = not bootstrapped yet (set silently to current level on first load).
+   */
+  celebratedLevel: integer("celebrated_level").notNull().default(0),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
@@ -319,6 +324,8 @@ export const userBadges = pgTable(
     /** Longest streak length when the badge was earned */
     streakDays: integer("streak_days").notNull(),
     earnedAt: timestamp("earned_at", { mode: "date" }).defaultNow().notNull(),
+    /** When the celebration popup was shown (null = pending). */
+    celebratedAt: timestamp("celebrated_at", { mode: "date" }),
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.badgeKey] }),
