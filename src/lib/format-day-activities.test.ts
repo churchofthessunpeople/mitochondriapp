@@ -171,14 +171,15 @@ describe("formatDayActivitiesCopy", () => {
       },
     ]);
 
-    const sunriseIdx = text.indexOf("Sunrise\n");
-    const dayIdx = text.indexOf("Activities");
-    const permIdx = text.indexOf("Automatic · every day");
+    const sunriseIdx = text.indexOf("Morning light\n");
+    const dayIdx = text.indexOf("Performed");
+    const permIdx = text.indexOf("Permanent\n");
     assert.ok(sunriseIdx >= 0 && dayIdx > sunriseIdx && permIdx > dayIdx);
     assert.match(text, /Open-sky morning light/);
     assert.match(text, /Mastic gum/);
     assert.match(text, /Cool bedroom sleep/);
     assert.doesNotMatch(text, /Sunrise \/ early morning/);
+    assert.doesNotMatch(text, /Automatic · every day/);
   });
 
   it("shows log count for multi-log activities without a timer", () => {

@@ -1,6 +1,10 @@
 /**
  * Builds Simple / Intermediate / Advanced reading tiers for Mitoversity entries
  * that do not yet define custom readingLevels.
+ *
+ * Tiers are additive: Simple = overview + practice; Intermediate = full article
+ * body (no truncated rehash); Advanced = technical addenda only (does not paste
+ * Intermediate bodies again).
  */
 
 import type { MitoEntry, MitoEntrySection, MitoPillar } from "@/lib/mitoversity";
@@ -18,7 +22,8 @@ function isMetaSection(section: MitoEntrySection): boolean {
     /read next/i.test(section.heading) ||
     /app fit/i.test(section.heading) ||
     /app scoring/i.test(section.heading) ||
-    /stacking/i.test(section.heading)
+    /stacking/i.test(section.heading) ||
+    /in this app/i.test(section.heading)
   );
 }
 
@@ -40,9 +45,8 @@ function isPracticeSection(section: MitoEntrySection): boolean {
 function buildSimpleSections(entry: MitoEntry): MitoEntrySection[] {
   const { sections, summary } = entry;
   const practice = sections.find(isPracticeSection);
-  const app = sections.find((s) => /how this fits|in this app|app fit/i.test(s.heading));
-  const core = sections.filter(
-    (s) => !isMetaSection(s) && !isKruseSection(s) && s !== practice,
+  const app = sections.find((s) =>
+    /how this fits|in this app|app fit/i.test(s.heading),
   );
 
   const out: MitoEntrySection[] = [
@@ -51,13 +55,6 @@ function buildSimpleSections(entry: MitoEntry): MitoEntrySection[] {
       body: summary,
     },
   ];
-
-  for (const section of core.slice(0, 3)) {
-    out.push({
-      heading: section.heading,
-      body: firstSentences(section.body, 2),
-    });
-  }
 
   if (practice) {
     out.push({
@@ -84,6 +81,22 @@ function buildSimpleSections(entry: MitoEntry): MitoEntrySection[] {
   return out;
 }
 
+function buildIntermediateSections(entry: MitoEntry): MitoEntrySection[] {
+  const core = entry.sections.filter((s) => !isMetaSection(s));
+  const out: MitoEntrySection[] = [
+    {
+      heading: "Building on Simple",
+      body: "This tier assumes you already read Simple (big picture, what to do, and how logging works). Below is the full article detail—mechanisms, practice, and framework notes—without repeating the Simple digest.",
+    },
+    ...core,
+    {
+      heading: "In this app (same habit, deeper why)",
+      body: "Logging and scoring are unchanged from Simple. Use this tier for the fuller why; switch back to Simple if you only need the habit checklist.",
+    },
+  ];
+  return out;
+}
+
 function advancedAddendum(
   section: MitoEntrySection,
   pillar: MitoPillar,
@@ -91,22 +104,34 @@ function advancedAddendum(
   const h = section.heading.toLowerCase();
   const parts: string[] = [];
 
-  if (pillar === "light" || /melanopsin|circadian|spectrum|lux|melatonin|uv|sun/i.test(h)) {
+  if (
+    pillar === "light" ||
+    /melanopsin|circadian|spectrum|lux|melatonin|uv|sun/i.test(h)
+  ) {
     parts.push(
       "Technical context: intrinsically photosensitive retinal ganglion cells (ipRGCs) integrate irradiance and spectral composition; melanopic equivalent daylight illuminance (EDI) is the modern photometric correlate for circadian dose. Phase-response curves quantify advance/delay from timed light; polysomnography and DLMO assays are research endpoints this app does not measure.",
     );
   }
-  if (pillar === "water" || /deuterium|water|hydration|co₂|bicarbonate|meal|seafood/i.test(h)) {
+  if (
+    pillar === "water" ||
+    /deuterium|water|hydration|co₂|bicarbonate|meal|seafood/i.test(h)
+  ) {
     parts.push(
       "Technical context: natural waters carry hydrogen-isotope signatures (δD relative to VSMOW); kinetic isotope effects on proton transfer are established in chemistry but health effect sizes from ordinary dietary variation remain contested. Acid–base physiology uses Henderson–Hasselbalch balance and carbonic anhydrase–catalyzed CO₂/HCO₃⁻ interconversion.",
     );
   }
-  if (pillar === "magnetism" || /emf|field|ground|magnet|nnemf|breaker|gauss/i.test(h)) {
+  if (
+    pillar === "magnetism" ||
+    /emf|field|ground|magnet|nnemf|breaker|gauss/i.test(h)
+  ) {
     parts.push(
       "Technical context: Earth’s main field is modeled by WMM/IGRF-class products (F, I, D); nnEMF refers to human-made time-varying EM fields distinct from geomagnetic DC background. Grounding electrode systems, common-mode RF on cables, and body-voltage metrology are engineering measurements—not inferred from catalog checkboxes.",
     );
   }
-  if (pillar === "support" || /sleep|cold|movement|lymph|glymph|jaw|thermo/i.test(h)) {
+  if (
+    pillar === "support" ||
+    /sleep|cold|movement|lymph|glymph|jaw|thermo/i.test(h)
+  ) {
     parts.push(
       "Technical context: autonomic, thermoregulatory, and sleep-architecture endpoints (slow-wave sleep, HRV, core temperature nadir) mediate many Support-pillar claims. Hormesis from cold or exercise load depends on dose, timing, and recovery environment (dark, cool, low-RF sleep).",
     );
@@ -132,17 +157,30 @@ function advancedAddendum(
 }
 
 function buildAdvancedSections(entry: MitoEntry): MitoEntrySection[] {
-  const expanded = entry.sections.map((section) => ({
-    heading: section.heading,
-    body: `${section.body}\n\n${advancedAddendum(section, entry.pillar)}`,
+  const core = entry.sections.filter(
+    (s) => !isMetaSection(s) && !isPracticeSection(s),
+  );
+
+  const addenda = core.map((section) => ({
+    heading: `${section.heading} — technical depth`,
+    body: `Assumes Intermediate. ${advancedAddendum(section, entry.pillar)}`,
   }));
 
-  expanded.push({
-    heading: "Measurement limits in this app",
-    body: `No Mitoversity article replaces labs, imaging, polysomnography, magnetometers, or isotope assays. Protocol logs for “${entry.title}” record intentional habits aligned with the ${entry.pillar} pillar—they do not verify mechanistic outcomes or diagnose disease.`,
-  });
-
-  return expanded;
+  return [
+    {
+      heading: "Building on Intermediate",
+      body: "Advanced adds research-grade context and epistemic boundaries only. It does not restate the Intermediate article body—read that tier first for the full mechanisms and practice.",
+    },
+    ...addenda,
+    {
+      heading: "Measurement limits in this app",
+      body: `No Mitoversity article replaces labs, imaging, polysomnography, magnetometers, or isotope assays. Protocol logs for “${entry.title}” record intentional habits aligned with the ${entry.pillar} pillar—they do not verify mechanistic outcomes or diagnose disease.`,
+    },
+    {
+      heading: "In this app",
+      body: "Same habit logging as Simple. Use Intermediate for the full why; use Advanced for technical framing only.",
+    },
+  ];
 }
 
 export function hasCompleteReadingLevels(
@@ -159,7 +197,7 @@ export function hasCompleteReadingLevels(
 export function buildReadingLevels(entry: MitoEntry): MitoReadingLevels {
   return {
     simple: { sections: buildSimpleSections(entry) },
-    intermediate: { sections: entry.sections },
+    intermediate: { sections: buildIntermediateSections(entry) },
     advanced: { sections: buildAdvancedSections(entry) },
   };
 }
@@ -170,8 +208,7 @@ export function applyReadingLevels(entry: MitoEntry): MitoEntry {
     return {
       ...entry,
       sections:
-        entry.readingLevels!.simple?.sections ??
-        entry.sections,
+        entry.readingLevels!.simple?.sections ?? entry.sections,
     };
   }
 

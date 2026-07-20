@@ -3,9 +3,9 @@
  * Stored on protocol meta as `articleId`; used for "Learn more" links.
  */
 export const PROTOCOL_ARTICLE_IDS: Record<string, string> = {
-  "sunrise-horizon": "sunrise-horizon",
-  "sunrise-open-sky": "sunrise-open-sky",
-  "sunrise-outside": "sunrise-outside",
+  "sunrise-horizon": "sunrise-why",
+  "sunrise-open-sky": "sunrise-why",
+  "sunrise-outside": "sunrise-why",
   "sun-exposure": "solar-noon-vitamin-d",
   "sunset-viewing": "sunset-viewing-why",
   "red-nir-light": "red-nir-light",

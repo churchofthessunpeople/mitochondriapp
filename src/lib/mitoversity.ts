@@ -66,7 +66,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     title: "Why morning outdoor light—and sunrise—matter",
     pillar: "light",
     summary:
-      "Established circadian biology plus place-based lifestyle teaching on why first outdoor light is a high-leverage daily signal.",
+      "Sunrise as the daily EMF reset for mitochondrial TCA timing, circadian clocks, and fat metabolism—framed through Nick Lane’s bioenergetics work and Dr. Jack Kruse’s light-first teaching.",
     relatedProtocolIds: [
       "sunrise-horizon",
       "sunrise-open-sky",
@@ -74,28 +74,36 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     ],
     sections: [
       {
-        heading: "Circadian clocks are light-trained",
-        body: "Almost every tissue has a molecular clock. The master pacemaker in the brain (suprachiasmatic nucleus) is reset primarily by light detected in the eye—not by clocks on the wall. When that signal is strong and well timed, peripheral clocks (including in metabolic tissues) tend to stay aligned. When people live under dim days and bright nights, clocks drift: sleep, hormones, and daytime energy often follow. This core idea is mainstream chronobiology, not a niche invention.",
+        heading: "Life runs on light, not genes first",
+        body: "Nick Lane’s modern bioenergetics talks (including his public lecture work on mitochondria and the origins of complex life) push a hard point: cells amplify ancient biochemical networks that began in energy-rich environments; genes are not the primary “software.” In Dr. Jack Kruse’s reading of that work, the levers that amplify and time those pathways in mammals are controlled by electromagnetic fields from the sun. Clock genes stabilize biochemistry for your skin’s light environment—they do not invent metabolism from scratch. Mainstream chronobiology agrees that the solar day–night cycle entrains the mammalian circadian system; Kruse’s stronger claim is that AM solar EMF is the default switch that retunes TCA-cycle spin rates so mitochondria can burn fat coherently.",
       },
       {
-        heading: "Non-visual photoreception (melanopsin)",
-        body: "Specialized retinal cells that contain melanopsin project to the circadian system. They are especially responsive to short-wavelength (blue-enriched) light and to the overall intensity of outdoor daylight. That is why a bright outdoor morning differs from indoor LEDs or phone screens: spectrum, intensity, and timing all matter. Glass filters and sunglasses change the dose; indoor lighting rarely matches outdoor radiance at dawn.",
+        heading: "The living matrix vs the benchtop",
+        body: "Biology historically studied life by cutting, fixing, homogenizing, and fractionating tissue—methods that drain water and freeze a living syncytium into static parts. Kruse argues that Mitchell’s chemiosmotic ATPase story, as taught from prepared samples, under-explains how much ATP a living mammal needs in vivo. In his light–water–magnetism frame, ATPase accounts for at most about one-third of cellular ATP demand; the other two-thirds emerge from biophysical interactions of sunlight with water and melanin. That critique (drawing also on Gilbert Ling and Robert O. Becker’s earlier bioelectric work) is Kruse’s teaching layer—not a settled Nobel rewrite. What both Lane’s slides and Kruse share is that mitochondria are electrical, membrane-organized machines whose timing matters as much as their enzyme list.",
       },
       {
-        heading: "Sunrise as a distinct outdoor cue",
-        body: "Dawn and early morning light have a characteristic intensity ramp and spectral mix as the sun rises. Practically, being outdoors then couples you to the solar day more cleanly than “bright screens at 7 a.m.” Research on circadian phase shifting emphasizes morning light for advancing clocks and evening light for delay—supporting the habit of front-loading outdoor light and dimming late.",
+        heading: "Sunrise resets mitochondrial membranes",
+        body: "Kruse’s Leptin Rx–era teaching: every place the TCA cycle runs is tied to membranes packed with lipid rafts that convert sunlight into a DC-like electric current. That charge stabilizes forward TCA cycling so mitochondria burn fat. Miss AM outdoor light and that charge does not set—fat oxidation becomes metabolically “expensive,” skin ages faster, and skin cells are more vulnerable to later UV damage. He also points to inner mitochondrial membrane junctions (IMJs) aligning with the morning solar signal so fat-burning machinery runs in phase. Nick Lane’s talk slides on membrane bioenergetics and electromagnetic context are used in Kruse’s blogs as a modern echo of that story: incoming EMF informs mitochondrial membranes how to turn the TCA cycle in the fat-burning direction. Exact IMJ-alignment claims and ATP fractions are Kruse-specific; circadian control of metabolic enzymes is mainstream.",
       },
       {
-        heading: "Mitochondria and daily metabolic timing",
-        body: "Mitochondrial activity, insulin sensitivity, and many metabolic pathways show circadian rhythms. Aligning the light–dark cycle is one of the strongest non-drug levers studied for keeping those rhythms coherent. Better clock alignment is associated, in research literature, with more stable sleep and metabolic markers; mechanisms include hormone timing (e.g. melatonin, cortisol patterns) and cellular redox cycles that vary across 24 hours.",
+        heading: "Clocks, skin, and food timing",
+        body: "The hierarchically organized mammalian clock has a central pacemaker in the SCN and peripheral clocks in nearly every cell. CLOCK/BMAL1 transcription loops (with PERs and CRYs) create ~24-hour gene rhythms that regulate metabolism, cell proliferation, and drug responses. Skin clocks help set gut clocks; many skin-expressed genes respond acutely to food intake. Kruse’s practical meal hierarchy—“eat like a king 30 minutes after sunrise, a prince at lunch, a pauper at dinner”—follows from that: daylight hours disorder molecular clocks through living; night (melatonin + leptin signaling) repairs defective TCA mitochondria; AM sunlight then re-synchronizes the repaired fleet. Restricted feeding can shift clock phase without always shifting epidermal DNA-synthesis phase—evidence that light and food are coupled but not interchangeable. Diet composition is secondary if the light environment is artificial: without sunrise, fat metabolism via TCA is the first casualty in this framework.",
       },
       {
-        heading: "Where Dr. Jack Kruse’s teaching is specific",
-        body: "Dr. Jack Kruse’s public writing stresses a stronger hierarchy than generic “get morning light”: true outdoor sunrise with an unobstructed solar path (eyes to the horizon disk, no glass) as the day’s primary “solar call,” UV-A/full-spectrum outdoor light as non-substitutable by indoor LEDs, and tight coupling of that signal to mitochondrial redox and the wider light–water–magnetism stack (including DHA in retinal membranes). Those emphases and the exact lifestyle prescriptions are his framework; this app’s sunrise quality tiers (horizon / open sky / outside) are a pedagogical mirror of that hierarchy, not lab dosimetry.",
+        heading: "One octave of sunlight in a noisy spectrum",
+        body: "The electromagnetic spectrum spans roughly 10^−14 m to 10^8 m in wavelength—about 73 octaves of frequency doubling. Visible sunlight is only one octave. Kruse’s long-standing question before and after the Leptin Rx: with rising artificial light, phones, and network RF, is the organism’s “resonant music” drowning in electromagnetic noise? nnEMF and blue-rich night light scramble free-radical and redox signaling inside mitochondria—technology-induced chronic light stress that looks like “diseases from nowhere.” Genes respond to EMF timing; they do not override a broken light environment. Shift work, lazy sunrise habits, and living under LEDs all break the same rule: humans invented lighting that runs the pathway wrong for nearly everyone.",
+      },
+      {
+        heading: "Clinical signs you’re missing the AM light–fat TCA link",
+        body: "In Kruse’s teaching (not a diagnostic checklist), chronic failure to handle fat via TCA for lack of morning light shows up as: dry/scaly skin and poor sleep; dry eyes; feeling constantly cold; dry hair or hair loss; hormonal disruption including loss of menstrual cycle; low melatonin (raising disease risk in his framing); constant hunger / never feeling full; poor concentration and mental fatigue; fat-soluble vitamin issues; stools that never settle near Bristol type 4; and inability to lose weight consistently. Treat these as lifestyle red flags pointing back to sunrise and night darkness—not as a substitute for medical evaluation.",
+      },
+      {
+        heading: "Where Kruse extends Lane—and where science is settled",
+        body: "Credit Lane for connecting mitochondria, membranes, and electric origins of metabolism more boldly since ~2015. Kruse’s disagreement: Lane remains too “centralized” on Mitchell-style ATP accounting and underweights melanin, water, and full-spectrum solar EMF that Becker and others mapped decades earlier. Settled science you can lean on without accepting every Kruse claim: morning outdoor light is the strongest non-drug circadian zeitgeber; evening blue light delays melatonin; peripheral clocks track the SCN; metabolic pathways are circadian. Kruse’s hierarchy—horizon disk sunrise over open sky over “just outside,” no glass, light before food, melanin as major ATP partner—is the lifestyle prescription this app mirrors pedagogically, not lab dosimetry.",
       },
       {
         heading: "How this app uses the idea",
-        body: "Logging a morning outdoor light keystone can unlock a day points boost on other habits—teaching “light first.” Quality tiers reward clearer outdoor signals. That is product design grounded in circadian priority, with Kruse’s sunrise ranking as the lifestyle inspiration for the tiers.",
+        body: "Log a morning outdoor light keystone (horizon / open sky / outside) before screens. Higher-quality outdoor signals unlock a day points boost—teaching “light first,” then food. Pair with sunset viewing, evening blue-light hygiene, and true dark sleep so melatonin can do overnight TCA repair before the next sunrise re-synchronizes the fleet. Watch Lane’s mitochondrial slides for the membrane/bioenergetics backbone; treat Kruse’s sunrise rule as the daily operating system. Educational only—not medical advice. Video reference: Nick Lane lecture (YouTube: FLaTU-t1CQM).",
       },
     ],
   },
@@ -333,7 +341,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     title: "Magnetic sleep systems (Magnetico & dual-polar pads)",
     pillar: "magnetism",
     summary:
-      "Why sleep-time magnetism is discussed, how Magnetico’s under-mattress unidirectional design differs from dual-polar pads—choose your reading level below.",
+      "Night magnetism, Schumann/telluric context, melatonin, indoor CO₂, and why a unidirectional Magnetico pad is discussed for nnEMF-heavy bedrooms—choose your reading level below.",
     relatedProtocolIds: [
       "magnetico-sleep-pad",
       "phone-away-sleep",
@@ -494,7 +502,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "Practical rebounding habits",
-        body: "Start low: 2–5 minutes of soft bounces, both feet down, posture tall, gaze forward. Build toward 10–15 minutes if joints tolerate it. Barefoot or minimal shoes on a stable rebounder can add light foot/ankle work; hold a doorway bar if balance is new. Morning outdoor rebounding stacks movement with daylight (pair with mitochondrial movement logged in the app); indoor sessions still count as movement. Stop if you feel dizzy, knee pain, or pelvic floor pressure that worries you—high-intensity bouncing is not required for lymph benefit; consistency beats intensity.",
+        body: "Keep sessions gentle: soft bounces, both feet down, posture tall, gaze forward. In this app each log is a 15-minute block—use +/− to match how long you actually bounced. Barefoot or minimal shoes on a stable rebounder can add light foot/ankle work; hold a doorway bar if balance is new. Morning outdoor rebounding stacks movement with daylight; indoor sessions still count as movement. Stop if you feel dizzy, knee pain, or pelvic floor pressure that worries you—high-intensity bouncing is not required for lymph benefit; consistency beats intensity.",
       },
       {
         heading: "Where Dr. Jack Kruse’s teaching is specific",
@@ -502,7 +510,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "Log “Rebounding” when you complete a session on your rebounder (duration scales points; each log asks full sunlight, outside, or indoors). Add it only to your available list if you own equipment — otherwise use Mitochondrial movement or walking. Mitoversity keeps this article for users who already rebound or are deciding whether to buy a rebounder. Educational only—not medical advice for lymphedema, edema, or post-operative care.",
+        body: "Log “Rebounding” when you complete a session on your rebounder. Each log asks full sunlight, outside, or indoors, then adds 15 minutes; use +/− for more blocks. Add it only to your available list if you own equipment — otherwise use Mitochondrial movement or walking. Educational only—not medical advice for lymphedema, edema, or post-operative care.",
       },
     ],
   },

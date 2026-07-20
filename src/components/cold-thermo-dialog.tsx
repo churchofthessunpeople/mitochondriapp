@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Snowflake } from "lucide-react";
+import { ArrowLeft, Snowflake, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
@@ -145,7 +145,7 @@ export function ColdThermoDialog({
             className="rounded-lg p-1 text-muted"
             aria-label="Close"
           >
-            ×
+            <X className="h-5 w-5" />
           </button>
         </div>
 

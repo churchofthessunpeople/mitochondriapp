@@ -19,15 +19,15 @@ const DEFAULT: ProtocolMeta = { equipment: "none" };
 const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   "sunrise-horizon": {
     equipment: "none",
-    how: "Be outside before the sun clears the horizon. Look at the solar disk with bare eyes — no sunglasses, no window glass between you and the sky.\n\nFull points when your viewing session falls within 15 minutes before or after local sunrise; each minute outside costs 1 point (worst edge of start/finish). Skin, grounding, and sunglasses adjust your day boost on the check-in.",
+    how: "Be outside before the sun clears the horizon. Look at the solar disk with bare eyes — no sunglasses, no window glass between you and the sky.\n\nFull points when your viewing session falls within 15 minutes before or after local sunrise; each minute outside costs 1 point (worst edge of start/finish). Skin, grounding, and sunglasses adjust your day boost on the check-in.\n\nTap Learn more for why sunrise light retunes mitochondrial fat-burning and circadian clocks.",
   },
   "sunrise-open-sky": {
     equipment: "none",
-    how: "Get outside in the morning under a reasonably open sky — yard, park, or balcony with wide sky view.\n\nEyes open to outdoor light (no sunglasses). A few minutes is enough; longer is fine if you have time.",
+    how: "Get outside in the morning under a reasonably open sky — yard, park, or balcony with wide sky view.\n\nEyes open to outdoor light (no sunglasses). A few minutes is enough; longer is fine if you have time.\n\nTap Learn more for why morning outdoor light is the day’s metabolic reset.",
   },
   "sunrise-outside": {
     equipment: "none",
-    how: "Step outside in the morning even if trees, buildings, or heavy cloud limit the view.\n\nAny outdoor morning light to the eyes counts — porch, street, or trail. No glass between you and the sky if you can avoid it.",
+    how: "Step outside in the morning even if trees, buildings, or heavy cloud limit the view.\n\nAny outdoor morning light to the eyes counts — porch, street, or trail. No glass between you and the sky if you can avoid it.\n\nTap Learn more for the full sunrise / mitochondria lesson.",
   },
   "sun-exposure": {
     equipment: "none",
@@ -127,7 +127,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   rebounding: {
     equipment: "required",
-    how: "Use a stable mini-trampoline (rebounder) — not a toy trampoline. Soft bounces with both feet on the mat, knees slightly bent, posture tall.\n\nStart with 5–10 minutes and build toward 15. Morning outdoor rebounding stacks movement with daylight. Each log asks environment (sunlight / outside / indoors) and duration in 15-minute blocks.",
+    how: "Use a stable mini-trampoline (rebounder) — not a toy trampoline. Soft bounces with both feet on the mat, knees slightly bent, posture tall.\n\nEach log asks environment (sunlight / outside / indoors), then adds 15 minutes. Use +/− for more or less time in 15-minute blocks. Morning outdoor rebounding stacks movement with daylight.",
   },
   "mastic-gum": {
     equipment: "required",
@@ -176,12 +176,12 @@ export function getProtocolMeta(
 
 /** How-to copy for the activity dialog; falls back to catalog description. */
 export function getProtocolHowTo(
-  protocol: { id: string; description: string },
+  protocol: { id: string; description?: string | null },
   metaMap?: Record<string, ProtocolMeta>,
 ): string {
   const how = getProtocolMeta(protocol.id, metaMap).how;
   if (how?.trim()) return how.trim();
-  return protocol.description.trim();
+  return (protocol.description ?? "").trim() || "See the Learn more article for guidance.";
 }
 
 export function equipmentLabel(e: EquipmentNeed): string {

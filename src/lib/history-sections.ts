@@ -24,9 +24,9 @@ export const HISTORY_SECTIONS: {
   id: HistorySectionId;
   label: string;
 }[] = [
-  { id: "sunrise", label: "Sunrise" },
-  { id: "day", label: "Activities" },
-  { id: "permanent", label: "Automatic · every day" },
+  { id: "sunrise", label: "Morning light" },
+  { id: "day", label: "Performed" },
+  { id: "permanent", label: "Permanent" },
 ];
 
 export type AggregatedActivity = {
