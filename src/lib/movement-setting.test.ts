@@ -22,6 +22,25 @@ describe("requiresMovementSetting", () => {
       false,
     );
   });
+
+  it("skips mastic gum (movement category, not exercise location)", () => {
+    assert.equal(
+      requiresMovementSetting({
+        id: "mastic-gum",
+        category: "movement",
+        durationEnabled: true,
+      }),
+      false,
+    );
+    assert.equal(
+      requiresMovementSetting({
+        id: "rebounding",
+        category: "movement",
+        durationEnabled: true,
+      }),
+      true,
+    );
+  });
 });
 
 describe("encode/decode movement setting variant", () => {

@@ -7,7 +7,8 @@ export function SiteDisclaimer() {
       aria-label="Medical disclaimer"
     >
       <p className="mx-auto max-w-3xl">
-        Mitochondriapp is for educational lifestyle tracking only — not medical
+        While the activities listed here are a useful guide, if you live in a area with poor light, water and magnetism, they may not be effective, and you may need to consider relocating. 
+        Mitochondriapp is for educational lifestyle tracking only. It is not medical
         advice, diagnosis, or treatment. Protocols, scores, and Mitoversity
         content are informational. Consult a qualified healthcare professional
         before changing your health routine or stopping prescribed care.

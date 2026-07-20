@@ -91,7 +91,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "cold-thermogenesis": {
     equipment: "optional",
-    how: "Deliberate cold exposure: cold shower, outdoor cold, or plunge if you have safe access.\n\nBuild duration gradually. Log minutes in 15-minute blocks (+) or custom time. Set skin surface temp: ~50°F is the target; each 5°F warmer reduces base points before duration scales.",
+    how: "Deliberate cold exposure: cold shower, outdoor cold, or plunge if you have safe access.\n\nBuild duration gradually. Each log asks skin surface temp (~50°F target; warmer earns fewer base points) then session length. Aim for ~50°F skin for 10+ minutes when ready.",
   },
   "reduce-nnemf-block": {
     equipment: "optional",

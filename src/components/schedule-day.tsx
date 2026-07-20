@@ -4,6 +4,7 @@ import { Check, ChevronDown, Flame, Minus, Pencil, Plus, Sun, X } from "lucide-r
 import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import type { Protocol } from "@/db/schema";
 import { AddActivityDialog } from "@/components/add-activity-dialog";
+import { ColdThermoDialog } from "@/components/cold-thermo-dialog";
 import {
   ProtocolHowToButton,
   ProtocolHowToDialog,
@@ -51,7 +52,10 @@ import {
 } from "@/lib/sleep-room-temp";
 import { isPermanentProtocol } from "@/lib/permanent-activities";
 import {
+  MOVEMENT_SETTING_OPTIONS,
+  movementSettingBasePoints,
   requiresMovementSetting,
+  type MovementSetting,
 } from "@/lib/movement-setting";
 import {
   isSunExposureProtocolId,
@@ -243,8 +247,10 @@ export function ScheduleDay({
     open: boolean;
     initialProtocol: Protocol | null;
   }>({ open: false, initialProtocol: null });
+  const [coldThermoProtocol, setColdThermoProtocol] =
+    useState<Protocol | null>(null);
   const [choicePicker, setChoicePicker] = useState<{
-    kind: "magnetico" | "sleep" | "sunExposure";
+    kind: "magnetico" | "sleep" | "sunExposure" | "movement";
     protocol: Protocol;
   } | null>(null);
   const [addActivityOpen, setAddActivityOpen] = useState(false);
@@ -531,6 +537,14 @@ export function ScheduleDay({
 
   function toggleSingle(protocol: Protocol) {
     if (protocol.durationEnabled && (counts[protocol.id] ?? 0) === 0) {
+      if (isColdThermoProtocolId(protocol.id)) {
+        setColdThermoProtocol(protocol);
+        return;
+      }
+      if (requiresMovementSetting(protocol)) {
+        setChoicePicker({ kind: "movement", protocol });
+        return;
+      }
       addOne(protocol);
       return;
     }
@@ -724,13 +738,41 @@ export function ScheduleDay({
 
   function chooseSunExposureSlot(protocol: Protocol, slot: SunExposureSlot) {
     setChoicePicker(null);
-    addOne(protocol, sunExposureInputForSlot(slot));
+    addOne(protocol, { sunExposure: sunExposureInputForSlot(slot) });
   }
 
-  function addOne(protocol: Protocol, sunExposure?: SunExposureLogInput) {
+  function chooseMovementSetting(
+    protocol: Protocol,
+    setting: MovementSetting,
+  ) {
+    setChoicePicker(null);
+    addOne(protocol, { movementSetting: setting });
+  }
+
+  function chooseColdThermo(
+    protocol: Protocol,
+    skinTempF: ColdThermoSkinTempF,
+    durationMinutes: number,
+  ) {
+    setColdThermoSkinTempF(skinTempF);
+    setColdThermoProtocol(null);
+    addOne(protocol, { skinTempF, durationMinutes });
+  }
+
+  function addOne(
+    protocol: Protocol,
+    opts?: {
+      sunExposure?: SunExposureLogInput;
+      movementSetting?: MovementSetting;
+      skinTempF?: ColdThermoSkinTempF;
+      durationMinutes?: number;
+    },
+  ) {
     const count = counts[protocol.id] ?? 0;
     const prevMins = durations[protocol.id] ?? 0;
-    const mins = protocol.durationEnabled ? DURATION_BLOCK_MINUTES : undefined;
+    const mins = protocol.durationEnabled
+      ? (opts?.durationMinutes ?? DURATION_BLOCK_MINUTES)
+      : undefined;
     bumpCounts({ protocolId: protocol.id, delta: 1 });
     if (mins) {
       bumpDurations({ protocolId: protocol.id, delta: mins });
@@ -740,16 +782,16 @@ export function ScheduleDay({
         const res = await logCompletionAction(protocol.id, {
           durationMinutes: mins,
           skinTempF: isColdThermoProtocolId(protocol.id)
-            ? coldThermoSkinTempF
+            ? (opts?.skinTempF ?? coldThermoSkinTempF)
             : undefined,
           sunExposure: isSunExposureProtocolId(protocol.id)
-            ? (sunExposure ??
+            ? (opts?.sunExposure ??
               sunExposureInputForSlot(
                 sunSlotFromLocalHm(currentLocalHm(timeZone), { sun, timeZone }),
               ))
             : undefined,
           movementSetting: requiresMovementSetting(protocol)
-            ? "outside"
+            ? (opts?.movementSetting ?? "outside")
             : undefined,
         });
         applySnap({ ...res, protocolId: protocol.id });
@@ -759,7 +801,11 @@ export function ScheduleDay({
               ? ` · +${res.streakBonus} streak`
               : "";
           const time =
-            mins && protocol.durationEnabled ? `+${mins} min · ` : "+1 · ";
+            mins && protocol.durationEnabled
+              ? isColdThermoProtocolId(protocol.id) && opts?.skinTempF != null
+                ? `${formatColdThermoSkinTemp(opts.skinTempF)} · ${mins} min · `
+                : `+${mins} min · `
+              : "+1 · ";
           push(`${time}+${res.points} pts${extra}`);
         }
       } catch (e) {
@@ -794,6 +840,23 @@ export function ScheduleDay({
     return p.allowsMultiple && !p.durationEnabled;
   }
 
+  /** First log / another +15 for multi & timed activities (sun exposure opens slot picker). */
+  function addMultiOrTimed(protocol: Protocol) {
+    if (isSunExposureProtocolId(protocol.id)) {
+      setChoicePicker({ kind: "sunExposure", protocol });
+      return;
+    }
+    if (isColdThermoProtocolId(protocol.id)) {
+      setColdThermoProtocol(protocol);
+      return;
+    }
+    if (requiresMovementSetting(protocol)) {
+      setChoicePicker({ kind: "movement", protocol });
+      return;
+    }
+    addOne(protocol);
+  }
+
   function renderRow(p: Protocol) {
     const count = counts[p.id] ?? 0;
     const totalMins = durations[p.id] ?? 0;
@@ -802,14 +865,8 @@ export function ScheduleDay({
     const rowBusy = busyId === p.id;
 
     if (multi) {
-      return (
-        <li key={p.id} className="space-y-1.5">
-          <div
-            className={cn(
-              "flex items-center gap-3 rounded-2xl border px-3.5 py-3",
-              isDone ? "border-accent/40 bg-accent/10" : "border-border bg-card",
-            )}
-          >
+      const multiBody = (
+        <>
           <span
             className={cn(
               "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
@@ -848,47 +905,86 @@ export function ScheduleDay({
                     {protocolHint(p)}
                     {p.durationEnabled && totalMins > 0
                       ? ` · ${totalMins} min today`
-                      : p.durationEnabled
-                        ? ` · +/− ${DURATION_BLOCK_MINUTES} min`
-                        : ""}
+                      : isColdThermoProtocolId(p.id)
+                        ? " · tap to set temp & duration"
+                        : p.durationEnabled
+                          ? ` · tap to add ${DURATION_BLOCK_MINUTES} min`
+                          : " · tap to log"}
                   </>
                 )}
             </span>
           </span>
-          <div className="flex shrink-0 items-center gap-1.5">
-            <ProtocolHowToButton
-              protocol={p}
-              onClick={() => setHowToFor(p)}
-            />
-            <button
-              type="button"
-              disabled={rowBusy || count <= 0}
-              onClick={() => removeOne(p)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted transition hover:border-red-400/40 hover:text-red-400 disabled:opacity-35"
-              aria-label={`Remove one ${p.name}`}
-            >
-              <Minus className="h-4 w-4" strokeWidth={2.5} />
-            </button>
-            <button
-              type="button"
-              disabled={rowBusy}
-              onClick={() =>
-                isSunExposureProtocolId(p.id)
-                  ? setChoicePicker({ kind: "sunExposure", protocol: p })
-                  : addOne(p)
-              }
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent transition hover:bg-accent/25 disabled:opacity-35"
-              aria-label={
-                isSunExposureProtocolId(p.id)
-                  ? `Log sun exposure — choose morning, noon, or afternoon`
-                  : p.durationEnabled
-                    ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
-                    : `Add one ${p.name}`
-              }
-            >
-              <Plus className="h-4 w-4" strokeWidth={2.5} />
-            </button>
-          </div>
+        </>
+      );
+
+      return (
+        <li key={p.id} className="space-y-1.5">
+          <div
+            className={cn(
+              "flex items-center gap-3 rounded-2xl border px-3.5 py-3",
+              isDone ? "border-accent/40 bg-accent/10" : "border-border bg-card",
+            )}
+          >
+            {/* First log: whole row body; after that only + adds more. */}
+            {isDone ? (
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                {multiBody}
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={rowBusy}
+                onClick={() => addMultiOrTimed(p)}
+                className="flex min-w-0 flex-1 items-center gap-3 text-left transition disabled:opacity-60"
+                aria-label={
+                  isSunExposureProtocolId(p.id)
+                    ? `Log sun exposure — choose morning, noon, or afternoon`
+                    : isColdThermoProtocolId(p.id)
+                      ? `Log ${p.name} — choose skin temperature and duration`
+                      : requiresMovementSetting(p)
+                        ? `Log ${p.name} — choose full sunlight, outside, or indoors`
+                        : p.durationEnabled
+                          ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                          : `Log ${p.name}`
+                }
+              >
+                {multiBody}
+              </button>
+            )}
+            <div className="flex shrink-0 items-center gap-1.5">
+              <ProtocolHowToButton
+                protocol={p}
+                onClick={() => setHowToFor(p)}
+              />
+              <button
+                type="button"
+                disabled={rowBusy || count <= 0}
+                onClick={() => removeOne(p)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted transition hover:border-red-400/40 hover:text-red-400 disabled:opacity-35"
+                aria-label={`Remove one ${p.name}`}
+              >
+                <Minus className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                disabled={rowBusy}
+                onClick={() => addMultiOrTimed(p)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent transition hover:bg-accent/25 disabled:opacity-35"
+                aria-label={
+                  isSunExposureProtocolId(p.id)
+                    ? `Log sun exposure — choose morning, noon, or afternoon`
+                    : isColdThermoProtocolId(p.id)
+                      ? `Log ${p.name} — choose skin temperature and duration`
+                      : requiresMovementSetting(p)
+                        ? `Log ${p.name} — choose full sunlight, outside, or indoors`
+                        : p.durationEnabled
+                          ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                          : `Add one ${p.name}`
+                }
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            </div>
           </div>
         </li>
       );
@@ -1129,7 +1225,9 @@ export function ScheduleDay({
                     ? "Tap your gauss rating"
                     : choicePicker.kind === "sleep"
                       ? "Tap your bedroom temperature"
-                      : "Which sun window was this?"}
+                      : choicePicker.kind === "movement"
+                        ? "Where did you do this session?"
+                        : "Which sun window was this?"}
                 </p>
               </div>
               <button
@@ -1178,6 +1276,25 @@ export function ScheduleDay({
                     );
                   }}
                 />
+              ) : choicePicker.kind === "movement" ? (
+                <OptionListChoice
+                  options={MOVEMENT_SETTING_OPTIONS.map(
+                    (opt): ClickThroughOption => ({
+                      id: opt.id,
+                      title: opt.label,
+                      subtitle: `${opt.detail} · ${movementSettingBasePoints(opt.id, choicePicker.protocol.points)} pts / ${DURATION_BLOCK_MINUTES} min`,
+                      highlight: opt.id === "full_sunlight",
+                    }),
+                  )}
+                  selectedId="full_sunlight"
+                  disabled={busyId === choicePicker.protocol.id}
+                  onChoose={(id) => {
+                    chooseMovementSetting(
+                      choicePicker.protocol,
+                      id as MovementSetting,
+                    );
+                  }}
+                />
               ) : (
                 <OptionListChoice
                   options={SUN_EXPOSURE_SLOTS.map(
@@ -1212,6 +1329,18 @@ export function ScheduleDay({
           initialProtocol={sunriseDialog.initialProtocol}
           onLog={logSunriseKeystone}
           onCancel={closeSunriseDialog}
+        />
+      ) : null}
+      {coldThermoProtocol ? (
+        <ColdThermoDialog
+          protocol={coldThermoProtocol}
+          pending={busyId === coldThermoProtocol.id}
+          sunriseMultiplier={sunriseMult}
+          initialTempF={coldThermoSkinTempF}
+          onLog={(tempF, mins) =>
+            chooseColdThermo(coldThermoProtocol, tempF, mins)
+          }
+          onCancel={() => setColdThermoProtocol(null)}
         />
       ) : null}
       {catalogProtocols?.length && onAvailableIdsChange ? (

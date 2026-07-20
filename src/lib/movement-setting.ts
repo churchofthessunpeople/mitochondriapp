@@ -49,10 +49,17 @@ const BASE_MULTIPLIER: Record<MovementSetting, number> = {
   indoors: 0.7,
 };
 
+/** Jaw work uses the movement category but is not an outdoor/indoor exercise log. */
+const MOVEMENT_SETTING_EXCLUDED_IDS = new Set(["mastic-gum"]);
+
 export function requiresMovementSetting(protocol: {
+  id?: string;
   category: string;
   durationEnabled: boolean;
 }): boolean {
+  if (protocol.id && MOVEMENT_SETTING_EXCLUDED_IDS.has(protocol.id)) {
+    return false;
+  }
   return protocol.category === "movement" && protocol.durationEnabled;
 }
 
