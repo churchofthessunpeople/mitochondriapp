@@ -264,8 +264,9 @@ export function TodayHome({
     }
   }
 
-  // New calendar day (or hard navigation) — adopt server props once.
-  // Do not sync on every prop change: logs update live state without /app revalidate.
+  // Adopt server day stats on calendar change and after focus sync (router.refresh).
+  // Same-device logs update live state without revalidating /app, so these props
+  // only change on navigation / returning to the tab.
   useEffect(() => {
     setLiveCounts(completionCounts);
     setLiveDurations(completionDurations ?? {});
@@ -273,8 +274,15 @@ export function TodayHome({
     setLiveStreak(streak);
     setLiveSunriseMult(sunriseMultiplier);
     setLiveSunriseTierLabel(sunriseTierLabel ?? null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- dateLabel only
-  }, [dateLabel]);
+  }, [
+    dateLabel,
+    completionCounts,
+    completionDurations,
+    dayPoints,
+    streak,
+    sunriseMultiplier,
+    sunriseTierLabel,
+  ]);
 
   const onCompletionCountsChange = useCallback(
     (counts: Record<string, number>) => {

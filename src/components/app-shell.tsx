@@ -24,6 +24,7 @@ import type { TourStep } from "@/lib/app-tour";
 import type { PlaceFactors } from "@/lib/place-factors";
 import { ROUTES } from "@/lib/routes";
 import type { SunTimes } from "@/lib/sun";
+import { useFocusSync } from "@/lib/use-focus-sync";
 import type { WeeklySummary } from "@/lib/weekly";
 import { cn } from "@/lib/utils";
 
@@ -266,6 +267,12 @@ export function AppShell({
   const [sunriseTierLabel, setSunriseTierLabel] = useState(
     initialSunriseTierLabel,
   );
+
+  useFocusSync();
+
+  useEffect(() => {
+    setAvailableIds(initialAvailableIds);
+  }, [initialAvailableIds]);
 
   useEffect(() => {
     setMorningLightDone(morningLightLogged);
