@@ -72,14 +72,46 @@ export function sunScoreFromLatitude(latitude: number): number {
 }
 
 /**
+ * Magma / volcanic geology influence range (lifestyle proxy, not hazard).
+ * Within FULL_KM → full +4 boost (score 5). Beyond ZERO_KM → boost 0 (score 1).
+ * Between: inverse-square falloff in 1/r² so distant crust has no effect.
+ */
+export const MAGMA_FULL_INFLUENCE_KM = 100;
+export const MAGMA_ZERO_INFLUENCE_KM = 750;
+
+/**
+ * Geology boost 0–4 from distance (km) using inverse-square falloff.
+ * boost=0 past ZERO_KM — magma systems at continental range do not help you.
+ */
+export function magmaGeologyBoostFromKm(nearestKm: number): number {
+  if (!Number.isFinite(nearestKm) || nearestKm < 0) return 0;
+  if (nearestKm <= MAGMA_FULL_INFLUENCE_KM) return 4;
+  if (nearestKm >= MAGMA_ZERO_INFLUENCE_KM) return 0;
+
+  const inv = 1 / (nearestKm * nearestKm);
+  const invFull =
+    1 / (MAGMA_FULL_INFLUENCE_KM * MAGMA_FULL_INFLUENCE_KM);
+  const invZero =
+    1 / (MAGMA_ZERO_INFLUENCE_KM * MAGMA_ZERO_INFLUENCE_KM);
+  const t = (inv - invZero) / (invFull - invZero);
+  return Math.max(0, Math.min(4, 4 * t));
+}
+
+/**
  * Magnetism / geological vitality from distance to Holocene volcanoes,
  * US monitored systems, and major arc/hotspot/rift midpoints.
  * Closer to free-flowing magma systems → higher (lifestyle framework, not hazard).
+ * Uses 1/r² falloff; beyond ~750 km the boost is zero.
  */
 export function magnetismScoreFromLocation(
   latitude: number,
   longitude: number,
-): { score: number; nearestKm: number; nearestName: string } {
+): {
+  score: number;
+  boost: number;
+  nearestKm: number;
+  nearestName: string;
+} {
   let nearestKm = Infinity;
   let nearestName = "none";
 
@@ -91,14 +123,11 @@ export function magnetismScoreFromLocation(
     }
   }
 
-  let score = 1;
-  if (nearestKm <= 250) score = 5;
-  else if (nearestKm <= 600) score = 4;
-  else if (nearestKm <= 1500) score = 3;
-  else if (nearestKm <= 3500) score = 2;
-  else score = 1;
+  const boostRaw = magmaGeologyBoostFromKm(nearestKm);
+  const boost = Math.round(boostRaw);
+  const score = Math.max(1, Math.min(5, 1 + boost));
 
-  return { score, nearestKm, nearestName };
+  return { score, boost, nearestKm, nearestName };
 }
 
 /**

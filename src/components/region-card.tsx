@@ -1,4 +1,5 @@
 import type { Region } from "@/db/schema";
+import { formatPopulationDensityBand } from "@/lib/artificial-em";
 import { formatDistanceKm } from "@/lib/geo";
 import type { PlaceFactors } from "@/lib/place-factors";
 import { ratingLabel } from "@/lib/regions";
@@ -195,6 +196,21 @@ export function RegionCard({
                 value={placeFactors.geologyLabel}
                 detail={placeFactors.geologyDetail}
               />
+              {placeFactors.artificialEm?.populationDensityBand ? (
+                <FactorRow
+                  label="Population density"
+                  value={`${formatPopulationDensityBand(placeFactors.artificialEm.populationDensityBand)}${
+                    (placeFactors.artificialEm.densityBump ?? 0) > 0
+                      ? ` · EM +${placeFactors.artificialEm.densityBump}`
+                      : ""
+                  }`}
+                  detail={
+                    placeFactors.artificialEm.buildingCount != null
+                      ? `${placeFactors.artificialEm.buildingCount.toLocaleString()} mapped buildings (~1.5 km) · device-density proxy for phones/Wi‑Fi not on tower maps`
+                      : "Building-map proxy for people and consumer RF — not a census headcount"
+                  }
+                />
+              ) : null}
               {placeFactors.artificialEm && (
                 <FactorRow
                   label="Artificial EM load"
@@ -204,11 +220,12 @@ export function RegionCard({
               )}
             </ul>
             <p className="mt-2 text-[10px] leading-relaxed text-muted">
-              Main field = WMM planetary model. Geology = magma systems.
-              Inclination drop = April 2026 Kruse-framework regional synthesis
-              from your ZIP — not a live decay-rate sensor. Artificial EM =
-              open-map infrastructure proxy (cells/masts/plants) — not a
-              personal exposure meter.
+              Main field = WMM planetary model. Geology = magma systems with
+              1/r² distance falloff (no boost past ~750 km). Inclination drop =
+              April 2026 Kruse-framework regional synthesis from your ZIP — not
+              a live decay-rate sensor. Artificial EM = open-map infrastructure
+              proxy (cells/masts/plants) plus building-density device proxy —
+              not a personal exposure meter.
             </p>
             {placeFactors.inclinationZone && (
               <div className="mt-3 rounded-2xl border border-accent/25 bg-accent/5 px-3 py-2.5">

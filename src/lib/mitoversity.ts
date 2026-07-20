@@ -209,11 +209,11 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "Geology score in this app (volcano / magma proximity)",
-        body: "Separately, the app scores “geological vitality” as distance to Holocene volcanic and magma-system anchors (Smithsonian Global Volcanism Program–derived catalogs and USGS lists). That is a transparent lifestyle proxy for living crustal systems—not the same number as total field F from WMM, and not a volcanic hazard product.",
+        body: "Separately, the app scores “geological vitality” as distance to Holocene volcanic and magma-system anchors (Smithsonian Global Volcanism Program–derived catalogs and USGS lists). Influence uses inverse-square falloff (1/r²): full boost within ~100 km of an anchor, tapering to zero past ~750 km—so a volcano a continent away does not inflate your score. That is a transparent lifestyle proxy for living crustal systems—not the same number as total field F from WMM, and not a volcanic hazard product.",
       },
       {
         heading: "Artificial EM infrastructure",
-        body: "Cell sites, masts, power plants, and dense urban electronics create non-native electromagnetic environments. They do not appear in WMM. This app’s artificial EM load score is an open-map proxy (e.g. OpenCelliD when available, OpenStreetMap masts and plants)—useful for “how built-up is the RF/power landscape,” not a personal V/m or µW/m² measurement at your pillow.",
+        body: "Cell sites, masts, power plants, and dense urban electronics create non-native electromagnetic environments. They do not appear in WMM. This app’s artificial EM load score is an open-map proxy (e.g. OpenCelliD when available, OpenStreetMap masts and plants) plus a soft population/device-density bump from mapped building counts—useful for “how built-up is the RF/power landscape,” not a personal V/m or µW/m² measurement at your pillow.",
       },
       {
         heading: "Where Dr. Jack Kruse’s teaching is specific",

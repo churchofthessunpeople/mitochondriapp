@@ -5,9 +5,17 @@
  * - OpenCelliD getInArea when OPENCELLID_API_KEY is set and returns data
  * - OpenStreetMap Overpass: communication masts / mobile towers
  * - OpenStreetMap: nearby power plants (distance)
+ * - OpenStreetMap building count (~1.5 km) as population / device-density proxy
  *
  * Educational lifestyle framework only.
  */
+
+export type PopulationDensityBand =
+  | "rural"
+  | "low"
+  | "suburban"
+  | "urban"
+  | "dense";
 
 export type ArtificialEmSnapshot = {
   /** 1 = quiet / rural proxy … 5 = dense infrastructure proxy */
@@ -17,6 +25,12 @@ export type ArtificialEmSnapshot = {
   cellCount: number | null;
   /** OSM communication masts / towers in radius */
   mastCount: number;
+  /** OSM buildings in ~1.5 km — population / device-density proxy */
+  buildingCount?: number | null;
+  /** Coarse density band from building count */
+  populationDensityBand?: PopulationDensityBand | null;
+  /** Soft score bump applied from density (0–2) */
+  densityBump?: number;
   /** Nearest power plant distance km, if found within search */
   nearestPlantKm: number | null;
   nearestPlantName: string | null;
@@ -26,8 +40,17 @@ export type ArtificialEmSnapshot = {
   detailLine: string;
 };
 
+/** True when snapshot predates population-density fields (force re-fetch). */
+export function artificialEmNeedsRefresh(
+  em: ArtificialEmSnapshot | null | undefined,
+): boolean {
+  if (!em) return true;
+  return !("populationDensityBand" in em) && !("buildingCount" in em);
+}
+
 const CELL_RADIUS_M = 2000; // OpenCelliD BBOX limit ~4 km²
 const MAST_RADIUS_M = 5000;
+const BUILDING_RADIUS_M = 1500;
 const PLANT_RADIUS_M = 40_000;
 
 function roundCoord(n: number, places = 2): number {
@@ -55,6 +78,8 @@ export function scoreArtificialEmLoad(opts: {
   cellCount: number | null;
   mastCount: number;
   nearestPlantKm: number | null;
+  /** Soft device-density bump from population/buildings (0–2) */
+  densityBump?: number;
 }): number {
   let score = 1;
 
@@ -82,7 +107,66 @@ export function scoreArtificialEmLoad(opts: {
     else if (pk <= 15) score = Math.min(5, score + 1);
   }
 
+  const bump = Math.max(0, Math.min(2, opts.densityBump ?? 0));
+  score = Math.min(5, score + bump);
+
   return Math.max(1, Math.min(5, score));
+}
+
+/**
+ * Map OSM building count (~1.5 km) to a density band.
+ * Proxy for people + consumer devices that open maps miss.
+ */
+export function populationDensityBandFromBuildings(
+  buildingCount: number | null | undefined,
+): PopulationDensityBand | null {
+  if (buildingCount == null || !Number.isFinite(buildingCount)) return null;
+  const n = Math.max(0, Math.trunc(buildingCount));
+  if (n < 80) return "rural";
+  if (n < 400) return "low";
+  if (n < 1500) return "suburban";
+  if (n < 5000) return "urban";
+  return "dense";
+}
+
+/**
+ * Soft bump from human density: denser places → more phones/Wi‑Fi/APs.
+ * Extra +1 when mapped towers look quiet but buildings say people are dense
+ * (fills OpenCelliD/OSM mast gaps).
+ */
+export function densityBumpFromBand(
+  band: PopulationDensityBand | null,
+  infraScoreBeforeBump: number,
+): number {
+  if (!band) return 0;
+  if (band === "dense") {
+    return infraScoreBeforeBump <= 2 ? 2 : 1;
+  }
+  if (band === "urban") {
+    return infraScoreBeforeBump <= 2 ? 2 : 1;
+  }
+  if (band === "suburban") {
+    return infraScoreBeforeBump <= 2 ? 1 : 0;
+  }
+  return 0;
+}
+
+export function formatPopulationDensityBand(
+  band: PopulationDensityBand | null,
+): string | null {
+  if (!band) return null;
+  switch (band) {
+    case "rural":
+      return "Rural";
+    case "low":
+      return "Low density";
+    case "suburban":
+      return "Suburban";
+    case "urban":
+      return "Urban";
+    case "dense":
+      return "Dense urban";
+  }
 }
 
 /**
@@ -208,6 +292,27 @@ out center;`;
   return els.length;
 }
 
+/** Building count in radius via Overpass `out count` — population / device proxy. */
+export async function fetchOsmBuildingCount(
+  latitude: number,
+  longitude: number,
+  radiusM = BUILDING_RADIUS_M,
+): Promise<number | null> {
+  const lat = roundCoord(latitude, 3);
+  const lon = roundCoord(longitude, 3);
+  const q = `[out:json][timeout:15];
+way["building"](around:${radiusM},${lat},${lon});
+out count;`;
+  const els = await overpassQuery(q);
+  const countEl = els.find((e) => e.type === "count");
+  const tags = countEl?.tags;
+  if (!tags) return null;
+  const raw = tags.ways ?? tags.total ?? tags.nodes;
+  if (raw == null) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : null;
+}
+
 function haversineKm(
   lat1: number,
   lon1: number,
@@ -263,19 +368,33 @@ export async function fetchArtificialEmSnapshot(
 ): Promise<ArtificialEmSnapshot> {
   const sources: string[] = [];
 
-  const [cellCount, mastCount, plant] = await Promise.all([
+  const [cellCount, mastCount, buildingCount, plant] = await Promise.all([
     fetchOpenCellIdCount(latitude, longitude),
     fetchOsmMastCount(latitude, longitude),
+    fetchOsmBuildingCount(latitude, longitude),
     fetchNearestPowerPlant(latitude, longitude),
   ]);
 
   if (cellCount != null) sources.push("OpenCelliD");
   sources.push("OpenStreetMap");
 
+  const infraBeforeDensity = scoreArtificialEmLoad({
+    cellCount,
+    mastCount,
+    nearestPlantKm: plant?.km ?? null,
+    densityBump: 0,
+  });
+  const populationDensityBand =
+    populationDensityBandFromBuildings(buildingCount);
+  const densityBump = densityBumpFromBand(
+    populationDensityBand,
+    infraBeforeDensity,
+  );
   const loadScore = scoreArtificialEmLoad({
     cellCount,
     mastCount,
     nearestPlantKm: plant?.km ?? null,
+    densityBump,
   });
 
   const parts: string[] = [];
@@ -285,6 +404,14 @@ export async function fetchArtificialEmSnapshot(
   parts.push(
     `${mastCount} mapped mast${mastCount === 1 ? "" : "s"} / towers (5 km)`,
   );
+  if (buildingCount != null) {
+    const bandLabel = formatPopulationDensityBand(populationDensityBand);
+    parts.push(
+      `${buildingCount.toLocaleString()} buildings (~1.5 km)${
+        bandLabel ? ` · ${bandLabel.toLowerCase()}` : ""
+      }${densityBump > 0 ? ` · density +${densityBump}` : ""}`,
+    );
+  }
   if (plant) {
     parts.push(
       `nearest plant ~${plant.km < 10 ? plant.km.toFixed(1) : Math.round(plant.km)} km (${plant.name})`,
@@ -299,6 +426,9 @@ export async function fetchArtificialEmSnapshot(
     loadLabel: label,
     cellCount,
     mastCount,
+    buildingCount,
+    populationDensityBand,
+    densityBump,
     nearestPlantKm: plant?.km ?? null,
     nearestPlantName: plant?.name ?? null,
     radiusKm: MAST_RADIUS_M / 1000,

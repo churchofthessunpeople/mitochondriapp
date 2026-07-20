@@ -29,8 +29,9 @@ export function GuideMagnetismPanel() {
           </li>
           <li>
             <strong className="text-foreground">Geology</strong> — distance to
-            Holocene magma systems (GVP/USGS). Lifestyle proxy, not a field
-            meter or hazard alert.
+            Holocene magma systems (GVP/USGS) with inverse-square (1/r²)
+            falloff: full boost nearby, zero past ~750 km. Lifestyle proxy, not
+            a field meter or hazard alert.
           </li>
           <li>
             <strong className="text-foreground">Inclination drop zones</strong> —

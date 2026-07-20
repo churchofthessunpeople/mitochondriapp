@@ -30,6 +30,7 @@ import type { OpenAppSheet } from "@/lib/app-sheets";
 import type { TodaySection } from "@/lib/app-tabs";
 import type { PlaceFactors } from "@/lib/place-factors";
 import { enrichPlaceMagnetismAction } from "@/lib/actions/place";
+import { artificialEmNeedsRefresh } from "@/lib/artificial-em";
 import { formatLevelLabel, levelFromXp } from "@/lib/levels";
 import { ROUTES } from "@/lib/routes";
 import {
@@ -189,7 +190,8 @@ export function TodayHome({
     if (section !== "place" || !livePlaceFactors) return;
     if (
       livePlaceFactors.geomag?.source === "bgs-wmm" &&
-      livePlaceFactors.artificialEm
+      livePlaceFactors.artificialEm &&
+      !artificialEmNeedsRefresh(livePlaceFactors.artificialEm)
     ) {
       return;
     }

@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  MAGMA_FULL_INFLUENCE_KM,
+  MAGMA_ZERO_INFLUENCE_KM,
   VOLCANIC_HOTSPOTS,
   compositeHealthRating,
   magnetismScoreFromLocation,
@@ -56,29 +58,31 @@ export function ScoringGuidePanel() {
         <p className="text-sm text-muted">
           Distance to the nearest Holocene volcano or major magma system
           (Smithsonian GVP catalog + USGS US volcanoes + arc/hotspot midpoints).
-          Proxy for free-flowing magma / dynamic geological context — not a
-          real-time eruption alert.
+          Boost uses inverse-square falloff (1/r²): full influence within ~
+          {MAGMA_FULL_INFLUENCE_KM} km, zero boost past ~
+          {MAGMA_ZERO_INFLUENCE_KM} km. Lifestyle proxy — not a real-time
+          eruption alert.
         </p>
         <ul className="space-y-1 text-sm">
           <li>
-            <strong>≤ 250 km</strong> → 5
+            <strong>≤ {MAGMA_FULL_INFLUENCE_KM} km</strong> → 5 (full magma
+            boost)
           </li>
           <li>
-            <strong>≤ 600 km</strong> → 4
+            <strong>
+              {MAGMA_FULL_INFLUENCE_KM}–{MAGMA_ZERO_INFLUENCE_KM} km
+            </strong>{" "}
+            → 2–4 (1/r² taper)
           </li>
           <li>
-            <strong>≤ 1,500 km</strong> → 3
-          </li>
-          <li>
-            <strong>≤ 3,500 km</strong> → 2
-          </li>
-          <li>
-            <strong>Farther</strong> → 1
+            <strong>≥ {MAGMA_ZERO_INFLUENCE_KM} km</strong> → 1 (no boost —
+            too far to matter)
           </li>
         </ul>
         <p className="text-xs text-muted">
           Example near San Salvador → nearest {mag.nearestName} (~
-          {Math.round(mag.nearestKm)} km) → magnetism {mag.score}.
+          {Math.round(mag.nearestKm)} km) → geology {mag.score}/5
+          {mag.boost > 0 ? ` (+${mag.boost} boost)` : " (no boost)"}.
         </p>
         <details className="text-xs text-muted">
           <summary className="cursor-pointer text-foreground">

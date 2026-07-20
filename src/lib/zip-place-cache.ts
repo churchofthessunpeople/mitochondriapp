@@ -7,7 +7,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { zipPlaceCache } from "@/db/schema";
 import type { ArtificialEmSnapshot } from "@/lib/artificial-em";
-import { fetchArtificialEmQuick } from "@/lib/artificial-em";
+import {
+  artificialEmNeedsRefresh,
+  fetchArtificialEmQuick,
+} from "@/lib/artificial-em";
 import { geocodeUsZip, type GeocodedPlace } from "@/lib/geo";
 import {
   fetchGeomagFieldQuick,
@@ -219,7 +222,7 @@ export async function resolveZipMagnetismEnrichment(
 }> {
   if (rawZip) {
     const cached = await getZipPlaceCached(rawZip);
-    if (cached?.geomag) {
+    if (cached?.geomag && !artificialEmNeedsRefresh(cached.artificialEm)) {
       return {
         geomag: cached.geomag,
         artificialEm: cached.artificialEm,
@@ -231,6 +234,42 @@ export async function resolveZipMagnetismEnrichment(
               ? formatElevation(elevationM)
               : null,
         fromCache: true,
+      };
+    }
+
+    // Geomag cache hit but artificial EM is pre-density schema — refresh EM only.
+    if (cached?.geomag && artificialEmNeedsRefresh(cached.artificialEm)) {
+      const artificialEm = await fetchArtificialEmQuick(
+        cached.geocode.latitude,
+        cached.geocode.longitude,
+      );
+      if (artificialEm) {
+        try {
+          const code = normalizeUsZip(rawZip);
+          if (code) {
+            await db
+              .update(zipPlaceCache)
+              .set({
+                artificialEm,
+                refreshedAt: new Date(),
+              })
+              .where(eq(zipPlaceCache.postalCode, code));
+          }
+        } catch {
+          /* keep serving live EM even if cache write fails */
+        }
+      }
+      return {
+        geomag: cached.geomag,
+        artificialEm: artificialEm ?? cached.artificialEm,
+        elevationM: cached.elevationM ?? elevationM ?? null,
+        elevationLabel:
+          cached.elevationM != null
+            ? formatElevation(cached.elevationM)
+            : elevationM != null
+              ? formatElevation(elevationM)
+              : null,
+        fromCache: false,
       };
     }
 

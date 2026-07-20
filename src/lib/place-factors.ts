@@ -17,7 +17,7 @@ import {
   formatGeomagDisplay,
   type GeomagDisplay,
 } from "@/lib/geomag";
-import { magnetismScoreFromLocation } from "@/lib/region-scoring";
+import { magnetismScoreFromLocation, MAGMA_ZERO_INFLUENCE_KM } from "@/lib/region-scoring";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 
 export type PlaceFactors = {
@@ -168,7 +168,10 @@ export function buildPlaceFactors(opts: {
     nearestVolcanoKm: mag.nearestKm,
     // Clearest for users: this is the closest catalog anchor, not "under your feet"
     geologyLabel: mag.nearestName,
-    geologyDetail: `${formatDistanceKm(mag.nearestKm)} away · nearest magma / volcanic system (geology score · GVP/USGS catalog)`,
+    geologyDetail:
+      mag.boost <= 0
+        ? `${formatDistanceKm(mag.nearestKm)} away · geology ${mag.score}/5 · no magma boost at this distance (1/r² falloff past ~${MAGMA_ZERO_INFLUENCE_KM} km)`
+        : `${formatDistanceKm(mag.nearestKm)} away · geology ${mag.score}/5 · +${mag.boost} magma boost (1/r² · GVP/USGS catalog)`,
     geomag: opts.geomag ?? null,
     artificialEm: opts.artificialEm ?? null,
     inclinationZone: lookupInclinationDropZones(latitude, longitude),
