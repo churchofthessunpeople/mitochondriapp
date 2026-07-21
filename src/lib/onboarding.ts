@@ -11,7 +11,7 @@ export const STARTER_PROTOCOL_IDS = [
   "sun-exposure",
   "sunset-viewing",
   "blue-light-hygiene",
-  "dark-bedroom",
+  "sleep-space",
   "reduce-nnemf-block",
   "morning-movement",
 ] as const;

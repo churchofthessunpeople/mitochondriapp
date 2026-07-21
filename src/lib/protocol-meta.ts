@@ -103,7 +103,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "phone-away-sleep": {
     equipment: "none",
-    how: "Phone out of the bedroom entirely, or on airplane mode and far from your head — not on the nightstand.\n\nSet up before bed so you are not reaching for it if you wake.",
+    how: "Now part of Sleep Space. Phone out of the bedroom entirely, or on airplane mode and far from your head — not on the nightstand.",
   },
   "air-tube-headphones": {
     equipment: "required",
@@ -111,15 +111,23 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "magnetico-sleep-pad": {
     equipment: "required",
-    how: "Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nSet pad strength on the checklist: 5 G = 10 pts, 10 G = 25 pts, 20 G = 50 pts. Day boost multipliers come from morning sunlight only. Once on your available list this auto-logs nightly; tap to skip when traveling.",
+    how: "Now part of Sleep Space. Sleep on a Magnetico or equivalent under-mattress unidirectional pad — under mattress or box spring with ≥4″ spacer, correct N-hemisphere negative polarity, not a dual-polar topper on the bed.\n\nEnable Magnetico inside Sleep Space and pick 5 / 10 / 20 G (10 / 25 / 50 pts).",
   },
   "breaker-off-bedroom": {
     equipment: "optional",
-    how: "With an electrician, label bedroom circuits. Flip those breakers off at the panel before sleep.\n\nKeep fridge, heat, safety, and egress lighting circuits on. Auto-logs nightly while on your list; skip when away.",
+    how: "Now part of Sleep Space. With an electrician, label bedroom circuits. Flip those breakers off at the panel before sleep.\n\nKeep fridge, heat, safety, and egress lighting circuits on.",
   },
   "breaker-off-office": {
     equipment: "optional",
-    how: "Label desk and office circuits. Cut power when you leave or on a fixed schedule that matches your workday.\n\nAuto-logs daily while on your list; skip on days the office stayed powered.",
+    how: "Now part of Work Space. Label desk and office circuits. Cut power when you leave or on a fixed schedule that matches your workday.",
+  },
+  "sleep-space": {
+    equipment: "optional",
+    how: "One permanent bedroom stack. Tap Sleep Space and enable what you actually run: cool bedroom (°F), Magnetico (5/10/20 G), true dark, bedroom breakers off, phone away from bed, grounding mat, and/or negative ion generator.\n\nPoints = sum of enabled options. Auto-logs nightly while on your available list — skip when traveling.",
+  },
+  "work-space": {
+    equipment: "optional",
+    how: "One permanent desk/office stack. Tap Work Space and enable: office breakers off, grounding mat, negative ion generator, and/or low artificial field (desk EMF hygiene).\n\nAir-tube headphones stay separate. Points = sum of enabled options. Auto-logs daily with no fixed clock time.",
   },
   "morning-movement": {
     equipment: "none",
@@ -147,11 +155,11 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "dark-bedroom": {
     equipment: "optional",
-    how: "Make the room pitch-black: blackout curtains, eye mask, tape over standby LEDs, cover charger lights.\n\nYou should not see your hand in front of your face when lights are out.",
+    how: "Now part of Sleep Space. Make the room pitch-black: blackout curtains, eye mask, tape over standby LEDs, cover charger lights.",
   },
   "cool-bedroom-sleep": {
     equipment: "optional",
-    how: "Set the bedroom thermostat at 65°F (18°C) or cooler — cool under covers, not shivering. Fans and breathable bedding help without over-chilling.\n\nPick your sleep temp on the checklist: 65°F earns 10 pts; each degree warmer costs 1 point. Auto-logs nightly while on your list; skip when traveling.",
+    how: "Now part of Sleep Space. Set the bedroom thermostat to 65°F (18°C) or cooler — 65°F earns 10 pts; each degree warmer costs 1 point.",
   },
   "consistent-sleep-window": {
     equipment: "none",

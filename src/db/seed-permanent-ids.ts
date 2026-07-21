@@ -4,11 +4,8 @@
  */
 export const SEED_PERMANENT_PROTOCOL_IDS = [
   "air-tube-headphones",
-  "magnetico-sleep-pad",
-  "breaker-off-bedroom",
-  "breaker-off-office",
-  "dark-bedroom",
-  "cool-bedroom-sleep",
+  "sleep-space",
+  "work-space",
 ] as const;
 
 export const SEED_PERMANENT_ID_SET = new Set<string>(SEED_PERMANENT_PROTOCOL_IDS);

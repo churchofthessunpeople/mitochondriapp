@@ -32,9 +32,9 @@ export function seedToProtocol(seed: ProtocolSeed): Protocol {
 
 /** Full active catalog from local seeds (no admin overrides). */
 export function getCatalogProtocols(): Protocol[] {
-  return PROTOCOL_SEEDS.map(seedToProtocol).sort(
-    (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name),
-  );
+  return PROTOCOL_SEEDS.filter((s) => !s.retired)
+    .map(seedToProtocol)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
 }
 
 /** Catalog with admin overrides applied (preferred for app reads). */
@@ -148,7 +148,13 @@ export async function ensureProtocolInDb(protocolId: string): Promise<boolean> {
  */
 export const ensureCatalogSyncedToDb = cache(async () => {
   try {
-    const list = await getMergedCatalogProtocols();
+    // Include retired seeds so historical FKs and migrations keep resolving.
+    const list = [
+      ...PROTOCOL_SEEDS.map(seedToProtocol),
+      ...(await getMergedCatalogProtocols()).filter(
+        (p) => !PROTOCOL_SEEDS.some((s) => s.id === p.id),
+      ),
+    ];
     if (list.length === 0) return;
 
     const existing = await db

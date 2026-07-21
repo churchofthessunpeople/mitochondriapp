@@ -76,6 +76,8 @@ type Props = {
   travelLabel?: string | null;
   magneticoGauss?: number;
   sleepRoomTempF?: number;
+  sleepSpaceConfig?: string | null;
+  workSpaceConfig?: string | null;
   initialSection?: TodaySection | null;
   leaderboards?: LeaderboardBoards | null;
   currentUserId?: string;
@@ -138,6 +140,8 @@ export function TodayHome({
   travelLabel,
   magneticoGauss = 10,
   sleepRoomTempF = 65,
+  sleepSpaceConfig = null,
+  workSpaceConfig = null,
   initialSection,
   leaderboards,
   currentUserId,
@@ -590,6 +594,8 @@ export function TodayHome({
             onCompletionDurationsChange={onCompletionDurationsChange}
             magneticoGauss={magneticoGauss}
             sleepRoomTempF={sleepRoomTempF}
+            sleepSpaceConfig={sleepSpaceConfig}
+            workSpaceConfig={workSpaceConfig}
             onStatsChange={onStatsChange}
           />
         )}

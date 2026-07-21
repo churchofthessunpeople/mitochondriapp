@@ -313,6 +313,8 @@ export default async function AppPage({
       travelLabel={userFlags?.travelPlaceLabel ?? null}
       magneticoGauss={fullUser.magneticoGauss ?? 10}
       sleepRoomTempF={fullUser.sleepRoomTempF ?? 65}
+      sleepSpaceConfig={fullUser.sleepSpaceConfig ?? null}
+      workSpaceConfig={fullUser.workSpaceConfig ?? null}
       currentUserId={userId}
       accountUser={{
         username: fullUser.username,

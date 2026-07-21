@@ -153,6 +153,8 @@ export type AppShellProps = {
   travelLabel?: string | null;
   magneticoGauss?: number;
   sleepRoomTempF?: number;
+  sleepSpaceConfig?: string | null;
+  workSpaceConfig?: string | null;
   accountUser: AccountPanelUser;
   currentUserId: string;
   isAdmin?: boolean;
@@ -220,6 +222,8 @@ export function AppShell({
   travelLabel,
   magneticoGauss = 10,
   sleepRoomTempF = 65,
+  sleepSpaceConfig = null,
+  workSpaceConfig = null,
   accountUser,
   currentUserId,
   isAdmin = false,
@@ -655,6 +659,8 @@ export function AppShell({
             travelLabel={travelLabel}
             magneticoGauss={magneticoGauss}
             sleepRoomTempF={sleepRoomTempF}
+            sleepSpaceConfig={sleepSpaceConfig}
+            workSpaceConfig={workSpaceConfig}
             initialSection={guestSafeTodaySection}
             leaderboards={leaderboards}
             currentUserId={currentUserId}

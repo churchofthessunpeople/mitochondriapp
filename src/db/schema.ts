@@ -117,6 +117,10 @@ export const users = pgTable("users", {
   magneticoGauss: integer("magnetico_gauss").notNull().default(10),
   /** Bedroom sleep temperature preference (°F); 65°F floor */
   sleepRoomTempF: integer("sleep_room_temp_f").notNull().default(65),
+  /** JSON Sleep Space option toggles (see space-hygiene.ts) */
+  sleepSpaceConfig: text("sleep_space_config"),
+  /** JSON Work Space option toggles (see space-hygiene.ts) */
+  workSpaceConfig: text("work_space_config"),
   /**
    * Last level shown in the achievement celebration popup.
    * 0 = not bootstrapped yet (set silently to current level on first load).

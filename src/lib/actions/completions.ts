@@ -37,6 +37,14 @@ import {
 } from "@/lib/protocol-variants";
 import { parseSleepRoomTempF, isSleepRoomTempProtocolId } from "@/lib/sleep-room-temp";
 import {
+  isSleepSpaceProtocolId,
+  isWorkSpaceProtocolId,
+  parseSleepSpaceConfig,
+  parseWorkSpaceConfig,
+  pointsForSleepSpace,
+  pointsForWorkSpace,
+} from "@/lib/space-hygiene";
+import {
   encodeSunExposureVariant,
   isSunExposureProtocolId,
   sunExposureBasePoints,
@@ -326,6 +334,33 @@ export async function logCompletionAction(
     );
     variantValue = encodeMovementSettingVariant(setting);
     basePoints = movementSettingBasePoints(setting, protocol.points);
+  } else if (isSleepSpaceProtocolId(protocolId)) {
+    const [u] = await db
+      .select({
+        magneticoGauss: users.magneticoGauss,
+        sleepRoomTempF: users.sleepRoomTempF,
+        sleepSpaceConfig: users.sleepSpaceConfig,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    basePoints = pointsForSleepSpace(parseSleepSpaceConfig(u?.sleepSpaceConfig), {
+      magneticoGauss: u?.magneticoGauss,
+      sleepRoomTempF: u?.sleepRoomTempF,
+    });
+    if (basePoints <= 0) {
+      throw new Error("Configure at least one Sleep Space option first");
+    }
+  } else if (isWorkSpaceProtocolId(protocolId)) {
+    const [u] = await db
+      .select({ workSpaceConfig: users.workSpaceConfig })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    basePoints = pointsForWorkSpace(parseWorkSpaceConfig(u?.workSpaceConfig));
+    if (basePoints <= 0) {
+      throw new Error("Configure at least one Work Space option first");
+    }
   } else if (isVariantProtocolId(protocolId)) {
     const [u] = await db
       .select({

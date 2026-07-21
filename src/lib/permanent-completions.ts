@@ -28,6 +28,15 @@ import {
   parseSleepRoomTempF,
 } from "@/lib/sleep-room-temp";
 import {
+  isSleepSpaceProtocolId,
+  isSpaceHygieneProtocolId,
+  isWorkSpaceProtocolId,
+  parseSleepSpaceConfig,
+  parseWorkSpaceConfig,
+  pointsForSleepSpace,
+  pointsForWorkSpace,
+} from "@/lib/space-hygiene";
+import {
   bestSunriseMultiplier,
   isSunriseKeystoneProtocol,
   pointsForLog,
@@ -66,11 +75,13 @@ async function sunriseMultiplierForDay(
   }
 }
 
-async function userVariantPreferences(userId: string) {
+async function userHygienePreferences(userId: string) {
   const [u] = await db
     .select({
       magneticoGauss: users.magneticoGauss,
       sleepRoomTempF: users.sleepRoomTempF,
+      sleepSpaceConfig: users.sleepSpaceConfig,
+      workSpaceConfig: users.workSpaceConfig,
     })
     .from(users)
     .where(eq(users.id, userId))
@@ -78,6 +89,8 @@ async function userVariantPreferences(userId: string) {
   return {
     magneticoGauss: parseMagneticoGauss(u?.magneticoGauss),
     sleepRoomTempF: parseSleepRoomTempF(u?.sleepRoomTempF),
+    sleepConfig: parseSleepSpaceConfig(u?.sleepSpaceConfig),
+    workConfig: parseWorkSpaceConfig(u?.workSpaceConfig),
   };
 }
 
@@ -89,6 +102,15 @@ export async function ensurePermanentCompletions(
   userId: string,
   completedOn: string,
 ): Promise<number> {
+  try {
+    const { migrateLegacySpaceFavoritesForUser } = await import(
+      "@/lib/actions/space-hygiene"
+    );
+    await migrateLegacySpaceFavoritesForUser(userId);
+  } catch {
+    // Favorites migration is best-effort; continue auto-log.
+  }
+
   const [favoriteIds, catalog] = await Promise.all([
     getUserFavoriteIds(userId),
     getMergedCatalogProtocols(),
@@ -104,7 +126,10 @@ export async function ensurePermanentCompletions(
   await dedupeSingleLogCompletions(userId, completedOn);
   await Promise.all(targets.map((id) => ensureProtocolInDb(id)));
 
-  const [skippedRows, existingRows, buffBefore, variantPrefs] =
+  const needsHygienePrefs = targets.some(
+    (id) => isVariantProtocolId(id) || isSpaceHygieneProtocolId(id),
+  );
+  const [skippedRows, existingRows, buffBefore, hygienePrefs] =
     await Promise.all([
       db
         .select({ protocolId: userPermanentSkips.protocolId })
@@ -128,8 +153,8 @@ export async function ensurePermanentCompletions(
           ),
         ),
       sunriseMultiplierForDay(userId, completedOn),
-      targets.some(isVariantProtocolId)
-        ? userVariantPreferences(userId)
+      needsHygienePrefs
+        ? userHygienePreferences(userId)
         : Promise.resolve(null),
     ]);
 
@@ -152,17 +177,31 @@ export async function ensurePermanentCompletions(
 
     const isMagnetico = isMagneticoProtocolId(protocolId);
     const isSleepTemp = isSleepRoomTempProtocolId(protocolId);
-    const variantValue = isMagnetico
-      ? variantPrefs!.magneticoGauss
-      : isSleepTemp
-        ? variantPrefs!.sleepRoomTempF
-        : null;
-    const points = pointsForLog(protocol, null, {
-      sunriseMultiplier: multForThisLog,
-      basePoints:
+    let variantValue: number | null = null;
+    let basePoints: number | undefined;
+
+    if (isSleepSpaceProtocolId(protocolId) && hygienePrefs) {
+      basePoints = pointsForSleepSpace(hygienePrefs.sleepConfig, {
+        magneticoGauss: hygienePrefs.magneticoGauss,
+        sleepRoomTempF: hygienePrefs.sleepRoomTempF,
+      });
+      if (basePoints <= 0) continue;
+    } else if (isWorkSpaceProtocolId(protocolId) && hygienePrefs) {
+      basePoints = pointsForWorkSpace(hygienePrefs.workConfig);
+      if (basePoints <= 0) continue;
+    } else if (isMagnetico || isSleepTemp) {
+      variantValue = isMagnetico
+        ? hygienePrefs!.magneticoGauss
+        : hygienePrefs!.sleepRoomTempF;
+      basePoints =
         variantValue != null
           ? variantBasePoints(protocolId, variantValue, protocol.points)
-          : undefined,
+          : undefined;
+    }
+
+    const points = pointsForLog(protocol, null, {
+      sunriseMultiplier: multForThisLog,
+      basePoints,
     });
 
     await db.insert(dailyCompletions).values({

@@ -457,4 +457,48 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
       },
     ],
   },
+  {
+    id: "sleep-space",
+    title: "Sleep Space — bedroom hygiene stack",
+    pillar: "magnetism",
+    summary:
+      "One permanent night stack: cool temp, Magnetico, true dark, breakers, phone away, grounding mat, and negative ions — points add up from what you enable.",
+    relatedProtocolIds: ["sleep-space", "work-space", "air-tube-headphones"],
+    sections: [
+      {
+        heading: "Why one Sleep Space row",
+        body: "Bedroom recovery is a stack, not a single checkbox. Cool temperature, unidirectional magnetism, true dark, cut AC circuits, phone distance, grounding, and ions all belong to the same night environment. This activity keeps them under one permanent habit so setup matches how you actually sleep.",
+      },
+      {
+        heading: "How scoring works",
+        body: "Enable only what you run. Points are the sum: cool bedroom follows the °F curve (65°F = 10 pts), Magnetico is 10/25/50 by gauss, true dark 8, bedroom breakers 6, phone away 5, grounding mat 10, negative ion generator 10. Auto-logs nightly while on your list; skip when traveling.",
+      },
+      {
+        heading: "How this fits the app",
+        body: "Add Sleep Space once from Edit activities. Tap the row anytime to change options. Work Space is the daytime desk counterpart; air-tube headphones stay separate for calls.",
+      },
+    ],
+  },
+  {
+    id: "work-space",
+    title: "Work Space — desk / office hygiene stack",
+    pillar: "magnetism",
+    summary:
+      "Permanent daytime desk stack: office breakers, grounding mat, negative ions, and low artificial field — sum scoring, no fixed clock time.",
+    relatedProtocolIds: ["work-space", "sleep-space", "air-tube-headphones"],
+    sections: [
+      {
+        heading: "Why Work Space",
+        body: "Most nnEMF and dirty-electricity exposure for desk workers happens in the workday environment. Rolling breakers, grounding, ions, and low-field desk habits into one permanent activity mirrors Sleep Space without forcing a morning-only log.",
+      },
+      {
+        heading: "How scoring works",
+        body: "Enable what you run: office breakers 6, grounding mat 10, negative ion generator 10, low artificial field 5. Points sum. Auto-logs daily with no locked time of day. Air-tube headphones remain a separate permanent for calls.",
+      },
+      {
+        heading: "How this fits the app",
+        body: "Add Work Space from Edit activities. Tap to configure. Pair with Sleep Space for a full indoor magnetism hygiene loop.",
+      },
+    ],
+  },
 ];

@@ -182,6 +182,7 @@ export function mergeProtocols(
   const allMeta = mergeAllProtocolMeta(overrides);
   const out: Protocol[] = [];
   for (const seed of seeds) {
+    if (seed.retired) continue;
     if (isProtocolDeleted(overrides, seed.id)) continue;
     const merged = mergeProtocolSeed(seed, overrides);
     const teaser = getProtocolTeaser(merged, allMeta);

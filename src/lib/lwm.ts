@@ -90,7 +90,7 @@ export const MAGNETISM_KEYSTONE_IDS = [
   "magnetic-awareness",
   "reduce-nnemf-block",
   "nature-contact",
-  "magnetico-sleep-pad",
+  "sleep-space",
 ] as const;
 
 export function isWaterKeystoneId(id: string): boolean {

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } f
 import type { Protocol } from "@/db/schema";
 import { AddActivityDialog } from "@/components/add-activity-dialog";
 import { ColdThermoDialog } from "@/components/cold-thermo-dialog";
+import { SpaceHygieneDialog } from "@/components/space-hygiene-dialog";
 import {
   ProtocolHowToButton,
   ProtocolHowToDialog,
@@ -17,6 +18,10 @@ import {
 import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
 import { setMagneticoGaussAction } from "@/lib/actions/magnetico";
 import { setSleepRoomTempAction } from "@/lib/actions/sleep-room-temp";
+import {
+  saveSleepSpaceConfigAction,
+  saveWorkSpaceConfigAction,
+} from "@/lib/actions/space-hygiene";
 import { orderProtocolsForNow } from "@/lib/checklist-order";
 import {
   isMagnetismKeystoneId,
@@ -50,6 +55,16 @@ import {
   SLEEP_ROOM_TEMP_OPTIONS,
   type SleepRoomTempF,
 } from "@/lib/sleep-room-temp";
+import {
+  formatSleepSpaceHint,
+  formatWorkSpaceHint,
+  isSleepSpaceProtocolId,
+  isWorkSpaceProtocolId,
+  parseSleepSpaceConfig,
+  parseWorkSpaceConfig,
+  type SleepSpaceConfig,
+  type WorkSpaceConfig,
+} from "@/lib/space-hygiene";
 import { isPermanentProtocol } from "@/lib/permanent-activities";
 import {
   MOVEMENT_SETTING_OPTIONS,
@@ -123,6 +138,8 @@ type Props = {
   onCompletionDurationsChange?: (durations: Record<string, number>) => void;
   magneticoGauss?: number;
   sleepRoomTempF?: number;
+  sleepSpaceConfig?: string | null;
+  workSpaceConfig?: string | null;
 };
 
 const MORNING_LIGHT_BUSY_ID = "morning-light";
@@ -232,6 +249,8 @@ export function ScheduleDay({
   onCompletionDurationsChange,
   magneticoGauss: initialMagneticoGauss = 10,
   sleepRoomTempF: initialSleepRoomTempF = 65,
+  sleepSpaceConfig: initialSleepSpaceConfig = null,
+  workSpaceConfig: initialWorkSpaceConfig = null,
 }: Props) {
   const { push } = useToast();
   const [, start] = useTransition();
@@ -259,6 +278,15 @@ export function ScheduleDay({
   );
   const [sleepRoomTempF, setSleepRoomTempF] = useState<SleepRoomTempF>(() =>
     parseSleepRoomTempF(initialSleepRoomTempF),
+  );
+  const [sleepConfig, setSleepConfig] = useState<SleepSpaceConfig>(() =>
+    parseSleepSpaceConfig(initialSleepSpaceConfig),
+  );
+  const [workConfig, setWorkConfig] = useState<WorkSpaceConfig>(() =>
+    parseWorkSpaceConfig(initialWorkSpaceConfig),
+  );
+  const [spaceDialog, setSpaceDialog] = useState<"sleep" | "work" | null>(
+    null,
   );
 
   useEffect(() => {
@@ -418,6 +446,15 @@ export function ScheduleDay({
   }
 
   function protocolHint(p: Protocol): string {
+    if (isSleepSpaceProtocolId(p.id)) {
+      return formatSleepSpaceHint(sleepConfig, {
+        magneticoGauss,
+        sleepRoomTempF,
+      });
+    }
+    if (isWorkSpaceProtocolId(p.id)) {
+      return formatWorkSpaceHint(workConfig);
+    }
     if (isMagneticoProtocolId(p.id)) {
       const pts = pointsForMagneticoGauss(magneticoGauss, p.points);
       const parts = [
@@ -557,6 +594,14 @@ export function ScheduleDay({
     }
     if (isSleepRoomTempProtocolId(protocol.id)) {
       setChoicePicker({ kind: "sleep", protocol });
+      return;
+    }
+    if (isSleepSpaceProtocolId(protocol.id)) {
+      setSpaceDialog("sleep");
+      return;
+    }
+    if (isWorkSpaceProtocolId(protocol.id)) {
+      setSpaceDialog("work");
       return;
     }
 
@@ -1217,11 +1262,80 @@ export function ScheduleDay({
             <ul className="space-y-2">{permanentProtocols.map(renderRow)}</ul>
           ) : (
             renderEmptyHint(
-              "Add a permanent habit (like cool bedroom sleep) via Edit activities — it auto-logs each day.",
+              "Add Sleep Space, Work Space, or air-tube headphones via Edit activities — they auto-log each day.",
             )
           )}
         </CollapsibleChecklistSection>
       </div>
+
+      {spaceDialog === "sleep" ? (
+        <SpaceHygieneDialog
+          kind="sleep"
+          initialConfig={sleepConfig}
+          magneticoGauss={magneticoGauss}
+          sleepRoomTempF={sleepRoomTempF}
+          onClose={() => setSpaceDialog(null)}
+          onSave={async (input) => {
+            const res = await saveSleepSpaceConfigAction(input);
+            setSleepConfig(input.config);
+            setMagneticoGauss(input.magneticoGauss);
+            setSleepRoomTempF(input.sleepRoomTempF);
+            setDayPoints(res.dayPoints);
+            onStatsChange?.({ dayPoints: res.dayPoints, streak });
+            if (res.logged && res.points > 0) {
+              bumpCounts({
+                protocolId: "sleep-space",
+                delta: 0,
+                absolute: 1,
+              });
+            } else if (res.points <= 0) {
+              bumpCounts({
+                protocolId: "sleep-space",
+                delta: 0,
+                absolute: 0,
+              });
+            }
+            setSpaceDialog(null);
+            push(
+              res.points > 0
+                ? `Sleep Space · ${res.points} pts`
+                : "Sleep Space saved — enable an option to earn points",
+            );
+          }}
+        />
+      ) : null}
+      {spaceDialog === "work" ? (
+        <SpaceHygieneDialog
+          kind="work"
+          initialConfig={workConfig}
+          onClose={() => setSpaceDialog(null)}
+          onSave={async (input) => {
+            const res = await saveWorkSpaceConfigAction(input);
+            setWorkConfig(input.config);
+            setDayPoints(res.dayPoints);
+            onStatsChange?.({ dayPoints: res.dayPoints, streak });
+            if (res.logged && res.points > 0) {
+              bumpCounts({
+                protocolId: "work-space",
+                delta: 0,
+                absolute: 1,
+              });
+            } else if (res.points <= 0) {
+              bumpCounts({
+                protocolId: "work-space",
+                delta: 0,
+                absolute: 0,
+              });
+            }
+            setSpaceDialog(null);
+            push(
+              res.points > 0
+                ? `Work Space · ${res.points} pts`
+                : "Work Space saved — enable an option to earn points",
+            );
+          }}
+        />
+      ) : null}
 
       <ProtocolHowToDialog
         protocol={howToFor}

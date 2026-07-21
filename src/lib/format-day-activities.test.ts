@@ -147,9 +147,8 @@ describe("formatDayActivitiesCopy", () => {
   it("sections sunrise, day, and permanent activities", () => {
     const text = formatDayActivitiesCopy("2026-07-14", [
       {
-        protocolName: "Cool bedroom sleep",
-        protocolId: "cool-bedroom-sleep",
-        variantValue: 65,
+        protocolName: "Sleep Space",
+        protocolId: "sleep-space",
         durationMinutes: null,
         pointsEarned: 10,
         isStreakBonus: false,
@@ -177,7 +176,7 @@ describe("formatDayActivitiesCopy", () => {
     assert.ok(sunriseIdx >= 0 && dayIdx > sunriseIdx && permIdx > dayIdx);
     assert.match(text, /Open-sky morning light/);
     assert.match(text, /Mastic gum/);
-    assert.match(text, /Cool bedroom sleep/);
+    assert.match(text, /Sleep Space/);
     assert.doesNotMatch(text, /Sunrise \/ early morning/);
     assert.doesNotMatch(text, /Automatic · every day/);
   });

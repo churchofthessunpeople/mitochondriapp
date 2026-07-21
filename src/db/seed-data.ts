@@ -26,6 +26,11 @@ export type ProtocolSeed = {
   sortOrder: number;
   /** Auto-log every day while on the user's available list */
   permanent?: boolean;
+  /**
+   * Retired from catalog UI (kept for history / FK name resolution).
+   * Rolled into Sleep Space / Work Space composites.
+   */
+  retired?: boolean;
 };
 
 function p(
@@ -38,6 +43,7 @@ function p(
     | "allowsMultiple"
     | "lockedTimeOfDay"
     | "permanent"
+    | "retired"
   > &
     Partial<
       Pick<
@@ -49,6 +55,7 @@ function p(
         | "allowsMultiple"
         | "lockedTimeOfDay"
         | "permanent"
+        | "retired"
       >
     >,
 ): ProtocolSeed {
@@ -61,6 +68,7 @@ function p(
     maxDurationMinutes: partial.maxDurationMinutes ?? 60,
     maxPerDay: partial.maxPerDay ?? (multi ? 9999 : 1),
     permanent: partial.permanent ?? false,
+    retired: partial.retired ?? false,
     id: partial.id,
     name: partial.name,
     description: partial.description,
@@ -317,12 +325,14 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "phone-away-sleep",
     name: "Phone away from bed",
-    description: "Phone in another room or far away on airplane mode.",
+    description:
+      "Retired — now an option under Sleep Space. Phone in another room or far away on airplane mode.",
     points: 5,
     category: "emf",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
     sortOrder: 61,
+    retired: true,
   }),
   p({
     id: "air-tube-headphones",
@@ -336,39 +346,62 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 57,
   }),
   p({
-    id: "magnetico-sleep-pad",
-    name: "Magnetico sleep pad",
+    id: "sleep-space",
+    name: "Sleep Space",
     description:
-      "Slept on a Magnetico (or equivalent under-mattress unidirectional) magnetic sleep system. Choose 5 / 10 / 20 gauss — 10 / 25 / 50 pts. Permanent: auto-logs nightly while on your available list.",
-    points: 25,
+      "Bedroom hygiene stack — cool temp, Magnetico, dark, breakers, phone away, grounding mat, negative ions. Points = sum of enabled options. Permanent: auto-logs nightly while on your available list.",
+    points: 0,
     category: "emf",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
     permanent: true,
+    sortOrder: 60,
+  }),
+  p({
+    id: "work-space",
+    name: "Work Space",
+    description:
+      "Desk / office hygiene stack — breakers, grounding mat, negative ions, low artificial field. Points = sum of enabled options. Permanent: auto-logs daily while on your available list (no fixed time).",
+    points: 0,
+    category: "emf",
+    timeOfDay: "anytime",
+    permanent: true,
+    sortOrder: 22,
+  }),
+  p({
+    id: "magnetico-sleep-pad",
+    name: "Magnetico sleep pad",
+    description:
+      "Retired — now an option under Sleep Space. Under-mattress unidirectional magnetic sleep system.",
+    points: 25,
+    category: "emf",
+    timeOfDay: "night",
+    lockedTimeOfDay: "night",
     sortOrder: 63,
+    retired: true,
   }),
   p({
     id: "breaker-off-bedroom",
     name: "Bedroom breakers off",
     description:
-      "Bedroom circuits switched off at the panel overnight (dirty electricity / AC fields). Permanent: auto-logs nightly while on your available list.",
+      "Retired — now an option under Sleep Space. Bedroom circuits off overnight.",
     points: 6,
     category: "emf",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
-    permanent: true,
     sortOrder: 64,
+    retired: true,
   }),
   p({
     id: "breaker-off-office",
     name: "Office breakers off",
     description:
-      "Main work / office circuits off when not in use (or on a low-field schedule). Permanent: auto-logs daily while on your available list.",
+      "Retired — now an option under Work Space. Office circuits off when not in use.",
     points: 6,
     category: "emf",
-    timeOfDay: "morning",
-    permanent: true,
-    sortOrder: 22,
+    timeOfDay: "anytime",
+    sortOrder: 23,
+    retired: true,
   }),
   p({
     id: "morning-movement",
@@ -448,25 +481,25 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "dark-bedroom",
     name: "True dark sleep environment",
     description:
-      "Pitch-black or eye mask; minimal night light pollution. Permanent: auto-logs nightly while on your available list.",
+      "Retired — now an option under Sleep Space. Pitch-black or eye mask.",
     points: 8,
     category: "sleep",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
-    permanent: true,
-    sortOrder: 60,
+    sortOrder: 160,
+    retired: true,
   }),
   p({
     id: "cool-bedroom-sleep",
     name: "Cool bedroom sleep",
     description:
-      "Bedroom at 65°F or cooler for overnight thermoregulation. 65°F = 10 pts; each degree warmer on the thermostat costs 1 pt. Permanent: auto-logs nightly while on your available list.",
+      "Retired — now an option under Sleep Space. Bedroom at 65°F or cooler.",
     points: 10,
     category: "sleep",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
-    permanent: true,
-    sortOrder: 61,
+    sortOrder: 161,
+    retired: true,
   }),
   p({
     id: "consistent-sleep-window",

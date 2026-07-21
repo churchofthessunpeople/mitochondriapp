@@ -27,6 +27,8 @@ export const PROTOCOL_ARTICLE_IDS: Record<string, string> = {
   "phone-away-sleep": "phone-away-sleep",
   "air-tube-headphones": "air-tube-headphones",
   "magnetico-sleep-pad": "magnetico-sleep-pad",
+  "sleep-space": "sleep-space",
+  "work-space": "work-space",
   "breaker-off-bedroom": "breaker-off-bedroom",
   "breaker-off-office": "breaker-off-office",
   "morning-movement": "morning-movement",
