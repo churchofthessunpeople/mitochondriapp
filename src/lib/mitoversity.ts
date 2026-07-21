@@ -26,6 +26,10 @@ import {
   MAGNETICO_SLEEP_PAD_READING_LEVELS,
   MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
 } from "@/lib/mitoversity-magnetico-sleep-pad";
+import {
+  TUNING_FORKS_READING_LEVELS,
+  TUNING_FORKS_SIMPLE_SECTIONS,
+} from "@/lib/mitoversity-tuning-forks";
 import type { MitoReadingLevels } from "@/lib/mitoversity-reading-levels";
 import { applyReadingLevels } from "@/lib/mitoversity-reading-level-builder";
 
@@ -393,6 +397,21 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
         body: "Log “Mastic gum chewing” when you complete a session of real mastic resin/gum (not candy gum). It sits under Support via the movement category—jaw work as a small physical practice. Duration logging is enabled so longer sessions can scale points within the cap. Equipment is required: if you do not own mastic, leave the habit off your available list. Pair with real meals that still require chewing (e.g. seafood-forward, less ultra-processed food) rather than using gum as the only mechanical load in the day.",
       },
     ],
+  },
+  {
+    id: "tuning-forks",
+    title: "Tuning forks (40 Hz & C128)",
+    pillar: "support",
+    summary:
+      "Why 40 Hz is the recommended session frequency, how weighted C128 (128 Hz) body-contact circuits are taught for calm / parasympathetic self-care, and how to log intentional fork time.",
+    relatedProtocolIds: [
+      "tuning-forks",
+      "blue-light-hygiene",
+      "phone-away-sleep",
+      "cold-face-plunge",
+    ],
+    sections: TUNING_FORKS_SIMPLE_SECTIONS,
+    readingLevels: TUNING_FORKS_READING_LEVELS,
   },
   {
     id: "true-dark-bedroom",

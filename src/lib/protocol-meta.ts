@@ -133,6 +133,10 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
     equipment: "required",
     how: "Use real Chios mastic resin or gum — not candy gum. Take a piece large enough to give real jaw resistance.\n\nChew actively on both sides of the jaw for about 15 minutes (or your logged duration). Each log asks indoors vs outside vs full sunlight. Stop if you have TMJ pain or jaw issues.",
   },
+  "tuning-forks": {
+    equipment: "required",
+    how: "Use real metal tuning forks (not phone apps alone). Recommended: 40 Hz for a short listening / near-field vibration session. Suggested body-contact fork: weighted C128 (128 Hz).\n\nActivate by striking the fork on the palm (or a soft activator), then hold near the ears or place the stem/base on bone. For a C128 parasympathetic circuit: crown, forehead, mastoid behind each ear (3 activations per side), TMJ in front of each ear (3 per side), manubrium (~1 in below the top of the breastbone), xiphoid (lower sternum where the ribs meet), and sacrum between the posterior dimples — 3 activations per spot.\n\nEach log adds 15 minutes; use +/− for more or less in 15-minute blocks. Stop if you feel dizzy, ear pain, or joint discomfort. Educational only — not treatment for anxiety, cortisol disorders, or neurological disease.",
+  },
   "blue-light-hygiene": {
     equipment: "optional",
     how: "After sunset, dim screens, use warm bulbs, or wear blue blockers if needed.\n\nLower brightness and color temperature through the evening so light matches winding down.",

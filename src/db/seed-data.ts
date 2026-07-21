@@ -412,6 +412,20 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     sortOrder: 55,
   }),
   p({
+    id: "tuning-forks",
+    name: "Tuning forks",
+    description:
+      "Intentional sound/vibration session with tuning forks — 40 Hz recommended; C128 (128 Hz) weighted fork for on-body parasympathetic work. Equipment required.",
+    points: 5,
+    category: "other",
+    timeOfDay: "anytime",
+    allowsMultiple: true,
+    durationEnabled: true,
+    referenceMinutes: 15,
+    maxDurationMinutes: 45,
+    sortOrder: 56,
+  }),
+  p({
     id: "blue-light-hygiene",
     name: "Evening blue-light hygiene",
     description: "Dim screens, warm light, or blue blockers after sunset.",

@@ -32,6 +32,7 @@ export const PROTOCOL_ARTICLE_IDS: Record<string, string> = {
   "morning-movement": "morning-movement",
   rebounding: "rebounding-lymphatic",
   "mastic-gum": "mastic-gum-chewing",
+  "tuning-forks": "tuning-forks",
   "blue-light-hygiene": "blue-light-hygiene",
   "screen-light-hygiene": "screen-light-hygiene",
   "dark-bedroom": "true-dark-bedroom",
