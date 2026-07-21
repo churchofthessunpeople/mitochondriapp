@@ -183,7 +183,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "Practical solar noon habit",
-        body: "Check solar noon on Place. When UV season allows (latitude band and season coach lines on Today hint at this), get outdoors with unprotected skin on arms, legs, or torso for a non-burning interval—often quoted in popular guides as roughly 10–20 minutes for lighter skin types at mid-latitudes in summer, shorter at high noon in strong sun or for darker melanin (which needs longer but tolerates more). Build gradually. Glass blocks UVB; windows do not count. Log “Sun exposure” in the noon slot (10 am–2 pm) with duration, grounding, and skin answers. Pair with morning light keystones so the full Light arc is eyes + skin, not pills alone.",
+        body: "Check solar noon on Place. When UV season allows (latitude band and season coach lines on Today hint at this), get outdoors with unprotected skin on arms, legs, or torso for a non-burning interval—often quoted in popular guides as roughly 10–20 minutes for lighter skin types at mid-latitudes in summer, shorter at high noon in strong sun or for darker melanin (which needs longer but tolerates more). Build gradually. Glass blocks UVB; windows do not count. Log “Sun exposure” in the solar noon slot (1 hour before through 2 hours after local solar noon) with duration. Pair with morning light keystones so the full Light arc is eyes + skin, not pills alone.",
       },
       {
         heading: "When supplements still belong",

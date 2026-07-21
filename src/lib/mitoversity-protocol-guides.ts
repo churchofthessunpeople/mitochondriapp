@@ -81,7 +81,7 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     sections: [
       {
         heading: "Why one activity, three slots",
-        body: "Morning, solar noon, and afternoon sun are different UV and circadian jobs. This app keeps one Sun exposure activity and routes each log into a clock slot: morning 6–10 am, noon 10 am–2 pm, afternoon 2–6 pm. Add more minutes to the same slot anytime during the day.",
+        body: "Morning, solar noon, and afternoon sun are different UV and circadian jobs. This app keeps one Sun exposure activity and routes each log into a solar-relative slot: morning from sunrise to 1 hour before solar noon, solar noon from then until 2 hours after solar noon, then afternoon until sunset (windows come from Place sun times). Add more minutes to the same slot anytime during the day.",
       },
       {
         heading: "What you log",

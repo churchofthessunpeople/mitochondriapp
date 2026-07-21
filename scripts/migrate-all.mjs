@@ -53,6 +53,8 @@ await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_timezone text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS travel_until text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS magnetico_gauss integer NOT NULL DEFAULT 10`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS sleep_room_temp_f integer NOT NULL DEFAULT 65`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS sleep_space_config text`;
+await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS work_space_config text`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name_changed_at timestamp`;
 await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_guest boolean NOT NULL DEFAULT false`;
 // Existing rows get true (skip tutorial); new inserts use DEFAULT false.
