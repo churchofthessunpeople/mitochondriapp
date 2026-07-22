@@ -1,6 +1,6 @@
 /**
- * Daytime sun exposure — logged into solar-relative slots
- * (morning / solar noon / afternoon) with duration in 15-minute blocks.
+ * Outside Time — daytime outdoor light logged into solar-relative slots
+ * (morning / solar noon / afternoon), full sun vs shade, and duration.
  * UV-by-ZIP weighting is stubbed for later.
  */
 
@@ -8,9 +8,11 @@ import type { TimeOfDay } from "@/db/schema";
 import { formatTimeInZone, type SunTimes } from "@/lib/sun";
 import { displayTimeToHm } from "@/lib/time-hm";
 
+/** Catalog id (stable). Display name is “Outside Time”. */
 export const SUN_EXPOSURE_PROTOCOL_ID = "sun-exposure";
+export const OUTSIDE_TIME_PROTOCOL_ID = SUN_EXPOSURE_PROTOCOL_ID;
 
-/** Legacy catalog ids replaced by sun-exposure. */
+/** Legacy catalog ids replaced by outside-time / sun-exposure. */
 export const SUN_EXPOSURE_LEGACY_IDS = [
   "morning-natural-light",
   "midday-sun-skin",
@@ -18,8 +20,12 @@ export const SUN_EXPOSURE_LEGACY_IDS = [
 
 export type SunExposureSlot = "morning" | "noon" | "afternoon";
 
+/** Direct sun vs shade / cloud cover for the session. */
+export type OutsideCover = "full_sun" | "shaded";
+
 export type SunExposureLogInput = {
   slot: SunExposureSlot;
+  cover: OutsideCover;
   /** Local wall-clock HH:mm when the session started (optional, for future UV). */
   startHm?: string;
 };
@@ -33,6 +39,12 @@ export type SunExposureSlotDef = {
   timeOfDay: TimeOfDay;
 };
 
+export type OutsideCoverDef = {
+  id: OutsideCover;
+  label: string;
+  detail: string;
+};
+
 /** Minutes before solar noon that the solar-noon slot begins. */
 export const SUN_EXPOSURE_NOON_LEAD_MINUTES = 60;
 /** Minutes after solar noon that the solar-noon slot ends. */
@@ -44,7 +56,7 @@ export const SUN_EXPOSURE_FALLBACK_SOLAR_NOON_HM = "12:00";
 export const SUN_EXPOSURE_SLOTS: readonly SunExposureSlotDef[] = [
   {
     id: "morning",
-    label: "Morning sun",
+    label: "Morning",
     clockLabel: "Sunrise – 1h before solar noon",
     timeOfDay: "morning",
   },
@@ -56,11 +68,30 @@ export const SUN_EXPOSURE_SLOTS: readonly SunExposureSlotDef[] = [
   },
   {
     id: "afternoon",
-    label: "Afternoon sun",
+    label: "Afternoon",
     clockLabel: "2h after solar noon – sunset",
     timeOfDay: "evening",
   },
 ] as const;
+
+export const OUTSIDE_COVER_OPTIONS: readonly OutsideCoverDef[] = [
+  {
+    id: "full_sun",
+    label: "Full sun",
+    detail: "Direct sun on skin — strongest outdoor dose",
+  },
+  {
+    id: "shaded",
+    label: "Shaded",
+    detail: "Shade, trees, porch, or heavy cloud",
+  },
+] as const;
+
+/** Base-point multiplier vs catalog (per 15-min block). */
+const COVER_MULTIPLIER: Record<OutsideCover, number> = {
+  full_sun: 1,
+  shaded: 0.75,
+};
 
 const SLOT_INDEX: Record<SunExposureSlot, number> = {
   morning: 0,
@@ -70,9 +101,17 @@ const SLOT_INDEX: Record<SunExposureSlot, number> = {
 
 const SLOT_BY_INDEX: SunExposureSlot[] = ["morning", "noon", "afternoon"];
 
-/** Pack slot into variant_value (legacy logs may carry extra modifier bits). */
+const COVER_BIT = 0b100;
+
+/**
+ * Pack slot + cover into variant_value.
+ * Bits 0–1 = slot; bit 2 = shaded (0 = full sun).
+ * Values 0–3 are legacy slot-only (treated as full sun).
+ */
 export function encodeSunExposureVariant(input: SunExposureLogInput): number {
-  return SLOT_INDEX[input.slot] ?? 0;
+  const slot = SLOT_INDEX[input.slot] ?? 0;
+  const cover = input.cover === "shaded" ? COVER_BIT : 0;
+  return slot | cover;
 }
 
 export function decodeSunExposureVariant(
@@ -81,9 +120,13 @@ export function decodeSunExposureVariant(
   if (typeof variantValue !== "number" || !Number.isFinite(variantValue)) {
     return null;
   }
-  const slot = SLOT_BY_INDEX[Math.trunc(variantValue) & 0b11];
+  const v = Math.trunc(variantValue);
+  const slot = SLOT_BY_INDEX[v & 0b11];
   if (!slot) return null;
-  return { slot };
+  // New packing is 0–7. Larger legacy values keep slot bits only → full sun.
+  const cover: OutsideCover =
+    v >= 0 && v <= 7 && (v & COVER_BIT) !== 0 ? "shaded" : "full_sun";
+  return { slot, cover };
 }
 
 export function isSunExposureProtocolId(
@@ -96,6 +139,13 @@ export function sunExposureSlotDef(
   slot: SunExposureSlot,
 ): SunExposureSlotDef {
   return SUN_EXPOSURE_SLOTS.find((s) => s.id === slot) ?? SUN_EXPOSURE_SLOTS[0]!;
+}
+
+export function outsideCoverDef(cover: OutsideCover): OutsideCoverDef {
+  return (
+    OUTSIDE_COVER_OPTIONS.find((c) => c.id === cover) ??
+    OUTSIDE_COVER_OPTIONS[0]!
+  );
 }
 
 export function timeOfDayForSunSlot(slot: SunExposureSlot): TimeOfDay {
@@ -164,7 +214,7 @@ export type SunExposureSlotBounds = {
   noonEndMins: number;
 };
 
-/** Local-minute bounds for today's sun-exposure slots. */
+/** Local-minute bounds for today's outside-time slots. */
 export function sunExposureSlotBounds(
   sun?: SunTimes | null,
   timeZone = "UTC",
@@ -247,7 +297,8 @@ export function formatSunExposureLabel(
   const decoded = decodeSunExposureVariant(variantValue);
   if (!decoded) return null;
   const def = sunExposureSlotDef(decoded.slot);
-  const parts = [def.label];
+  const cover = outsideCoverDef(decoded.cover);
+  const parts = [def.label, cover.label];
   if (durationMinutes != null && durationMinutes > 0) {
     parts.push(`${durationMinutes} min`);
   }
@@ -267,16 +318,21 @@ export function sunExposureUvFactor(_opts: {
   return 1;
 }
 
-/** Effective base points for one sun-exposure log (before duration blocks). */
+/** Effective base points for one outside-time log (before duration blocks). */
 export function sunExposureBasePoints(
   catalogBase: number,
-  opts?: { slot?: SunExposureSlot; uvIndex?: number | null },
+  opts?: {
+    slot?: SunExposureSlot;
+    cover?: OutsideCover;
+    uvIndex?: number | null;
+  },
 ): number {
   const uv = sunExposureUvFactor({
     slot: opts?.slot ?? "noon",
     uvIndex: opts?.uvIndex,
   });
-  return Math.max(1, Math.round(catalogBase * uv));
+  const coverMult = COVER_MULTIPLIER[opts?.cover ?? "full_sun"] ?? 1;
+  return Math.max(1, Math.round(catalogBase * uv * coverMult));
 }
 
 export function remapSunExposureFavoriteId(protocolId: string): string {

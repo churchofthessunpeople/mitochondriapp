@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, users } from "@/db/schema";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { resolveEditableCompletedOn } from "@/lib/editable-day";
 import {
   parseSleepRoomTempF,
   pointsForSleepRoomTemp,
@@ -22,10 +23,11 @@ async function requireUserId() {
 }
 
 /**
- * Persist bedroom sleep temp preference and refresh today's auto-log points if present.
+ * Persist bedroom sleep temp preference and refresh the day's auto-log points if present.
  */
 export async function setSleepRoomTempAction(
   tempRaw: number,
+  completedOnRaw?: string | null,
 ): Promise<{ tempF: SleepRoomTempF; dayPoints: number }> {
   const userId = await requireUserId();
   const tempF = parseSleepRoomTempF(tempRaw);
@@ -40,7 +42,8 @@ export async function setSleepRoomTempAction(
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
-  const completedOn = getTodayIsoForTimezone(u?.timezone || "UTC");
+  const today = getTodayIsoForTimezone(u?.timezone || "UTC");
+  const completedOn = resolveEditableCompletedOn(today, completedOnRaw);
 
   const protocol = getCatalogProtocolById(SLEEP_ROOM_TEMP_PROTOCOL_ID);
   const [row] = await db

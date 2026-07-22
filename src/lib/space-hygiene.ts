@@ -21,6 +21,7 @@ export type SleepSpaceOptionId =
   | "coolBedroom"
   | "magnetico"
   | "trueDark"
+  | "circadianWindow"
   | "breakersOff"
   | "phoneAway"
   | "groundingMat"
@@ -39,6 +40,7 @@ export const DEFAULT_SLEEP_SPACE_CONFIG: SleepSpaceConfig = {
   coolBedroom: false,
   magnetico: false,
   trueDark: false,
+  circadianWindow: false,
   breakersOff: false,
   phoneAway: false,
   groundingMat: false,
@@ -58,6 +60,7 @@ export const SLEEP_SPACE_FLAT_POINTS: Record<
   number
 > = {
   trueDark: 8,
+  circadianWindow: 7,
   breakersOff: 6,
   phoneAway: 5,
   groundingMat: 10,
@@ -99,6 +102,13 @@ export const SLEEP_SPACE_OPTION_META: {
     detail: "Pitch-black or effective eye mask",
     how: "Make the room pitch-black: blackout curtains, eye mask, tape over standby LEDs, cover charger lights.\n\nYou should not see your hand in front of your face when lights are out.",
     articleId: "true-dark-bedroom",
+  },
+  {
+    id: "circadianWindow",
+    label: "Circadian sleep window",
+    detail: "Consistent bed and wake times aligned with night",
+    how: "Go to bed and wake on a consistent window aligned with night — same rough times even on weekends within reason.\n\nEnable this Sleep Space option on nights you hit your target sleep window, not only when you were tired.",
+    articleId: "consistent-sleep-window",
   },
   {
     id: "breakersOff",
@@ -170,6 +180,7 @@ export const RETIRED_INTO_SLEEP_SPACE: Record<string, SleepSpaceOptionId> = {
   "cool-bedroom-sleep": "coolBedroom",
   "magnetico-sleep-pad": "magnetico",
   "dark-bedroom": "trueDark",
+  "consistent-sleep-window": "circadianWindow",
   "breaker-off-bedroom": "breakersOff",
   "phone-away-sleep": "phoneAway",
 };
@@ -221,6 +232,10 @@ export function parseSleepSpaceConfig(raw: unknown): SleepSpaceConfig {
     coolBedroom: asBool(obj.coolBedroom, DEFAULT_SLEEP_SPACE_CONFIG.coolBedroom),
     magnetico: asBool(obj.magnetico, DEFAULT_SLEEP_SPACE_CONFIG.magnetico),
     trueDark: asBool(obj.trueDark, DEFAULT_SLEEP_SPACE_CONFIG.trueDark),
+    circadianWindow: asBool(
+      obj.circadianWindow,
+      DEFAULT_SLEEP_SPACE_CONFIG.circadianWindow,
+    ),
     breakersOff: asBool(obj.breakersOff, DEFAULT_SLEEP_SPACE_CONFIG.breakersOff),
     phoneAway: asBool(obj.phoneAway, DEFAULT_SLEEP_SPACE_CONFIG.phoneAway),
     groundingMat: asBool(

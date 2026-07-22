@@ -96,18 +96,49 @@ describe("sunExposureSlotClockLabel", () => {
 });
 
 describe("encode/decode sun exposure variant", () => {
-  it("round-trips slot", () => {
-    const packed = encodeSunExposureVariant({ slot: "noon" });
-    assert.deepEqual(decodeSunExposureVariant(packed), { slot: "noon" });
+  it("round-trips slot and cover", () => {
+    const packed = encodeSunExposureVariant({
+      slot: "noon",
+      cover: "full_sun",
+    });
+    assert.deepEqual(decodeSunExposureVariant(packed), {
+      slot: "noon",
+      cover: "full_sun",
+    });
+    const shaded = encodeSunExposureVariant({
+      slot: "afternoon",
+      cover: "shaded",
+    });
+    assert.deepEqual(decodeSunExposureVariant(shaded), {
+      slot: "afternoon",
+      cover: "shaded",
+    });
   });
 
-  it("reads slot from legacy packed values", () => {
-    assert.deepEqual(decodeSunExposureVariant(20), { slot: "morning" });
+  it("reads slot from legacy packed values as full sun", () => {
+    assert.deepEqual(decodeSunExposureVariant(20), {
+      slot: "morning",
+      cover: "full_sun",
+    });
+    assert.deepEqual(decodeSunExposureVariant(1), {
+      slot: "noon",
+      cover: "full_sun",
+    });
   });
 });
 
 describe("sunExposureBasePoints", () => {
-  it("uses full catalog base", () => {
-    assert.equal(sunExposureBasePoints(8, { slot: "noon" }), 8);
+  it("uses full catalog base for full sun", () => {
+    assert.equal(
+      sunExposureBasePoints(8, { slot: "noon", cover: "full_sun" }),
+      8,
+    );
+  });
+
+  it("reduces points for shaded cover", () => {
+    assert.equal(
+      sunExposureBasePoints(8, { slot: "noon", cover: "shaded" }),
+      6,
+    );
   });
 });

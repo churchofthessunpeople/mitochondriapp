@@ -142,7 +142,7 @@ export function computeLwmProgress(
     light,
     water,
     magnetism,
-    lightLabel: light ? "Morning light logged" : "Need sunrise / AM light",
+    lightLabel: light ? "Sunrise logged" : "Need sunrise / AM light",
     waterLabel: water
       ? "Water keystone logged"
       : "Need low-D hydration or meal",

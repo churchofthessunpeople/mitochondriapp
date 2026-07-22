@@ -24,7 +24,7 @@ const BASE_TOUR_STEPS: TourStep[] = [
   {
     id: "morning-light",
     target: "morning-light",
-    title: "Morning light",
+    title: "Sunrise",
     body: "Your keystone check-in. Tap to log your sunrise experience - it can boost the rest of today’s points.",
     appTab: "schedule",
     todaySection: "checklist",
@@ -38,18 +38,10 @@ const BASE_TOUR_STEPS: TourStep[] = [
     todaySection: "checklist",
   },
   {
-    id: "suggested",
-    target: "section-suggested",
-    title: "Suggested",
-    body: "Activities that fit the current sun phase show up first so you know what’s timely now.",
-    appTab: "schedule",
-    todaySection: "checklist",
-  },
-  {
     id: "available",
     target: "section-available",
     title: "Available",
-    body: "Everything else on your list for today. Tap a row to log it.",
+    body: "Your checklist for today. Tap a row to log it.",
     appTab: "schedule",
     todaySection: "checklist",
   },

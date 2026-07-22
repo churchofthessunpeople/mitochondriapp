@@ -14,7 +14,7 @@ export function GuideLightPanel() {
 
       <section className="glass space-y-2 rounded-3xl p-5">
         <h2 className="text-base font-semibold text-foreground">
-          Daily keystone · Morning light
+          Daily keystone · Sunrise
         </h2>
         <ul className="list-inside list-disc space-y-1.5">
           <li>
@@ -59,13 +59,13 @@ export function GuideLightPanel() {
 
       <section className="glass space-y-2 rounded-3xl p-5">
         <h2 className="text-base font-semibold text-foreground">
-          Solar noon · Vitamin D
+          Outside Time · Vitamin D
         </h2>
         <ul className="list-inside list-disc space-y-1.5">
           <li>
-            <strong className="text-foreground">Midday sun on skin</strong> —
+            <strong className="text-foreground">Daytime outdoors</strong> —
             UVB near solar noon (see Place) drives natural vitamin D₃ in skin;
-            not the same job as morning light to the eyes
+            not the same job as Sunrise light to the eyes
           </li>
           <li>
             Short, non-burning outdoor blocks beat window glass or pills-only

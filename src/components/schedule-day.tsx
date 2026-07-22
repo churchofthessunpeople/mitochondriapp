@@ -32,6 +32,7 @@ import {
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import { SunriseKeystoneDialog } from "@/components/sunrise-keystone-dialog";
+import { SunExposureDialog } from "@/components/sun-exposure-dialog";
 import {
   coldThermoSkinTempBasePoints,
   formatColdThermoSkinTemp,
@@ -73,12 +74,11 @@ import {
   type MovementSetting,
 } from "@/lib/movement-setting";
 import {
+  encodeSunExposureVariant,
+  formatSunExposureLabel,
   isSunExposureProtocolId,
-  SUN_EXPOSURE_SLOTS,
-  sunExposureSlotClockLabel,
   sunSlotFromLocalHm,
   type SunExposureLogInput,
-  type SunExposureSlot,
 } from "@/lib/sun-exposure";
 import { currentLocalHm } from "@/lib/sunrise-timing";
 import {
@@ -105,6 +105,11 @@ type Props = {
   dayPoints: number;
   streak: { current: number; best: number };
   dateLabel: string;
+  /**
+   * Calendar day being edited (YYYY-MM-DD). Today or yesterday.
+   * Defaults to todayIso / server today when omitted.
+   */
+  completedOn?: string;
   /** Hide stats, tips, and weekly summary — activity list only */
   compact?: boolean;
   /** Full catalog for Add Activity (not just checklist items) */
@@ -146,14 +151,12 @@ const MORNING_LIGHT_BUSY_ID = "morning-light";
 
 type ChecklistSectionId =
   | "morningLight"
-  | "suggested"
   | "available"
   | "performed"
   | "permanent";
 
 const DEFAULT_SECTIONS_OPEN: Record<ChecklistSectionId, boolean> = {
   morningLight: true,
-  suggested: true,
   available: true,
   performed: true,
   permanent: true,
@@ -226,6 +229,7 @@ export function ScheduleDay({
   dayPoints: initialPoints,
   streak: initialStreak,
   dateLabel,
+  completedOn: completedOnProp,
   hideTitle = false,
   catalogProtocols,
   availableIds = [],
@@ -252,6 +256,7 @@ export function ScheduleDay({
   sleepSpaceConfig: initialSleepSpaceConfig = null,
   workSpaceConfig: initialWorkSpaceConfig = null,
 }: Props) {
+  const completedOn = completedOnProp ?? todayIso;
   const { push } = useToast();
   const [, start] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -268,8 +273,10 @@ export function ScheduleDay({
   }>({ open: false, initialProtocol: null });
   const [coldThermoProtocol, setColdThermoProtocol] =
     useState<Protocol | null>(null);
+  const [outsideTimeProtocol, setOutsideTimeProtocol] =
+    useState<Protocol | null>(null);
   const [choicePicker, setChoicePicker] = useState<{
-    kind: "magnetico" | "sleep" | "sunExposure" | "movement";
+    kind: "magnetico" | "sleep" | "movement";
     protocol: Protocol;
   } | null>(null);
   const [addActivityOpen, setAddActivityOpen] = useState(false);
@@ -357,14 +364,13 @@ export function ScheduleDay({
     [manualProtocols, counts],
   );
 
-  const { suggested, available } = useMemo(() => {
+  const available = useMemo(() => {
     const pending = manualProtocols.filter((p) => (counts[p.id] ?? 0) === 0);
-    const { suggested: sug, rest } = orderProtocolsForNow(pending, {
+    return orderProtocolsForNow(pending, {
       phase,
       localHour,
       completionCounts: counts,
     });
-    return { suggested: sug, available: rest };
   }, [manualProtocols, phase, localHour, counts]);
 
   const permanentProtocols = useMemo(
@@ -373,12 +379,6 @@ export function ScheduleDay({
   );
 
   const sunriseCatalog = allProtocols ?? protocols;
-
-  const suggestedSunSlot = useMemo(
-    () =>
-      sunSlotFromLocalHm(currentLocalHm(timeZone), { sun, timeZone }),
-    [sun, timeZone],
-  );
 
   const sunriseTierOptions = useMemo(
     () => resolveSunriseTierOptions(sunriseCatalog),
@@ -475,7 +475,7 @@ export function ScheduleDay({
       return `${formatColdThermoSkinTemp(coldThermoSkinTempF)} · ${base} pts / 15 min`;
     }
     if (isSunExposureProtocolId(p.id)) {
-      return `${p.points} pts / 15 min · ${SUN_EXPOSURE_SLOTS.map((s) => s.label.toLowerCase()).join(" · ")}`;
+      return `${p.points} pts / 15 min · morning · noon · afternoon · sun or shade`;
     }
     const parts: string[] = [`${p.points} pts`];
     if (isSunriseKeystoneProtocol(p)) parts.push("Light keystone");
@@ -494,7 +494,7 @@ export function ScheduleDay({
     runLog(protocol.id, async () => {
       try {
         bumpCounts({ protocolId: protocol.id, delta: -1 });
-        const res = await removeOneCompletionAction(protocol.id);
+        const res = await removeOneCompletionAction(protocol.id, completedOn);
         applySnap({ ...res, protocolId: protocol.id, count: 0 });
         push(`Skipped tonight — ${protocol.name}`);
       } catch (e) {
@@ -512,11 +512,11 @@ export function ScheduleDay({
     setBusyId(protocol.id);
     start(async () => {
       try {
-        const res = await setMagneticoGaussAction(next);
+        const res = await setMagneticoGaussAction(next, completedOn);
         setMagneticoGauss(res.gauss);
         if (!wasLogged) {
           bumpCounts({ protocolId: protocol.id, delta: 1 });
-          const logged = await logPermanentTonightAction(protocol.id);
+          const logged = await logPermanentTonightAction(protocol.id, completedOn);
           applySnap({ ...logged, protocolId: protocol.id });
           push(
             `${formatMagneticoGauss(res.gauss)} · logged · +${logged.points} pts`,
@@ -546,11 +546,11 @@ export function ScheduleDay({
     setBusyId(protocol.id);
     start(async () => {
       try {
-        const res = await setSleepRoomTempAction(next);
+        const res = await setSleepRoomTempAction(next, completedOn);
         setSleepRoomTempF(res.tempF);
         if (!wasLogged) {
           bumpCounts({ protocolId: protocol.id, delta: 1 });
-          const logged = await logPermanentTonightAction(protocol.id);
+          const logged = await logPermanentTonightAction(protocol.id, completedOn);
           applySnap({ ...logged, protocolId: protocol.id });
           push(
             `${formatSleepRoomTemp(res.tempF)} · logged · +${logged.points} pts`,
@@ -612,7 +612,7 @@ export function ScheduleDay({
       runLog(protocol.id, async () => {
         try {
           bumpCounts({ protocolId: protocol.id, delta: 1 });
-          const res = await logPermanentTonightAction(protocol.id);
+          const res = await logPermanentTonightAction(protocol.id, completedOn);
           applySnap({ ...res, protocolId: protocol.id });
           push(`Logged tonight · +${res.points} pts`);
         } catch (e) {
@@ -629,7 +629,7 @@ export function ScheduleDay({
     runLog(protocol.id, async () => {
       try {
         bumpCounts({ protocolId: protocol.id, delta: count > 0 ? -1 : 1 });
-        const res = await logCompletionAction(protocol.id);
+        const res = await logCompletionAction(protocol.id, { completedOn });
         applySnap({ ...res, protocolId: protocol.id });
         if (res.action === "added") {
           const extra =
@@ -662,7 +662,7 @@ export function ScheduleDay({
       try {
         for (const t of SUNRISE_TIERS) {
           if ((countsRef.current[t.protocolId] ?? 0) > 0) {
-            await removeOneCompletionAction(t.protocolId);
+            await removeOneCompletionAction(t.protocolId, completedOn);
             bumpCounts({ protocolId: t.protocolId, delta: 0, absolute: 0 });
           }
         }
@@ -671,6 +671,7 @@ export function ScheduleDay({
           sunriseModifiers: modifiers,
           viewedAtStart: viewedAtStartIso,
           viewedAtEnd: viewedAtEndIso,
+          completedOn,
         });
         applySnap({ ...res, protocolId: protocol.id });
         closeSunriseDialog();
@@ -698,7 +699,7 @@ export function ScheduleDay({
 
     return (
       <CollapsibleChecklistSection
-        title="Morning light"
+        title="Sunrise"
         count={morningLightLogged ? 1 : 0}
         accent
         open={sectionsOpen.morningLight}
@@ -737,7 +738,7 @@ export function ScheduleDay({
                     morningLightLogged && "text-accent",
                   )}
                 >
-                  {loggedSunriseTier?.shortLabel ?? "Morning light check-in"}
+                  {loggedSunriseTier?.shortLabel ?? "Sunrise check-in"}
                 </span>
                 <span className="mt-0.5 block text-xs text-muted">
                   {morningLightLogged
@@ -787,16 +788,21 @@ export function ScheduleDay({
     );
   }
 
-  function sunExposureInputForSlot(slot: SunExposureSlot): SunExposureLogInput {
+  function defaultOutsideTimeInput(): SunExposureLogInput {
     return {
-      slot,
+      slot: sunSlotFromLocalHm(currentLocalHm(timeZone), { sun, timeZone }),
+      cover: "full_sun",
       startHm: currentLocalHm(timeZone),
     };
   }
 
-  function chooseSunExposureSlot(protocol: Protocol, slot: SunExposureSlot) {
-    setChoicePicker(null);
-    addOne(protocol, { sunExposure: sunExposureInputForSlot(slot) });
+  function chooseOutsideTime(
+    protocol: Protocol,
+    input: SunExposureLogInput,
+    durationMinutes: number,
+  ) {
+    setOutsideTimeProtocol(null);
+    addOne(protocol, { sunExposure: input, durationMinutes });
   }
 
   function chooseMovementSetting(
@@ -843,14 +849,12 @@ export function ScheduleDay({
             ? (opts?.skinTempF ?? coldThermoSkinTempF)
             : undefined,
           sunExposure: isSunExposureProtocolId(protocol.id)
-            ? (opts?.sunExposure ??
-              sunExposureInputForSlot(
-                sunSlotFromLocalHm(currentLocalHm(timeZone), { sun, timeZone }),
-              ))
+            ? (opts?.sunExposure ?? defaultOutsideTimeInput())
             : undefined,
           movementSetting: requiresMovementSetting(protocol)
             ? (opts?.movementSetting ?? "outside")
             : undefined,
+          completedOn,
         });
         applySnap({ ...res, protocolId: protocol.id });
         if (res.action === "added") {
@@ -862,7 +866,9 @@ export function ScheduleDay({
             mins && protocol.durationEnabled
               ? isColdThermoProtocolId(protocol.id) && opts?.skinTempF != null
                 ? `${formatColdThermoSkinTemp(opts.skinTempF)} · ${mins} min · `
-                : `+${mins} min · `
+                : isSunExposureProtocolId(protocol.id) && opts?.sunExposure
+                  ? `${formatSunExposureLabel(encodeSunExposureVariant(opts.sunExposure), mins)} · `
+                  : `+${mins} min · `
               : "+1 · ";
           push(`${time}+${res.points} pts${extra}`);
         }
@@ -884,7 +890,7 @@ export function ScheduleDay({
     bumpCounts({ protocolId: protocol.id, delta: -1 });
     runLog(protocol.id, async () => {
       try {
-        const res = await removeOneCompletionAction(protocol.id);
+        const res = await removeOneCompletionAction(protocol.id, completedOn);
         applySnap({ ...res, protocolId: protocol.id });
         push("Removed last log");
       } catch (e) {
@@ -898,10 +904,10 @@ export function ScheduleDay({
     return p.allowsMultiple && !p.durationEnabled;
   }
 
-  /** First log / another +15 for multi & timed activities (sun exposure opens slot picker). */
+  /** First log / another session for multi & timed activities. */
   function addMultiOrTimed(protocol: Protocol) {
     if (isSunExposureProtocolId(protocol.id)) {
-      setChoicePicker({ kind: "sunExposure", protocol });
+      setOutsideTimeProtocol(protocol);
       return;
     }
     if (isColdThermoProtocolId(protocol.id)) {
@@ -963,9 +969,11 @@ export function ScheduleDay({
                     {protocolHint(p)}
                     {p.durationEnabled && totalMins > 0
                       ? ` · ${totalMins} min today`
-                      : isColdThermoProtocolId(p.id)
+                      :                     isColdThermoProtocolId(p.id)
                         ? " · tap to set temp & duration"
-                        : p.durationEnabled
+                        : isSunExposureProtocolId(p.id)
+                          ? " · tap to set time, sun/shade & duration"
+                          : p.durationEnabled
                           ? ` · tap to add ${DURATION_BLOCK_MINUTES} min`
                           : " · tap to log"}
                   </>
@@ -996,7 +1004,7 @@ export function ScheduleDay({
                 className="flex min-w-0 flex-1 items-center gap-3 text-left transition disabled:opacity-60"
                 aria-label={
                   isSunExposureProtocolId(p.id)
-                    ? `Log sun exposure — choose morning, noon, or afternoon`
+                    ? `Log Outside Time — choose time of day, sun or shade, and duration`
                     : isColdThermoProtocolId(p.id)
                       ? `Log ${p.name} — choose skin temperature and duration`
                       : requiresMovementSetting(p)
@@ -1031,7 +1039,7 @@ export function ScheduleDay({
                 className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent transition hover:bg-accent/25 disabled:opacity-35"
                 aria-label={
                   isSunExposureProtocolId(p.id)
-                    ? `Log sun exposure — choose morning, noon, or afternoon`
+                    ? `Log Outside Time — choose time of day, sun or shade, and duration`
                     : isColdThermoProtocolId(p.id)
                       ? `Log ${p.name} — choose skin temperature and duration`
                       : requiresMovementSetting(p)
@@ -1151,8 +1159,8 @@ export function ScheduleDay({
             sunriseMult <= 1 && (
               <p className="rounded-2xl border border-border px-3.5 py-2.5 text-xs leading-relaxed text-muted">
                 <span className="font-medium text-foreground">Tip · </span>
-                Morning light boosts the rest of today: horizon 2× · open sky
-                1.5× · outside 1.25× — logged from the daily sunrise check-in.
+                Sunrise boosts the rest of today: horizon 2× · open sky
+                1.5× · outside 1.25× — logged from the daily Sunrise check-in.
               </p>
             )
           )}
@@ -1187,34 +1195,13 @@ export function ScheduleDay({
             </div>
           )}
 
-          <p className="text-sm text-muted">
-            Your activities · suggested for this sun phase first
-          </p>
+          <p className="text-sm text-muted">Your activities for today</p>
         </>
       )}
 
       <div className="space-y-5">
         {renderSunriseSection()}
         {renderAddActivityButton()}
-
-        <CollapsibleChecklistSection
-          title="Suggested"
-          count={suggested.length}
-          accent
-          open={sectionsOpen.suggested}
-          onToggle={() => toggleSection("suggested")}
-          tourId="section-suggested"
-        >
-          {suggested.length > 0 ? (
-            <ul className="space-y-2">{suggested.map(renderRow)}</ul>
-          ) : (
-            renderEmptyHint(
-              protocols.length === 0
-                ? "Add activities to see phase-timed suggestions here."
-                : "Nothing fits this sun phase right now — check Available below.",
-            )
-          )}
-        </CollapsibleChecklistSection>
 
         <CollapsibleChecklistSection
           title="Available"
@@ -1229,7 +1216,7 @@ export function ScheduleDay({
             renderEmptyHint(
               protocols.length === 0
                 ? "Tap Edit activities to build your list."
-                : "All remaining activities are suggested above, or already performed.",
+                : "Everything on your list is already performed.",
             )
           )}
         </CollapsibleChecklistSection>
@@ -1276,7 +1263,7 @@ export function ScheduleDay({
           sleepRoomTempF={sleepRoomTempF}
           onClose={() => setSpaceDialog(null)}
           onSave={async (input) => {
-            const res = await saveSleepSpaceConfigAction(input);
+            const res = await saveSleepSpaceConfigAction({ ...input, completedOn });
             setSleepConfig(input.config);
             setMagneticoGauss(input.magneticoGauss);
             setSleepRoomTempF(input.sleepRoomTempF);
@@ -1310,7 +1297,7 @@ export function ScheduleDay({
           initialConfig={workConfig}
           onClose={() => setSpaceDialog(null)}
           onSave={async (input) => {
-            const res = await saveWorkSpaceConfigAction(input);
+            const res = await saveWorkSpaceConfigAction({ ...input, completedOn });
             setWorkConfig(input.config);
             setDayPoints(res.dayPoints);
             onStatsChange?.({ dayPoints: res.dayPoints, streak });
@@ -1353,9 +1340,7 @@ export function ScheduleDay({
                     ? "Tap your gauss rating"
                     : choicePicker.kind === "sleep"
                       ? "Tap your bedroom temperature"
-                      : choicePicker.kind === "movement"
-                        ? "Where did you do this session?"
-                        : "Which sun window was this?"}
+                      : "Where did you do this session?"}
                 </p>
               </div>
               <button
@@ -1404,7 +1389,7 @@ export function ScheduleDay({
                     );
                   }}
                 />
-              ) : choicePicker.kind === "movement" ? (
+              ) : (
                 <OptionListChoice
                   options={MOVEMENT_SETTING_OPTIONS.map(
                     (opt): ClickThroughOption => ({
@@ -1420,25 +1405,6 @@ export function ScheduleDay({
                     chooseMovementSetting(
                       choicePicker.protocol,
                       id as MovementSetting,
-                    );
-                  }}
-                />
-              ) : (
-                <OptionListChoice
-                  options={SUN_EXPOSURE_SLOTS.map(
-                    (s): ClickThroughOption => ({
-                      id: s.id,
-                      title: s.label,
-                      subtitle: sunExposureSlotClockLabel(s.id, sun, timeZone),
-                      highlight: s.id === suggestedSunSlot,
-                    }),
-                  )}
-                  selectedId={suggestedSunSlot}
-                  disabled={busyId === choicePicker.protocol.id}
-                  onChoose={(id) => {
-                    chooseSunExposureSlot(
-                      choicePicker.protocol,
-                      id as SunExposureSlot,
                     );
                   }}
                 />
@@ -1469,6 +1435,19 @@ export function ScheduleDay({
             chooseColdThermo(coldThermoProtocol, tempF, mins)
           }
           onCancel={() => setColdThermoProtocol(null)}
+        />
+      ) : null}
+      {outsideTimeProtocol ? (
+        <SunExposureDialog
+          protocol={outsideTimeProtocol}
+          timeZone={timeZone}
+          sun={sun}
+          pending={busyId === outsideTimeProtocol.id}
+          sunriseMultiplier={sunriseMult}
+          onLog={(input, mins) =>
+            chooseOutsideTime(outsideTimeProtocol, input, mins)
+          }
+          onCancel={() => setOutsideTimeProtocol(null)}
         />
       ) : null}
       {catalogProtocols?.length && onAvailableIdsChange ? (

@@ -344,7 +344,7 @@ export async function deleteAdminProtocolAction(
   await requireAdmin();
   if (isSunriseKeystoneProtocolId(protocolId)) {
     throw new Error(
-      "Morning light tiers (horizon / open sky / outside) cannot be deleted — they power the daily sunrise check-in.",
+      "Sunrise tiers (horizon / open sky / outside) cannot be deleted — they power the daily Sunrise check-in.",
     );
   }
   const overrides = await loadContentOverrides();

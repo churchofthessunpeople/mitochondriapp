@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, users } from "@/db/schema";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { resolveEditableCompletedOn } from "@/lib/editable-day";
 import {
   MAGNETICO_PROTOCOL_ID,
   parseMagneticoGauss,
@@ -22,10 +23,11 @@ async function requireUserId() {
 }
 
 /**
- * Persist Magnetico gauss preference and refresh today's auto-log points if present.
+ * Persist Magnetico gauss preference and refresh the day's auto-log points if present.
  */
 export async function setMagneticoGaussAction(
   gaussRaw: number,
+  completedOnRaw?: string | null,
 ): Promise<{ gauss: MagneticoGauss; dayPoints: number }> {
   const userId = await requireUserId();
   const gauss = parseMagneticoGauss(gaussRaw);
@@ -43,7 +45,8 @@ export async function setMagneticoGaussAction(
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
-  const completedOn = getTodayIsoForTimezone(u?.timezone || "UTC");
+  const today = getTodayIsoForTimezone(u?.timezone || "UTC");
+  const completedOn = resolveEditableCompletedOn(today, completedOnRaw);
 
   const protocol = getCatalogProtocolById(MAGNETICO_PROTOCOL_ID);
   const [row] = await db

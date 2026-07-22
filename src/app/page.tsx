@@ -52,7 +52,7 @@ export default async function HomePage() {
           <ul className="mx-auto mt-6 max-w-xs space-y-2 text-left text-sm text-muted">
             <li>· US ZIP → sunrise/sunset at your coordinates</li>
             <li>· Pick only activities you can actually do</li>
-            <li>· Suggested-now follows the sun phase</li>
+            <li>· Log light, water, and magnetism habits</li>
           </ul>
         </div>
 

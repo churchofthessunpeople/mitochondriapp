@@ -9,6 +9,10 @@ import { getMergedCatalogProtocolById } from "@/lib/catalog";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import {
+  resolveEditableCompletedOn,
+  yesterdayIsoFromToday,
+} from "@/lib/editable-day";
+import {
   clearPermanentSkip,
   ensurePermanentCompletions,
   recordPermanentSkip,
@@ -87,6 +91,54 @@ async function userToday(userId: string) {
     .where(eq(users.id, userId))
     .limit(1);
   return getTodayIsoForTimezone(u?.timezone || "UTC");
+}
+
+async function resolveCompletedOnForUser(
+  userId: string,
+  requestedIso?: string | null,
+): Promise<string> {
+  const today = await userToday(userId);
+  return resolveEditableCompletedOn(today, requestedIso);
+}
+
+export type EditableDaySnapshot = {
+  completedOn: string;
+  todayIso: string;
+  yesterdayIso: string;
+  isYesterday: boolean;
+  dayPoints: number;
+  completionCounts: Record<string, number>;
+  completionDurations: Record<string, number>;
+  sunriseMultiplier: number;
+  sunriseTierLabel: string | null;
+  streak: { current: number; best: number };
+};
+
+/** Load checklist stats for today or yesterday (clamped). */
+export async function loadEditableDayAction(
+  requestedIso?: string | null,
+): Promise<EditableDaySnapshot> {
+  const userId = await requireUser();
+  const todayIso = await userToday(userId);
+  const yesterdayIso = yesterdayIsoFromToday(todayIso);
+  const completedOn = resolveEditableCompletedOn(todayIso, requestedIso);
+  const [stats, streak, buff] = await Promise.all([
+    getUserDayStats(userId, completedOn),
+    getUserStreak(userId, todayIso),
+    getSunriseBuffToday(userId, completedOn),
+  ]);
+  return {
+    completedOn,
+    todayIso,
+    yesterdayIso,
+    isYesterday: completedOn === yesterdayIso,
+    dayPoints: stats.points,
+    completionCounts: Object.fromEntries(stats.completionCounts),
+    completionDurations: Object.fromEntries(stats.completionDurations),
+    sunriseMultiplier: buff.multiplier,
+    sunriseTierLabel: buff.tier?.shortLabel ?? null,
+    streak,
+  };
 }
 
 /**
@@ -222,14 +274,22 @@ export async function logCompletionAction(
     viewedAt?: string;
     /** Optional skin surface temp (°F) for cold thermogenesis logs. */
     skinTempF?: number | null;
-    /** Daytime sun exposure dialog answers. */
+    /** Outside Time dialog answers (slot, cover, optional start). */
     sunExposure?: SunExposureLogInput;
     /** Movement / exercise environment (sunlight, outside, indoors). */
     movementSetting?: MovementSetting;
+    /**
+     * Calendar day to edit (YYYY-MM-DD). Clamped to today or yesterday
+     * in the user’s timezone.
+     */
+    completedOn?: string | null;
   },
 ): Promise<CompletionResult> {
   const userId = await requireUser();
-  const completedOn = await userToday(userId);
+  const completedOn = await resolveCompletedOnForUser(
+    userId,
+    options?.completedOn,
+  );
 
   // Local seeds are source of truth — skip full catalog upsert on every tap
   const protocol = await getMergedCatalogProtocolById(protocolId);
@@ -325,9 +385,12 @@ export async function logCompletionAction(
     basePoints = variantBasePoints(protocolId, variantValue, protocol.points);
   } else if (isSunExposureProtocolId(protocolId)) {
     const sun = options?.sunExposure;
-    if (!sun) throw new Error("Sun exposure details required");
+    if (!sun) throw new Error("Outside Time details required");
     variantValue = encodeSunExposureVariant(sun);
-    basePoints = sunExposureBasePoints(protocol.points, { slot: sun.slot });
+    basePoints = sunExposureBasePoints(protocol.points, {
+      slot: sun.slot,
+      cover: sun.cover,
+    });
   } else if (isMovementSettingProtocolId(protocolId)) {
     const setting = parseMovementSetting(
       options?.movementSetting ?? "outside",
@@ -468,9 +531,10 @@ export async function logCompletionAction(
 
 export async function removeOneCompletionAction(
   protocolId: string,
+  completedOnRaw?: string | null,
 ): Promise<CompletionResult> {
   const userId = await requireUser();
-  const completedOn = await userToday(userId);
+  const completedOn = await resolveCompletedOnForUser(userId, completedOnRaw);
 
   const [row] = await db
     .select()
@@ -515,11 +579,12 @@ export async function toggleCompletionAction(protocolId: string) {
 /** Re-log a permanent activity after skipping tonight, or refresh auto-logs. */
 export async function logPermanentTonightAction(
   protocolId: string,
+  completedOnRaw?: string | null,
 ): Promise<CompletionResult> {
   const userId = await requireUser();
-  const completedOn = await userToday(userId);
+  const completedOn = await resolveCompletedOnForUser(userId, completedOnRaw);
   if (!(await isPermanentProtocolMerged(protocolId))) {
-    return logCompletionAction(protocolId);
+    return logCompletionAction(protocolId, { completedOn });
   }
   await clearPermanentSkip(userId, protocolId, completedOn);
 
@@ -545,5 +610,5 @@ export async function logPermanentTonightAction(
     };
   }
 
-  return logCompletionAction(protocolId);
+  return logCompletionAction(protocolId, { completedOn });
 }

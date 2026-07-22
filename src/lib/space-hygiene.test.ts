@@ -14,10 +14,11 @@ describe("pointsForSleepSpace", () => {
       pointsForSleepSpace({
         ...DEFAULT_SLEEP_SPACE_CONFIG,
         trueDark: true,
+        circadianWindow: true,
         phoneAway: true,
         groundingMat: true,
       }),
-      8 + 5 + 10,
+      8 + 7 + 5 + 10,
     );
   });
 
@@ -57,6 +58,7 @@ describe("migrateLegacyFavoritesToSpaceConfigs", () => {
       favoriteIds: [
         "magnetico-sleep-pad",
         "dark-bedroom",
+        "consistent-sleep-window",
         "breaker-off-office",
         "air-tube-headphones",
       ],
@@ -66,11 +68,13 @@ describe("migrateLegacyFavoritesToSpaceConfigs", () => {
     assert.equal(result.changed, true);
     assert.equal(result.sleepConfig.magnetico, true);
     assert.equal(result.sleepConfig.trueDark, true);
+    assert.equal(result.sleepConfig.circadianWindow, true);
     assert.equal(result.workConfig.breakersOff, true);
     assert.ok(result.nextFavoriteIds.includes("sleep-space"));
     assert.ok(result.nextFavoriteIds.includes("work-space"));
     assert.ok(result.nextFavoriteIds.includes("air-tube-headphones"));
     assert.ok(!result.nextFavoriteIds.includes("magnetico-sleep-pad"));
+    assert.ok(!result.nextFavoriteIds.includes("consistent-sleep-window"));
     assert.ok(!result.nextFavoriteIds.includes("breaker-off-office"));
   });
 });

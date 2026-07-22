@@ -170,7 +170,7 @@ describe("formatDayActivitiesCopy", () => {
       },
     ]);
 
-    const sunriseIdx = text.indexOf("Morning light\n");
+    const sunriseIdx = text.indexOf("Sunrise\n");
     const dayIdx = text.indexOf("Performed");
     const permIdx = text.indexOf("Permanent\n");
     assert.ok(sunriseIdx >= 0 && dayIdx > sunriseIdx && permIdx > dayIdx);

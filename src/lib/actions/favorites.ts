@@ -51,7 +51,7 @@ export async function toggleFavoriteAction(
     throw new Error("Activity not found");
   }
   if (!isCatalogSelectableProtocolId(protocolId)) {
-    throw new Error("Morning light is logged each day from the sunrise check-in");
+    throw new Error("Sunrise is logged each day from the Sunrise check-in");
   }
   const inDb = await ensureProtocolInDb(protocolId);
   if (!inDb) throw new Error("Activity not found");

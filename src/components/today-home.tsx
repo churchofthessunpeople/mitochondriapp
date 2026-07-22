@@ -2,6 +2,8 @@
 
 import {
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   ClipboardList,
   Flame,
@@ -9,7 +11,7 @@ import {
   Trophy,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Protocol, Region } from "@/db/schema";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
 import { LwmStrip } from "@/components/lwm-strip";
@@ -26,8 +28,13 @@ const LeaderboardPanel = dynamic(
 );
 import { LevelProgressBar } from "@/components/level-progress";
 import type { PermanentAutoLogSnap } from "@/lib/actions/favorites";
+import { loadEditableDayAction } from "@/lib/actions/completions";
 import type { OpenAppSheet } from "@/lib/app-sheets";
 import type { TodaySection } from "@/lib/app-tabs";
+import {
+  formatEditableDayLabel,
+  yesterdayIsoFromToday,
+} from "@/lib/editable-day";
 import type { PlaceFactors } from "@/lib/place-factors";
 import { enrichPlaceMagnetismAction } from "@/lib/actions/place";
 import { artificialEmNeedsRefresh } from "@/lib/artificial-em";
@@ -171,13 +178,16 @@ export function TodayHome({
     setSection(tourSection === "catalog" ? "checklist" : tourSection);
   }, [tourSection, isGuest]);
   const [overviewOpen, setOverviewOpen] = useState(false);
+  const [viewDayIso, setViewDayIso] = useState(todayIso);
+  const [daySwitchPending, setDaySwitchPending] = useState(false);
   const [liveCounts, setLiveCounts] = useState(completionCounts);
   const [liveDurations, setLiveDurations] = useState(completionDurations ?? {});
   const [livePoints, setLivePoints] = useState(dayPoints);
+  const [todayPoints, setTodayPoints] = useState(dayPoints);
   const [liveStreak, setLiveStreak] = useState(streak);
   const levelProgress = useMemo(
-    () => levelFromXp(lifetimePoints - dayPoints + livePoints),
-    [lifetimePoints, dayPoints, livePoints],
+    () => levelFromXp(lifetimePoints - dayPoints + todayPoints),
+    [lifetimePoints, dayPoints, todayPoints],
   );
   const [liveSunriseMult, setLiveSunriseMult] = useState(sunriseMultiplier);
   const [liveSunriseTierLabel, setLiveSunriseTierLabel] = useState(
@@ -185,6 +195,36 @@ export function TodayHome({
   );
   const [livePlaceFactors, setLivePlaceFactors] = useState(placeFactors);
   const [placeMagnetismLoading, setPlaceMagnetismLoading] = useState(false);
+
+  const yesterdayIso = useMemo(
+    () => yesterdayIsoFromToday(todayIso),
+    [todayIso],
+  );
+  const viewingYesterday = viewDayIso !== todayIso;
+  const viewDateLabel = formatEditableDayLabel(
+    viewDayIso,
+    todayIso,
+    dateLabel,
+  );
+
+  type DayCache = {
+    counts: Record<string, number>;
+    durations: Record<string, number>;
+    points: number;
+    mult: number;
+    tier: string | null;
+  };
+  const todayCacheRef = useRef<DayCache>({
+    counts: completionCounts,
+    durations: completionDurations ?? {},
+    points: dayPoints,
+    mult: sunriseMultiplier,
+    tier: sunriseTierLabel ?? null,
+  });
+
+  useEffect(() => {
+    setViewDayIso(todayIso);
+  }, [todayIso]);
 
   useEffect(() => {
     setLivePlaceFactors(placeFactors);
@@ -273,13 +313,23 @@ export function TodayHome({
   // Adopt server day stats on calendar change and after focus sync (router.refresh).
   // Same-device logs update live state without revalidating /app, so these props
   // only change on navigation / returning to the tab.
+  // Skip while editing yesterday so a refresh does not wipe the back-day view.
   useEffect(() => {
+    if (viewDayIso !== todayIso) return;
     setLiveCounts(completionCounts);
     setLiveDurations(completionDurations ?? {});
     setLivePoints(dayPoints);
+    setTodayPoints(dayPoints);
     setLiveStreak(streak);
     setLiveSunriseMult(sunriseMultiplier);
     setLiveSunriseTierLabel(sunriseTierLabel ?? null);
+    todayCacheRef.current = {
+      counts: completionCounts,
+      durations: completionDurations ?? {},
+      points: dayPoints,
+      mult: sunriseMultiplier,
+      tier: sunriseTierLabel ?? null,
+    };
   }, [
     dateLabel,
     completionCounts,
@@ -288,7 +338,52 @@ export function TodayHome({
     streak,
     sunriseMultiplier,
     sunriseTierLabel,
+    viewDayIso,
+    todayIso,
   ]);
+
+  async function goToDay(iso: string) {
+    if (daySwitchPending || iso === viewDayIso) return;
+    if (iso !== todayIso && iso !== yesterdayIso) return;
+
+    if (viewDayIso === todayIso) {
+      todayCacheRef.current = {
+        counts: liveCounts,
+        durations: liveDurations,
+        points: livePoints,
+        mult: liveSunriseMult,
+        tier: liveSunriseTierLabel,
+      };
+      setTodayPoints(livePoints);
+    }
+
+    setDaySwitchPending(true);
+    try {
+      if (iso === todayIso) {
+        const c = todayCacheRef.current;
+        setLiveCounts(c.counts);
+        setLiveDurations(c.durations);
+        setLivePoints(c.points);
+        setTodayPoints(c.points);
+        setLiveSunriseMult(c.mult);
+        setLiveSunriseTierLabel(c.tier);
+        setViewDayIso(todayIso);
+        return;
+      }
+      const snap = await loadEditableDayAction(iso);
+      setLiveCounts(snap.completionCounts);
+      setLiveDurations(snap.completionDurations);
+      setLivePoints(snap.dayPoints);
+      setLiveSunriseMult(snap.sunriseMultiplier);
+      setLiveSunriseTierLabel(snap.sunriseTierLabel);
+      setLiveStreak(snap.streak);
+      setViewDayIso(snap.completedOn);
+    } catch {
+      /* keep current day on failure */
+    } finally {
+      setDaySwitchPending(false);
+    }
+  }
 
   const onCompletionCountsChange = useCallback(
     (counts: Record<string, number>) => {
@@ -321,12 +416,24 @@ export function TodayHome({
     }) => {
       setLivePoints(s.dayPoints);
       setLiveStreak(s.streak);
+      if (viewDayIso === todayIso) {
+        setTodayPoints(s.dayPoints);
+        todayCacheRef.current = {
+          ...todayCacheRef.current,
+          points: s.dayPoints,
+          mult: s.sunriseMultiplier ?? todayCacheRef.current.mult,
+          tier:
+            s.sunriseTierLabel !== undefined
+              ? s.sunriseTierLabel
+              : todayCacheRef.current.tier,
+        };
+      }
       if (s.sunriseMultiplier != null) setLiveSunriseMult(s.sunriseMultiplier);
       if (s.sunriseTierLabel !== undefined) {
         setLiveSunriseTierLabel(s.sunriseTierLabel);
       }
     },
-    [],
+    [viewDayIso, todayIso],
   );
 
   const catalogProtocols = useMemo(
@@ -412,45 +519,76 @@ export function TodayHome({
           className="rounded-2xl border border-border bg-foreground/[0.02]"
           data-tour="today-overview"
         >
-          <button
-            type="button"
-            onClick={() => setOverviewOpen((o) => !o)}
-            className="flex w-full items-center gap-3 px-3.5 py-2.5 text-left"
-            aria-expanded={overviewOpen}
-          >
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold tracking-tight">
-                {dateLabel}
-              </p>
-              <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
-                <span className="tabular-nums">
-                  {formatPoints(livePoints)} pts
-                </span>
-                <span aria-hidden>·</span>
-                <span className="inline-flex items-center gap-0.5 tabular-nums">
-                  {liveStreak.current > 0 && (
-                    <Flame className="h-3 w-3 text-accent-2" />
+          <div className="flex items-stretch gap-0.5 px-1 py-1">
+            <button
+              type="button"
+              onClick={() => void goToDay(yesterdayIso)}
+              disabled={viewingYesterday || daySwitchPending}
+              className="inline-flex w-9 shrink-0 items-center justify-center rounded-xl text-muted transition hover:bg-foreground/[0.04] hover:text-foreground disabled:opacity-30"
+              aria-label="Edit yesterday"
+            >
+              <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setOverviewOpen((o) => !o)}
+              className="flex min-w-0 flex-1 items-center gap-3 px-2.5 py-2 text-left"
+              aria-expanded={overviewOpen}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold tracking-tight">
+                  {viewDateLabel}
+                </p>
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
+                  <span className="tabular-nums">
+                    {formatPoints(livePoints)} pts
+                  </span>
+                  <span aria-hidden>·</span>
+                  <span className="inline-flex items-center gap-0.5 tabular-nums">
+                    {liveStreak.current > 0 && (
+                      <Flame className="h-3 w-3 text-accent-2" />
+                    )}
+                    {liveStreak.current}d streak
+                  </span>
+                  <span aria-hidden>·</span>
+                  <span className="tabular-nums">
+                    {formatLevelLabel(levelProgress.level)}
+                  </span>
+                  {!overviewOpen && (
+                    <>
+                      <span aria-hidden>·</span>
+                      <span className="truncate">{placeSummary}</span>
+                    </>
                   )}
-                  {liveStreak.current}d streak
-                </span>
-                <span aria-hidden>·</span>
-                <span className="tabular-nums">
-                  {formatLevelLabel(levelProgress.level)}
-                </span>
-                {!overviewOpen && (
-                  <>
-                    <span aria-hidden>·</span>
-                    <span className="truncate">{placeSummary}</span>
-                  </>
-                )}
-              </p>
-            </div>
-            {overviewOpen ? (
-              <ChevronUp className="h-4 w-4 shrink-0 text-muted" />
-            ) : (
-              <ChevronDown className="h-4 w-4 shrink-0 text-muted" />
-            )}
-          </button>
+                </p>
+              </div>
+              {overviewOpen ? (
+                <ChevronUp className="h-4 w-4 shrink-0 text-muted" />
+              ) : (
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => void goToDay(todayIso)}
+              disabled={!viewingYesterday || daySwitchPending}
+              className="inline-flex w-9 shrink-0 items-center justify-center rounded-xl text-muted transition hover:bg-foreground/[0.04] hover:text-foreground disabled:opacity-30"
+              aria-label="Back to today"
+            >
+              <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+            </button>
+          </div>
+
+          {viewingYesterday ? (
+            <p className="border-t border-border px-3.5 py-2 text-xs leading-relaxed text-muted">
+              <span className="font-medium text-foreground">
+                Editing yesterday
+              </span>
+              {" — "}
+              for night habits you logged after putting the phone away. Logs
+              count for that day only.
+            </p>
+          ) : null}
 
           {overviewOpen && (
             <div className="space-y-4 border-t border-border px-3.5 py-3.5">
@@ -520,7 +658,7 @@ export function TodayHome({
               ) : (
                 showMorningLightTip && (
                   <p className="rounded-xl border border-border px-3 py-2 text-xs leading-relaxed text-muted">
-                    Morning light boosts the rest of today: horizon 2× · open
+                    Sunrise boosts the rest of today: horizon 2× · open
                     sky 1.5× · outside 1.25×
                   </p>
                 )
@@ -565,13 +703,14 @@ export function TodayHome({
       <div role="tabpanel" className="min-h-[12rem]">
         {section === "checklist" && (
           <ScheduleDay
-            key={todayIso}
+            key={viewDayIso}
             protocols={availableProtocols}
             completionCounts={liveCounts}
             completionDurations={liveDurations}
             dayPoints={livePoints}
             streak={liveStreak}
-            dateLabel={dateLabel}
+            dateLabel={viewDateLabel}
+            completedOn={viewDayIso}
             todayIso={todayIso}
             hideTitle
             compact

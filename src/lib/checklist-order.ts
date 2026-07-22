@@ -1,5 +1,4 @@
 import type { Protocol, TimeOfDay } from "@/db/schema";
-import { isSuggestedNow } from "@/lib/suggested-now";
 import type { sunPhase } from "@/lib/sun";
 
 type Phase = ReturnType<typeof sunPhase>;
@@ -23,7 +22,8 @@ function slotRank(slot: TimeOfDay, phase: Phase): number {
 }
 
 /**
- * Sort checklist: suggested-for-now first, then by phase affinity, then name.
+ * Sort checklist by phase affinity, then name.
+ * Done items are ranked lower so Available stays focused on what’s left.
  */
 export function orderProtocolsForNow(
   protocols: Protocol[],
@@ -32,31 +32,24 @@ export function orderProtocolsForNow(
     localHour: number;
     completionCounts: Record<string, number>;
   },
-): { suggested: Protocol[]; rest: Protocol[] } {
-  const { phase, localHour, completionCounts } = opts;
+): Protocol[] {
+  const { phase, completionCounts } = opts;
+  void opts.localHour;
 
   const scored = protocols.map((p) => {
     const count = completionCounts[p.id] ?? 0;
     const ideal = idealSlot(p);
-    // "anytime" stays in rest so Suggested now stays sharp
-    const suggested =
-      count === 0 &&
-      ideal !== "anytime" &&
-      isSuggestedNow(p, localHour);
     const rank = slotRank(ideal, phase);
     const doneBoost = count > 0 ? 100 : 0;
-    return { p, suggested, rank: rank + doneBoost };
+    return { p, rank: rank + doneBoost };
   });
 
   scored.sort((a, b) => {
-    if (a.suggested !== b.suggested) return a.suggested ? -1 : 1;
     if (a.rank !== b.rank) return a.rank - b.rank;
     return a.p.name.localeCompare(b.p.name);
   });
 
-  const suggested = scored.filter((s) => s.suggested).map((s) => s.p);
-  const rest = scored.filter((s) => !s.suggested).map((s) => s.p);
-  return { suggested, rest };
+  return scored.map((s) => s.p);
 }
 
 export function seasonCoachLine(

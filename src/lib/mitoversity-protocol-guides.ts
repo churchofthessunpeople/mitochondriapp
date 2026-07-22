@@ -73,23 +73,23 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
   },
   {
     id: "sun-exposure",
-    title: "Sun exposure by time of day",
+    title: "Outside Time",
     pillar: "light",
     summary:
-      "One outdoor sun habit logged into morning, noon, or afternoon slots—with grounding, skin exposure, and duration.",
+      "Outdoor time by morning, solar noon, or afternoon — full sun or shade, with duration. Daytime light habit separate from the Sunrise check-in.",
     relatedProtocolIds: ["sun-exposure"],
     sections: [
       {
         heading: "Why one activity, three slots",
-        body: "Morning, solar noon, and afternoon sun are different UV and circadian jobs. This app keeps one Sun exposure activity and routes each log into a solar-relative slot: morning from sunrise to 1 hour before solar noon, solar noon from then until 2 hours after solar noon, then afternoon until sunset (windows come from Place sun times). Add more minutes to the same slot anytime during the day.",
+        body: "Morning, solar noon, and afternoon light are different UV and circadian jobs. Outside Time routes each log into a solar-relative slot from Place sun times: morning from sunrise to 1 hour before solar noon, solar noon until 2 hours after, then afternoon until sunset. Log another session anytime you go out again.",
       },
       {
         heading: "What you log",
-        body: "Session time (or pick the slot), whether you were barefoot on earth, how much skin was exposed, and duration. Quality slightly adjusts points; ZIP UV weighting is planned next so noon at high UV can score differently from winter mornings.",
+        body: "Time of day (slot), full sun vs shaded, and how long you stayed. Full sun scores higher than shade. ZIP UV weighting is planned next so strong noon UV can score differently from winter mornings.",
       },
       {
         heading: "How this fits the app",
-        body: "Sunrise keystones remain separate—they unlock the day boost. Sun exposure is the daytime skin + outdoor light habit. Pair with Place solar noon and the solar-noon vitamin D lesson for context.",
+        body: "Sunrise check-in remains separate—it unlocks the day boost. Outside Time is the daytime outdoor-light habit for skin and spectrum. Pair with Place solar noon and the solar-noon vitamin D lesson for context.",
       },
     ],
   },
@@ -440,8 +440,8 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     title: "Circadian sleep window",
     pillar: "support",
     summary:
-      "Consistent bed and wake times aligned with night—anchor for glymphatic and hormone timing.",
-    relatedProtocolIds: ["consistent-sleep-window"],
+      "Consistent bed and wake times aligned with night—anchor for glymphatic and hormone timing. Now an option inside Sleep Space.",
+    relatedProtocolIds: ["consistent-sleep-window", "sleep-space"],
     sections: [
       {
         heading: "Regularity beats perfection",
@@ -449,11 +449,11 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
       },
       {
         heading: "Practice",
-        body: "Log when you hit your target window, not only when exhausted. Pair with dark, cool, low-RF nights.",
+        body: "Enable Circadian sleep window inside Sleep Space when you hit your target window, not only when exhausted. Pair with dark, cool, low-RF nights from the same stack.",
       },
       {
         heading: "Read next",
-        body: "See “Fully dark sleep environment” and “Cool bedroom sleep (~65 °F)” for environment levers.",
+        body: "See Sleep Space for the full bedroom hygiene stack, including true dark and cool bedroom.",
       },
     ],
   },
@@ -462,16 +462,16 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     title: "Sleep Space — bedroom hygiene stack",
     pillar: "magnetism",
     summary:
-      "One permanent night stack: cool temp, Magnetico, true dark, breakers, phone away, grounding mat, and negative ions — points add up from what you enable.",
+      "One permanent night stack: cool temp, Magnetico, true dark, circadian sleep window, breakers, phone away, grounding mat, and negative ions — points add up from what you enable.",
     relatedProtocolIds: ["sleep-space", "work-space", "air-tube-headphones"],
     sections: [
       {
         heading: "Why one Sleep Space row",
-        body: "Bedroom recovery is a stack, not a single checkbox. Cool temperature, unidirectional magnetism, true dark, cut AC circuits, phone distance, grounding, and ions all belong to the same night environment. This activity keeps them under one permanent habit so setup matches how you actually sleep.",
+        body: "Bedroom recovery is a stack, not a single checkbox. Cool temperature, unidirectional magnetism, true dark, a consistent sleep–wake window, cut AC circuits, phone distance, grounding, and ions all belong to the same night environment. This activity keeps them under one permanent habit so setup matches how you actually sleep.",
       },
       {
         heading: "How scoring works",
-        body: "Enable only what you run. Points are the sum: cool bedroom follows the °F curve (65°F = 10 pts), Magnetico is 10/25/50 by gauss, true dark 8, bedroom breakers 6, phone away 5, grounding mat 10, negative ion generator 10. Auto-logs nightly while on your list; skip when traveling.",
+        body: "Enable only what you run. Points are the sum: cool bedroom follows the °F curve (65°F = 10 pts), Magnetico is 10/25/50 by gauss, true dark 8, circadian sleep window 7, bedroom breakers 6, phone away 5, grounding mat 10, negative ion generator 10. Auto-logs nightly while on your list; skip when traveling.",
       },
       {
         heading: "How this fits the app",

@@ -322,7 +322,7 @@ export function SunriseKeystoneDialog({
 
   const title =
     step === "tier"
-      ? "Morning light — how did you do?"
+      ? "Sunrise — how did you do?"
       : step === "sky"
         ? "Sky conditions"
         : step === "grounded"
@@ -331,7 +331,7 @@ export function SunriseKeystoneDialog({
             ? "Skin exposure"
             : step === "sunglasses"
               ? "Sunglasses"
-              : "Confirm morning light";
+              : "Confirm Sunrise";
 
   const subtitle =
     step === "tier" ? (
@@ -628,7 +628,7 @@ export function SunriseKeystoneDialog({
                 onClick={confirm}
                 className="btn-primary h-11 rounded-2xl text-sm font-semibold"
               >
-                Log morning light
+                Log Sunrise
               </button>
               {initialTier && onCancel ? (
                 <button

@@ -142,9 +142,8 @@ export async function ensureProtocolInDb(protocolId: string): Promise<boolean> {
 }
 
 /**
- * Ensure protocol FK rows exist in Neon.
- * Skips when every catalog id is already present (normal case after seed).
- * Missing rows are upserted in parallel.
+ * Ensure protocol FK rows exist in Neon and stay aligned with seeds.
+ * Inserts missing ids; updates rows whose catalog fields drifted.
  */
 export const ensureCatalogSyncedToDb = cache(async () => {
   try {
@@ -158,13 +157,31 @@ export const ensureCatalogSyncedToDb = cache(async () => {
     if (list.length === 0) return;
 
     const existing = await db
-      .select({ id: protocols.id })
+      .select({
+        id: protocols.id,
+        name: protocols.name,
+        points: protocols.points,
+        description: protocols.description,
+        maxDurationMinutes: protocols.maxDurationMinutes,
+        sortOrder: protocols.sortOrder,
+      })
       .from(protocols);
-    const have = new Set(existing.map((r) => r.id));
-    const missing = list.filter((p) => !have.has(p.id));
-    if (missing.length === 0) return;
+    const have = new Map(existing.map((r) => [r.id, r]));
 
-    await Promise.all(missing.map((row) => upsertProtocolRow(row)));
+    const stale = list.filter((p) => {
+      const row = have.get(p.id);
+      if (!row) return true;
+      return (
+        row.name !== p.name ||
+        row.points !== p.points ||
+        row.description !== p.description ||
+        row.maxDurationMinutes !== p.maxDurationMinutes ||
+        row.sortOrder !== p.sortOrder
+      );
+    });
+    if (stale.length === 0) return;
+
+    await Promise.all(stale.map((row) => upsertProtocolRow(row)));
   } catch (e) {
     console.warn("[catalog] sync to DB failed", e);
   }

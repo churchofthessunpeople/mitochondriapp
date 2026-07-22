@@ -115,16 +115,16 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   }),
   p({
     id: "sun-exposure",
-    name: "Sun exposure",
+    name: "Outside Time",
     description:
-      "Outdoor sun by time of day — morning (sunrise–12), noon (12–4), or afternoon (4–sunset). Log the slot and add 15-minute blocks with +/−.",
+      "Time outdoors — pick morning, solar noon, or afternoon (from your place sun times), full sun or shaded, and how long you stayed.",
     points: 8,
     category: "light",
     timeOfDay: "anytime",
     allowsMultiple: true,
     durationEnabled: true,
     referenceMinutes: 15,
-    maxDurationMinutes: 60,
+    maxDurationMinutes: 120,
     sortOrder: 10,
   }),
   p({
@@ -349,7 +349,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "sleep-space",
     name: "Sleep Space",
     description:
-      "Bedroom hygiene stack — cool temp, Magnetico, dark, breakers, phone away, grounding mat, negative ions. Points = sum of enabled options. Permanent: auto-logs nightly while on your available list.",
+      "Bedroom hygiene stack — cool temp, Magnetico, dark, circadian sleep window, breakers, phone away, grounding mat, negative ions. Points = sum of enabled options. Permanent: auto-logs nightly while on your available list.",
     points: 0,
     category: "emf",
     timeOfDay: "night",
@@ -504,11 +504,13 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "consistent-sleep-window",
     name: "Circadian sleep window",
-    description: "Consistent dark sleep window aligned with night.",
+    description:
+      "Retired — now an option under Sleep Space. Consistent dark sleep window aligned with night.",
     points: 7,
     category: "sleep",
     timeOfDay: "night",
     lockedTimeOfDay: "night",
-    sortOrder: 62,
+    sortOrder: 162,
+    retired: true,
   }),
 ];

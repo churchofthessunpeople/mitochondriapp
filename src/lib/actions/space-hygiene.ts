@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { dailyCompletions, userFavorites, users } from "@/db/schema";
 import { getCatalogProtocolById } from "@/lib/catalog";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
+import { resolveEditableCompletedOn } from "@/lib/editable-day";
 import { getUserFavoriteIds } from "@/lib/favorites";
 import { parseMagneticoGauss } from "@/lib/magnetico";
 import { clearPermanentSkip } from "@/lib/permanent-completions";
@@ -42,6 +43,13 @@ async function todayForUser(userId: string) {
     .where(eq(users.id, userId))
     .limit(1);
   return getTodayIsoForTimezone(u?.timezone || "UTC");
+}
+
+async function completedOnForUser(
+  userId: string,
+  requestedIso?: string | null,
+) {
+  return resolveEditableCompletedOn(await todayForUser(userId), requestedIso);
 }
 
 async function refreshSpaceCompletion(
@@ -114,6 +122,7 @@ export async function saveSleepSpaceConfigAction(input: {
   config: SleepSpaceConfig;
   magneticoGauss?: number;
   sleepRoomTempF?: number;
+  completedOn?: string | null;
 }): Promise<{ dayPoints: number; points: number; logged: boolean }> {
   const userId = await requireUserId();
   const config = parseSleepSpaceConfig(input.config);
@@ -134,7 +143,7 @@ export async function saveSleepSpaceConfigAction(input: {
 
   await db.update(users).set(patch).where(eq(users.id, userId));
 
-  const completedOn = await todayForUser(userId);
+  const completedOn = await completedOnForUser(userId, input.completedOn);
   const [u] = await db
     .select({
       magneticoGauss: users.magneticoGauss,
@@ -176,7 +185,7 @@ export async function saveSleepSpaceConfigAction(input: {
       const { logPermanentTonightAction } = await import(
         "@/lib/actions/completions"
       );
-      await logPermanentTonightAction(SLEEP_SPACE_PROTOCOL_ID);
+      await logPermanentTonightAction(SLEEP_SPACE_PROTOCOL_ID, completedOn);
       logged = true;
     } else {
       logged = true;
@@ -190,6 +199,7 @@ export async function saveSleepSpaceConfigAction(input: {
 
 export async function saveWorkSpaceConfigAction(input: {
   config: WorkSpaceConfig;
+  completedOn?: string | null;
 }): Promise<{ dayPoints: number; points: number; logged: boolean }> {
   const userId = await requireUserId();
   const config = parseWorkSpaceConfig(input.config);
@@ -199,7 +209,7 @@ export async function saveWorkSpaceConfigAction(input: {
     .set({ workSpaceConfig: serializeWorkSpaceConfig(config) })
     .where(eq(users.id, userId));
 
-  const completedOn = await todayForUser(userId);
+  const completedOn = await completedOnForUser(userId, input.completedOn);
   const basePoints = pointsForWorkSpace(config);
 
   await ensureProtocolInDb(WORK_SPACE_PROTOCOL_ID);
@@ -229,7 +239,7 @@ export async function saveWorkSpaceConfigAction(input: {
       const { logPermanentTonightAction } = await import(
         "@/lib/actions/completions"
       );
-      await logPermanentTonightAction(WORK_SPACE_PROTOCOL_ID);
+      await logPermanentTonightAction(WORK_SPACE_PROTOCOL_ID, completedOn);
       logged = true;
     } else {
       logged = true;

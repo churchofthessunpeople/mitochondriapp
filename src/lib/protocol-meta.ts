@@ -31,7 +31,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "sun-exposure": {
     equipment: "none",
-    how: "Go outside without glass between you and the sky. Tap + and pick morning, solar noon, or afternoon sun — each tap adds 15 minutes in that slot.\n\nSlots follow your place sun times: morning (sunrise → 1 hour before solar noon), solar noon (1 hour before → 2 hours after solar noon), afternoon (then → sunset). Stay within a non-burning window; build time gradually. Sunrise keystones are separate — they unlock the day boost.",
+    how: "Log outdoor time: pick morning, solar noon, or afternoon (from Place sun times), whether you were in full sun or shade, and how long you stayed.\n\nSlots: morning (sunrise → 1 hour before solar noon), solar noon (1 hour before → 2 hours after), afternoon (then → sunset). Full sun scores higher than shade. Stay within a non-burning window. Sunrise check-in is separate — it unlocks the day boost.",
   },
   "sunset-viewing": {
     equipment: "none",
@@ -123,7 +123,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "sleep-space": {
     equipment: "optional",
-    how: "One permanent bedroom stack. Tap Sleep Space and enable what you actually run: cool bedroom (°F), Magnetico (5/10/20 G), true dark, bedroom breakers off, phone away from bed, grounding mat, and/or negative ion generator.\n\nPoints = sum of enabled options. Auto-logs nightly while on your available list — skip when traveling.",
+    how: "One permanent bedroom stack. Tap Sleep Space and enable what you actually run: cool bedroom (°F), Magnetico (5/10/20 G), true dark, circadian sleep window, bedroom breakers off, phone away from bed, grounding mat, and/or negative ion generator.\n\nPoints = sum of enabled options. Auto-logs nightly while on your available list — skip when traveling.",
   },
   "work-space": {
     equipment: "optional",
@@ -163,7 +163,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "consistent-sleep-window": {
     equipment: "none",
-    how: "Go to bed and wake on a consistent window aligned with night — same rough times even on weekends within reason.\n\nLog when you hit your target sleep window, not just when you were tired.",
+    how: "Now part of Sleep Space. Go to bed and wake on a consistent window aligned with night — same rough times even on weekends within reason.\n\nEnable Circadian sleep window inside Sleep Space when you hit your target window.",
   },
 };
 
