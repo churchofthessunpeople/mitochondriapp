@@ -20,9 +20,11 @@ import {
 import { getSunriseBuffToday } from "@/lib/sunrise-buff";
 import { isPermanentProtocolMerged } from "@/lib/permanent-activities";
 import {
+  encodeColdThermoVariant,
   isColdThermoProtocolId,
   OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
-  parseColdThermoSkinTempF,
+  parseColdThermoLogInput,
+  type ColdThermoLogInput,
 } from "@/lib/cold-thermo-skin-temp";
 import {
   encodeMovementSettingVariant,
@@ -55,6 +57,18 @@ import {
   timeOfDayForSunSlot,
   type SunExposureLogInput,
 } from "@/lib/sun-exposure";
+import {
+  encodeDrinkingWaterVariant,
+  isDrinkingWaterProtocolId,
+  normalizeDrinkingWaterInput,
+  type DrinkingWaterLogInput,
+} from "@/lib/drinking-water";
+import {
+  encodeExerciseVariant,
+  exerciseBasePoints,
+  isExerciseProtocolId,
+  type ExerciseLogInput,
+} from "@/lib/exercise";
 import {
   effectiveSunriseBoostMultiplier,
   encodeSunriseEndOffset,
@@ -274,8 +288,14 @@ export async function logCompletionAction(
     viewedAt?: string;
     /** Optional skin surface temp (°F) for cold thermogenesis logs. */
     skinTempF?: number | null;
+    /** Cold thermogenesis mode + skin temp (preferred over skinTempF alone). */
+    coldThermo?: ColdThermoLogInput;
     /** Outside Time dialog answers (slot, cover, optional start). */
     sunExposure?: SunExposureLogInput;
+    /** Drinking water dialog answers (source, minerals, carbonation, DDW ppm). */
+    drinkingWater?: DrinkingWaterLogInput;
+    /** Exercise dialog answers (type, indoors/outdoors). */
+    exercise?: ExerciseLogInput;
     /** Movement / exercise environment (sunlight, outside, indoors). */
     movementSetting?: MovementSetting;
     /**
@@ -379,10 +399,19 @@ export async function logCompletionAction(
       durationMinutes,
     );
   } else if (isColdThermoProtocolId(protocolId)) {
-    variantValue = parseColdThermoSkinTempF(
-      options?.skinTempF ?? OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
-    );
+    const cold = options?.coldThermo
+      ? parseColdThermoLogInput(
+          encodeColdThermoVariant(options.coldThermo),
+          options.coldThermo.skinTempF,
+        )
+      : parseColdThermoLogInput(
+          options?.skinTempF ?? OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
+        );
+    variantValue = encodeColdThermoVariant(cold);
     basePoints = variantBasePoints(protocolId, variantValue, protocol.points);
+    if (cold.mode === "face_immersion") {
+      durationMinutes = null;
+    }
   } else if (isSunExposureProtocolId(protocolId)) {
     const sun = options?.sunExposure;
     if (!sun) throw new Error("Outside Time details required");
@@ -391,6 +420,17 @@ export async function logCompletionAction(
       slot: sun.slot,
       cover: sun.cover,
     });
+  } else if (isDrinkingWaterProtocolId(protocolId)) {
+    const water = options?.drinkingWater;
+    if (!water) throw new Error("Drinking water details required");
+    const normalized = normalizeDrinkingWaterInput(water);
+    variantValue = encodeDrinkingWaterVariant(normalized);
+    basePoints = variantBasePoints(protocolId, variantValue, protocol.points);
+  } else if (isExerciseProtocolId(protocolId)) {
+    const ex = options?.exercise;
+    if (!ex) throw new Error("Exercise details required");
+    variantValue = encodeExerciseVariant(ex);
+    basePoints = exerciseBasePoints(ex, protocol.points);
   } else if (isMovementSettingProtocolId(protocolId)) {
     const setting = parseMovementSetting(
       options?.movementSetting ?? "outside",

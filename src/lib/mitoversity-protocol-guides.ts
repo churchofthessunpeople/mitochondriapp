@@ -160,24 +160,24 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     ],
   },
   {
-    id: "mineralized-water",
-    title: "Purified and mineralized water",
+    id: "drinking-water",
+    title: "Drinking water",
     pillar: "water",
     summary:
-      "Well-mineralized hydration—spring water or remineralized filter water, not deionized-only all day.",
-    relatedProtocolIds: ["mineralized-water"],
+      "One glass log: RO, spring, or deuterium-depleted; optional salt or baking soda; still or carbonated.",
+    relatedProtocolIds: ["drinking-water"],
     sections: [
       {
-        heading: "Minerals in water",
-        body: "Electrolytes and trace minerals support hydration that plain distilled or deionized water alone may not. Remineralize RO or purified water when that is your source.",
+        heading: "Source",
+        body: "Reverse osmosis and similar purified water are fine when remineralized. Spring or mineral water already carries minerals. Deuterium-depleted water (DDW) is logged with the label’s deuterium PPM (natural water is ~150 ppm).",
+      },
+      {
+        heading: "Remineralization & carbonation",
+        body: "Add sea/electrolyte salt or baking soda when you use them, and pick the amount. Still vs carbonated is a final choice — sparkling water counts; sugary soda does not.",
       },
       {
         heading: "Practice",
-        body: "Drink intentional servings of mineralized water spread through the day. Log each serving. Pair with daylight-aligned hydration timing.",
-      },
-      {
-        heading: "Deuterium context",
-        body: "Source geography affects isotope content—see high-latitude glacial water and deuterium/ATP articles for the deeper Water-pillar story.",
+        body: "Log each intentional glass. Spread servings through the day. Baking soda is best ≥2 hours from meals. Pair with daylight-aligned hydration timing and Low-D morning hydration.",
       },
     ],
   },
@@ -252,8 +252,8 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     title: "Cold face and head immersion",
     pillar: "support",
     summary:
-      "Entry-level cold via face or brief head immersion—autonomic wake-up without full plunge gear.",
-    relatedProtocolIds: ["cold-face-plunge"],
+      "Entry-level cold via face or brief head immersion—now Face immersion inside Cold thermogenesis (3 rounds).",
+    relatedProtocolIds: ["cold-face-plunge", "cold-thermogenesis"],
     sections: [
       {
         heading: "Trigeminal cold pathway",
@@ -261,7 +261,7 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
       },
       {
         heading: "Practice",
-        body: "Brief cold water on face or head in a safe setting. Progress toward longer cold thermogenesis sessions when ready. Log each intentional exposure.",
+        body: "In Cold thermogenesis, choose Face immersion and skin temperature. The app logs 3 rounds per session. Progress toward cold plunge or shower when ready.",
       },
       {
         heading: "Read next",
@@ -393,19 +393,19 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
   },
   {
     id: "morning-movement",
-    title: "Mitochondrial movement in daylight",
+    title: "Exercise in daylight",
     pillar: "support",
     summary:
-      "Zone 2, resistance, or play outdoors in morning light—exercise stacked with circadian timing.",
-    relatedProtocolIds: ["morning-movement"],
+      "Walking, resistance bands, or rebounding—indoors or outdoors—with duration logged as Exercise.",
+    relatedProtocolIds: ["exercise"],
     sections: [
       {
         heading: "Movement plus light",
-        body: "Exercise in outdoor morning light couples muscle pump, lymph flow, and melanopsin drive—better than treadmill-under-fluorescents for this lifestyle frame.",
+        body: "Exercise in outdoor light couples muscle pump, lymph flow, and melanopsin drive—better than treadmill-under-fluorescents for this lifestyle frame.",
       },
       {
         heading: "Practice",
-        body: "Walk, jog, resistance work, or play outside in daylight. Each log asks full sunlight, outside, or indoors, then duration in 15-minute blocks. Rebounding has its own activity if you own a rebounder.",
+        body: "Log Exercise: pick rebounding, resistance bands, or walking; choose outdoors or indoors; then session length. Outdoor sessions earn full base points.",
       },
       {
         heading: "Read next",

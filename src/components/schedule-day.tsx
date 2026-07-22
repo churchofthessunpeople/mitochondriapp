@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } f
 import type { Protocol } from "@/db/schema";
 import { AddActivityDialog } from "@/components/add-activity-dialog";
 import { ColdThermoDialog } from "@/components/cold-thermo-dialog";
+import { DrinkingWaterDialog } from "@/components/drinking-water-dialog";
+import { ExerciseDialog } from "@/components/exercise-dialog";
 import { SpaceHygieneDialog } from "@/components/space-hygiene-dialog";
 import {
   ProtocolHowToButton,
@@ -34,12 +36,26 @@ import {
 import { SunriseKeystoneDialog } from "@/components/sunrise-keystone-dialog";
 import { SunExposureDialog } from "@/components/sun-exposure-dialog";
 import {
-  coldThermoSkinTempBasePoints,
-  formatColdThermoSkinTemp,
+  formatColdThermoLabel,
+  encodeColdThermoVariant,
   isColdThermoProtocolId,
+  isColdThermoTimedMode,
   OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
+  type ColdThermoLogInput,
   type ColdThermoSkinTempF,
 } from "@/lib/cold-thermo-skin-temp";
+import {
+  encodeDrinkingWaterVariant,
+  formatDrinkingWaterLabel,
+  isDrinkingWaterProtocolId,
+  type DrinkingWaterLogInput,
+} from "@/lib/drinking-water";
+import {
+  encodeExerciseVariant,
+  formatExerciseLabel,
+  isExerciseProtocolId,
+  type ExerciseLogInput,
+} from "@/lib/exercise";
 import {
   formatMagneticoGauss,
   isMagneticoProtocolId,
@@ -273,6 +289,11 @@ export function ScheduleDay({
   }>({ open: false, initialProtocol: null });
   const [coldThermoProtocol, setColdThermoProtocol] =
     useState<Protocol | null>(null);
+  const [drinkingWaterProtocol, setDrinkingWaterProtocol] =
+    useState<Protocol | null>(null);
+  const [exerciseProtocol, setExerciseProtocol] = useState<Protocol | null>(
+    null,
+  );
   const [outsideTimeProtocol, setOutsideTimeProtocol] =
     useState<Protocol | null>(null);
   const [choicePicker, setChoicePicker] = useState<{
@@ -441,10 +462,6 @@ export function ScheduleDay({
     }
   }
 
-  function coldThermoLogBase(protocol: Protocol): number {
-    return coldThermoSkinTempBasePoints(coldThermoSkinTempF, protocol.points);
-  }
-
   function protocolHint(p: Protocol): string {
     if (isSleepSpaceProtocolId(p.id)) {
       return formatSleepSpaceHint(sleepConfig, {
@@ -471,8 +488,13 @@ export function ScheduleDay({
       return parts.join(" · ");
     }
     if (isColdThermoProtocolId(p.id)) {
-      const base = coldThermoLogBase(p);
-      return `${formatColdThermoSkinTemp(coldThermoSkinTempF)} · ${base} pts / 15 min`;
+      return `plunge · shower · face · tap to log`;
+    }
+    if (isDrinkingWaterProtocolId(p.id)) {
+      return `${p.points} pts · RO · spring · DDW · salt · carbonated · tap to log`;
+    }
+    if (isExerciseProtocolId(p.id)) {
+      return `${p.points} pts / 15 min · rebound · bands · walk · in/out`;
     }
     if (isSunExposureProtocolId(p.id)) {
       return `${p.points} pts / 15 min · morning · noon · afternoon · sun or shade`;
@@ -576,6 +598,10 @@ export function ScheduleDay({
     if (protocol.durationEnabled && (counts[protocol.id] ?? 0) === 0) {
       if (isColdThermoProtocolId(protocol.id)) {
         setColdThermoProtocol(protocol);
+        return;
+      }
+      if (isExerciseProtocolId(protocol.id)) {
+        setExerciseProtocol(protocol);
         return;
       }
       if (requiresMovementSetting(protocol)) {
@@ -815,12 +841,29 @@ export function ScheduleDay({
 
   function chooseColdThermo(
     protocol: Protocol,
-    skinTempF: ColdThermoSkinTempF,
+    input: ColdThermoLogInput,
+    durationMinutes: number | null,
+  ) {
+    setColdThermoSkinTempF(input.skinTempF);
+    setColdThermoProtocol(null);
+    addOne(protocol, { coldThermo: input, durationMinutes: durationMinutes ?? undefined });
+  }
+
+  function chooseDrinkingWater(
+    protocol: Protocol,
+    input: DrinkingWaterLogInput,
+  ) {
+    setDrinkingWaterProtocol(null);
+    addOne(protocol, { drinkingWater: input });
+  }
+
+  function chooseExercise(
+    protocol: Protocol,
+    input: ExerciseLogInput,
     durationMinutes: number,
   ) {
-    setColdThermoSkinTempF(skinTempF);
-    setColdThermoProtocol(null);
-    addOne(protocol, { skinTempF, durationMinutes });
+    setExerciseProtocol(null);
+    addOne(protocol, { exercise: input, durationMinutes });
   }
 
   function addOne(
@@ -829,13 +872,22 @@ export function ScheduleDay({
       sunExposure?: SunExposureLogInput;
       movementSetting?: MovementSetting;
       skinTempF?: ColdThermoSkinTempF;
+      coldThermo?: ColdThermoLogInput;
+      drinkingWater?: DrinkingWaterLogInput;
+      exercise?: ExerciseLogInput;
       durationMinutes?: number;
     },
   ) {
     const count = counts[protocol.id] ?? 0;
     const prevMins = durations[protocol.id] ?? 0;
+    const isFace =
+      isColdThermoProtocolId(protocol.id) &&
+      opts?.coldThermo != null &&
+      !isColdThermoTimedMode(opts.coldThermo.mode);
     const mins = protocol.durationEnabled
-      ? (opts?.durationMinutes ?? DURATION_BLOCK_MINUTES)
+      ? isFace
+        ? undefined
+        : (opts?.durationMinutes ?? DURATION_BLOCK_MINUTES)
       : undefined;
     bumpCounts({ protocolId: protocol.id, delta: 1 });
     if (mins) {
@@ -843,11 +895,26 @@ export function ScheduleDay({
     }
     runLog(protocol.id, async () => {
       try {
+        const coldThermo =
+          opts?.coldThermo ??
+          (isColdThermoProtocolId(protocol.id)
+            ? {
+                mode: "plunge" as const,
+                skinTempF: opts?.skinTempF ?? coldThermoSkinTempF,
+              }
+            : undefined);
+        const drinkingWater = isDrinkingWaterProtocolId(protocol.id)
+          ? opts?.drinkingWater
+          : undefined;
+        const exercise = isExerciseProtocolId(protocol.id)
+          ? opts?.exercise
+          : undefined;
         const res = await logCompletionAction(protocol.id, {
-          durationMinutes: mins,
-          skinTempF: isColdThermoProtocolId(protocol.id)
-            ? (opts?.skinTempF ?? coldThermoSkinTempF)
-            : undefined,
+          durationMinutes: mins ?? null,
+          coldThermo,
+          skinTempF: coldThermo?.skinTempF,
+          drinkingWater,
+          exercise,
           sunExposure: isSunExposureProtocolId(protocol.id)
             ? (opts?.sunExposure ?? defaultOutsideTimeInput())
             : undefined,
@@ -863,13 +930,17 @@ export function ScheduleDay({
               ? ` · +${res.streakBonus} streak`
               : "";
           const time =
-            mins && protocol.durationEnabled
-              ? isColdThermoProtocolId(protocol.id) && opts?.skinTempF != null
-                ? `${formatColdThermoSkinTemp(opts.skinTempF)} · ${mins} min · `
-                : isSunExposureProtocolId(protocol.id) && opts?.sunExposure
-                  ? `${formatSunExposureLabel(encodeSunExposureVariant(opts.sunExposure), mins)} · `
-                  : `+${mins} min · `
-              : "+1 · ";
+            isColdThermoProtocolId(protocol.id) && coldThermo
+              ? `${formatColdThermoLabel(encodeColdThermoVariant(coldThermo), mins)} · `
+              : isDrinkingWaterProtocolId(protocol.id) && drinkingWater
+                ? `${formatDrinkingWaterLabel(encodeDrinkingWaterVariant(drinkingWater))} · `
+                : isExerciseProtocolId(protocol.id) && exercise
+                  ? `${formatExerciseLabel(encodeExerciseVariant(exercise), mins)} · `
+                  : mins && protocol.durationEnabled
+                    ? isSunExposureProtocolId(protocol.id) && opts?.sunExposure
+                      ? `${formatSunExposureLabel(encodeSunExposureVariant(opts.sunExposure), mins)} · `
+                      : `+${mins} min · `
+                    : "+1 · ";
           push(`${time}+${res.points} pts${extra}`);
         }
       } catch (e) {
@@ -912,6 +983,14 @@ export function ScheduleDay({
     }
     if (isColdThermoProtocolId(protocol.id)) {
       setColdThermoProtocol(protocol);
+      return;
+    }
+    if (isDrinkingWaterProtocolId(protocol.id)) {
+      setDrinkingWaterProtocol(protocol);
+      return;
+    }
+    if (isExerciseProtocolId(protocol.id)) {
+      setExerciseProtocol(protocol);
       return;
     }
     if (requiresMovementSetting(protocol)) {
@@ -969,9 +1048,13 @@ export function ScheduleDay({
                     {protocolHint(p)}
                     {p.durationEnabled && totalMins > 0
                       ? ` · ${totalMins} min today`
-                      :                     isColdThermoProtocolId(p.id)
-                        ? " · tap to set temp & duration"
-                        : isSunExposureProtocolId(p.id)
+                      : isColdThermoProtocolId(p.id)
+                          ? " · tap to set mode, temp & duration"
+                          : isDrinkingWaterProtocolId(p.id)
+                          ? " · tap to set source, minerals & carbonation"
+                          : isExerciseProtocolId(p.id)
+                          ? " · tap to set type, place & duration"
+                          : isSunExposureProtocolId(p.id)
                           ? " · tap to set time, sun/shade & duration"
                           : p.durationEnabled
                           ? ` · tap to add ${DURATION_BLOCK_MINUTES} min`
@@ -1006,12 +1089,16 @@ export function ScheduleDay({
                   isSunExposureProtocolId(p.id)
                     ? `Log Outside Time — choose time of day, sun or shade, and duration`
                     : isColdThermoProtocolId(p.id)
-                      ? `Log ${p.name} — choose skin temperature and duration`
-                      : requiresMovementSetting(p)
-                        ? `Log ${p.name} — choose full sunlight, outside, or indoors`
-                        : p.durationEnabled
-                          ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
-                          : `Log ${p.name}`
+                      ? `Log ${p.name} — choose plunge, shower, or face immersion`
+                      : isDrinkingWaterProtocolId(p.id)
+                        ? `Log ${p.name} — choose source, minerals, and carbonation`
+                        : isExerciseProtocolId(p.id)
+                          ? `Log ${p.name} — choose type, indoors or outdoors, and duration`
+                          : requiresMovementSetting(p)
+                            ? `Log ${p.name} — choose full sunlight, outside, or indoors`
+                            : p.durationEnabled
+                              ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                              : `Log ${p.name}`
                 }
               >
                 {multiBody}
@@ -1041,12 +1128,16 @@ export function ScheduleDay({
                   isSunExposureProtocolId(p.id)
                     ? `Log Outside Time — choose time of day, sun or shade, and duration`
                     : isColdThermoProtocolId(p.id)
-                      ? `Log ${p.name} — choose skin temperature and duration`
-                      : requiresMovementSetting(p)
-                        ? `Log ${p.name} — choose full sunlight, outside, or indoors`
-                        : p.durationEnabled
-                          ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
-                          : `Add one ${p.name}`
+                      ? `Log ${p.name} — choose plunge, shower, or face immersion`
+                      : isDrinkingWaterProtocolId(p.id)
+                        ? `Log ${p.name} — choose source, minerals, and carbonation`
+                        : isExerciseProtocolId(p.id)
+                          ? `Log ${p.name} — choose type, indoors or outdoors, and duration`
+                          : requiresMovementSetting(p)
+                            ? `Log ${p.name} — choose full sunlight, outside, or indoors`
+                            : p.durationEnabled
+                              ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                              : `Add one ${p.name}`
                 }
               >
                 <Plus className="h-4 w-4" strokeWidth={2.5} />
@@ -1431,10 +1522,32 @@ export function ScheduleDay({
           pending={busyId === coldThermoProtocol.id}
           sunriseMultiplier={sunriseMult}
           initialTempF={coldThermoSkinTempF}
-          onLog={(tempF, mins) =>
-            chooseColdThermo(coldThermoProtocol, tempF, mins)
+          onLog={(input, mins) =>
+            chooseColdThermo(coldThermoProtocol, input, mins)
           }
           onCancel={() => setColdThermoProtocol(null)}
+        />
+      ) : null}
+      {drinkingWaterProtocol ? (
+        <DrinkingWaterDialog
+          protocol={drinkingWaterProtocol}
+          pending={busyId === drinkingWaterProtocol.id}
+          sunriseMultiplier={sunriseMult}
+          onLog={(input) =>
+            chooseDrinkingWater(drinkingWaterProtocol, input)
+          }
+          onCancel={() => setDrinkingWaterProtocol(null)}
+        />
+      ) : null}
+      {exerciseProtocol ? (
+        <ExerciseDialog
+          protocol={exerciseProtocol}
+          pending={busyId === exerciseProtocol.id}
+          sunriseMultiplier={sunriseMult}
+          onLog={(input, mins) =>
+            chooseExercise(exerciseProtocol, input, mins)
+          }
+          onCancel={() => setExerciseProtocol(null)}
         />
       ) : null}
       {outsideTimeProtocol ? (

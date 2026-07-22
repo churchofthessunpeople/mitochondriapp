@@ -1,7 +1,10 @@
 import {
-  coldThermoSkinTempBasePoints,
+  coldThermoBasePoints,
+  decodeColdThermoVariant,
+  formatColdThermoLabel,
   formatColdThermoSkinTemp,
   isColdThermoProtocolId,
+  parseColdThermoLogInput,
   parseColdThermoSkinTempF,
 } from "@/lib/cold-thermo-skin-temp";
 import {
@@ -29,6 +32,18 @@ import {
   isSunExposureProtocolId,
   sunExposureBasePoints,
 } from "@/lib/sun-exposure";
+import {
+  decodeDrinkingWaterVariant,
+  drinkingWaterBasePoints,
+  formatDrinkingWaterLabel,
+  isDrinkingWaterProtocolId,
+} from "@/lib/drinking-water";
+import {
+  decodeExerciseVariant,
+  exerciseBasePoints,
+  formatExerciseLabel,
+  isExerciseProtocolId,
+} from "@/lib/exercise";
 
 /** Effective base points when a protocol log carries a variant (gauss, °F, etc.). */
 export function variantBasePoints(
@@ -43,10 +58,18 @@ export function variantBasePoints(
     );
   }
   if (isColdThermoProtocolId(protocolId)) {
-    return coldThermoSkinTempBasePoints(
-      parseColdThermoSkinTempF(variantValue),
-      catalogBase,
-    );
+    const input = parseColdThermoLogInput(variantValue);
+    return coldThermoBasePoints(input, catalogBase);
+  }
+  if (isDrinkingWaterProtocolId(protocolId)) {
+    const decoded = decodeDrinkingWaterVariant(variantValue);
+    if (!decoded) return undefined;
+    return drinkingWaterBasePoints(decoded, catalogBase);
+  }
+  if (isExerciseProtocolId(protocolId)) {
+    const decoded = decodeExerciseVariant(variantValue);
+    if (!decoded) return undefined;
+    return exerciseBasePoints(decoded, catalogBase);
   }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return pointsForSleepRoomTemp(parseSleepRoomTempF(variantValue));
@@ -78,7 +101,16 @@ export function formatVariantLabel(
     return `${formatMagneticoGauss(gauss)} · ${pointsForMagneticoGauss(gauss, catalogBase)} pts`;
   }
   if (isColdThermoProtocolId(protocolId)) {
-    return formatColdThermoSkinTemp(parseColdThermoSkinTempF(variantValue));
+    return (
+      formatColdThermoLabel(variantValue) ??
+      formatColdThermoSkinTemp(parseColdThermoSkinTempF(variantValue))
+    );
+  }
+  if (isDrinkingWaterProtocolId(protocolId)) {
+    return formatDrinkingWaterLabel(variantValue);
+  }
+  if (isExerciseProtocolId(protocolId)) {
+    return formatExerciseLabel(variantValue);
   }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return formatSleepRoomTemp(parseSleepRoomTempF(variantValue));
@@ -100,7 +132,11 @@ export function isVariantProtocolId(protocolId: string): boolean {
 }
 
 export function isPerLogVariantProtocolId(protocolId: string): boolean {
-  return isColdThermoProtocolId(protocolId);
+  return (
+    isColdThermoProtocolId(protocolId) ||
+    isDrinkingWaterProtocolId(protocolId) ||
+    isExerciseProtocolId(protocolId)
+  );
 }
 
 export function isMovementSettingVariantValue(
@@ -109,4 +145,4 @@ export function isMovementSettingVariantValue(
   return decodeMovementSettingVariant(variantValue) != null;
 }
 
-export { requiresMovementSetting };
+export { requiresMovementSetting, decodeColdThermoVariant };

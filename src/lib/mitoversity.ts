@@ -242,7 +242,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     relatedProtocolIds: [
       "low-d-hydration",
       "deuterium-aware-meal",
-      "mineralized-water",
+      "drinking-water",
       "seafood-meal",
       "hydration-timing",
     ],
@@ -276,8 +276,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     summary:
       "Carbon dioxide in drinks and metabolism: Bohr effect, acid–base balance, and where Kruse’s sparkling-water lifestyle advice sits on top of that physiology.",
     relatedProtocolIds: [
-      "carbonated-water",
-      "mineralized-water",
+      "drinking-water",
       "low-d-hydration",
       "hydration-timing",
     ],
@@ -315,9 +314,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     summary:
       "¼ tsp bicarbonate in water twice daily (≥2 h from meals): alkaline buffer vs carbonated CO₂, carbonic anhydrase, MCG anti-inflammatory study, and Kruse proton/mitochondria framing.",
     relatedProtocolIds: [
-      "baking-soda-water",
-      "carbonated-water",
-      "mineralized-water",
+      "drinking-water",
       "hydration-timing",
       "deuterium-aware-meal",
     ],
@@ -363,7 +360,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       "What Chios mastic resin is, how intentional chewing differs from soft modern diets and candy gum, oral-research angles, and how this app logs the habit.",
     relatedProtocolIds: [
       "mastic-gum",
-      "morning-movement",
+      "exercise",
       "seafood-meal",
       "early-dinner",
     ],
@@ -497,7 +494,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     pillar: "support",
     summary:
       "How lymph moves without a heart pump, why mini-trampoline bouncing is discussed for drainage, what research actually shows, and how to use rebounding if you own a rebounder.",
-    relatedProtocolIds: ["morning-movement", "nature-contact"],
+    relatedProtocolIds: ["exercise", "nature-contact"],
     sections: [
       {
         heading: "The lymphatic system has no central pump",
@@ -521,7 +518,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "Practical rebounding habits",
-        body: "Keep sessions gentle: soft bounces, both feet down, posture tall, gaze forward. In this app each log is a 15-minute block—use +/− to match how long you actually bounced. Barefoot or minimal shoes on a stable rebounder can add light foot/ankle work; hold a doorway bar if balance is new. Morning outdoor rebounding stacks movement with daylight; indoor sessions still count as movement. Stop if you feel dizzy, knee pain, or pelvic floor pressure that worries you—high-intensity bouncing is not required for lymph benefit; consistency beats intensity.",
+        body: "Keep sessions gentle: soft bounces, both feet down, posture tall, gaze forward. In this app log Exercise → Rebounding, then outdoors or indoors, then duration. Barefoot or minimal shoes on a stable rebounder can add light foot/ankle work; hold a doorway bar if balance is new. Outdoor rebounding stacks movement with daylight; indoor sessions still count. Stop if you feel dizzy, knee pain, or pelvic floor pressure that worries you—high-intensity bouncing is not required for lymph benefit; consistency beats intensity.",
       },
       {
         heading: "Where Dr. Jack Kruse’s teaching is specific",
@@ -559,7 +556,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "Working toward ten minutes at ~50 °F skin",
-        body: "Progress in stages: (1) Weeks 1–2: 30–90 second cold shower finishes or face immersion; log “Cold face / head immersion” if that is your entry. (2) Weeks 3–6: plunge 2–5 minutes in ~60–65 °F water; exit before panic breathing dominates the whole session. (3) Intermediate: lower water toward 55 °F and extend toward 5–8 minutes with calm nasal breathing and relaxed shoulders. (4) Target phase: water cold enough (often high 40s–low 50s °F depending on body fat, movement, and tub heat loss) that measured or estimated skin at trunk/limbs hovers near 50 °F while you remain composed for 10+ minutes. Use a simple infrared skin thermometer on dry skin immediately before re-warming if you want objective feedback. Shivering late in the session is common; violent early shivering means you entered too fast or too cold.",
+        body: "Progress in stages: (1) Weeks 1–2: 30–90 second cold shower finishes or face immersion; log Cold thermogenesis → Face immersion (3 rounds) if that is your entry. (2) Weeks 3–6: plunge 2–5 minutes in ~60–65 °F water; exit before panic breathing dominates the whole session. (3) Intermediate: lower water toward 55 °F and extend toward 5–8 minutes with calm nasal breathing and relaxed shoulders. (4) Target phase: water cold enough (often high 40s–low 50s °F depending on body fat, movement, and tub heat loss) that measured or estimated skin at trunk/limbs hovers near 50 °F while you remain composed for 10+ minutes. Use a simple infrared skin thermometer on dry skin immediately before re-warming if you want objective feedback. Shivering late in the session is common; violent early shivering means you entered too fast or too cold.",
       },
       {
         heading: "Safety and stop rules",
@@ -575,7 +572,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "Log “Cold thermogenesis session” with duration when you complete a plunge, cold shower block, or deliberate full-body cold exposure. Duration logging scales points from a 5-minute reference up to the 20-minute cap—ten minutes at goal intensity lands at roughly double the base reference. Use “Cold face / head immersion” for partial entry work on non-plunge days. Put cold habits on your available list only if you have safe access (plunge, lake, shower). This article’s 50 °F × 10 min target is educational guidance for progression, not a score gate the app enforces. Educational only—not medical advice.",
+        body: "Log Cold thermogenesis: choose Cold plunge or Cold shower (skin temp + duration) or Face immersion (skin temp + 3 rounds). Duration scales timed points from a 5-minute reference up to the 20-minute cap—ten minutes at goal intensity lands at roughly double the base reference. Put cold on your available list only if you have safe access (plunge, lake, shower). This article’s 50 °F × 10 min target is educational guidance for progression, not a score gate the app enforces. Educational only—not medical advice.",
       },
     ],
   },
@@ -685,9 +682,8 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       "Isotope hydrology behind polar and alpine precipitation, why Icelandic glacial spring water is often deuterium-depleted, and how that fits deuterium-aware hydration in this app.",
     relatedProtocolIds: [
       "low-d-hydration",
-      "mineralized-water",
+      "drinking-water",
       "deuterium-aware-meal",
-      "carbonated-water",
     ],
     sections: [
       {

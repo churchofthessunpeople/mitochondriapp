@@ -49,8 +49,17 @@ const BASE_MULTIPLIER: Record<MovementSetting, number> = {
   indoors: 0.7,
 };
 
-/** Jaw work uses the movement category but is not an outdoor/indoor exercise log. */
-const MOVEMENT_SETTING_EXCLUDED_IDS = new Set(["mastic-gum"]);
+/**
+ * Not logged via the old sunlight/outside/indoors picker:
+ * - mastic-gum: jaw work, not cardio/strength place
+ * - exercise (+ retired parents): dedicated Exercise dialog
+ */
+const MOVEMENT_SETTING_EXCLUDED_IDS = new Set([
+  "mastic-gum",
+  "exercise",
+  "morning-movement",
+  "rebounding",
+]);
 
 export function requiresMovementSetting(protocol: {
   id?: string;

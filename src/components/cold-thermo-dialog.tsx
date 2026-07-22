@@ -8,22 +8,28 @@ import {
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
+  COLD_THERMO_MODE_OPTIONS,
   COLD_THERMO_SKIN_TEMP_OPTIONS,
+  FACE_IMMERSION_ROUNDS,
   OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
-  coldThermoSkinTempBasePoints,
+  coldThermoBasePoints,
+  coldThermoModeLabel,
   formatColdThermoSkinTemp,
+  isColdThermoTimedMode,
+  type ColdThermoLogInput,
+  type ColdThermoMode,
   type ColdThermoSkinTempF,
 } from "@/lib/cold-thermo-skin-temp";
 import { DURATION_BLOCK_MINUTES, pointsForLog } from "@/lib/scoring";
 
-type Step = "temp" | "duration";
+type Step = "mode" | "temp" | "duration";
 
 type Props = {
   protocol: Protocol;
   pending?: boolean;
   sunriseMultiplier?: number;
   initialTempF?: ColdThermoSkinTempF;
-  onLog: (skinTempF: ColdThermoSkinTempF, durationMinutes: number) => void;
+  onLog: (input: ColdThermoLogInput, durationMinutes: number | null) => void;
   onCancel: () => void;
 };
 
@@ -40,7 +46,8 @@ export function coldThermoDurationChoices(maxMinutes: number): number[] {
 }
 
 /**
- * Cold thermogenesis: skin temperature → duration.
+ * Cold thermogenesis: mode → skin temperature → duration (plunge/shower only).
+ * Face immersion logs immediately after temp (3 rounds).
  */
 export function ColdThermoDialog({
   protocol,
@@ -50,7 +57,8 @@ export function ColdThermoDialog({
   onLog,
   onCancel,
 }: Props) {
-  const [step, setStep] = useState<Step>("temp");
+  const [step, setStep] = useState<Step>("mode");
+  const [mode, setMode] = useState<ColdThermoMode>("plunge");
   const [tempF, setTempF] = useState<ColdThermoSkinTempF>(initialTempF);
   const [durationMins, setDurationMins] = useState(
     Math.min(
@@ -59,12 +67,18 @@ export function ColdThermoDialog({
     ),
   );
 
-  const basePoints = useMemo(
-    () => coldThermoSkinTempBasePoints(tempF, protocol.points),
-    [tempF, protocol.points],
+  const input: ColdThermoLogInput = useMemo(
+    () => ({ mode, skinTempF: tempF }),
+    [mode, tempF],
   );
 
-  const previewPts = pointsForLog(protocol, durationMins, {
+  const basePoints = useMemo(
+    () => coldThermoBasePoints(input, protocol.points),
+    [input, protocol.points],
+  );
+
+  const previewDuration = isColdThermoTimedMode(mode) ? durationMins : null;
+  const previewPts = pointsForLog(protocol, previewDuration, {
     sunriseMultiplier,
     basePoints,
   });
@@ -73,17 +87,37 @@ export function ColdThermoDialog({
     protocol.maxDurationMinutes || 20,
   );
 
+  const modeOptions: ClickThroughOption[] = useMemo(
+    () =>
+      COLD_THERMO_MODE_OPTIONS.map((o) => ({
+        id: o.id,
+        title: o.label,
+        subtitle: o.detail,
+        highlight: o.id === "plunge",
+      })),
+    [],
+  );
+
   const tempOptions: ClickThroughOption[] = useMemo(
     () =>
-      COLD_THERMO_SKIN_TEMP_OPTIONS.map((t) => ({
-        id: String(t),
-        title: formatColdThermoSkinTemp(t),
-        subtitle: `${coldThermoSkinTempBasePoints(t, protocol.points)} pts / ${DURATION_BLOCK_MINUTES} min${
-          t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F ? " · target" : ""
-        }`,
-        highlight: t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
-      })),
-    [protocol.points],
+      COLD_THERMO_SKIN_TEMP_OPTIONS.map((t) => {
+        const pts = coldThermoBasePoints(
+          { mode, skinTempF: t },
+          protocol.points,
+        );
+        const unit = isColdThermoTimedMode(mode)
+          ? `${DURATION_BLOCK_MINUTES} min`
+          : `${FACE_IMMERSION_ROUNDS} rounds`;
+        return {
+          id: String(t),
+          title: formatColdThermoSkinTemp(t),
+          subtitle: `${pts} pts / ${unit}${
+            t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F ? " · target" : ""
+          }`,
+          highlight: t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
+        };
+      }),
+    [mode, protocol.points],
   );
 
   const durationOptions: ClickThroughOption[] = useMemo(
@@ -101,8 +135,16 @@ export function ColdThermoDialog({
   );
 
   function goBack() {
-    if (step === "duration") setStep("temp");
+    if (step === "temp") setStep("mode");
+    else if (step === "duration") setStep("temp");
   }
+
+  const stepHint =
+    step === "mode"
+      ? "Cold plunge, shower, or face immersion?"
+      : step === "temp"
+        ? `${coldThermoModeLabel(mode)} · skin surface temperature?`
+        : `${coldThermoModeLabel(mode)} · ${formatColdThermoSkinTemp(tempF)} · ${basePoints} pts / ${DURATION_BLOCK_MINUTES} min`;
 
   return (
     <div className="fixed inset-0 z-[110] flex items-end justify-center bg-black/50 p-4 sm:items-center">
@@ -113,7 +155,7 @@ export function ColdThermoDialog({
         aria-labelledby="cold-thermo-title"
       >
         <div className="flex items-start gap-2">
-          {step === "duration" ? (
+          {step !== "mode" ? (
             <button
               type="button"
               onClick={goBack}
@@ -133,11 +175,7 @@ export function ColdThermoDialog({
                 {protocol.name}
               </p>
             </div>
-            <p className="mt-1 text-xs text-muted">
-              {step === "temp"
-                ? "What was your skin surface temperature?"
-                : `${formatColdThermoSkinTemp(tempF)} · ${basePoints} pts / ${DURATION_BLOCK_MINUTES} min`}
-            </p>
+            <p className="mt-1 text-xs text-muted">{stepHint}</p>
           </div>
           <button
             type="button"
@@ -149,15 +187,32 @@ export function ColdThermoDialog({
           </button>
         </div>
 
-        {step === "temp" ? (
+        {step === "mode" ? (
+          <div className="mt-4">
+            <OptionListChoice
+              options={modeOptions}
+              selectedId={mode}
+              disabled={pending}
+              onChoose={(id) => {
+                setMode(id as ColdThermoMode);
+                setStep("temp");
+              }}
+            />
+          </div>
+        ) : step === "temp" ? (
           <div className="mt-4">
             <OptionListChoice
               options={tempOptions}
               selectedId={String(tempF)}
               disabled={pending}
               onChoose={(id) => {
-                setTempF(Number(id) as ColdThermoSkinTempF);
-                setStep("duration");
+                const next = Number(id) as ColdThermoSkinTempF;
+                setTempF(next);
+                if (!isColdThermoTimedMode(mode)) {
+                  onLog({ mode: "face_immersion", skinTempF: next }, null);
+                } else {
+                  setStep("duration");
+                }
               }}
             />
           </div>
@@ -170,7 +225,7 @@ export function ColdThermoDialog({
               onChoose={(id) => {
                 const mins = Number(id);
                 setDurationMins(mins);
-                onLog(tempF, mins);
+                onLog({ mode, skinTempF: tempF }, mins);
               }}
             />
             <p className="text-center text-xs text-accent">

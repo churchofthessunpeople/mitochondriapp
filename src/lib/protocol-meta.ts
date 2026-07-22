@@ -55,15 +55,19 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "mineralized-water": {
     equipment: "optional",
-    how: "Drink well-mineralized water — natural mineral water or remineralized filter water, not deionized-only all day.\n\nSpread through the day; log each intentional serving.",
+    how: "Now part of Drinking water. Choose reverse osmosis, spring, or deuterium-depleted, then remineralization and still vs carbonated.",
   },
   "carbonated-water": {
     equipment: "optional",
-    how: "Unsweetened sparkling or carbonated mineral water — home carbonator or bottled, not sugary soda.\n\nUse as a hydration habit you actually enjoy and will repeat.",
+    how: "Now part of Drinking water. Choose Carbonated on the last step — unsweetened sparkling only, not sugary soda.",
   },
   "baking-soda-water": {
     equipment: "none",
-    how: "Use plain baking soda (sodium bicarbonate) — not baking powder.\n\nDissolve ¼ teaspoon in a full glass of water. Drink twice daily when following the full protocol. Take each dose at least 2 hours before or after meals so it does not neutralize stomach acid during digestion.\n\nLog each glass separately. Ask your clinician first if you have high blood pressure, heart failure, kidney disease, or sodium restrictions.",
+    how: "Now part of Drinking water. Choose Baking soda under remineralization (¼ tsp is the common protocol dose). Take at least 2 hours from meals. Ask your clinician first if you have high blood pressure, heart failure, kidney disease, or sodium restrictions.",
+  },
+  "drinking-water": {
+    equipment: "optional",
+    how: "Log each intentional glass:\n\n1) Source — reverse osmosis, spring, or deuterium-depleted water.\n2) If DDW — deuterium PPM on the label (lower is more depleted; natural water is ~150 ppm).\n3) Remineralization — none, sea/electrolyte salt, or baking soda, then amount when applicable.\n4) Still or carbonated (not sugary soda).\n\nSpread servings through the day. Baking soda: prefer ≥2 hours from meals.",
   },
   "hydration-timing": {
     equipment: "none",
@@ -87,11 +91,11 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "cold-face-plunge": {
     equipment: "optional",
-    how: "Cold water on face, neck, or brief head immersion — bowl of ice water, cold tap, or shower splash.\n\nShort and sharp is fine; breathe steadily. Skip if it triggers dizziness or you are unsafe to do so.",
+    how: "Now part of Cold thermogenesis. Choose Face immersion, then skin temperature — the app logs 3 rounds per the face immersion protocol.\n\nShort and sharp is fine; breathe steadily. Skip if it triggers dizziness or you are unsafe to do so.",
   },
   "cold-thermogenesis": {
     equipment: "optional",
-    how: "Deliberate cold exposure: cold shower, outdoor cold, or plunge if you have safe access.\n\nBuild duration gradually. Each log asks skin surface temp (~50°F target; warmer earns fewer base points) then session length. Aim for ~50°F skin for 10+ minutes when ready.",
+    how: "Pick cold plunge, cold shower, or face immersion, then skin surface temperature (~50°F target; warmer earns fewer base points).\n\nPlunge and shower: choose session length next. Face immersion: logged as 3 rounds — no duration picker. Build cold gradually; aim for ~50°F skin for 10+ minutes on plunge days when ready.",
   },
   "reduce-nnemf-block": {
     equipment: "optional",
@@ -131,11 +135,15 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "morning-movement": {
     equipment: "none",
-    how: "Zone 2 walk, resistance work, or play outside in daylight when possible — not only under gym fluorescents.\n\nEach log asks full sunlight, outside, or indoors, then minutes in 15-minute blocks.",
+    how: "Now part of Exercise. Choose walking, resistance bands, or rebounding, then indoors/outdoors and duration.",
   },
   rebounding: {
     equipment: "required",
-    how: "Use a stable mini-trampoline (rebounder) — not a toy trampoline. Soft bounces with both feet on the mat, knees slightly bent, posture tall.\n\nEach log asks environment (sunlight / outside / indoors), then adds 15 minutes. Use +/− for more or less time in 15-minute blocks. Morning outdoor rebounding stacks movement with daylight.",
+    how: "Now part of Exercise. Choose Rebounding, then indoors or outdoors and session length. Soft bounces on a stable rebounder — not a toy trampoline.",
+  },
+  exercise: {
+    equipment: "optional",
+    how: "Pick the type — rebounding (needs a rebounder), resistance bands, or walking — then whether it was outdoors or indoors, then how long.\n\nOutdoor sessions earn full base points; indoor sessions earn a bit less. Log each intentional session.",
   },
   "mastic-gum": {
     equipment: "required",

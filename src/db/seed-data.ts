@@ -192,34 +192,48 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "mineralized-water",
     name: "Purified and Mineralized Water",
     description:
-      "Mineralized/spring water. Remineralize if using RO purified water",
+      "Retired — now an option under Drinking water (source + salt/baking soda).",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
     allowsMultiple: true,
     sortOrder: 50,
+    retired: true,
   }),
   p({
     id: "carbonated-water",
     name: "Carbonated / sparkling water",
     description:
-      "Sparkling or carbonated water (not soda). Can purchase a Sodastream or other carbonator to make at home.",
+      "Retired — now Still / Carbonated under Drinking water.",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
     allowsMultiple: true,
     sortOrder: 51,
+    retired: true,
   }),
   p({
     id: "baking-soda-water",
     name: "Baking soda water",
     description:
-      "¼ tsp plain baking soda (sodium bicarbonate) in a glass of water — twice daily, at least 2 hours away from meals. Alkaline buffer, not carbonated.",
+      "Retired — now Baking soda remineralization under Drinking water.",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
     allowsMultiple: true,
     sortOrder: 53,
+    retired: true,
+  }),
+  p({
+    id: "drinking-water",
+    name: "Drinking water",
+    description:
+      "Log a glass: RO, spring, or deuterium-depleted; salt or baking soda remineralization; still or carbonated. DDW includes deuterium PPM.",
+    points: 4,
+    category: "water_food",
+    timeOfDay: "anytime",
+    allowsMultiple: true,
+    sortOrder: 50,
   }),
   p({
     id: "hydration-timing",
@@ -274,18 +288,20 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "cold-face-plunge",
     name: "Cold face / head immersion",
-    description: "Cold water on face or brief head immersion.",
+    description:
+      "Retired — now Face immersion under Cold thermogenesis. Cold water on face or brief head immersion (3 rounds).",
     points: 5,
     category: "cold",
     timeOfDay: "morning",
     allowsMultiple: true,
-    sortOrder: 11,
+    sortOrder: 111,
+    retired: true,
   }),
   p({
     id: "cold-thermogenesis",
-    name: "Cold thermogenesis session",
+    name: "Cold thermogenesis",
     description:
-      "Cold shower, plunge, or deliberate cold exposure. Skin temp ~50°F optimal; warmer in 5° steps earns fewer base points before duration.",
+      "Plunge, cold shower, or face immersion. Pick mode, skin temp (~50°F target), and duration for plunge/shower — face immersion is 3 rounds.",
     points: 24,
     category: "cold",
     timeOfDay: "anytime",
@@ -406,7 +422,8 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   p({
     id: "morning-movement",
     name: "Mitochondrial movement",
-    description: "Zone 2, resistance, or play outside in daylight.",
+    description:
+      "Retired — now under Exercise (walking / resistance bands / rebounding).",
     points: 3,
     category: "movement",
     timeOfDay: "morning",
@@ -415,12 +432,13 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     referenceMinutes: 15,
     maxDurationMinutes: 120,
     sortOrder: 13,
+    retired: true,
   }),
   p({
     id: "rebounding",
     name: "Rebounding",
     description:
-      "Rhythmic bouncing on a mini-trampoline (rebounder). Equipment required — add only if you own a rebounder.",
+      "Retired — now Rebounding under Exercise. Mini-trampoline sessions.",
     points: 3,
     category: "movement",
     timeOfDay: "anytime",
@@ -429,6 +447,21 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     referenceMinutes: 15,
     maxDurationMinutes: 60,
     sortOrder: 14,
+    retired: true,
+  }),
+  p({
+    id: "exercise",
+    name: "Exercise",
+    description:
+      "Rebounding, resistance bands, or walking — indoors or outdoors, with duration.",
+    points: 3,
+    category: "movement",
+    timeOfDay: "anytime",
+    allowsMultiple: true,
+    durationEnabled: true,
+    referenceMinutes: 15,
+    maxDurationMinutes: 120,
+    sortOrder: 13,
   }),
   p({
     id: "mastic-gum",

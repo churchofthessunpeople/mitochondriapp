@@ -79,7 +79,7 @@ export function pillarMeta(id: LwmPillarId): LwmPillarMeta {
 export const WATER_KEYSTONE_IDS = [
   "low-d-hydration",
   "deuterium-aware-meal",
-  "mineralized-water",
+  "drinking-water",
 ] as const;
 
 /**

@@ -23,10 +23,18 @@ describe("requiresMovementSetting", () => {
     );
   });
 
-  it("skips mastic gum (movement category, not exercise location)", () => {
+  it("skips mastic gum and Exercise (dedicated dialogs)", () => {
     assert.equal(
       requiresMovementSetting({
         id: "mastic-gum",
+        category: "movement",
+        durationEnabled: true,
+      }),
+      false,
+    );
+    assert.equal(
+      requiresMovementSetting({
+        id: "exercise",
         category: "movement",
         durationEnabled: true,
       }),
@@ -38,7 +46,7 @@ describe("requiresMovementSetting", () => {
         category: "movement",
         durationEnabled: true,
       }),
-      true,
+      false,
     );
   });
 });

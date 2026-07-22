@@ -13,7 +13,7 @@ export const STARTER_PROTOCOL_IDS = [
   "blue-light-hygiene",
   "sleep-space",
   "reduce-nnemf-block",
-  "morning-movement",
+  "exercise",
 ] as const;
 
 export type StarterProtocolId = (typeof STARTER_PROTOCOL_IDS)[number];
