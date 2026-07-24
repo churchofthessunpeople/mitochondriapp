@@ -25,6 +25,7 @@ import {
 import {
   MAGNETICO_SLEEP_PAD_SECTIONS,
 } from "@/lib/mitoversity-magnetico-sleep-pad";
+import { SUNRISE_WHY_SECTIONS } from "@/lib/mitoversity-sunrise-why";
 import {
   TUNING_FORKS_READING_LEVELS,
   TUNING_FORKS_SIMPLE_SECTIONS,
@@ -71,49 +72,17 @@ export const MITO_PILLAR_LABEL: Record<MitoPillar, string> = {
 export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
   {
     id: "sunrise-why",
-    title: "Why morning outdoor light—and sunrise—matter",
+    title: "Why sunrise is the most important part of the day",
     pillar: "light",
     summary:
-      "Sunrise as the daily EMF reset for mitochondrial TCA timing, circadian clocks, and fat metabolism—framed through Nick Lane’s bioenergetics work and Dr. Jack Kruse’s light-first teaching.",
+      "Morning outdoor light as the daily reset for circadian clocks, mitochondrial timing, and fat metabolism—what is settled, what is framework, and how to log it.",
     relatedProtocolIds: [
       "sunrise-horizon",
       "sunrise-open-sky",
       "sunrise-outside",
     ],
-    sections: [
-      {
-        heading: "Life runs on light, not genes first",
-        body: "Nick Lane’s modern bioenergetics talks (including his public lecture work on mitochondria and the origins of complex life) push a hard point: cells amplify ancient biochemical networks that began in energy-rich environments; genes are not the primary “software.” In Dr. Jack Kruse’s reading of that work, the levers that amplify and time those pathways in mammals are controlled by electromagnetic fields from the sun. Clock genes stabilize biochemistry for your skin’s light environment—they do not invent metabolism from scratch. Mainstream chronobiology agrees that the solar day–night cycle entrains the mammalian circadian system; Kruse’s stronger claim is that AM solar EMF is the default switch that retunes TCA-cycle spin rates so mitochondria can burn fat coherently.",
-      },
-      {
-        heading: "The living matrix vs the benchtop",
-        body: "Biology historically studied life by cutting, fixing, homogenizing, and fractionating tissue—methods that drain water and freeze a living syncytium into static parts. Kruse argues that Mitchell’s chemiosmotic ATPase story, as taught from prepared samples, under-explains how much ATP a living mammal needs in vivo. In his light–water–magnetism frame, ATPase accounts for at most about one-third of cellular ATP demand; the other two-thirds emerge from biophysical interactions of sunlight with water and melanin. That critique (drawing also on Gilbert Ling and Robert O. Becker’s earlier bioelectric work) is Kruse’s teaching layer—not a settled Nobel rewrite. What both Lane’s slides and Kruse share is that mitochondria are electrical, membrane-organized machines whose timing matters as much as their enzyme list.",
-      },
-      {
-        heading: "Sunrise resets mitochondrial membranes",
-        body: "Kruse’s Leptin Rx–era teaching: every place the TCA cycle runs is tied to membranes packed with lipid rafts that convert sunlight into a DC-like electric current. That charge stabilizes forward TCA cycling so mitochondria burn fat. Miss AM outdoor light and that charge does not set—fat oxidation becomes metabolically “expensive,” skin ages faster, and skin cells are more vulnerable to later UV damage. He also points to inner mitochondrial membrane junctions (IMJs) aligning with the morning solar signal so fat-burning machinery runs in phase. Nick Lane’s talk slides on membrane bioenergetics and electromagnetic context are used in Kruse’s blogs as a modern echo of that story: incoming EMF informs mitochondrial membranes how to turn the TCA cycle in the fat-burning direction. Exact IMJ-alignment claims and ATP fractions are Kruse-specific; circadian control of metabolic enzymes is mainstream.",
-      },
-      {
-        heading: "Clocks, skin, and food timing",
-        body: "The hierarchically organized mammalian clock has a central pacemaker in the SCN and peripheral clocks in nearly every cell. CLOCK/BMAL1 transcription loops (with PERs and CRYs) create ~24-hour gene rhythms that regulate metabolism, cell proliferation, and drug responses. Skin clocks help set gut clocks; many skin-expressed genes respond acutely to food intake. Kruse’s practical meal hierarchy—“eat like a king 30 minutes after sunrise, a prince at lunch, a pauper at dinner”—follows from that: daylight hours disorder molecular clocks through living; night (melatonin + leptin signaling) repairs defective TCA mitochondria; AM sunlight then re-synchronizes the repaired fleet. Restricted feeding can shift clock phase without always shifting epidermal DNA-synthesis phase—evidence that light and food are coupled but not interchangeable. Diet composition is secondary if the light environment is artificial: without sunrise, fat metabolism via TCA is the first casualty in this framework.",
-      },
-      {
-        heading: "One octave of sunlight in a noisy spectrum",
-        body: "The electromagnetic spectrum spans roughly 10^−14 m to 10^8 m in wavelength—about 73 octaves of frequency doubling. Visible sunlight is only one octave. Kruse’s long-standing question before and after the Leptin Rx: with rising artificial light, phones, and network RF, is the organism’s “resonant music” drowning in electromagnetic noise? nnEMF and blue-rich night light scramble free-radical and redox signaling inside mitochondria—technology-induced chronic light stress that looks like “diseases from nowhere.” Genes respond to EMF timing; they do not override a broken light environment. Shift work, lazy sunrise habits, and living under LEDs all break the same rule: humans invented lighting that runs the pathway wrong for nearly everyone.",
-      },
-      {
-        heading: "Clinical signs you’re missing the AM light–fat TCA link",
-        body: "In Kruse’s teaching (not a diagnostic checklist), chronic failure to handle fat via TCA for lack of morning light shows up as: dry/scaly skin and poor sleep; dry eyes; feeling constantly cold; dry hair or hair loss; hormonal disruption including loss of menstrual cycle; low melatonin (raising disease risk in his framing); constant hunger / never feeling full; poor concentration and mental fatigue; fat-soluble vitamin issues; stools that never settle near Bristol type 4; and inability to lose weight consistently. Treat these as lifestyle red flags pointing back to sunrise and night darkness—not as a substitute for medical evaluation.",
-      },
-      {
-        heading: "Where Kruse extends Lane—and where science is settled",
-        body: "Credit Lane for connecting mitochondria, membranes, and electric origins of metabolism more boldly since ~2015. Kruse’s disagreement: Lane remains too “centralized” on Mitchell-style ATP accounting and underweights melanin, water, and full-spectrum solar EMF that Becker and others mapped decades earlier. Settled science you can lean on without accepting every Kruse claim: morning outdoor light is the strongest non-drug circadian zeitgeber; evening blue light delays melatonin; peripheral clocks track the SCN; metabolic pathways are circadian. Kruse’s hierarchy—horizon disk sunrise over open sky over “just outside,” no glass, light before food, melanin as major ATP partner—is the lifestyle prescription this app mirrors pedagogically, not lab dosimetry.",
-      },
-      {
-        heading: "How this app uses the idea",
-        body: "Log a morning outdoor light keystone (horizon / open sky / outside) before screens. Higher-quality outdoor signals unlock a day points boost—teaching “light first,” then food. Pair with sunset viewing, evening blue-light hygiene, and true dark sleep so melatonin can do overnight TCA repair before the next sunrise re-synchronizes the fleet. Watch Lane’s mitochondrial slides for the membrane/bioenergetics backbone; treat Kruse’s sunrise rule as the daily operating system. Educational only—not medical advice. Video reference: Nick Lane lecture (YouTube: FLaTU-t1CQM).",
-      },
-    ],
+    flatArticle: true,
+    sections: SUNRISE_WHY_SECTIONS,
   },
   {
     id: "sunset-viewing-why",
@@ -154,7 +123,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "Log “Watch the sunset” when you viewed sunset light outdoors with bare eyes. It earns Light-category points on your checklist. Pair with sunrise keystones for a full Light day. Read “Why morning outdoor light—and sunrise—matter” and “Fully dark sleep environment” for the full Light pillar arc. Educational only—not medical advice.",
+        body: "Log “Watch the sunset” when you viewed sunset light outdoors with bare eyes. It earns Light-category points on your checklist. Pair with sunrise keystones for a full Light day. Read “Why sunrise is the most important part of the day” and “Fully dark sleep environment” for the full Light pillar arc. Educational only—not medical advice.",
       },
     ],
   },
@@ -199,7 +168,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "Log Outside Time near solar noon when season and latitude allow safe UV. Use the Sunrise check-in separately for circadian boost. Read “Why morning outdoor light—and sunrise—matter” and Place’s solar noon line for timing. Mitoversity does not track 25(OH)D labs. Educational only—not medical advice; do not stop prescribed vitamin D without your doctor.",
+        body: "Log Outside Time near solar noon when season and latitude allow safe UV. Use the Sunrise check-in separately for circadian boost. Read “Why sunrise is the most important part of the day” and Place’s solar noon line for timing. Mitoversity does not track 25(OH)D labs. Educational only—not medical advice; do not stop prescribed vitamin D without your doctor.",
       },
     ],
   },
@@ -450,7 +419,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "How this fits the app",
-        body: "Log “True dark sleep environment” for pitch black or effective eye mask nights. Log “Evening blue-light hygiene” and “Phone away from bed” as upstream Light and Magnetism habits. Log “Circadian sleep window” for consistent bed/wake timing. Read “Why morning outdoor light—and sunrise—matter” and “Why watching the sunset matters” for the day arc. Educational only—not medical advice for insomnia or sleep apnea.",
+        body: "Log “True dark sleep environment” for pitch black or effective eye mask nights. Log “Evening blue-light hygiene” and “Phone away from bed” as upstream Light and Magnetism habits. Log “Circadian sleep window” for consistent bed/wake timing. Read “Why sunrise is the most important part of the day” and “Why watching the sunset matters” for the day arc. Educational only—not medical advice for insomnia or sleep apnea.",
       },
     ],
   },
