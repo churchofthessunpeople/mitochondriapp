@@ -204,6 +204,13 @@ export function buildReadingLevels(entry: MitoEntry): MitoReadingLevels {
 
 /** Attach generated tiers when an entry lacks complete custom readingLevels. */
 export function applyReadingLevels(entry: MitoEntry): MitoEntry {
+  if (entry.flatArticle) {
+    return {
+      ...entry,
+      readingLevels: undefined,
+    };
+  }
+
   if (hasCompleteReadingLevels(entry.readingLevels)) {
     return {
       ...entry,

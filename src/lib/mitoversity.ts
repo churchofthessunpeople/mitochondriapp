@@ -23,8 +23,7 @@ import {
   SCREEN_LIGHT_HYGIENE_SIMPLE_SECTIONS,
 } from "@/lib/mitoversity-screen-light-hygiene";
 import {
-  MAGNETICO_SLEEP_PAD_READING_LEVELS,
-  MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
+  MAGNETICO_SLEEP_PAD_SECTIONS,
 } from "@/lib/mitoversity-magnetico-sleep-pad";
 import {
   TUNING_FORKS_READING_LEVELS,
@@ -52,6 +51,11 @@ export type MitoEntry = {
   sections: MitoEntrySection[];
   /** Optional tiered content: simple, intermediate, advanced. */
   readingLevels?: MitoReadingLevels;
+  /**
+   * Single continuous article — skip Simple / Intermediate / Advanced tiers.
+   * Use while migrating curriculum off the accordion format.
+   */
+  flatArticle?: boolean;
 };
 
 export const MITO_PILLAR_LABEL: Record<MitoPillar, string> = {
@@ -342,15 +346,16 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     title: "Magnetic sleep systems (Magnetico & dual-polar pads)",
     pillar: "magnetism",
     summary:
-      "Night magnetism, Schumann/telluric context, melatonin, indoor CO₂, and why a unidirectional Magnetico pad is discussed for nnEMF-heavy bedrooms—choose your reading level below.",
+      "Why under-mattress unidirectional pads are discussed for electro-noisy bedrooms—Earth’s night field, melatonin, indoor air, and how dual-polar toppers differ.",
     relatedProtocolIds: [
       "magnetico-sleep-pad",
       "phone-away-sleep",
       "dark-bedroom",
       "magnetic-awareness",
+      "sleep-space",
     ],
-    sections: MAGNETICO_SLEEP_PAD_SIMPLE_SECTIONS,
-    readingLevels: MAGNETICO_SLEEP_PAD_READING_LEVELS,
+    flatArticle: true,
+    sections: MAGNETICO_SLEEP_PAD_SECTIONS,
   },
   {
     id: "mastic-gum-chewing",
