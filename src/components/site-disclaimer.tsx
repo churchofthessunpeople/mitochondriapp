@@ -11,7 +11,7 @@ export function SiteDisclaimer() {
         Mitochondriapp is for educational lifestyle tracking only. It is not medical
         advice, diagnosis, or treatment. Protocols, scores, and Mitoversity
         content are informational. Consult a qualified healthcare professional
-        before changing your health routine or stopping prescribed care.
+        before changing your health routine or stopping prescribed care. This app is not affiliated with or endorsed by Dr. Jack Kruse.
       </p>
     </aside>
   );
