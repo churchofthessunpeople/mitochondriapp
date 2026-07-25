@@ -53,8 +53,8 @@ export function GuideMagnetismPanel() {
         </h2>
         <ul className="list-inside list-disc space-y-1.5">
           <li>
-            <strong className="text-foreground">Barefoot earth</strong> — soil,
-            grass, sand, stone
+            <strong className="text-foreground">Grounding</strong> — barefoot
+            (5 pts) or Make like the Sphinx (10 pts)
           </li>
           <li>
             <strong className="text-foreground">Low artificial field hour</strong>{" "}

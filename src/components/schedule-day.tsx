@@ -57,6 +57,13 @@ import {
   type ExerciseLogInput,
 } from "@/lib/exercise";
 import {
+  GROUNDING_MODE_OPTIONS,
+  groundingModeLabel,
+  groundingModePoints,
+  isGroundingProtocolId,
+  type GroundingMode,
+} from "@/lib/grounding";
+import {
   formatMagneticoGauss,
   isMagneticoProtocolId,
   MAGNETICO_GAUSS_OPTIONS,
@@ -297,7 +304,7 @@ export function ScheduleDay({
   const [outsideTimeProtocol, setOutsideTimeProtocol] =
     useState<Protocol | null>(null);
   const [choicePicker, setChoicePicker] = useState<{
-    kind: "magnetico" | "sleep" | "movement";
+    kind: "magnetico" | "sleep" | "movement" | "grounding";
     protocol: Protocol;
   } | null>(null);
   const [addActivityOpen, setAddActivityOpen] = useState(false);
@@ -495,6 +502,9 @@ export function ScheduleDay({
     }
     if (isExerciseProtocolId(p.id)) {
       return `${p.points} pts / 15 min · rebound · bands · walk · in/out`;
+    }
+    if (isGroundingProtocolId(p.id)) {
+      return `barefoot 5 pts · sphinx 10 pts · tap to log`;
     }
     if (isSunExposureProtocolId(p.id)) {
       return `${p.points} pts / 15 min · morning · noon · afternoon · sun or shade`;
@@ -866,6 +876,11 @@ export function ScheduleDay({
     addOne(protocol, { exercise: input, durationMinutes });
   }
 
+  function chooseGrounding(protocol: Protocol, mode: GroundingMode) {
+    setChoicePicker(null);
+    addOne(protocol, { groundingMode: mode });
+  }
+
   function addOne(
     protocol: Protocol,
     opts?: {
@@ -875,6 +890,7 @@ export function ScheduleDay({
       coldThermo?: ColdThermoLogInput;
       drinkingWater?: DrinkingWaterLogInput;
       exercise?: ExerciseLogInput;
+      groundingMode?: GroundingMode;
       durationMinutes?: number;
     },
   ) {
@@ -909,12 +925,16 @@ export function ScheduleDay({
         const exercise = isExerciseProtocolId(protocol.id)
           ? opts?.exercise
           : undefined;
+        const groundingMode = isGroundingProtocolId(protocol.id)
+          ? (opts?.groundingMode ?? "barefoot")
+          : undefined;
         const res = await logCompletionAction(protocol.id, {
           durationMinutes: mins ?? null,
           coldThermo,
           skinTempF: coldThermo?.skinTempF,
           drinkingWater,
           exercise,
+          groundingMode,
           sunExposure: isSunExposureProtocolId(protocol.id)
             ? (opts?.sunExposure ?? defaultOutsideTimeInput())
             : undefined,
@@ -936,11 +956,13 @@ export function ScheduleDay({
                 ? `${formatDrinkingWaterLabel(encodeDrinkingWaterVariant(drinkingWater))} · `
                 : isExerciseProtocolId(protocol.id) && exercise
                   ? `${formatExerciseLabel(encodeExerciseVariant(exercise), mins)} · `
-                  : mins && protocol.durationEnabled
-                    ? isSunExposureProtocolId(protocol.id) && opts?.sunExposure
-                      ? `${formatSunExposureLabel(encodeSunExposureVariant(opts.sunExposure), mins)} · `
-                      : `+${mins} min · `
-                    : "+1 · ";
+                  : isGroundingProtocolId(protocol.id) && groundingMode
+                    ? `${groundingModeLabel(groundingMode)} · `
+                    : mins && protocol.durationEnabled
+                      ? isSunExposureProtocolId(protocol.id) && opts?.sunExposure
+                        ? `${formatSunExposureLabel(encodeSunExposureVariant(opts.sunExposure), mins)} · `
+                        : `+${mins} min · `
+                      : "+1 · ";
           push(`${time}+${res.points} pts${extra}`);
         }
       } catch (e) {
@@ -991,6 +1013,10 @@ export function ScheduleDay({
     }
     if (isExerciseProtocolId(protocol.id)) {
       setExerciseProtocol(protocol);
+      return;
+    }
+    if (isGroundingProtocolId(protocol.id)) {
+      setChoicePicker({ kind: "grounding", protocol });
       return;
     }
     if (requiresMovementSetting(protocol)) {
@@ -1094,11 +1120,13 @@ export function ScheduleDay({
                         ? `Log ${p.name} — choose source, minerals, and carbonation`
                         : isExerciseProtocolId(p.id)
                           ? `Log ${p.name} — choose type, indoors or outdoors, and duration`
-                          : requiresMovementSetting(p)
-                            ? `Log ${p.name} — choose full sunlight, outside, or indoors`
-                            : p.durationEnabled
-                              ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
-                              : `Log ${p.name}`
+                          : isGroundingProtocolId(p.id)
+                            ? `Log ${p.name} — choose barefoot or Make like the Sphinx`
+                            : requiresMovementSetting(p)
+                              ? `Log ${p.name} — choose full sunlight, outside, or indoors`
+                              : p.durationEnabled
+                                ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                                : `Log ${p.name}`
                 }
               >
                 {multiBody}
@@ -1133,11 +1161,13 @@ export function ScheduleDay({
                         ? `Log ${p.name} — choose source, minerals, and carbonation`
                         : isExerciseProtocolId(p.id)
                           ? `Log ${p.name} — choose type, indoors or outdoors, and duration`
-                          : requiresMovementSetting(p)
-                            ? `Log ${p.name} — choose full sunlight, outside, or indoors`
-                            : p.durationEnabled
-                              ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
-                              : `Add one ${p.name}`
+                          : isGroundingProtocolId(p.id)
+                            ? `Log ${p.name} — choose barefoot or Make like the Sphinx`
+                            : requiresMovementSetting(p)
+                              ? `Log ${p.name} — choose full sunlight, outside, or indoors`
+                              : p.durationEnabled
+                                ? `Add ${DURATION_BLOCK_MINUTES} minutes ${p.name}`
+                                : `Add one ${p.name}`
                 }
               >
                 <Plus className="h-4 w-4" strokeWidth={2.5} />
@@ -1421,7 +1451,7 @@ export function ScheduleDay({
       />
 
       {choicePicker && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
+        <div className="fixed inset-0 z-[110] flex items-end justify-center bg-black/50 p-4 sm:items-center">
           <div className="glass w-full max-w-sm rounded-3xl p-5">
             <div className="flex items-start justify-between gap-2">
               <div>
@@ -1431,7 +1461,9 @@ export function ScheduleDay({
                     ? "Tap your gauss rating"
                     : choicePicker.kind === "sleep"
                       ? "Tap your bedroom temperature"
-                      : "Where did you do this session?"}
+                      : choicePicker.kind === "grounding"
+                        ? "How did you ground?"
+                        : "Where did you do this session?"}
                 </p>
               </div>
               <button
@@ -1477,6 +1509,25 @@ export function ScheduleDay({
                     chooseSleepTemp(
                       choicePicker.protocol,
                       Number(id) as SleepRoomTempF,
+                    );
+                  }}
+                />
+              ) : choicePicker.kind === "grounding" ? (
+                <OptionListChoice
+                  options={GROUNDING_MODE_OPTIONS.map(
+                    (opt): ClickThroughOption => ({
+                      id: opt.id,
+                      title: opt.label,
+                      subtitle: `${opt.detail} · ${groundingModePoints(opt.id)} pts`,
+                      highlight: opt.id === "sphinx",
+                    }),
+                  )}
+                  selectedId="barefoot"
+                  disabled={busyId === choicePicker.protocol.id}
+                  onChoose={(id) => {
+                    chooseGrounding(
+                      choicePicker.protocol,
+                      id as GroundingMode,
                     );
                   }}
                 />

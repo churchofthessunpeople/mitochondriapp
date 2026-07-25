@@ -117,23 +117,23 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
   },
   {
     id: "barefoot-earth",
-    title: "Barefoot earth contact",
+    title: "Grounding",
     pillar: "magnetism",
     summary:
-      "Skin on soil, grass, sand, or stone—direct Earth coupling in the Magnetism pillar.",
+      "Earth contact—barefoot feet (5 pts) or Make like the Sphinx belly contact (10 pts).",
     relatedProtocolIds: ["barefoot-earth"],
     sections: [
       {
         heading: "What you are doing",
-        body: "Barefoot time on real ground lets charge and pressure patterns from Earth reach your body—distinct from rubber-soled indoor life. Asphalt is a weaker proxy than soil or grass when you can choose.",
+        body: "Direct skin-to-earth contact lets charge and pressure patterns from the ground reach your body—distinct from rubber-soled indoor life. Asphalt is a weaker proxy than soil or grass when you can choose.",
       },
       {
-        heading: "Practice",
-        body: "Stand or walk barefoot on natural surfaces. Log time in 15-minute blocks or custom duration. Morning outdoor sessions stack with Light habits.",
+        heading: "Barefoot or Sphinx",
+        body: "Barefoot is standing or walking with feet on natural surfaces (5 pts). Make like the Sphinx means lying prone with belly and torso on the earth for fuller contact (10 pts). Log each intentional session.",
       },
       {
         heading: "Indoor mats",
-        body: "Commercial grounding mats can extend Earth contact indoors—see the grounding mats article for stake vs outlet safety. Outdoor barefoot remains the zero-hardware baseline.",
+        body: "Commercial grounding mats can extend Earth contact indoors—see the grounding mats article for stake vs outlet safety. Outdoor grounding remains the zero-hardware baseline.",
       },
     ],
   },

@@ -43,7 +43,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "barefoot-earth": {
     equipment: "none",
-    how: "Stand or walk barefoot on soil, grass, sand, or stone — real earth when you can, not asphalt if avoidable.\n\nLog time in 15-minute blocks (+ button) or set custom minutes.",
+    how: "Pick Barefoot (feet on soil, grass, sand, or stone — 5 pts) or Make like the Sphinx (belly / torso on the earth for fuller contact — 10 pts).\n\nPrefer real earth over asphalt when you can. Log each intentional session.",
   },
   "nature-contact": {
     equipment: "none",

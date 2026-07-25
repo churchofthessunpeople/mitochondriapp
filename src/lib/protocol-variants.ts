@@ -44,6 +44,12 @@ import {
   formatExerciseLabel,
   isExerciseProtocolId,
 } from "@/lib/exercise";
+import {
+  formatGroundingLabel,
+  groundingModePoints,
+  isGroundingProtocolId,
+  parseGroundingMode,
+} from "@/lib/grounding";
 
 /** Effective base points when a protocol log carries a variant (gauss, °F, etc.). */
 export function variantBasePoints(
@@ -70,6 +76,9 @@ export function variantBasePoints(
     const decoded = decodeExerciseVariant(variantValue);
     if (!decoded) return undefined;
     return exerciseBasePoints(decoded, catalogBase);
+  }
+  if (isGroundingProtocolId(protocolId)) {
+    return groundingModePoints(parseGroundingMode(variantValue));
   }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return pointsForSleepRoomTemp(parseSleepRoomTempF(variantValue));
@@ -112,6 +121,9 @@ export function formatVariantLabel(
   if (isExerciseProtocolId(protocolId)) {
     return formatExerciseLabel(variantValue);
   }
+  if (isGroundingProtocolId(protocolId)) {
+    return formatGroundingLabel(variantValue);
+  }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return formatSleepRoomTemp(parseSleepRoomTempF(variantValue));
   }
@@ -135,7 +147,8 @@ export function isPerLogVariantProtocolId(protocolId: string): boolean {
   return (
     isColdThermoProtocolId(protocolId) ||
     isDrinkingWaterProtocolId(protocolId) ||
-    isExerciseProtocolId(protocolId)
+    isExerciseProtocolId(protocolId) ||
+    isGroundingProtocolId(protocolId)
   );
 }
 

@@ -70,6 +70,13 @@ import {
   type ExerciseLogInput,
 } from "@/lib/exercise";
 import {
+  encodeGroundingVariant,
+  groundingModePoints,
+  isGroundingProtocolId,
+  parseGroundingMode,
+  type GroundingMode,
+} from "@/lib/grounding";
+import {
   effectiveSunriseBoostMultiplier,
   encodeSunriseEndOffset,
   pointsForSunriseKeystoneLog,
@@ -296,6 +303,8 @@ export async function logCompletionAction(
     drinkingWater?: DrinkingWaterLogInput;
     /** Exercise dialog answers (type, indoors/outdoors). */
     exercise?: ExerciseLogInput;
+    /** Grounding mode (barefoot or sphinx). */
+    groundingMode?: GroundingMode;
     /** Movement / exercise environment (sunlight, outside, indoors). */
     movementSetting?: MovementSetting;
     /**
@@ -431,6 +440,10 @@ export async function logCompletionAction(
     if (!ex) throw new Error("Exercise details required");
     variantValue = encodeExerciseVariant(ex);
     basePoints = exerciseBasePoints(ex, protocol.points);
+  } else if (isGroundingProtocolId(protocolId)) {
+    const mode = parseGroundingMode(options?.groundingMode ?? "barefoot");
+    variantValue = encodeGroundingVariant(mode);
+    basePoints = groundingModePoints(mode);
   } else if (isMovementSettingProtocolId(protocolId)) {
     const setting = parseMovementSetting(
       options?.movementSetting ?? "outside",

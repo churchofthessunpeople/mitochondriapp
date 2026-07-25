@@ -152,16 +152,13 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
   }),
   p({
     id: "barefoot-earth",
-    name: "Barefoot earth contact",
+    name: "Grounding",
     description:
-      "Barefoot time on soil, grass, sand, or stone. Magnetism keystone — Earth contact lifestyle.",
-    points: 7,
+      "Earth contact — barefoot (5 pts) or Make like the Sphinx belly contact (10 pts). Magnetism keystone.",
+    points: 5,
     category: "grounding",
     timeOfDay: "morning",
     allowsMultiple: true,
-    durationEnabled: true,
-    referenceMinutes: 15,
-    maxDurationMinutes: 60,
     sortOrder: 12,
   }),
   p({

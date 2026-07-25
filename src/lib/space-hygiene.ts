@@ -128,7 +128,7 @@ export const SLEEP_SPACE_OPTION_META: {
     id: "groundingMat",
     label: "Grounding mat",
     detail: "Earth-connected sleep mat / sheet",
-    how: "Use a conductive sleep mat or sheet wired to a verified Earth reference — prefer an exterior ground stake with a current-limiting resistor over an untested outlet ground.\n\nEnable this Sleep Space option on nights the mat is connected and in contact with skin. Outdoor barefoot time remains a separate Barefoot earth contact log.",
+    how: "Use a conductive sleep mat or sheet wired to a verified Earth reference — prefer an exterior ground stake with a current-limiting resistor over an untested outlet ground.\n\nEnable this Sleep Space option on nights the mat is connected and in contact with skin. Outdoor Grounding (barefoot or Sphinx) remains a separate checklist activity.",
     articleId: "grounding-mats-earth-stake",
   },
   {

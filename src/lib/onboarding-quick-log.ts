@@ -5,6 +5,7 @@
 
 import type { Protocol } from "@/db/schema";
 import { isExerciseProtocolId, type ExerciseLogInput } from "@/lib/exercise";
+import { isGroundingProtocolId, type GroundingMode } from "@/lib/grounding";
 import { requiresMovementSetting, type MovementSetting } from "@/lib/movement-setting";
 import { isPermanentProtocol } from "@/lib/permanent-activities";
 import { DURATION_BLOCK_MINUTES } from "@/lib/scoring";
@@ -21,6 +22,7 @@ export type OnboardingQuickLogOptions = {
   durationMinutes?: number | null;
   sunExposure?: SunExposureLogInput;
   exercise?: ExerciseLogInput;
+  groundingMode?: GroundingMode;
   movementSetting?: MovementSetting;
 };
 
@@ -62,6 +64,10 @@ export function onboardingQuickLogOptions(
         location: "outdoors",
       },
     };
+  }
+
+  if (isGroundingProtocolId(protocol.id)) {
+    return { groundingMode: "barefoot" };
   }
 
   if (requiresMovementSetting(protocol)) {
