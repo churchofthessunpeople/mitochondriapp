@@ -9,6 +9,10 @@ import { logCompletionAction } from "@/lib/actions/completions";
 import { markOnboardingCompleteAction } from "@/lib/actions/onboarding";
 import { toggleFavoriteAction } from "@/lib/actions/favorites";
 import { setLocationFromZipAction } from "@/lib/actions/region";
+import {
+  canQuickLogDuringOnboarding,
+  onboardingQuickLogOptions,
+} from "@/lib/onboarding-quick-log";
 import { ROUTES } from "@/lib/routes";
 import { isCatalogSelectableProtocol } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
@@ -44,12 +48,20 @@ export function OnboardingWizard({
 
   function continueFromLocation() {
     setZipError(null);
-    const trimmed = zip.trim();
+    const trimmed = zip.trim().replace(/\s+/g, "");
     if (!trimmed) {
       setStep("activities");
       return;
     }
 
+    if (!/^\d{5}(?:-?\d{4})?$/.test(trimmed)) {
+      setZipError("Enter a valid US ZIP code (e.g. 90210).");
+      return;
+    }
+
+    // Advance immediately — ZIP geocode/enrichment continues in the background.
+    setZipSuccess(`Saving ${trimmed.slice(0, 5)}…`);
+    setStep("activities");
     setLocationPending(true);
     start(async () => {
       try {
@@ -59,12 +71,15 @@ export function OnboardingWizard({
         if (result.error) {
           setZipError(result.error);
           setZipSuccess(null);
+          setStep("location");
           return;
         }
-        setZipSuccess(result.success ?? `Located ${result.placeLabel ?? trimmed}.`);
-        setStep("activities");
+        setZipSuccess(
+          result.success ?? `Located ${result.placeLabel ?? trimmed}.`,
+        );
       } catch (e) {
         setZipError(e instanceof Error ? e.message : "Could not save location");
+        setStep("location");
       } finally {
         setLocationPending(false);
       }
@@ -121,7 +136,12 @@ export function OnboardingWizard({
   const stepIndex = steps.indexOf(step);
 
   const winCandidates = starterProtocols
-    .filter((p) => available.has(p.id) && isCatalogSelectableProtocol(p))
+    .filter(
+      (p) =>
+        available.has(p.id) &&
+        isCatalogSelectableProtocol(p) &&
+        canQuickLogDuringOnboarding(p),
+    )
     .slice(0, 4);
 
   return (
@@ -288,6 +308,9 @@ export function OnboardingWizard({
             Toggle only what you can realistically do this week. Example: skip
             gear you don&apos;t have. You can add more later on Activities.
           </p>
+          {locationPending ? (
+            <p className="mt-2 text-xs text-muted">Saving your ZIP in the background…</p>
+          ) : null}
           <p className="mt-2 text-sm">
             <span className="font-medium text-accent">{available.size}</span>
             <span className="text-muted"> selected</span>
@@ -377,9 +400,13 @@ export function OnboardingWizard({
                   type="button"
                   disabled={pending}
                   onClick={() => {
+                    setError(null);
                     start(async () => {
                       try {
-                        await logCompletionAction(p.id);
+                        await logCompletionAction(
+                          p.id,
+                          onboardingQuickLogOptions(p),
+                        );
                         setStep("done");
                       } catch (e) {
                         setError(

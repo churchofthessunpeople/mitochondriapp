@@ -77,7 +77,7 @@ export function MitoArticleModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/55 p-3 sm:items-center sm:p-4"
+      className="fixed inset-0 z-[125] flex items-end justify-center bg-black/55 p-3 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="mito-article-title"

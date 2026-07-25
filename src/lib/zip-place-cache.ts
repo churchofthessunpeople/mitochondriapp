@@ -1,9 +1,13 @@
 /**
  * Shared ZIP place cache — geocode + elevation + WMM + artificial EM.
  * One lookup per ZIP per ~30 days (not per user session).
+ *
+ * Cold lookups return after geocode (fast path). Elevation / WMM / artificial
+ * EM fill in via `after()` so onboarding and ZIP save stay responsive.
  */
 
 import { eq } from "drizzle-orm";
+import { after } from "next/server";
 import { db } from "@/db";
 import { zipPlaceCache } from "@/db/schema";
 import type { ArtificialEmSnapshot } from "@/lib/artificial-em";
@@ -15,6 +19,7 @@ import { geocodeUsZip, type GeocodedPlace } from "@/lib/geo";
 import {
   fetchGeomagFieldQuick,
   formatGeomagDisplay,
+  geomagDipoleFallback,
   type GeomagDisplay,
   type GeomagField,
 } from "@/lib/geomag";
@@ -167,41 +172,53 @@ async function upsertZipPlaceCache(entry: {
     });
 }
 
+async function enrichAndCacheZipPlace(geocode: GeocodedPlace): Promise<void> {
+  const { elevationM, geomag, artificialEm } = await fetchZipEnrichment(
+    geocode.latitude,
+    geocode.longitude,
+  );
+  await upsertZipPlaceCache({
+    geocode,
+    elevationM,
+    geomag,
+    artificialEm,
+    refreshedAt: new Date(),
+  });
+}
+
 /**
- * Resolve ZIP place data — cache hit when fresh, otherwise one external fetch
- * batch then store for ~30 days.
+ * Resolve ZIP place data — cache hit when fresh, otherwise geocode immediately
+ * and return. Heavy enrichment (elevation, WMM, artificial EM) continues in
+ * `after()` and warms the 30-day cache.
  */
 export async function resolveZipPlaceData(
   rawZip: string,
 ): Promise<ZipPlaceResolved> {
   const cached = await getZipPlaceCached(rawZip);
-  if (cached) return cached;
+  if (cached) {
+    if (artificialEmNeedsRefresh(cached.artificialEm)) {
+      after(() => {
+        void enrichAndCacheZipPlace(cached.geocode).catch(() => {});
+      });
+    }
+    return cached;
+  }
 
   const geocode = await geocodeUsZip(rawZip);
-  const { elevationM, geomag, artificialEm } = await fetchZipEnrichment(
-    geocode.latitude,
-    geocode.longitude,
-  );
   const refreshedAt = new Date();
+  const geomag = geomagDipoleFallback(geocode.latitude, geocode.longitude);
 
-  try {
-    await upsertZipPlaceCache({
-      geocode,
-      elevationM,
-      geomag,
-      artificialEm,
-      refreshedAt,
-    });
-  } catch {
-    /* table may not exist yet — still return live data */
-  }
+  // Do not cache the stub for 30 days — only persist after full enrichment.
+  after(() => {
+    void enrichAndCacheZipPlace(geocode).catch(() => {});
+  });
 
   return {
     postalCode: geocode.postalCode,
     geocode,
-    elevationM,
+    elevationM: null,
     geomag: formatGeomagDisplay(geomag),
-    artificialEm,
+    artificialEm: null,
     refreshedAt,
     fromCache: false,
   };

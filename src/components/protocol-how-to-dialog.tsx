@@ -47,7 +47,7 @@ export function ProtocolHowToDialog({
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center"
+        className="fixed inset-0 z-[120] flex items-end justify-center bg-black/50 p-4 sm:items-center"
         role="dialog"
         aria-modal="true"
         aria-labelledby="how-to-title"
