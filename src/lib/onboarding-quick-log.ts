@@ -17,12 +17,14 @@ import {
   isSunExposureProtocolId,
   type SunExposureLogInput,
 } from "@/lib/sun-exposure";
+import { isVagusNerveProtocolId, type VagusMode } from "@/lib/vagus-nerve";
 
 export type OnboardingQuickLogOptions = {
   durationMinutes?: number | null;
   sunExposure?: SunExposureLogInput;
   exercise?: ExerciseLogInput;
   groundingMode?: GroundingMode;
+  vagusMode?: VagusMode;
   movementSetting?: MovementSetting;
 };
 
@@ -68,6 +70,10 @@ export function onboardingQuickLogOptions(
 
   if (isGroundingProtocolId(protocol.id)) {
     return { groundingMode: "barefoot" };
+  }
+
+  if (isVagusNerveProtocolId(protocol.id)) {
+    return { vagusMode: "cold_face_immersion" };
   }
 
   if (requiresMovementSetting(protocol)) {

@@ -26,7 +26,7 @@ export const CASTOR_OIL_NAVEL_SIMPLE_SECTIONS: MitoEntrySection[] = [
   },
   {
     heading: "How this fits the app",
-    body: "Log “Castor oil navel application” when you complete your evening drop. Pair with daylight-aligned hydration, deuterium-aware meals, and early dinner if gut comfort is your goal—it does not replace morning light, grounding, or dark sleep. Educational only—not medical advice for bloating, IBD, or infection.",
+    body: "Log Vagus nerve stimulation → Castor oil navel when you complete your evening drop. Pair with daylight-aligned hydration, deuterium-aware meals, and early dinner if gut comfort is your goal—it does not replace morning light, grounding, or dark sleep. Educational only—not medical advice for bloating, IBD, or infection.",
   },
 ];
 

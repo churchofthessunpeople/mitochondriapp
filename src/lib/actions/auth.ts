@@ -3,12 +3,14 @@
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
 import { AuthError, CredentialsSignin } from "next-auth";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { auth, signIn, signOut } from "@/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { generateStrongPassword } from "@/lib/generate-password";
+import { purgeExpiredGuests } from "@/lib/guest-cleanup";
 import { validateNewPassword } from "@/lib/password";
 import {
   AUTH_RATE,
@@ -291,6 +293,13 @@ export async function startGuestAction(): Promise<void> {
     tutorialComplete: false,
     isGuest: true,
     showOnLeaderboard: false,
+  });
+
+  // Opportunistic sweep so Admin Users does not fill with abandoned guests.
+  after(() => {
+    void purgeExpiredGuests().catch((err) => {
+      console.error("[guest-cleanup]", err);
+    });
   });
 
   try {

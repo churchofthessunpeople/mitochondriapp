@@ -1,11 +1,11 @@
 /**
- * LOCAL ACTIVITY CATALOG — source of truth (like Mitoversity articles).
+ * BASELINE ACTIVITY CATALOG (TypeScript).
  *
- * Edit this file to add/change/remove activities, then restart `npm run dev`.
- * Neon auto-syncs these rows for favorites/logs FKs; you do not need db:seed
- * just to try a new activity locally.
+ * Day-to-day edits: Admin → Content (writes content/*.json overlays).
+ * This file is the shipped default; overlays merge on top at runtime.
+ * Neon only mirrors protocol ids for favorites/logs FKs.
  *
- * Optional how-to / equipment: src/lib/protocol-meta.ts
+ * Optional how-to / equipment baseline: src/lib/protocol-meta.ts
  */
 import type { ProtocolCategory, TimeOfDay } from "./schema";
 
@@ -189,7 +189,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "mineralized-water",
     name: "Purified and Mineralized Water",
     description:
-      "Retired — now an option under Drinking water (source + salt/baking soda).",
+      "Retired — now an option under Drinking water (source + salt).",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
@@ -213,7 +213,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "baking-soda-water",
     name: "Baking soda water",
     description:
-      "Retired — now Baking soda remineralization under Drinking water.",
+      "Retired — now Baking soda water under Vagus nerve stimulation.",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
@@ -225,7 +225,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "drinking-water",
     name: "Drinking water",
     description:
-      "Log a glass: RO, spring, or deuterium-depleted; salt or baking soda remineralization; still or carbonated. DDW includes deuterium PPM.",
+      "Log a glass: RO, spring, or deuterium-depleted; optional salt remineralization; still or carbonated. DDW includes deuterium PPM.",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
@@ -246,10 +246,22 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "castor-oil-navel",
     name: "Castor oil navel application",
     description:
-      "Organic cold-pressed castor oil applied to the belly button (navel). Low-cost Support / Water adjunct — equipment required.",
+      "Retired — now Castor oil navel under Vagus nerve stimulation.",
     points: 6,
     category: "water_food",
     timeOfDay: "evening",
+    sortOrder: 52,
+    retired: true,
+  }),
+  p({
+    id: "vagus-nerve-stimulation",
+    name: "Vagus nerve stimulation",
+    description:
+      "Cold face immersion (5), baking soda water (4), or castor oil navel (6) — practices that stimulate the vagus nerve.",
+    points: 5,
+    category: "other",
+    timeOfDay: "anytime",
+    allowsMultiple: true,
     sortOrder: 52,
   }),
   p({
@@ -286,7 +298,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "cold-face-plunge",
     name: "Cold face / head immersion",
     description:
-      "Retired — now Face immersion under Cold thermogenesis. Cold water on face or brief head immersion (3 rounds).",
+      "Retired — now Cold face immersion under Vagus nerve stimulation.",
     points: 5,
     category: "cold",
     timeOfDay: "morning",
@@ -298,7 +310,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "cold-thermogenesis",
     name: "Cold thermogenesis",
     description:
-      "Plunge, cold shower, or face immersion. Pick mode, skin temp (~50°F target), and duration for plunge/shower — face immersion is 3 rounds.",
+      "Cold plunge or cold shower. Pick mode, skin temp (~50°F target), and duration.",
     points: 24,
     category: "cold",
     timeOfDay: "anytime",

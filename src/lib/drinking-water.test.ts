@@ -85,9 +85,12 @@ describe("remapDrinkingWaterFavoriteId", () => {
       remapDrinkingWaterFavoriteId("carbonated-water"),
       "drinking-water",
     );
+  });
+
+  it("does not claim baking soda (now vagus)", () => {
     assert.equal(
       remapDrinkingWaterFavoriteId("baking-soda-water"),
-      "drinking-water",
+      "baking-soda-water",
     );
   });
 });

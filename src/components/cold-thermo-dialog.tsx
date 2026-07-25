@@ -10,12 +10,10 @@ import {
 import {
   COLD_THERMO_MODE_OPTIONS,
   COLD_THERMO_SKIN_TEMP_OPTIONS,
-  FACE_IMMERSION_ROUNDS,
   OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
   coldThermoBasePoints,
   coldThermoModeLabel,
   formatColdThermoSkinTemp,
-  isColdThermoTimedMode,
   type ColdThermoLogInput,
   type ColdThermoMode,
   type ColdThermoSkinTempF,
@@ -46,8 +44,8 @@ export function coldThermoDurationChoices(maxMinutes: number): number[] {
 }
 
 /**
- * Cold thermogenesis: mode → skin temperature → duration (plunge/shower only).
- * Face immersion logs immediately after temp (3 rounds).
+ * Cold thermogenesis: mode → skin temperature → duration.
+ * Face immersion is logged under Vagus nerve stimulation.
  */
 export function ColdThermoDialog({
   protocol,
@@ -77,8 +75,7 @@ export function ColdThermoDialog({
     [input, protocol.points],
   );
 
-  const previewDuration = isColdThermoTimedMode(mode) ? durationMins : null;
-  const previewPts = pointsForLog(protocol, previewDuration, {
+  const previewPts = pointsForLog(protocol, durationMins, {
     sunriseMultiplier,
     basePoints,
   });
@@ -105,13 +102,10 @@ export function ColdThermoDialog({
           { mode, skinTempF: t },
           protocol.points,
         );
-        const unit = isColdThermoTimedMode(mode)
-          ? `${DURATION_BLOCK_MINUTES} min`
-          : `${FACE_IMMERSION_ROUNDS} rounds`;
         return {
           id: String(t),
           title: formatColdThermoSkinTemp(t),
-          subtitle: `${pts} pts / ${unit}${
+          subtitle: `${pts} pts / ${DURATION_BLOCK_MINUTES} min${
             t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F ? " · target" : ""
           }`,
           highlight: t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
@@ -141,7 +135,7 @@ export function ColdThermoDialog({
 
   const stepHint =
     step === "mode"
-      ? "Cold plunge, shower, or face immersion?"
+      ? "Cold plunge or cold shower?"
       : step === "temp"
         ? `${coldThermoModeLabel(mode)} · skin surface temperature?`
         : `${coldThermoModeLabel(mode)} · ${formatColdThermoSkinTemp(tempF)} · ${basePoints} pts / ${DURATION_BLOCK_MINUTES} min`;
@@ -206,13 +200,8 @@ export function ColdThermoDialog({
               selectedId={String(tempF)}
               disabled={pending}
               onChoose={(id) => {
-                const next = Number(id) as ColdThermoSkinTempF;
-                setTempF(next);
-                if (!isColdThermoTimedMode(mode)) {
-                  onLog({ mode: "face_immersion", skinTempF: next }, null);
-                } else {
-                  setStep("duration");
-                }
+                setTempF(Number(id) as ColdThermoSkinTempF);
+                setStep("duration");
               }}
             />
           </div>
@@ -228,8 +217,8 @@ export function ColdThermoDialog({
                 onLog({ mode, skinTempF: tempF }, mins);
               }}
             />
-            <p className="text-center text-xs text-accent">
-              Preview ≈ {previewPts} pts at {durationMins} min
+            <p className="text-center text-xs text-muted">
+              ≈ {previewPts} pts at {durationMins} min
             </p>
           </div>
         )}

@@ -4,10 +4,8 @@ import { and, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { userFavorites, userScheduleItems, type TimeOfDay } from "@/db/schema";
-import {
-  ensureProtocolInDb,
-  getCatalogProtocolById,
-} from "@/lib/catalog";
+import { getCatalogProtocolById } from "@/lib/catalog";
+import { ensureProtocolInDb } from "@/lib/catalog-server";
 import { revalidateApp } from "@/lib/revalidate-app";
 import { canAssignToSlot } from "@/lib/schedule-rules";
 import { TIME_OF_DAY_ORDER } from "@/lib/time-of-day";

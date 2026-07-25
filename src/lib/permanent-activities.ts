@@ -3,7 +3,9 @@
  * until removed or skipped for a specific night.
  *
  * Base flags live in seed-data.ts (ids mirrored in seed-permanent-ids.ts for
- * client-safe imports); admin overrides can promote/demote via content_overrides.
+ * client-safe imports); admin overlays in content/ can promote/demote.
+ *
+ * Client-safe: no catalog-server / fs imports.
  */
 
 import { SEED_PERMANENT_ID_SET } from "@/db/seed-permanent-ids";
@@ -29,16 +31,4 @@ export function buildPermanentProtocolIds(
   protocols: readonly CatalogProtocol[],
 ): string[] {
   return protocols.filter((p) => isPermanentProtocol(p)).map((p) => p.id);
-}
-
-export async function isPermanentProtocolMerged(
-  protocolId: string,
-): Promise<boolean> {
-  const { getMergedCatalogProtocolById } = await import("@/lib/catalog");
-  const row = await getMergedCatalogProtocolById(protocolId);
-  return row ? isPermanentProtocol(row as CatalogProtocol) : false;
-}
-
-export function getPermanentProtocolIds(): readonly string[] {
-  return [...SEED_PERMANENT_ID_SET];
 }

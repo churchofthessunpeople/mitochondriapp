@@ -1,3 +1,5 @@
+import "server-only";
+
 import { unstable_cache } from "next/cache";
 import {
   getDailyLeaderboard,
@@ -5,18 +7,13 @@ import {
   getMonthlyLeaderboard,
   getWeeklyLeaderboard,
 } from "@/lib/data";
+import {
+  leaderboardCacheDay,
+  type LeaderboardBoards,
+} from "@/lib/leaderboards-shared";
 
-export type LeaderboardBoards = {
-  day: Awaited<ReturnType<typeof getLeaderboard>>;
-  week: Awaited<ReturnType<typeof getLeaderboard>>;
-  month: Awaited<ReturnType<typeof getLeaderboard>>;
-  allTime: Awaited<ReturnType<typeof getLeaderboard>>;
-};
-
-/** UTC calendar day — leaderboards refresh at most once per day. */
-export function leaderboardCacheDay(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+export type { LeaderboardBoards };
+export { leaderboardCacheDay };
 
 /**
  * Shared daily cache across users. Auth is checked by the server action caller.

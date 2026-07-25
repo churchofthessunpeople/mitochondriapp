@@ -1,6 +1,7 @@
+import "server-only";
+
 import { cache } from "react";
-import { db } from "@/db";
-import { contentOverrides, type Protocol, type ProtocolCategory } from "@/db/schema";
+import type { Protocol, ProtocolCategory } from "@/db/schema";
 import { PROTOCOL_SEEDS, type ProtocolSeed } from "@/db/seed-data";
 import { CATEGORY_META, CATEGORY_ORDER } from "@/lib/categories";
 import {
@@ -17,7 +18,8 @@ import {
 import { LWM_PILLARS, type LwmPillarMeta } from "@/lib/lwm";
 import { TIME_OF_DAY_META, TIME_OF_DAY_ORDER } from "@/lib/time-of-day";
 import type { TimeOfDay } from "@/db/schema";
-import { seedToProtocol } from "@/lib/catalog";
+import { loadContentFiles } from "@/lib/content-files";
+import { seedToProtocol } from "@/lib/protocol-seed";
 import { getProtocolTeaser } from "@/lib/protocol-display";
 import { buildPermanentProtocolIds } from "@/lib/permanent-activities";
 
@@ -149,14 +151,11 @@ export type CategoryOverride = Partial<{ label: string; blurb: string }>;
 
 export type CopyOverride = string;
 
-/** Load all overrides once per server request. */
+/**
+ * Load catalog overlays from git-tracked content/ files (not Neon).
+ */
 export const loadContentOverrides = cache(async (): Promise<OverrideMap> => {
-  try {
-    const rows = await db.select().from(contentOverrides);
-    return new Map(rows.map((r) => [r.key, r.value]));
-  } catch {
-    return new Map();
-  }
+  return loadContentFiles();
 });
 
 function mergeRecord<T extends object>(base: T, patch: unknown): T {
@@ -306,17 +305,8 @@ export function mergeLwmPillars(overrides: OverrideMap): readonly LwmPillarMeta[
   });
 }
 
-export type AppContentBundle = {
-  protocols: Protocol[];
-  permanentProtocolIds: string[];
-  protocolMeta: Record<string, ProtocolMeta>;
-  mitoEntries: MitoEntry[];
-  categoryMeta: ReturnType<typeof mergeCategoryMeta>;
-  mitoPillarLabels: Record<MitoPillar, string>;
-  mitoversityIntro: string;
-  timeOfDayMeta: ReturnType<typeof mergeTimeOfDayMeta>;
-  lwmPillars: readonly LwmPillarMeta[];
-};
+export type { AppContentBundle } from "@/lib/app-content-types";
+import type { AppContentBundle } from "@/lib/app-content-types";
 
 export async function loadAppContent(): Promise<AppContentBundle> {
   const overrides = await loadContentOverrides();

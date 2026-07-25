@@ -15,6 +15,7 @@
     "volcanoes:build": "node scripts/build-volcanic-anchors.mjs",
     "db:setup": "node scripts/migrate-all.mjs",
     "db:clear-users": "node scripts/clear-users.mjs",
+    "db:cleanup-guests": "node scripts/cleanup-guests.mjs",
     "admin:promote": "node scripts/promote-admin.mjs",
     "db:migrate-username": "node scripts/migrate-username.mjs",
     "db:migrate-schedule": "node scripts/migrate-schedule.mjs",
@@ -23,8 +24,10 @@
     "db:migrate-guest": "node scripts/migrate-guest.mjs",
     "db:migrate-badges": "node scripts/migrate-badges.mjs",
     "db:migrate-space-hygiene": "node scripts/migrate-space-hygiene.mjs",
+    "db:migrate-vagus": "node scripts/migrate-vagus-merge.mjs",
+    "content:export-from-db": "node scripts/export-content-overrides-to-files.mjs",
     "email:probe": "node scripts/probe-email.mjs",
-    "test": "tsx --test src/lib/sun.test.ts src/lib/scoring.test.ts src/lib/geomag.test.ts src/lib/artificial-em.test.ts src/lib/magnetico.test.ts src/lib/cold-thermo-skin-temp.test.ts src/lib/inclination-drop-zones.test.ts src/lib/format-day-activities.test.ts src/lib/sun-exposure.test.ts src/lib/zip-place-cache.test.ts src/lib/username.test.ts src/lib/display-name.test.ts src/lib/display-name-policy.test.ts src/lib/week-range.test.ts src/lib/levels.test.ts src/lib/movement-setting.test.ts src/lib/region-scoring.test.ts src/lib/mitoversity-reading-levels.test.ts src/lib/space-hygiene.test.ts src/lib/editable-day.test.ts"
+    "test": "tsx --test src/lib/sun.test.ts src/lib/scoring.test.ts src/lib/geomag.test.ts src/lib/artificial-em.test.ts src/lib/magnetico.test.ts src/lib/cold-thermo-skin-temp.test.ts src/lib/drinking-water.test.ts src/lib/grounding.test.ts src/lib/vagus-nerve.test.ts src/lib/inclination-drop-zones.test.ts src/lib/format-day-activities.test.ts src/lib/sun-exposure.test.ts src/lib/zip-place-cache.test.ts src/lib/username.test.ts src/lib/display-name.test.ts src/lib/display-name-policy.test.ts src/lib/week-range.test.ts src/lib/levels.test.ts src/lib/movement-setting.test.ts src/lib/region-scoring.test.ts src/lib/mitoversity-reading-levels.test.ts src/lib/space-hygiene.test.ts src/lib/editable-day.test.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",
@@ -41,6 +44,7 @@
     "next-auth": "^5.0.0-beta.31",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
   },

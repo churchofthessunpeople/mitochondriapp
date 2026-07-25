@@ -12,7 +12,7 @@ import type { PendingCelebrations } from "@/lib/achievements";
 import type { LevelProgress } from "@/lib/levels";
 import { AppContentProvider } from "@/components/app-content-context";
 import { AppTutorial } from "@/components/app-tutorial";
-import type { AppContentBundle } from "@/lib/content-overrides";
+import type { AppContentBundle } from "@/lib/app-content-types";
 import { AppSheet } from "@/components/app-sheet";
 import type { LeaderboardBoards } from "@/components/leaderboard-panel";
 import { SunriseCheckIn } from "@/components/sunrise-check-in";

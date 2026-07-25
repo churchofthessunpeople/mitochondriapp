@@ -2,14 +2,18 @@ import type { AppTab, TodaySection } from "@/lib/app-tabs";
 
 export type TourStep = {
   id: string;
-  /** Matches `data-tour` on the target element */
-  target: string;
+  /** Matches `data-tour` on the target element (omit for centered modal steps) */
+  target?: string;
   title: string;
   body: string;
   appTab?: AppTab;
   todaySection?: TodaySection;
   /** Prefer bubble below (default) or above the target */
   placement?: "above" | "below";
+  /** Centered dialog (no spotlight). Used for the closing Jack Kruse tip. */
+  modal?: boolean;
+  /** Optional outbound link shown on modal steps */
+  link?: { href: string; label: string };
 };
 
 const BASE_TOUR_STEPS: TourStep[] = [
@@ -98,6 +102,21 @@ const GUEST_TOUR_STEP: TourStep = {
   placement: "above",
 };
 
+/** Final tip — always last, after guest Save step when applicable. */
+const KRUSE_TOUR_STEP: TourStep = {
+  id: "jack-kruse",
+  modal: true,
+  title: "Go deeper with Dr. Jack Kruse",
+  body: "This app is inspired by Dr. Kruse’s light–water–magnetism teaching. Visit his site for the full library of essays, forums, and getting-started guides.",
+  link: {
+    href: "https://jackkruse.com/getting-started/",
+    label: "Visit jackkruse.com",
+  },
+};
+
 export function getAppTourSteps(isGuest: boolean): TourStep[] {
-  return isGuest ? [...BASE_TOUR_STEPS, GUEST_TOUR_STEP] : BASE_TOUR_STEPS;
+  const steps = isGuest
+    ? [...BASE_TOUR_STEPS, GUEST_TOUR_STEP]
+    : [...BASE_TOUR_STEPS];
+  return [...steps, KRUSE_TOUR_STEP];
 }

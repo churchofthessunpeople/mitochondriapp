@@ -10,55 +10,9 @@ if (!url) {
 }
 const sql = neon(url);
 
-const legacyIds = [
-  "mineralized-water",
-  "carbonated-water",
-  "baking-soda-water",
-];
+// Catalog SoT is seed-data.ts + content/ — FK + favorites remap only.
+const legacyIds = ["mineralized-water", "carbonated-water"];
 
-for (const id of legacyIds) {
-  await sql`
-    insert into content_overrides (key, value, updated_at)
-    values (
-      ${`protocol:${id}`},
-      ${JSON.stringify({ active: false, deleted: true })}::jsonb,
-      now()
-    )
-    on conflict (key) do update set
-      value = excluded.value,
-      updated_at = now()
-  `;
-}
-
-await sql`
-  insert into content_overrides (key, value, updated_at)
-  values (
-    'protocol:drinking-water',
-    ${JSON.stringify({
-      name: "Drinking water",
-      active: true,
-      points: 4,
-      category: "water_food",
-      maxPerDay: 9999,
-      permanent: false,
-      sortOrder: 50,
-      timeOfDay: "anytime",
-      allowsMultiple: true,
-      durationEnabled: false,
-      lockedTimeOfDay: null,
-      referenceMinutes: 15,
-      maxDurationMinutes: 60,
-      description:
-        "Log a glass: RO, spring, or deuterium-depleted; salt or baking soda remineralization; still or carbonated. DDW includes deuterium PPM.",
-    })}::jsonb,
-    now()
-  )
-  on conflict (key) do update set
-    value = excluded.value,
-    updated_at = now()
-`;
-
-// protocols table has no `permanent` column — that flag lives in seed/overrides only.
 await sql`
   insert into protocols (
     id, name, description, points, category, time_of_day, allows_multiple,
@@ -68,7 +22,7 @@ await sql`
   values (
     'drinking-water',
     'Drinking water',
-    'Log a glass: RO, spring, or deuterium-depleted; salt or baking soda remineralization; still or carbonated. DDW includes deuterium PPM.',
+    'Log a glass: RO, spring, or deuterium-depleted; optional salt remineralization; still or carbonated. DDW includes deuterium PPM.',
     4,
     'water_food',
     'anytime',
@@ -95,8 +49,7 @@ const usersWithLegacy = await sql`
   select distinct user_id from user_favorites
   where protocol_id in (
     'mineralized-water',
-    'carbonated-water',
-    'baking-soda-water'
+    'carbonated-water'
   )
 `;
 for (const row of usersWithLegacy) {
@@ -110,20 +63,18 @@ await sql`
   delete from user_favorites
   where protocol_id in (
     'mineralized-water',
-    'carbonated-water',
-    'baking-soda-water'
+    'carbonated-water'
   )
 `;
 await sql`
   delete from user_schedule_items
   where protocol_id in (
     'mineralized-water',
-    'carbonated-water',
-    'baking-soda-water'
+    'carbonated-water'
   )
 `;
 
-console.log("drinking water merge overrides applied", {
+console.log("drinking water merge (favorites remap + FK only)", {
   legacyDeleted: legacyIds,
   remappedUsers: usersWithLegacy.length,
 });

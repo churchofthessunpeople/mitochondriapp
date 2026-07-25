@@ -63,11 +63,11 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "baking-soda-water": {
     equipment: "none",
-    how: "Now part of Drinking water. Choose Baking soda under remineralization (¼ tsp is the common protocol dose). Take at least 2 hours from meals. Ask your clinician first if you have high blood pressure, heart failure, kidney disease, or sodium restrictions.",
+    how: "Now part of Vagus nerve stimulation. Choose Baking soda water (¼ tsp sodium bicarbonate in a glass). Take at least 2 hours from meals. Ask your clinician first if you have high blood pressure, heart failure, kidney disease, or sodium restrictions.",
   },
   "drinking-water": {
     equipment: "optional",
-    how: "Log each intentional glass:\n\n1) Source — reverse osmosis, spring, or deuterium-depleted water.\n2) If DDW — deuterium PPM on the label (lower is more depleted; natural water is ~150 ppm).\n3) Remineralization — none, sea/electrolyte salt, or baking soda, then amount when applicable.\n4) Still or carbonated (not sugary soda).\n\nSpread servings through the day. Baking soda: prefer ≥2 hours from meals.",
+    how: "Log each intentional glass:\n\n1) Source — reverse osmosis, spring, or deuterium-depleted water.\n2) If DDW — deuterium PPM on the label (lower is more depleted; natural water is ~150 ppm).\n3) Remineralization — none or sea/electrolyte salt, then amount when applicable.\n4) Still or carbonated (not sugary soda).\n\nSpread servings through the day. Baking soda water is logged under Vagus nerve stimulation.",
   },
   "hydration-timing": {
     equipment: "none",
@@ -75,7 +75,11 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "castor-oil-navel": {
     equipment: "required",
-    how: "Use organic, cold-pressed castor oil from a reputable source (commercial grades have ricin removed — never use raw castor beans).\n\nClean and dry the navel. With a clean dropper, place 2–5 drops in the belly button. Optional: cover with a small soft cloth if you are lying down so sheets do not stain.\n\nTypical timing is before sleep; wash any residue the next morning if needed. Patch-test on the inner arm first. Stop for redness, itch, or discharge. Do not use if pregnant, with an umbilical hernia, or an open belly wound unless a clinician approves. External navel use only — do not drink castor oil as part of this habit.",
+    how: "Now part of Vagus nerve stimulation. Choose Castor oil navel.\n\nUse organic, cold-pressed castor oil from a reputable source (commercial grades have ricin removed — never use raw castor beans).\n\nClean and dry the navel. With a clean dropper, place 2–5 drops in the belly button. Optional: cover with a small soft cloth if you are lying down so sheets do not stain.\n\nTypical timing is before sleep; wash any residue the next morning if needed. Patch-test on the inner arm first. Stop for redness, itch, or discharge. Do not use if pregnant, with an umbilical hernia, or an open belly wound unless a clinician approves. External navel use only — do not drink castor oil as part of this habit.",
+  },
+  "vagus-nerve-stimulation": {
+    equipment: "optional",
+    how: "Pick one vagus-stimulating practice per log:\n\n• Cold face immersion — 3 rounds of cold water on the face or brief head immersion (5 pts).\n• Baking soda water — ¼ tsp sodium bicarbonate in a glass, ≥2 hours from meals (4 pts).\n• Castor oil navel — organic cold-pressed castor oil drops in the belly button (6 pts).\n\nYou can log more than one practice in a day. Ask a clinician before baking soda if you have sodium restrictions or kidney/heart disease. Castor: external navel use only.",
   },
   "deuterium-aware-meal": {
     equipment: "none",
@@ -91,11 +95,11 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "cold-face-plunge": {
     equipment: "optional",
-    how: "Now part of Cold thermogenesis. Choose Face immersion, then skin temperature — the app logs 3 rounds per the face immersion protocol.\n\nShort and sharp is fine; breathe steadily. Skip if it triggers dizziness or you are unsafe to do so.",
+    how: "Now part of Vagus nerve stimulation. Choose Cold face immersion — 3 rounds of cold water on the face or brief head immersion.\n\nShort and sharp is fine; breathe steadily. Skip if it triggers dizziness or you are unsafe to do so.",
   },
   "cold-thermogenesis": {
     equipment: "optional",
-    how: "Pick cold plunge, cold shower, or face immersion, then skin surface temperature (~50°F target; warmer earns fewer base points).\n\nPlunge and shower: choose session length next. Face immersion: logged as 3 rounds — no duration picker. Build cold gradually; aim for ~50°F skin for 10+ minutes on plunge days when ready.",
+    how: "Pick cold plunge or cold shower, then skin surface temperature (~50°F target; warmer earns fewer base points), then session length.\n\nBuild cold gradually; aim for ~50°F skin for 10+ minutes on plunge days when ready. Cold face immersion is logged under Vagus nerve stimulation.",
   },
   "reduce-nnemf-block": {
     equipment: "optional",

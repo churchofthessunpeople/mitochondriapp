@@ -7,6 +7,7 @@ import { AddActivityDialog } from "@/components/add-activity-dialog";
 import { ColdThermoDialog } from "@/components/cold-thermo-dialog";
 import { DrinkingWaterDialog } from "@/components/drinking-water-dialog";
 import { ExerciseDialog } from "@/components/exercise-dialog";
+import { VagusNerveDialog } from "@/components/vagus-nerve-dialog";
 import { SpaceHygieneDialog } from "@/components/space-hygiene-dialog";
 import {
   ProtocolHowToButton,
@@ -63,6 +64,13 @@ import {
   isGroundingProtocolId,
   type GroundingMode,
 } from "@/lib/grounding";
+import {
+  encodeVagusVariant,
+  formatVagusLabel,
+  isVagusNerveProtocolId,
+  vagusModeLabel,
+  type VagusMode,
+} from "@/lib/vagus-nerve";
 import {
   formatMagneticoGauss,
   isMagneticoProtocolId,
@@ -301,6 +309,7 @@ export function ScheduleDay({
   const [exerciseProtocol, setExerciseProtocol] = useState<Protocol | null>(
     null,
   );
+  const [vagusProtocol, setVagusProtocol] = useState<Protocol | null>(null);
   const [outsideTimeProtocol, setOutsideTimeProtocol] =
     useState<Protocol | null>(null);
   const [choicePicker, setChoicePicker] = useState<{
@@ -495,7 +504,7 @@ export function ScheduleDay({
       return parts.join(" · ");
     }
     if (isColdThermoProtocolId(p.id)) {
-      return `plunge · shower · face · tap to log`;
+      return `plunge · shower · tap to log`;
     }
     if (isDrinkingWaterProtocolId(p.id)) {
       return `${p.points} pts · RO · spring · DDW · salt · carbonated · tap to log`;
@@ -505,6 +514,9 @@ export function ScheduleDay({
     }
     if (isGroundingProtocolId(p.id)) {
       return `barefoot 5 pts · sphinx 10 pts · tap to log`;
+    }
+    if (isVagusNerveProtocolId(p.id)) {
+      return `face 5 · baking soda 4 · castor 6 · tap to log`;
     }
     if (isSunExposureProtocolId(p.id)) {
       return `${p.points} pts / 15 min · morning · noon · afternoon · sun or shade`;
@@ -881,6 +893,11 @@ export function ScheduleDay({
     addOne(protocol, { groundingMode: mode });
   }
 
+  function chooseVagus(protocol: Protocol, mode: VagusMode) {
+    setVagusProtocol(null);
+    addOne(protocol, { vagusMode: mode });
+  }
+
   function addOne(
     protocol: Protocol,
     opts?: {
@@ -891,6 +908,7 @@ export function ScheduleDay({
       drinkingWater?: DrinkingWaterLogInput;
       exercise?: ExerciseLogInput;
       groundingMode?: GroundingMode;
+      vagusMode?: VagusMode;
       durationMinutes?: number;
     },
   ) {
@@ -928,6 +946,9 @@ export function ScheduleDay({
         const groundingMode = isGroundingProtocolId(protocol.id)
           ? (opts?.groundingMode ?? "barefoot")
           : undefined;
+        const vagusMode = isVagusNerveProtocolId(protocol.id)
+          ? (opts?.vagusMode ?? "cold_face_immersion")
+          : undefined;
         const res = await logCompletionAction(protocol.id, {
           durationMinutes: mins ?? null,
           coldThermo,
@@ -935,6 +956,7 @@ export function ScheduleDay({
           drinkingWater,
           exercise,
           groundingMode,
+          vagusMode,
           sunExposure: isSunExposureProtocolId(protocol.id)
             ? (opts?.sunExposure ?? defaultOutsideTimeInput())
             : undefined,
@@ -958,11 +980,13 @@ export function ScheduleDay({
                   ? `${formatExerciseLabel(encodeExerciseVariant(exercise), mins)} · `
                   : isGroundingProtocolId(protocol.id) && groundingMode
                     ? `${groundingModeLabel(groundingMode)} · `
-                    : mins && protocol.durationEnabled
-                      ? isSunExposureProtocolId(protocol.id) && opts?.sunExposure
-                        ? `${formatSunExposureLabel(encodeSunExposureVariant(opts.sunExposure), mins)} · `
-                        : `+${mins} min · `
-                      : "+1 · ";
+                    : isVagusNerveProtocolId(protocol.id) && vagusMode
+                      ? `${formatVagusLabel(encodeVagusVariant(vagusMode)) ?? vagusModeLabel(vagusMode)} · `
+                      : mins && protocol.durationEnabled
+                        ? isSunExposureProtocolId(protocol.id) && opts?.sunExposure
+                          ? `${formatSunExposureLabel(encodeSunExposureVariant(opts.sunExposure), mins)} · `
+                          : `+${mins} min · `
+                        : "+1 · ";
           push(`${time}+${res.points} pts${extra}`);
         }
       } catch (e) {
@@ -1017,6 +1041,10 @@ export function ScheduleDay({
     }
     if (isGroundingProtocolId(protocol.id)) {
       setChoicePicker({ kind: "grounding", protocol });
+      return;
+    }
+    if (isVagusNerveProtocolId(protocol.id)) {
+      setVagusProtocol(protocol);
       return;
     }
     if (requiresMovementSetting(protocol)) {
@@ -1080,6 +1108,8 @@ export function ScheduleDay({
                           ? " · tap to set source, minerals & carbonation"
                           : isExerciseProtocolId(p.id)
                           ? " · tap to set type, place & duration"
+                          : isVagusNerveProtocolId(p.id)
+                          ? " · tap to choose practice"
                           : isSunExposureProtocolId(p.id)
                           ? " · tap to set time, sun/shade & duration"
                           : p.durationEnabled
@@ -1115,13 +1145,15 @@ export function ScheduleDay({
                   isSunExposureProtocolId(p.id)
                     ? `Log Outside Time — choose time of day, sun or shade, and duration`
                     : isColdThermoProtocolId(p.id)
-                      ? `Log ${p.name} — choose plunge, shower, or face immersion`
+                      ? `Log ${p.name} — choose plunge or shower`
                       : isDrinkingWaterProtocolId(p.id)
                         ? `Log ${p.name} — choose source, minerals, and carbonation`
                         : isExerciseProtocolId(p.id)
                           ? `Log ${p.name} — choose type, indoors or outdoors, and duration`
                           : isGroundingProtocolId(p.id)
                             ? `Log ${p.name} — choose barefoot or Make like the Sphinx`
+                            : isVagusNerveProtocolId(p.id)
+                              ? `Log ${p.name} — choose cold face, baking soda water, or castor oil navel`
                             : requiresMovementSetting(p)
                               ? `Log ${p.name} — choose full sunlight, outside, or indoors`
                               : p.durationEnabled
@@ -1156,13 +1188,15 @@ export function ScheduleDay({
                   isSunExposureProtocolId(p.id)
                     ? `Log Outside Time — choose time of day, sun or shade, and duration`
                     : isColdThermoProtocolId(p.id)
-                      ? `Log ${p.name} — choose plunge, shower, or face immersion`
+                      ? `Log ${p.name} — choose plunge or shower`
                       : isDrinkingWaterProtocolId(p.id)
                         ? `Log ${p.name} — choose source, minerals, and carbonation`
                         : isExerciseProtocolId(p.id)
                           ? `Log ${p.name} — choose type, indoors or outdoors, and duration`
                           : isGroundingProtocolId(p.id)
                             ? `Log ${p.name} — choose barefoot or Make like the Sphinx`
+                            : isVagusNerveProtocolId(p.id)
+                              ? `Log ${p.name} — choose cold face, baking soda water, or castor oil navel`
                             : requiresMovementSetting(p)
                               ? `Log ${p.name} — choose full sunlight, outside, or indoors`
                               : p.durationEnabled
@@ -1599,6 +1633,14 @@ export function ScheduleDay({
             chooseExercise(exerciseProtocol, input, mins)
           }
           onCancel={() => setExerciseProtocol(null)}
+        />
+      ) : null}
+      {vagusProtocol ? (
+        <VagusNerveDialog
+          protocol={vagusProtocol}
+          pending={busyId === vagusProtocol.id}
+          onLog={(mode) => chooseVagus(vagusProtocol, mode)}
+          onCancel={() => setVagusProtocol(null)}
         />
       ) : null}
       {outsideTimeProtocol ? (

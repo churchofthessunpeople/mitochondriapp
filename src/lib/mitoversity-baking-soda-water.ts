@@ -26,7 +26,7 @@ export const BAKING_SODA_WATER_SIMPLE_SECTIONS: MitoEntrySection[] = [
   },
   {
     heading: "How this fits the app",
-    body: "Log “Baking soda water” for each ¼-tsp dose (twice daily when you follow the full protocol). Pair with mineralized water, daylight-aligned hydration, and deuterium-aware meals in the Water pillar. Educational only—not medical advice for kidney disease, autoimmunity, or blood pressure.",
+    body: "Log Vagus nerve stimulation → Baking soda water for each ¼-tsp dose (twice daily when you follow the full protocol). Pair with Drinking water, daylight-aligned hydration, and deuterium-aware meals in the Water pillar. Educational only—not medical advice for kidney disease, autoimmunity, or blood pressure.",
   },
 ];
 

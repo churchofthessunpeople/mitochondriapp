@@ -1,18 +1,14 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { protocols, userFavorites, userScheduleItems } from "@/db/schema";
-import { ensureProtocolInDb } from "@/lib/catalog";
+import { ensureProtocolInDb } from "@/lib/catalog-server";
 import { isCatalogSelectableProtocolId } from "@/lib/scoring";
 import {
   remapSunExposureFavoriteId,
   SUN_EXPOSURE_LEGACY_IDS,
   SUN_EXPOSURE_PROTOCOL_ID,
 } from "@/lib/sun-exposure";
-import {
-  COLD_FACE_PLUNGE_LEGACY_ID,
-  COLD_THERMOGENESIS_PROTOCOL_ID,
-  remapColdThermoFavoriteId,
-} from "@/lib/cold-thermo-skin-temp";
+import { remapColdThermoFavoriteId } from "@/lib/cold-thermo-skin-temp";
 import {
   DRINKING_WATER_LEGACY_IDS,
   DRINKING_WATER_PROTOCOL_ID,
@@ -23,6 +19,11 @@ import {
   EXERCISE_PROTOCOL_ID,
   remapExerciseFavoriteId,
 } from "@/lib/exercise";
+import {
+  remapVagusFavoriteId,
+  VAGUS_NERVE_LEGACY_IDS,
+  VAGUS_NERVE_PROTOCOL_ID,
+} from "@/lib/vagus-nerve";
 
 export async function getUserFavoriteIds(userId: string): Promise<Set<string>> {
   try {
@@ -65,14 +66,17 @@ export async function getUserFavoriteIds(userId: string): Promise<Set<string>> {
         );
     }
 
-    if (ids.includes(COLD_FACE_PLUNGE_LEGACY_ID)) {
-      await ensureProtocolInDb(COLD_THERMOGENESIS_PROTOCOL_ID);
-      if (!ids.includes(COLD_THERMOGENESIS_PROTOCOL_ID)) {
+    const legacyVagus = ids.filter((id) =>
+      (VAGUS_NERVE_LEGACY_IDS as readonly string[]).includes(id),
+    );
+    if (legacyVagus.length > 0) {
+      await ensureProtocolInDb(VAGUS_NERVE_PROTOCOL_ID);
+      if (!ids.includes(VAGUS_NERVE_PROTOCOL_ID)) {
         await db
           .insert(userFavorites)
           .values({
             userId,
-            protocolId: COLD_THERMOGENESIS_PROTOCOL_ID,
+            protocolId: VAGUS_NERVE_PROTOCOL_ID,
           })
           .onConflictDoNothing();
       }
@@ -81,7 +85,7 @@ export async function getUserFavoriteIds(userId: string): Promise<Set<string>> {
         .where(
           and(
             eq(userFavorites.userId, userId),
-            eq(userFavorites.protocolId, COLD_FACE_PLUNGE_LEGACY_ID),
+            inArray(userFavorites.protocolId, [...VAGUS_NERVE_LEGACY_IDS]),
           ),
         );
       await db
@@ -89,7 +93,7 @@ export async function getUserFavoriteIds(userId: string): Promise<Set<string>> {
         .where(
           and(
             eq(userScheduleItems.userId, userId),
-            eq(userScheduleItems.protocolId, COLD_FACE_PLUNGE_LEGACY_ID),
+            inArray(userScheduleItems.protocolId, [...VAGUS_NERVE_LEGACY_IDS]),
           ),
         );
     }
@@ -164,6 +168,7 @@ export async function getUserFavoriteIds(userId: string): Promise<Set<string>> {
       ...new Set(
         ids
           .map(remapSunExposureFavoriteId)
+          .map(remapVagusFavoriteId)
           .map(remapColdThermoFavoriteId)
           .map(remapDrinkingWaterFavoriteId)
           .map(remapExerciseFavoriteId),

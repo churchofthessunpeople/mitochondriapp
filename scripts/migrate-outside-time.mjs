@@ -1,58 +1,18 @@
 /**
- * Roll Sun Exposure → Outside Time in Neon content overrides,
- * and soft-delete legacy midday / morning-natural sun activities.
+ * Remap legacy midday / morning-natural favorites → Outside Time (sun-exposure).
+ * Catalog copy lives in seed-data.ts + content/ — not Neon overrides.
  */
 import { config } from "dotenv";
+config({ path: ".env.local" });
 config({ path: ".env" });
 import { neon } from "@neondatabase/serverless";
 
-const sql = neon(process.env.DATABASE_URL);
-
-const outsideTimeProtocol = {
-  name: "Outside Time",
-  active: true,
-  points: 8,
-  category: "light",
-  maxPerDay: 9999,
-  permanent: false,
-  sortOrder: 10,
-  timeOfDay: "anytime",
-  allowsMultiple: true,
-  durationEnabled: true,
-  lockedTimeOfDay: null,
-  referenceMinutes: 15,
-  maxDurationMinutes: 120,
-};
-
-const outsideTimeMeta = {
-  how: "Log outdoor time: pick morning, solar noon, or afternoon (from Place sun times), whether you were in full sun or shade, and how long you stayed.\n\nSlots: morning (sunrise → 1 hour before solar noon), solar noon (1 hour before → 2 hours after), afternoon (then → sunset). Full sun scores higher than shade. Stay within a non-burning window. Sunrise check-in is separate — it unlocks the day boost.",
-  articleId: "solar-noon-vitamin-d",
-  equipment: "none",
-};
-
-await sql`
-  insert into content_overrides (key, value, updated_at)
-  values
-    ('protocol:sun-exposure', ${JSON.stringify(outsideTimeProtocol)}::jsonb, now()),
-    ('protocol-meta:sun-exposure', ${JSON.stringify(outsideTimeMeta)}::jsonb, now())
-  on conflict (key) do update set
-    value = excluded.value,
-    updated_at = now()
-`;
-
-for (const id of ["midday-sun-skin", "morning-natural-light"]) {
-  await sql`
-    insert into content_overrides (key, value, updated_at)
-    values (
-      ${"protocol:" + id},
-      ${JSON.stringify({ active: false, deleted: true })}::jsonb,
-      now()
-    )
-    on conflict (key) do update set
-      value = excluded.value,
-      updated_at = now()
-  `;
+const url = process.env.DATABASE_URL;
+if (!url) {
+  console.error("DATABASE_URL missing");
+  process.exit(1);
 }
+const sql = neon(url);
 
 await sql`
   update protocols
@@ -65,7 +25,6 @@ await sql`
   where id = 'sun-exposure'
 `;
 
-// Remap favorites from legacy sun ids → Outside Time
 const legacy = ["midday-sun-skin", "morning-natural-light"];
 const usersWithLegacy = await sql`
   select distinct user_id from user_favorites
@@ -87,15 +46,8 @@ await sql`
   where protocol_id = any(${legacy})
 `;
 
-const check = await sql`
-  select key, value->>'name' as name, value->>'deleted' as deleted
-  from content_overrides
-  where key in (
-    'protocol:sun-exposure',
-    'protocol:midday-sun-skin',
-    'protocol:morning-natural-light'
-  )
-`;
-console.log("updated overrides", check);
 const p = await sql`select id, name from protocols where id = 'sun-exposure'`;
-console.log("protocol row", p);
+console.log("outside time merge (favorites remap + FK only)", {
+  remappedUsers: usersWithLegacy.length,
+  protocol: p[0],
+});

@@ -9,7 +9,7 @@ import {
 import {
   ensureProtocolInDb,
   getMergedCatalogProtocols,
-} from "@/lib/catalog";
+} from "@/lib/catalog-server";
 import { getUserFavoriteIds } from "@/lib/favorites";
 import {
   isMagneticoProtocolId,
@@ -17,8 +17,8 @@ import {
 } from "@/lib/magnetico";
 import {
   isPermanentProtocol,
-  isPermanentProtocolMerged,
 } from "@/lib/permanent-activities";
+import { isPermanentProtocolMerged } from "@/lib/permanent-activities-server";
 import {
   isVariantProtocolId,
   variantBasePoints,

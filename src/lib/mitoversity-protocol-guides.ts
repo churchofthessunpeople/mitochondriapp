@@ -164,7 +164,7 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     title: "Drinking water",
     pillar: "water",
     summary:
-      "One glass log: RO, spring, or deuterium-depleted; optional salt or baking soda; still or carbonated.",
+      "One glass log: RO, spring, or deuterium-depleted; optional salt; still or carbonated.",
     relatedProtocolIds: ["drinking-water"],
     sections: [
       {
@@ -173,11 +173,33 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
       },
       {
         heading: "Remineralization & carbonation",
-        body: "Add sea/electrolyte salt or baking soda when you use them, and pick the amount. Still vs carbonated is a final choice — sparkling water counts; sugary soda does not.",
+        body: "Add sea/electrolyte salt when you use it, and pick the amount. Still vs carbonated is a final choice — sparkling water counts; sugary soda does not. Baking soda water is logged under Vagus nerve stimulation.",
       },
       {
         heading: "Practice",
-        body: "Log each intentional glass. Spread servings through the day. Baking soda is best ≥2 hours from meals. Pair with daylight-aligned hydration timing and Low-D morning hydration.",
+        body: "Log each intentional glass. Spread servings through the day. Pair with daylight-aligned hydration timing and Low-D morning hydration.",
+      },
+    ],
+  },
+  {
+    id: "vagus-nerve-stimulation",
+    title: "Vagus nerve stimulation",
+    pillar: "support",
+    summary:
+      "Three practices under one activity: cold face immersion, baking soda water, and castor oil navel.",
+    relatedProtocolIds: ["vagus-nerve-stimulation"],
+    sections: [
+      {
+        heading: "Why these are grouped",
+        body: "Cold face immersion, baking soda water, and castor oil at the navel are often taught as parasympathetic / vagus-adjacent self-care. Logging them as modes of one activity keeps the checklist clearer without losing the old point values.",
+      },
+      {
+        heading: "Modes & points",
+        body: "Cold face immersion — 3 rounds, 5 pts. Baking soda water — ¼ tsp in a glass (≥2 h from meals), 4 pts. Castor oil navel — organic cold-pressed drops in the belly button, 6 pts. You can log more than one mode in a day.",
+      },
+      {
+        heading: "Read next",
+        body: "See the baking soda water, castor oil navel, and cold face immersion lessons for deeper physiology and safety notes.",
       },
     ],
   },
@@ -252,20 +274,23 @@ export const MITOVERSITY_PROTOCOL_GUIDES: readonly MitoEntry[] = [
     title: "Cold face and head immersion",
     pillar: "support",
     summary:
-      "Entry-level cold via face or brief head immersion—now Face immersion inside Cold thermogenesis (3 rounds).",
-    relatedProtocolIds: ["cold-face-plunge", "cold-thermogenesis"],
+      "Entry-level cold via face or brief head immersion—now Cold face immersion under Vagus nerve stimulation (3 rounds, 5 pts).",
+    relatedProtocolIds: [
+      "vagus-nerve-stimulation",
+      "cold-thermogenesis",
+    ],
     sections: [
       {
         heading: "Trigeminal cold pathway",
-        body: "Cold water on the face activates the diving reflex and sympathetic arousal—a smaller dose than full-body thermogenesis but useful for building cold tolerance.",
+        body: "Cold water on the face activates the diving reflex and autonomic pathways—a smaller dose than full-body thermogenesis, and a practical vagus-adjacent practice.",
       },
       {
         heading: "Practice",
-        body: "In Cold thermogenesis, choose Face immersion and skin temperature. The app logs 3 rounds per session. Progress toward cold plunge or shower when ready.",
+        body: "In Vagus nerve stimulation, choose Cold face immersion. Log 3 rounds per session. Progress toward cold plunge or shower under Cold thermogenesis when ready.",
       },
       {
         heading: "Read next",
-        body: "See “Cold thermogenesis: ~50 °F skin for 10+ minutes” for full plunge progression.",
+        body: "See “Cold thermogenesis: ~50 °F skin for 10+ minutes” for full plunge progression, and the Vagus nerve stimulation guide for sibling practices.",
       },
     ],
   },

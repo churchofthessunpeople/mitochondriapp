@@ -1,0 +1,38 @@
+{
+  "sunrise-why": {
+    "title": "Why the Sunrise is the most important part of the day",
+    "pillar": "light",
+    "summary": "Established circadian biology plus place-based lifestyle teaching on why first outdoor light is a high-leverage daily signal.",
+    "sections": [
+      {
+        "body": "Established circadian biology plus place-based lifestyle teaching on why first outdoor light is a high-leverage daily signal.",
+        "heading": "The big picture"
+      },
+      {
+        "body": "Almost every tissue has a molecular clock.  The master pacemaker in the brain (suprachiasmatic nucleus) is reset primarily by light detected in the eye—not by clocks on the wall.",
+        "heading": "Circadian clocks are light-trained"
+      },
+      {
+        "body": "Specialized retinal cells that contain melanopsin project to the circadian system.  They are especially responsive to short-wavelength (blue-enriched) light and to the overall intensity of outdoor daylight.",
+        "heading": "Non-visual photoreception (melanopsin)"
+      },
+      {
+        "body": "Dawn and early morning light have a characteristic intensity ramp and spectral mix as the sun rises.  ” Research on circadian phase shifting emphasizes morning light for advancing clocks and evening light for delay—supporting the habit of front-loading outdoor light and dimming late.",
+        "heading": "Sunrise as a distinct outdoor cue"
+      },
+      {
+        "body": "Dr.  Jack Kruse’s public writing stresses a stronger hierarchy than generic “get morning light”: true outdoor sunrise with an unobstructed solar path (eyes to the horizon disk, no glass) as the day’s primary “solar call,” UV-A/full-spectrum outdoor light as non-substitutable by indoor LEDs, and tight coupling of that signal to mitochondrial redox and the wider light–water–magnetism stack (including DHA in retinal membranes).",
+        "heading": "Lifestyle-framework note"
+      },
+      {
+        "body": "Log the related catalog activity when you complete this habit. Educational only—not medical advice.",
+        "heading": "In this app"
+      }
+    ],
+    "relatedProtocolIds": [
+      "sunrise-horizon",
+      "sunrise-open-sky",
+      "sunrise-outside"
+    ]
+  }
+}

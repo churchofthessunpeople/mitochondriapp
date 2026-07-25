@@ -11,7 +11,7 @@ import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
  */
 export const getActiveProtocols = cache(async (): Promise<Protocol[]> => {
   // Reads are local/merged — do not block on Neon FK sync.
-  const { getMergedCatalogProtocols } = await import("@/lib/catalog");
+  const { getMergedCatalogProtocols } = await import("@/lib/catalog-server");
   const { scheduleCatalogSync } = await import("@/lib/catalog-sync");
   scheduleCatalogSync();
   return getMergedCatalogProtocols();

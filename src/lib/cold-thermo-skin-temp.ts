@@ -1,12 +1,13 @@
 /**
- * Cold thermogenesis — skin temp + session mode (plunge, shower, or face immersion).
- * ~50°F skin is optimal; warmer = diminishing base. Face immersion is a fixed
- * 3-round protocol (no duration picker). Plunge and shower ask for duration.
+ * Cold thermogenesis — skin temp + session mode (plunge or shower).
+ * ~50°F skin is optimal; warmer = diminishing base.
+ * Face immersion lives under Vagus nerve stimulation; decode still supports
+ * historical face-immersion logs packed into variant_value.
  */
 
 export const COLD_THERMOGENESIS_PROTOCOL_ID = "cold-thermogenesis";
 
-/** Retired into cold thermogenesis (face immersion mode). */
+/** @deprecated Retired into vagus-nerve-stimulation (cold face immersion). */
 export const COLD_FACE_PLUNGE_LEGACY_ID = "cold-face-plunge";
 
 export const OPTIMAL_COLD_THERMO_SKIN_TEMP_F = 50;
@@ -16,6 +17,7 @@ export const COLD_THERMO_SKIN_TEMP_OPTIONS = [50, 55, 60, 65, 70] as const;
 
 export type ColdThermoSkinTempF = (typeof COLD_THERMO_SKIN_TEMP_OPTIONS)[number];
 
+/** Includes face_immersion for historical logs; UI only offers plunge | shower. */
 export type ColdThermoMode = "plunge" | "shower" | "face_immersion";
 
 export type ColdThermoLogInput = {
@@ -24,7 +26,7 @@ export type ColdThermoLogInput = {
 };
 
 export const COLD_THERMO_MODE_OPTIONS: {
-  id: ColdThermoMode;
+  id: Exclude<ColdThermoMode, "face_immersion">;
   label: string;
   detail: string;
 }[] = [
@@ -38,12 +40,13 @@ export const COLD_THERMO_MODE_OPTIONS: {
     label: "Cold shower",
     detail: "Cold shower finish or full cold shower — pick duration next",
   },
-  {
-    id: "face_immersion",
-    label: "Face immersion",
-    detail: "3 rounds of cold face / head immersion (fixed protocol)",
-  },
-] as const;
+];
+
+const COLD_THERMO_MODE_LABELS: Record<ColdThermoMode, string> = {
+  plunge: "Cold plunge",
+  shower: "Cold shower",
+  face_immersion: "Face immersion",
+};
 
 /** Assumed rounds when logging face immersion (no duration picker). */
 export const FACE_IMMERSION_ROUNDS = 3;
@@ -136,9 +139,7 @@ export function formatColdThermoSkinTemp(tempF: number): string {
 }
 
 export function coldThermoModeLabel(mode: ColdThermoMode): string {
-  return (
-    COLD_THERMO_MODE_OPTIONS.find((o) => o.id === mode)?.label ?? mode
-  );
+  return COLD_THERMO_MODE_LABELS[mode] ?? mode;
 }
 
 /**
@@ -224,9 +225,7 @@ export function formatColdThermoLabel(
   return parts.join(" · ");
 }
 
+/** Face plunge remaps via remapVagusFavoriteId — cold thermo no longer claims it. */
 export function remapColdThermoFavoriteId(protocolId: string): string {
-  if (protocolId === COLD_FACE_PLUNGE_LEGACY_ID) {
-    return COLD_THERMOGENESIS_PROTOCOL_ID;
-  }
   return protocolId;
 }

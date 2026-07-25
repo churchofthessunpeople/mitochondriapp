@@ -209,6 +209,11 @@ export function AppTutorial({
   const isLast = index >= steps.length - 1;
 
   const layout = useCallback(() => {
+    if (step.modal || !step.target) {
+      setHighlight(null);
+      setBubble(null);
+      return;
+    }
     const rect = measureTarget(step.target);
     if (!rect) {
       setBubble({
@@ -226,7 +231,7 @@ export function AppTutorial({
     });
     // Remeasure after scroll settles slightly
     const afterScroll = () => {
-      const r = measureTarget(step.target) ?? rect;
+      const r = measureTarget(step.target!) ?? rect;
       const pad = 6;
       setHighlight({
         top: r.top - pad,
@@ -266,9 +271,66 @@ export function AppTutorial({
     });
   }
 
+  const stepChrome = (
+    <>
+      <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-accent">
+        Tour · {index + 1} / {steps.length}
+      </p>
+      <h2
+        id="app-tour-title"
+        className="mt-1 text-base font-semibold tracking-tight text-foreground"
+      >
+        {step.title}
+      </h2>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted">{step.body}</p>
+      {step.link ? (
+        <a
+          href={step.link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-sm font-semibold text-accent transition hover:bg-accent/25"
+        >
+          {step.link.label}
+        </a>
+      ) : null}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={finish}
+          disabled={pending}
+          className="text-xs font-medium text-muted hover:text-foreground disabled:opacity-50"
+        >
+          Skip tour
+        </button>
+        <div className="flex gap-2">
+          {index > 0 && (
+            <button
+              type="button"
+              onClick={() => setIndex((i) => i - 1)}
+              className="btn-secondary h-9 rounded-xl px-3 text-xs font-semibold"
+            >
+              Back
+            </button>
+          )}
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => {
+              if (isLast) finish();
+              else setIndex((i) => i + 1);
+            }}
+            className="btn-primary h-9 rounded-xl px-4 text-xs font-semibold disabled:opacity-60"
+          >
+            {pending ? "…" : isLast ? "Done" : "Next"}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="pointer-events-none fixed inset-0 z-[80]" aria-live="polite">
-      {highlight && (
+      {highlight && !step.modal && (
         <div
           className="pointer-events-none absolute rounded-2xl ring-2 ring-accent transition-all duration-200"
           style={{
@@ -280,11 +342,24 @@ export function AppTutorial({
           }}
         />
       )}
-      {!highlight && (
+      {(!highlight || step.modal) && (
         <div className="pointer-events-none absolute inset-0 bg-black/45" />
       )}
 
-      {bubble && (
+      {step.modal ? (
+        <div className="pointer-events-auto absolute inset-0 z-[81] flex items-end justify-center p-4 sm:items-center">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="app-tour-title"
+            className="w-full max-w-sm rounded-2xl border border-accent/35 bg-[var(--header-bg)] p-5 shadow-xl"
+          >
+            {stepChrome}
+          </div>
+        </div>
+      ) : null}
+
+      {bubble && !step.modal && (
         <div
           role="dialog"
           aria-modal="true"
@@ -298,52 +373,7 @@ export function AppTutorial({
         >
           <div className="relative rounded-2xl border border-accent/35 bg-[var(--header-bg)] p-4 shadow-xl">
             <Tail placement={bubble.placement} />
-
-            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-accent">
-              Tour · {index + 1} / {steps.length}
-            </p>
-            <h2
-              id="app-tour-title"
-              className="mt-1 text-base font-semibold tracking-tight text-foreground"
-            >
-              {step.title}
-            </h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">
-              {step.body}
-            </p>
-
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={finish}
-                disabled={pending}
-                className="text-xs font-medium text-muted hover:text-foreground disabled:opacity-50"
-              >
-                Skip tour
-              </button>
-              <div className="flex gap-2">
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setIndex((i) => i - 1)}
-                    className="btn-secondary h-9 rounded-xl px-3 text-xs font-semibold"
-                  >
-                    Back
-                  </button>
-                )}
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => {
-                    if (isLast) finish();
-                    else setIndex((i) => i + 1);
-                  }}
-                  className="btn-primary h-9 rounded-xl px-4 text-xs font-semibold disabled:opacity-60"
-                >
-                  {pending ? "…" : isLast ? "Done" : "Next"}
-                </button>
-              </div>
-            </div>
+            {stepChrome}
           </div>
         </div>
       )}

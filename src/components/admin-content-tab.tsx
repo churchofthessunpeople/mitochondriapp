@@ -10,6 +10,7 @@ import {
   getAdminCopyEditorsAction,
   getAdminMitoEditorAction,
   getAdminProtocolEditorAction,
+  getContentWriteStatusAction,
   listAdminCategoryEditorsAction,
   listAdminMitoEditorsAction,
   listAdminProtocolEditorsAction,
@@ -33,6 +34,8 @@ import type { ProtocolCategory } from "@/db/schema";
 
 type ContentTab = "activities" | "articles" | "categories" | "labels";
 
+type MitoSectionDraft = { heading: string; body: string };
+
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block space-y-1 text-left">
@@ -43,6 +46,204 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 const inputClass = "field-input w-full rounded-xl px-3 py-2 text-sm";
+
+/** FormData → raw object; multi-value keys (checkboxes) become string[]. */
+function formDataToRaw(fd: FormData): Record<string, unknown> {
+  const raw: Record<string, unknown> = {};
+  for (const key of new Set(fd.keys())) {
+    const all = fd.getAll(key).map(String);
+    raw[key] = all.length > 1 ? all : (all[0] ?? "");
+  }
+  return raw;
+}
+
+function SectionsEditor({
+  initial,
+}: {
+  initial: MitoSectionDraft[];
+}) {
+  const [sections, setSections] = useState<MitoSectionDraft[]>(
+    initial.length > 0 ? initial : [{ heading: "Overview", body: "" }],
+  );
+  const [showJson, setShowJson] = useState(false);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-muted">Sections</span>
+        <button
+          type="button"
+          className="text-xs text-accent"
+          onClick={() =>
+            setSections((prev) => [...prev, { heading: "", body: "" }])
+          }
+        >
+          + Add section
+        </button>
+      </div>
+      {sections.map((section, index) => (
+        <div
+          key={index}
+          className="space-y-2 rounded-2xl border border-border p-3"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted">Section {index + 1}</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="text-xs text-muted disabled:opacity-30"
+                disabled={index === 0}
+                onClick={() =>
+                  setSections((prev) => {
+                    const next = [...prev];
+                    [next[index - 1], next[index]] = [next[index], next[index - 1]];
+                    return next;
+                  })
+                }
+              >
+                Up
+              </button>
+              <button
+                type="button"
+                className="text-xs text-muted disabled:opacity-30"
+                disabled={index >= sections.length - 1}
+                onClick={() =>
+                  setSections((prev) => {
+                    const next = [...prev];
+                    [next[index], next[index + 1]] = [next[index + 1], next[index]];
+                    return next;
+                  })
+                }
+              >
+                Down
+              </button>
+              <button
+                type="button"
+                className="text-xs text-red-400 disabled:opacity-30"
+                disabled={sections.length <= 1}
+                onClick={() =>
+                  setSections((prev) => prev.filter((_, i) => i !== index))
+                }
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+          <input
+            name={showJson ? undefined : `sectionHeading_${index}`}
+            value={section.heading}
+            onChange={(e) =>
+              setSections((prev) =>
+                prev.map((s, i) =>
+                  i === index ? { ...s, heading: e.target.value } : s,
+                ),
+              )
+            }
+            placeholder="Heading"
+            className={inputClass}
+            disabled={showJson}
+          />
+          <textarea
+            name={showJson ? undefined : `sectionBody_${index}`}
+            rows={4}
+            value={section.body}
+            onChange={(e) =>
+              setSections((prev) =>
+                prev.map((s, i) =>
+                  i === index ? { ...s, body: e.target.value } : s,
+                ),
+              )
+            }
+            placeholder="Body"
+            className={inputClass}
+            disabled={showJson}
+          />
+        </div>
+      ))}
+      <button
+        type="button"
+        className="text-xs text-muted underline"
+        onClick={() => setShowJson((v) => !v)}
+      >
+        {showJson ? "Hide advanced JSON" : "Advanced: raw JSON"}
+      </button>
+      {showJson ? (
+        <textarea
+          name="sectionsJson"
+          rows={8}
+          defaultValue={JSON.stringify(sections, null, 2)}
+          className={cn(inputClass, "font-mono text-xs")}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function RelatedProtocolPicker({
+  selected,
+}: {
+  selected: string[];
+}) {
+  const [options, setOptions] = useState<
+    { id: string; name: string }[] | null
+  >(null);
+  const [filter, setFilter] = useState("");
+  const selectedSet = useMemo(() => new Set(selected), [selected]);
+
+  useEffect(() => {
+    void listAdminProtocolEditorsAction(false).then((rows) =>
+      setOptions(rows.map((r) => ({ id: r.id, name: r.name }))),
+    );
+  }, []);
+
+  const visible = useMemo(() => {
+    if (!options) return [];
+    const q = filter.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter(
+      (o) =>
+        o.name.toLowerCase().includes(q) || o.id.toLowerCase().includes(q),
+    );
+  }, [options, filter]);
+
+  return (
+    <div className="space-y-2">
+      <span className="text-xs font-medium text-muted">Related activities</span>
+      <input
+        type="search"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        placeholder="Filter activities…"
+        className={inputClass}
+      />
+      <div className="max-h-48 space-y-1 overflow-y-auto rounded-2xl border border-border p-2">
+        {!options ? (
+          <p className="px-1 py-2 text-xs text-muted">Loading…</p>
+        ) : visible.length === 0 ? (
+          <p className="px-1 py-2 text-xs text-muted">No matches</p>
+        ) : (
+          visible.map((o) => (
+            <label
+              key={o.id}
+              className="flex cursor-pointer items-center gap-2 rounded-xl px-2 py-1.5 text-sm hover:bg-card"
+            >
+              <input
+                type="checkbox"
+                name="relatedProtocolIds"
+                value={o.id}
+                defaultChecked={selectedSet.has(o.id)}
+              />
+              <span className="min-w-0 truncate">
+                {o.name}{" "}
+                <span className="text-xs text-muted">({o.id})</span>
+              </span>
+            </label>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
 
 function matchesAdminSearch(
   query: string,
@@ -167,6 +368,14 @@ export function AdminContentTab({
   const [focusApplied, setFocusApplied] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmRequest | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [writeStatus, setWriteStatus] = useState<{
+    canWrite: boolean;
+    message: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    void getContentWriteStatusAction().then(setWriteStatus);
+  }, []);
 
   function runConfirm() {
     if (!confirm) return;
@@ -223,10 +432,21 @@ export function AdminContentTab({
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted">
-        Edit, add, or delete activities and Mitoversity articles, plus category
-        labels and copy. Deleted built-in entries can be restored from Show
-        deleted. Changes apply immediately for all users.
+        Edit activities, articles, categories, and labels. Saves write to{" "}
+        <code className="text-xs">content/</code> files in the repo (not the
+        database). Commit and deploy for production. Deleted built-ins can be
+        restored from Show deleted.
       </p>
+      {writeStatus && !writeStatus.canWrite ? (
+        <p className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          {writeStatus.message}
+        </p>
+      ) : writeStatus?.canWrite ? (
+        <p className="rounded-2xl border border-accent/30 bg-accent/10 px-3 py-2 text-xs text-muted">
+          File writes enabled — Save updates{" "}
+          <code className="text-[11px]">content/*.json</code> on disk.
+        </p>
+      ) : null}
       <div className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-foreground/[0.03] p-1">
         {(
           [
@@ -501,7 +721,7 @@ function ProtocolForm({
         run(async () => {
           try {
             await saveAdminProtocolAction(editor.id, raw);
-            push("Activity saved");
+            push("Activity saved to content/");
             await onSaved();
           } catch (err) {
             push(err instanceof Error ? err.message : "Save failed", "err");
@@ -682,7 +902,7 @@ function CreateProtocolForm({
         run(async () => {
           try {
             const id = await createAdminProtocolAction(raw);
-            push("Activity created");
+            push("Activity created in content/");
             await onCreated(id);
           } catch (err) {
             push(err instanceof Error ? err.message : "Create failed", "err");
@@ -960,11 +1180,18 @@ function MitoForm({
       className="glass space-y-3 rounded-3xl p-5"
       onSubmit={(e) => {
         e.preventDefault();
-        const raw = Object.fromEntries(new FormData(e.currentTarget).entries());
+        const raw = formDataToRaw(new FormData(e.currentTarget));
+        // Prefer structured section fields over stale advanced JSON.
+        if (
+          Object.keys(raw).some((k) => k.startsWith("sectionHeading_")) &&
+          typeof raw.sectionsJson === "string"
+        ) {
+          delete raw.sectionsJson;
+        }
         run(async () => {
           try {
             await saveAdminMitoAction(editor.entry.id, raw);
-            push("Article saved");
+            push("Article saved to content/mitoversity.json");
             await onSaved();
           } catch (err) {
             push(err instanceof Error ? err.message : "Save failed", "err");
@@ -1053,21 +1280,10 @@ function MitoForm({
           <option value="support">support</option>
         </select>
       </Field>
-      <Field label="Related activity ids (comma-separated)">
-        <input
-          name="relatedProtocolIds"
-          defaultValue={editor.entry.relatedProtocolIds?.join(", ") ?? ""}
-          className={inputClass}
-        />
-      </Field>
-      <Field label="Sections JSON">
-        <textarea
-          name="sectionsJson"
-          rows={10}
-          defaultValue={JSON.stringify(editor.entry.sections, null, 2)}
-          className={cn(inputClass, "font-mono text-xs")}
-        />
-      </Field>
+      <RelatedProtocolPicker
+        selected={editor.entry.relatedProtocolIds ?? []}
+      />
+      <SectionsEditor initial={editor.entry.sections} />
       <button
         type="submit"
         disabled={pending || editor.deleted}
@@ -1092,22 +1308,22 @@ function CreateMitoForm({
   onCreated: (id: string) => Promise<void>;
   onCancel: () => void;
 }) {
-  const defaultSections = JSON.stringify(
-    [{ heading: "Overview", body: "Add article content here." }],
-    null,
-    2,
-  );
-
   return (
     <form
       className="glass space-y-3 rounded-3xl p-5"
       onSubmit={(e) => {
         e.preventDefault();
-        const raw = Object.fromEntries(new FormData(e.currentTarget).entries());
+        const raw = formDataToRaw(new FormData(e.currentTarget));
+        if (
+          Object.keys(raw).some((k) => k.startsWith("sectionHeading_")) &&
+          typeof raw.sectionsJson === "string"
+        ) {
+          delete raw.sectionsJson;
+        }
         run(async () => {
           try {
             const id = await createAdminMitoAction(raw);
-            push("Article created");
+            push("Article created in content/mitoversity.json");
             await onCreated(id);
           } catch (err) {
             push(err instanceof Error ? err.message : "Create failed", "err");
@@ -1144,14 +1360,10 @@ function CreateMitoForm({
           <option value="support">support</option>
         </select>
       </Field>
-      <Field label="Sections JSON">
-        <textarea
-          name="sectionsJson"
-          rows={8}
-          defaultValue={defaultSections}
-          className={cn(inputClass, "font-mono text-xs")}
-        />
-      </Field>
+      <RelatedProtocolPicker selected={[]} />
+      <SectionsEditor
+        initial={[{ heading: "Overview", body: "Add article content here." }]}
+      />
       <button
         type="submit"
         disabled={pending}

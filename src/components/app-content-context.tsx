@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { AppContentBundle } from "@/lib/content-overrides";
+import type { AppContentBundle } from "@/lib/app-content-types";
 
 const AppContentContext = createContext<AppContentBundle | null>(null);
 

@@ -6,7 +6,7 @@ import { getLeaderboardsAction } from "@/lib/actions/leaderboards";
 import {
   leaderboardCacheDay,
   type LeaderboardBoards,
-} from "@/lib/leaderboards";
+} from "@/lib/leaderboards-shared";
 import { cn } from "@/lib/utils";
 
 export type { LeaderboardBoards };

@@ -1,14 +1,18 @@
 "use server";
 
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "@/auth";
-import { db } from "@/db";
-import { contentOverrides, protocols, type ProtocolCategory } from "@/db/schema";
+import type { ProtocolCategory } from "@/db/schema";
 import { PROTOCOL_SEEDS, type ProtocolSeed } from "@/db/seed-data";
 import { CATEGORY_ORDER } from "@/lib/categories";
 import { requireAdmin } from "@/lib/admin";
-import { ensureProtocolInDb } from "@/lib/catalog";
+import { ensureProtocolInDb } from "@/lib/catalog-server";
+import {
+  canWriteContentFiles,
+  contentWriteBlockedMessage,
+  deleteContentFileKey,
+  upsertContentFileKey,
+} from "@/lib/content-files";
 import {
   contentKey,
   getCustomProtocolSeed,
@@ -134,26 +138,33 @@ async function adminUserId() {
   return session?.user?.id ?? null;
 }
 
+/** @deprecated name kept for call sites — persists to content/ files, not Neon. */
 export async function upsertContentOverrideAction(
   key: string,
   value: unknown,
 ): Promise<void> {
   await requireAdmin();
-  const userId = await adminUserId();
-  await db
-    .insert(contentOverrides)
-    .values({ key, value, updatedBy: userId })
-    .onConflictDoUpdate({
-      target: contentOverrides.key,
-      set: { value, updatedAt: new Date(), updatedBy: userId },
-    });
+  void (await adminUserId());
+  upsertContentFileKey(key, value);
   revalidateApp();
 }
 
 export async function deleteContentOverrideAction(key: string): Promise<void> {
   await requireAdmin();
-  await db.delete(contentOverrides).where(eq(contentOverrides.key, key));
+  deleteContentFileKey(key);
   revalidateApp();
+}
+
+export async function getContentWriteStatusAction(): Promise<{
+  canWrite: boolean;
+  message: string | null;
+}> {
+  await requireAdmin();
+  const canWrite = canWriteContentFiles();
+  return {
+    canWrite,
+    message: canWrite ? null : contentWriteBlockedMessage(),
+  };
 }
 
 export type AdminProtocolEditorData = {
@@ -366,15 +377,6 @@ export async function deleteAdminProtocolAction(
     });
     await deleteContentOverrideAction(contentKey.protocolMeta(protocolId));
   }
-
-  try {
-    await db
-      .update(protocols)
-      .set({ active: false })
-      .where(eq(protocols.id, protocolId));
-  } catch {
-    // FK row may not exist yet for brand-new custom entries.
-  }
 }
 
 export async function restoreAdminProtocolAction(
@@ -504,9 +506,65 @@ const mitoOverrideSchema = z.object({
   title: z.string().min(4).max(200).optional(),
   summary: z.string().min(4).max(500).optional(),
   pillar: z.enum(["light", "water", "magnetism", "support"]).optional(),
-  relatedProtocolIds: z.string().optional(),
-  sectionsJson: z.string().optional(),
 });
+
+function parseRelatedProtocolIds(raw: Record<string, unknown>): string[] | undefined {
+  const value = raw.relatedProtocolIds;
+  if (value === undefined) return undefined;
+  if (Array.isArray(value)) {
+    return value.map(String).map((s) => s.trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function parseMitoSections(
+  raw: Record<string, unknown>,
+): MitoEntry["sections"] | undefined {
+  const indices = new Set<number>();
+  for (const key of Object.keys(raw)) {
+    const match = /^sectionHeading_(\d+)$/.exec(key);
+    if (match) indices.add(Number(match[1]));
+  }
+  if (indices.size > 0) {
+    const sections = [...indices]
+      .sort((a, b) => a - b)
+      .map((i) => ({
+        heading: String(raw[`sectionHeading_${i}`] ?? "").trim(),
+        body: String(raw[`sectionBody_${i}`] ?? "").trim(),
+      }))
+      .filter((s) => s.heading.length > 0 && s.body.length > 0);
+    if (sections.length === 0) {
+      throw new Error("Add at least one section with a heading and body");
+    }
+    return sections;
+  }
+
+  const json = String(raw.sectionsJson ?? "").trim();
+  if (!json) return undefined;
+  try {
+    const sections = JSON.parse(json) as MitoEntry["sections"];
+    if (!Array.isArray(sections)) throw new Error("sections must be an array");
+    for (const s of sections) {
+      if (
+        !s ||
+        typeof s !== "object" ||
+        typeof s.heading !== "string" ||
+        typeof s.body !== "string"
+      ) {
+        throw new Error("bad section");
+      }
+    }
+    return sections;
+  } catch {
+    throw new Error("Invalid sections JSON — use [{ heading, body }, …]");
+  }
+}
 
 export async function saveAdminMitoAction(
   entryId: string,
@@ -521,28 +579,18 @@ export async function saveAdminMitoAction(
   const parsed = mitoOverrideSchema.safeParse(raw);
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message);
 
+  const sections = parseMitoSections(raw);
+  const relatedProtocolIds = parseRelatedProtocolIds(raw);
+
   if (isCustom) {
-    let sections = [{ heading: "Overview", body: "Add article content here." }];
-    if (parsed.data.sectionsJson?.trim()) {
-      try {
-        sections = JSON.parse(parsed.data.sectionsJson) as MitoEntry["sections"];
-        if (!Array.isArray(sections)) throw new Error("sections must be an array");
-      } catch {
-        throw new Error("Invalid sections JSON — use [{ heading, body }, …]");
-      }
-    }
     const entry: MitoEntry = {
       id: entryId,
       title: parsed.data.title ?? "New article",
       summary: parsed.data.summary ?? "Summary",
       pillar: parsed.data.pillar ?? "support",
-      sections,
-      relatedProtocolIds: parsed.data.relatedProtocolIds
-        ? parsed.data.relatedProtocolIds
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [],
+      sections:
+        sections ?? [{ heading: "Overview", body: "Add article content here." }],
+      relatedProtocolIds: relatedProtocolIds ?? [],
     };
     await upsertContentOverrideAction(contentKey.mito(entryId), {
       ...entry,
@@ -554,21 +602,10 @@ export async function saveAdminMitoAction(
   if (parsed.data.title) patch.title = parsed.data.title;
   if (parsed.data.summary) patch.summary = parsed.data.summary;
   if (parsed.data.pillar) patch.pillar = parsed.data.pillar;
-  if (parsed.data.relatedProtocolIds !== undefined) {
-    patch.relatedProtocolIds = parsed.data.relatedProtocolIds
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
+  if (relatedProtocolIds !== undefined) {
+    patch.relatedProtocolIds = relatedProtocolIds;
   }
-  if (parsed.data.sectionsJson?.trim()) {
-    try {
-      const sections = JSON.parse(parsed.data.sectionsJson) as MitoEntry["sections"];
-      if (!Array.isArray(sections)) throw new Error("sections must be an array");
-      patch.sections = sections;
-    } catch {
-      throw new Error("Invalid sections JSON — use [{ heading, body }, …]");
-    }
-  }
+  if (sections) patch.sections = sections;
 
   if (Object.keys(patch).length === 0) {
     throw new Error("No changes to save");
@@ -596,15 +633,11 @@ export async function createAdminMitoAction(
   const parsed = mitoOverrideSchema.safeParse(raw);
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message);
 
-  let sections = [{ heading: "Overview", body: "Add article content here." }];
-  if (parsed.data.sectionsJson?.trim()) {
-    try {
-      sections = JSON.parse(parsed.data.sectionsJson) as MitoEntry["sections"];
-      if (!Array.isArray(sections)) throw new Error("sections must be an array");
-    } catch {
-      throw new Error("Invalid sections JSON — use [{ heading, body }, …]");
-    }
-  }
+  const sections =
+    parseMitoSections(raw) ?? [
+      { heading: "Overview", body: "Add article content here." },
+    ];
+  const relatedProtocolIds = parseRelatedProtocolIds(raw) ?? [];
 
   const entry: MitoEntry = {
     id,
@@ -612,12 +645,7 @@ export async function createAdminMitoAction(
     summary: parsed.data.summary ?? "Summary",
     pillar: parsed.data.pillar ?? "support",
     sections,
-    relatedProtocolIds: parsed.data.relatedProtocolIds
-      ? parsed.data.relatedProtocolIds
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [],
+    relatedProtocolIds,
   };
 
   const registry = getRegistryIds(overrides, REGISTRY_CUSTOM_MITO);
@@ -752,6 +780,6 @@ export async function resetAdminCopyAction(key: string): Promise<void> {
 
 export async function listContentOverrideKeysAction(): Promise<string[]> {
   await requireAdmin();
-  const rows = await db.select({ key: contentOverrides.key }).from(contentOverrides);
-  return rows.map((r) => r.key).sort();
+  const overrides = await loadContentOverrides();
+  return [...overrides.keys()].sort();
 }

@@ -1,5 +1,5 @@
 import { after } from "next/server";
-import { ensureCatalogSyncedToDb } from "@/lib/catalog";
+import { ensureCatalogSyncedToDb } from "@/lib/catalog-server";
 
 /**
  * Schedule catalog FK sync after the response is sent — never block login/home.

@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, userFavorites, users } from "@/db/schema";
 import { getCatalogProtocolById } from "@/lib/catalog";
+import { ensureProtocolInDb } from "@/lib/catalog-server";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { resolveEditableCompletedOn } from "@/lib/editable-day";
 import { getUserFavoriteIds } from "@/lib/favorites";
@@ -28,7 +29,6 @@ import {
   type WorkSpaceConfig,
 } from "@/lib/space-hygiene";
 import { getSunriseBuffToday } from "@/lib/sunrise-buff";
-import { ensureProtocolInDb } from "@/lib/catalog";
 
 async function requireUserId() {
   const session = await auth();

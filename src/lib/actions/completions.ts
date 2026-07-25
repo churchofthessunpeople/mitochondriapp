@@ -5,7 +5,7 @@ import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
-import { getMergedCatalogProtocolById } from "@/lib/catalog";
+import { getMergedCatalogProtocolById } from "@/lib/catalog-server";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import {
@@ -18,7 +18,7 @@ import {
   recordPermanentSkip,
 } from "@/lib/permanent-completions";
 import { getSunriseBuffToday } from "@/lib/sunrise-buff";
-import { isPermanentProtocolMerged } from "@/lib/permanent-activities";
+import { isPermanentProtocolMerged } from "@/lib/permanent-activities-server";
 import {
   encodeColdThermoVariant,
   isColdThermoProtocolId,
@@ -76,6 +76,13 @@ import {
   parseGroundingMode,
   type GroundingMode,
 } from "@/lib/grounding";
+import {
+  encodeVagusVariant,
+  isVagusNerveProtocolId,
+  parseVagusMode,
+  vagusModePoints,
+  type VagusMode,
+} from "@/lib/vagus-nerve";
 import {
   effectiveSunriseBoostMultiplier,
   encodeSunriseEndOffset,
@@ -305,6 +312,8 @@ export async function logCompletionAction(
     exercise?: ExerciseLogInput;
     /** Grounding mode (barefoot or sphinx). */
     groundingMode?: GroundingMode;
+    /** Vagus nerve stimulation mode. */
+    vagusMode?: VagusMode;
     /** Movement / exercise environment (sunlight, outside, indoors). */
     movementSetting?: MovementSetting;
     /**
@@ -444,6 +453,10 @@ export async function logCompletionAction(
     const mode = parseGroundingMode(options?.groundingMode ?? "barefoot");
     variantValue = encodeGroundingVariant(mode);
     basePoints = groundingModePoints(mode);
+  } else if (isVagusNerveProtocolId(protocolId)) {
+    const mode = parseVagusMode(options?.vagusMode ?? "cold_face_immersion");
+    variantValue = encodeVagusVariant(mode);
+    basePoints = vagusModePoints(mode);
   } else if (isMovementSettingProtocolId(protocolId)) {
     const setting = parseMovementSetting(
       options?.movementSetting ?? "outside",

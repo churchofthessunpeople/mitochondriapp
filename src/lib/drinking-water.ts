@@ -5,11 +5,10 @@
 
 export const DRINKING_WATER_PROTOCOL_ID = "drinking-water";
 
-/** Retired into drinking water. */
+/** Retired into drinking water. (Baking soda water → vagus-nerve-stimulation.) */
 export const DRINKING_WATER_LEGACY_IDS = [
   "mineralized-water",
   "carbonated-water",
-  "baking-soda-water",
 ] as const;
 
 export type WaterSource =
@@ -20,9 +19,10 @@ export type WaterSource =
 export type WaterCarbonation = "still" | "carbonated";
 
 /** How the glass was remineralized (if at all). */
+/** Includes baking_soda for historical logs; UI only offers none | salt. */
 export type WaterMineral = "none" | "salt" | "baking_soda";
 
-/** Salt / baking-soda dose per glass. */
+/** Salt dose per glass (baking soda amounts kept for historical decode). */
 export type WaterMineralAmount =
   | "pinch"
   | "eighth_tsp"
@@ -65,27 +65,30 @@ export const WATER_SOURCE_OPTIONS: {
   },
 ];
 
+/** Options shown in the Drinking water dialog (baking soda → Vagus). */
 export const WATER_MINERAL_OPTIONS: {
-  id: WaterMineral;
+  id: Exclude<WaterMineral, "baking_soda">;
   label: string;
   detail: string;
 }[] = [
   {
     id: "none",
     label: "Not remineralized",
-    detail: "Plain — no salt or baking soda added",
+    detail: "Plain — no salt added",
   },
   {
     id: "salt",
     label: "Salt",
     detail: "Sea salt or electrolyte salt — pick amount next",
   },
-  {
-    id: "baking_soda",
-    label: "Baking soda",
-    detail: "Sodium bicarbonate — pick amount next",
-  },
 ];
+
+/** Labels for decode / history (includes retired baking soda). */
+export const WATER_MINERAL_LABELS: Record<WaterMineral, string> = {
+  none: "Not remineralized",
+  salt: "Salt",
+  baking_soda: "Baking soda",
+};
 
 export const WATER_MINERAL_AMOUNT_OPTIONS: {
   id: WaterMineralAmount;
@@ -97,7 +100,7 @@ export const WATER_MINERAL_AMOUNT_OPTIONS: {
   {
     id: "quarter_tsp",
     label: "¼ tsp",
-    detail: "Common baking-soda protocol dose",
+    detail: "Common mineral dose",
   },
   { id: "half_tsp", label: "½ tsp", detail: "Stronger mineral dose" },
 ];
@@ -225,7 +228,7 @@ export function waterSourceLabel(source: WaterSource): string {
 }
 
 export function waterMineralLabel(mineral: WaterMineral): string {
-  return WATER_MINERAL_OPTIONS.find((o) => o.id === mineral)?.label ?? mineral;
+  return WATER_MINERAL_LABELS[mineral] ?? mineral;
 }
 
 export function waterMineralAmountLabel(amount: WaterMineralAmount): string {
@@ -261,8 +264,8 @@ export function normalizeDrinkingWaterInput(
 }
 
 /**
- * Flat catalog base for every serving (legacy mineralized / carbonated /
- * baking-soda were all 4 pts). Scoring differentiation can come later.
+ * Flat catalog base for every serving (legacy mineralized / carbonated
+ * were 4 pts). Scoring differentiation can come later.
  */
 export function drinkingWaterBasePoints(
   _input: DrinkingWaterLogInput,

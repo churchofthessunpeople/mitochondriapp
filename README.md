@@ -63,6 +63,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run db:setup` | Apply SQL migrations |
 | `npm run db:seed` | Seed catalog |
 | `npm run admin:promote -- <username>` | Grant `is_admin` (needs `DATABASE_URL`) |
+| `npm run db:cleanup-guests` | Delete guest accounts older than 24h (converted accounts kept) |
+
+Guest rows (`is_guest`) older than a day are purged automatically: on each new guest start, via daily Vercel cron (`/api/cron/cleanup-guests`), or the script above. Set `CRON_SECRET` in Vercel so the cron route can authorize.
 
 ### Admin access
 
@@ -80,19 +83,26 @@ A “key file on this PC” does not work well for a hosted web app: the server 
 
 `GET /api/health` — DB ping for deploys/canaries.
 
-## Customizing activities (local catalog)
+## Customizing activities & articles
 
-**Source of truth:** `src/db/seed-data.ts` (same idea as Mitoversity lessons).
+**Catalog is not authored in Neon.**
 
-1. Edit / add protocols in that file  
-2. Restart the dev server (`npm run dev`)  
-3. Open Catalog and enable the activity on your list  
+| Layer | Where |
+|-------|--------|
+| Baseline | `src/db/seed-data.ts`, `src/lib/protocol-meta.ts`, `src/lib/mitoversity*.ts` |
+| Day-to-day edits | Admin → Content (local `npm run dev`) → writes `content/*.json` |
+| Neon | User logs, favorites, schedule + thin `protocols` FK rows only |
 
-Neon still stores **who logged what** (and favorites). Protocol definitions are
-synced into the DB automatically so foreign keys work — you usually don’t need
-`npm run db:seed` just to change the activity list.
+1. Run `npm run dev` as an admin  
+2. Open Admin → Content — edit activities (points, how-to) or articles (section list)  
+3. Save updates `content/` on disk — commit those files and deploy  
 
-Optional UX metadata (equipment / how-to): `src/lib/protocol-meta.ts`.
+Production Admin Save is blocked (filesystem is read-only). One-time migrate from old Neon overrides:
+
+```bash
+npm run content:export-from-db -- --write
+# optional: npm run content:export-from-db -- --write --clear-db
+```
 
 ### Volcanic anchors (magnetism score)
 
@@ -111,8 +121,8 @@ npm run volcanoes:build
 ## Deploy
 
 1. Push to GitHub → import on Vercel  
-2. Set `DATABASE_URL`, `AUTH_SECRET`. Optionally set `AUTH_URL` to the **production** URL (not localhost). Auth uses `trustHost` so the request host is preferred.  
-3. Run `npm run db:setup` and `npm run db:seed` against prod DB  
+2. Set `DATABASE_URL`, `AUTH_SECRET`, and `CRON_SECRET` (for daily guest cleanup). Optionally set `AUTH_URL` to the **production** URL (not localhost). Auth uses `trustHost` so the request host is preferred.
+3. Run `npm run db:setup` and `npm run db:seed` against prod DB
 
 ## License
 

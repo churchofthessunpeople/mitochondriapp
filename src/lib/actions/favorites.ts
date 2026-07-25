@@ -5,13 +5,11 @@ import { after } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { userFavorites, userScheduleItems, users } from "@/db/schema";
-import {
-  ensureProtocolInDb,
-  getCatalogProtocolById,
-} from "@/lib/catalog";
+import { getCatalogProtocolById } from "@/lib/catalog";
+import { ensureProtocolInDb } from "@/lib/catalog-server";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import { getUserDayStats } from "@/lib/data";
-import { isPermanentProtocolMerged } from "@/lib/permanent-activities";
+import { isPermanentProtocolMerged } from "@/lib/permanent-activities-server";
 import { isCatalogSelectableProtocolId } from "@/lib/scoring";
 import { ensurePermanentCompletions } from "@/lib/permanent-completions";
 import { getUserStreak } from "@/lib/streaks";

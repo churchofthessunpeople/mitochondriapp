@@ -50,6 +50,12 @@ import {
   isGroundingProtocolId,
   parseGroundingMode,
 } from "@/lib/grounding";
+import {
+  formatVagusLabel,
+  isVagusNerveProtocolId,
+  parseVagusMode,
+  vagusModePoints,
+} from "@/lib/vagus-nerve";
 
 /** Effective base points when a protocol log carries a variant (gauss, °F, etc.). */
 export function variantBasePoints(
@@ -79,6 +85,9 @@ export function variantBasePoints(
   }
   if (isGroundingProtocolId(protocolId)) {
     return groundingModePoints(parseGroundingMode(variantValue));
+  }
+  if (isVagusNerveProtocolId(protocolId)) {
+    return vagusModePoints(parseVagusMode(variantValue));
   }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return pointsForSleepRoomTemp(parseSleepRoomTempF(variantValue));
@@ -124,6 +133,9 @@ export function formatVariantLabel(
   if (isGroundingProtocolId(protocolId)) {
     return formatGroundingLabel(variantValue);
   }
+  if (isVagusNerveProtocolId(protocolId)) {
+    return formatVagusLabel(variantValue);
+  }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return formatSleepRoomTemp(parseSleepRoomTempF(variantValue));
   }
@@ -148,7 +160,8 @@ export function isPerLogVariantProtocolId(protocolId: string): boolean {
     isColdThermoProtocolId(protocolId) ||
     isDrinkingWaterProtocolId(protocolId) ||
     isExerciseProtocolId(protocolId) ||
-    isGroundingProtocolId(protocolId)
+    isGroundingProtocolId(protocolId) ||
+    isVagusNerveProtocolId(protocolId)
   );
 }
 

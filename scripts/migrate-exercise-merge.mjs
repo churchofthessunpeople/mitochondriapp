@@ -12,49 +12,6 @@ const sql = neon(url);
 
 const legacyIds = ["morning-movement", "rebounding"];
 
-for (const id of legacyIds) {
-  await sql`
-    insert into content_overrides (key, value, updated_at)
-    values (
-      ${`protocol:${id}`},
-      ${JSON.stringify({ active: false, deleted: true })}::jsonb,
-      now()
-    )
-    on conflict (key) do update set
-      value = excluded.value,
-      updated_at = now()
-  `;
-}
-
-await sql`
-  insert into content_overrides (key, value, updated_at)
-  values (
-    'protocol:exercise',
-    ${JSON.stringify({
-      name: "Exercise",
-      active: true,
-      points: 3,
-      category: "movement",
-      maxPerDay: 9999,
-      permanent: false,
-      sortOrder: 13,
-      timeOfDay: "anytime",
-      allowsMultiple: true,
-      durationEnabled: true,
-      lockedTimeOfDay: null,
-      referenceMinutes: 15,
-      maxDurationMinutes: 120,
-      description:
-        "Rebounding, resistance bands, or walking — indoors or outdoors, with duration.",
-    })}::jsonb,
-    now()
-  )
-  on conflict (key) do update set
-    value = excluded.value,
-    updated_at = now()
-`;
-
-// protocols table has no `permanent` column — that flag lives in seed/overrides only.
 await sql`
   insert into protocols (
     id, name, description, points, category, time_of_day, allows_multiple,
@@ -109,7 +66,7 @@ await sql`
   where protocol_id in ('morning-movement', 'rebounding')
 `;
 
-console.log("exercise merge overrides applied", {
+console.log("exercise merge (favorites remap + FK only)", {
   legacyDeleted: legacyIds,
   remappedUsers: usersWithLegacy.length,
 });

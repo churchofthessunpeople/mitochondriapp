@@ -18,6 +18,7 @@ export const PROTOCOL_ARTICLE_IDS: Record<string, string> = {
   "drinking-water": "drinking-water",
   "hydration-timing": "hydration-timing",
   "castor-oil-navel": "castor-oil-navel",
+  "vagus-nerve-stimulation": "vagus-nerve-stimulation",
   "deuterium-aware-meal": "deuterium-atp-synthase",
   "seafood-meal": "seafood-meal",
   "early-dinner": "early-dinner",

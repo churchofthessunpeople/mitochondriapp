@@ -113,10 +113,10 @@ describe("formatColdThermoLabel", () => {
 });
 
 describe("remapColdThermoFavoriteId", () => {
-  it("rolls face plunge into cold thermogenesis", () => {
+  it("does not claim face plunge (now vagus)", () => {
     assert.equal(
       remapColdThermoFavoriteId("cold-face-plunge"),
-      "cold-thermogenesis",
+      "cold-face-plunge",
     );
   });
 });

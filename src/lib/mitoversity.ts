@@ -287,6 +287,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     summary:
       "¼ tsp bicarbonate in water twice daily (≥2 h from meals): alkaline buffer vs carbonated CO₂, carbonic anhydrase, MCG anti-inflammatory study, and Kruse proton/mitochondria framing.",
     relatedProtocolIds: [
+      "vagus-nerve-stimulation",
       "drinking-water",
       "hydration-timing",
       "deuterium-aware-meal",
@@ -379,7 +380,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       "tuning-forks",
       "blue-light-hygiene",
       "phone-away-sleep",
-      "cold-face-plunge",
+      "vagus-nerve-stimulation",
     ],
     sections: TUNING_FORKS_SIMPLE_SECTIONS,
     readingLevels: TUNING_FORKS_READING_LEVELS,
@@ -510,7 +511,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     pillar: "support",
     summary:
       "How deliberate cold plunging drives thermogenesis, why some protocols target ~50 °F skin surface for at least ten minutes, what physiology supports, and how to progress safely.",
-    relatedProtocolIds: ["cold-thermogenesis", "cold-face-plunge"],
+    relatedProtocolIds: ["cold-thermogenesis", "vagus-nerve-stimulation"],
     sections: [
       {
         heading: "What cold thermogenesis means",
@@ -530,7 +531,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
       },
       {
         heading: "Working toward ten minutes at ~50 °F skin",
-        body: "Progress in stages: (1) Weeks 1–2: 30–90 second cold shower finishes or face immersion; log Cold thermogenesis → Face immersion (3 rounds) if that is your entry. (2) Weeks 3–6: plunge 2–5 minutes in ~60–65 °F water; exit before panic breathing dominates the whole session. (3) Intermediate: lower water toward 55 °F and extend toward 5–8 minutes with calm nasal breathing and relaxed shoulders. (4) Target phase: water cold enough (often high 40s–low 50s °F depending on body fat, movement, and tub heat loss) that measured or estimated skin at trunk/limbs hovers near 50 °F while you remain composed for 10+ minutes. Use a simple infrared skin thermometer on dry skin immediately before re-warming if you want objective feedback. Shivering late in the session is common; violent early shivering means you entered too fast or too cold.",
+        body: "Progress in stages: (1) Weeks 1–2: 30–90 second cold shower finishes or face immersion; log Vagus nerve stimulation → Cold face immersion (3 rounds) if that is your entry. (2) Weeks 3–6: plunge 2–5 minutes in ~60–65 °F water; exit before panic breathing dominates the whole session. (3) Intermediate: lower water toward 55 °F and extend toward 5–8 minutes with calm nasal breathing and relaxed shoulders. (4) Target phase: water cold enough (often high 40s–low 50s °F depending on body fat, movement, and tub heat loss) that measured or estimated skin at trunk/limbs hovers near 50 °F while you remain composed for 10+ minutes. Use a simple infrared skin thermometer on dry skin immediately before re-warming if you want objective feedback. Shivering late in the session is common; violent early shivering means you entered too fast or too cold.",
       },
       {
         heading: "Safety and stop rules",
@@ -809,7 +810,7 @@ export const RAW_MITOVERSITY_ENTRIES: readonly MitoEntry[] = [
     summary:
       "Why quality castor oil at the navel is discussed in water and gut-support teaching—ricinoleic acid, vagus and deuterium frames, castor vs DMSO safety, and how to log the habit.",
     relatedProtocolIds: [
-      "castor-oil-navel",
+      "vagus-nerve-stimulation",
       "deuterium-aware-meal",
       "hydration-timing",
       "early-dinner",

@@ -181,35 +181,42 @@ export function OnboardingWizard({
             Optimize mitochondria daily
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Track the habits that support mitochondrial function —{" "}
-            <strong className="text-foreground">light</strong>,{" "}
-            <strong className="text-foreground">water</strong>, and{" "}
-            <strong className="text-foreground">magnetism</strong> — using
-            protocols you can actually do. Setup takes about a minute.
+            Learn about a track the habits that support optimal mitochondrial function, as taught by Dr. Jack Kruse and his three legged stool of {" "}
+            <strong className="text-foreground">Light</strong>,{" "}
+            <strong className="text-foreground">Water</strong>, and{" "}
+            <strong className="text-foreground">Magnetism</strong>.
           </p>
           <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left text-sm text-muted">
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               <span>
-                <strong className="text-foreground">Light</strong> — sunrise
-                keystone & outdoor spectrum from your ZIP
+                <strong className="text-foreground">Light</strong> - Sunrise and various outdoor spectrums according to your latitude
               </span>
             </li>
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               <span>
-                <strong className="text-foreground">Water</strong> — low-D
-                hydration & deuterium-aware meals
+                <strong className="text-foreground">Water</strong> - Lower Deuterium content
               </span>
             </li>
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               <span>
-                <strong className="text-foreground">Magnetism</strong> — ground,
-                geology place score, cut nnEMF
+                <strong className="text-foreground">Magnetism</strong> - Grounding, EMF hygiene, lower RF exposure
               </span>
             </li>
           </ul>
+          <p className="mx-auto mt-4 max-w-sm text-center text-sm">
+            <a
+              href="https://jackkruse.com/getting-started/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-accent underline-offset-2 transition hover:underline"
+            >
+              Click Here to visit Dr. Jack Kruse's website
+              for more information about his three legged stool of health.
+            </a>
+          </p>
           <button
             type="button"
             onClick={() => setStep("location")}
@@ -305,8 +312,7 @@ export function OnboardingWizard({
             What can you do?
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Toggle only what you can realistically do this week. Example: skip
-            gear you don&apos;t have. You can add more later on Activities.
+            Add activities you can realistically do daily.
           </p>
           {locationPending ? (
             <p className="mt-2 text-xs text-muted">Saving your ZIP in the background…</p>

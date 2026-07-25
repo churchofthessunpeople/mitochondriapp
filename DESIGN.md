@@ -4,7 +4,7 @@
 Use this to mark up changes: edit sections, strike through old rules, add **Decision** notes.  
 When code and this doc disagree, treat this doc as the *intent* you want — then implement.
 
-**Last updated:** 2026-07-14 (morning-light session scoring, variants, permanent logs, sitewide disclaimer)
+**Last updated:** 2026-07-25 (file-backed Admin content; catalog off Neon)
 
 ---
 
@@ -105,7 +105,7 @@ Secondary content **stays inside `/app`** with a **← Back** control:
 | **Browse regions** | Place → “Browse rated regions” | Optional region override + list |
 | **Guide Light / Water / Magnetism** | L · W · M strip | Pillar teaching cards |
 | **Day detail** | History day row | Logs for that calendar day (grouped sections) |
-| **Admin** | Profile / header / bottom nav / `?t=admin` | Users + protocols admin (if allowed) |
+| **Admin** | Profile / header / bottom nav / `?t=admin` | Users + Content (file-backed) admin (if allowed) |
 
 **Rule:** Aside from Today/Account/Mitoversity and auth/onboarding, user-facing links should open sheets, not multi-page chrome.
 
@@ -188,8 +188,15 @@ A catalog item you can log:
 | `permanent` | If true, auto-logs daily while on available list (see §6.5) |
 | `active` | Soft-delete / hide from catalog |
 
-**Source of truth for definitions:** `src/db/seed-data.ts` → synced to Neon via `src/lib/catalog.ts` on app load (dev: restart picks up seed changes; `npm run db:seed` still available).  
-**Extra UX copy (how / equipment):** `src/lib/protocol-meta.ts` (opens in Protocol how-to dialog from catalog).
+**Source of truth for definitions (layered):**
+
+1. **Baseline (repo TypeScript):** `src/db/seed-data.ts`, `src/lib/protocol-meta.ts`, `src/lib/mitoversity*.ts`
+2. **Admin overlays (repo JSON):** `content/*.json` — written by Admin Content forms in local development
+3. **Neon `protocols` table:** thin **FK mirror only** (favorites / completions / schedule). Never the editorial source of truth.
+
+**Do not author catalog copy in Neon.** Merge scripts may remap favorites and upsert FK rows; they must **not** write activity/article definition patches into `content_overrides`.
+
+**Extra UX copy (how / equipment):** baseline in `src/lib/protocol-meta.ts`; Admin edits land in `content/protocol-meta.json`.
 
 **Morning-light keystones** (`sunrise-horizon`, `sunrise-open-sky`, `sunrise-outside`) are **not catalog-selectable** — logged only via daily check-in and the fixed **Morning light** checklist row.
 
@@ -456,12 +463,12 @@ UI offers sun-relative presets when sun times known.
 | Tab / zone | Capabilities |
 |------------|----------------|
 | **Users** | Search, view/edit profile fields, reset password, delete user |
-| **Protocols** | List catalog, upsert / soft-disable protocols |
+| **Content** | Activities, articles, categories, labels — **file-backed forms** writing `content/*.json` (structured section editors; not Neon) |
 | **Danger zone** | Reset **all** user activity (all `daily_completions` + `user_permanent_skips`) — in-app confirm dialog |
 
 Admin entry: Profile link, desktop header, mobile bottom nav (admins only), `/app?t=admin`.
 
-Not a full CMS; seeds remain source of truth for protocol definitions.
+**Content save policy:** Writes are allowed in local development (`NODE_ENV=development`) or when `CONTENT_FILE_WRITE=1`. Production Save is blocked with a clear message — edit locally, commit `content/`, deploy. Do not reintroduce Neon `content_overrides` as the catalog CMS.
 
 ---
 
@@ -510,7 +517,7 @@ src/middleware.ts  # Auth + legacy redirects
 | Table | Role |
 |-------|------|
 | `users` | Identity, location, travel, admin, onboarding, leaderboard flag, **`magneticoGauss`**, **`sleepRoomTempF`** |
-| `protocols` | Global catalog (synced from seeds) |
+| `protocols` | Thin FK mirror of catalog ids (not editorial SoT; seeds + `content/`) |
 | `user_favorites` | Available list |
 | `user_schedule_items` | Optional time-of-day schedule (legacy / advanced) |
 | `daily_completions` | Logs (`pointsEarned`, `durationMinutes`, **`variantValue`**, **`sunriseBuffMultiplier`**, streak bonus flag, day) |
@@ -600,6 +607,7 @@ Use this section as a working scratchpad. Check when decided; note the rule in t
 | P9 | Public vs friends-only default boards | Open | Public opt-out today |
 | P10 | Sunrise in catalog? | Decided no | Daily check-in + Morning light row only |
 | P11 | Sky duration for full boost? | Implemented | 30 / 45 / 60 min (clear / cloudy / overcast) |
+| P12 | Catalog / articles in Neon? | **Decided no** | File-backed `content/` + TS seeds; Admin forms write files locally; Neon = user data + FK only |
 
 ---
 
@@ -607,11 +615,15 @@ Use this section as a working scratchpad. Check when decided; note the rule in t
 
 | Want to change… | Edit… | Then… |
 |-----------------|-------|--------|
-| Protocol list / points | `src/db/seed-data.ts` | Restart dev or `npm run db:seed` |
-| Protocol how-to / equipment | `src/lib/protocol-meta.ts` | Refresh app |
+| Activity name / points / how-to (day-to-day) | Admin → Content (local) → saves `content/protocols.json` + `content/protocol-meta.json` | Commit `content/`, deploy |
+| Article sections | Admin → Content → Articles (section list UI) → `content/mitoversity.json` | Commit + deploy |
+| Baseline protocol list (git default) | `src/db/seed-data.ts` | Restart dev; optional fold Admin overlays back into seeds later |
+| Baseline how-to / equipment | `src/lib/protocol-meta.ts` | Refresh app |
+| Baseline Mitoversity lessons | `src/lib/mitoversity*.ts` | Refresh app |
+| Export old Neon overrides → files | `npm run content:export-from-db -- --write` | Optionally `--clear-db`; commit `content/` |
 | Morning boost tiers / modifiers | `src/lib/scoring.ts` + seeds + `sunrise-keystone-dialog.tsx` | Tests |
 | Sunrise timing / sky rules | `src/lib/sunrise-timing.ts`, `src/lib/sunrise-sky.ts`, `sunrise-keystone-points.ts` | `npx tsx --test src/lib/sunrise-*.test.ts` |
-| Magnetico / cold / sleep variants | `src/lib/magnetico.ts`, `cold-thermo-skin-temp.ts`, `sleep-room-temp.ts`, `protocol-variants.ts` | `npm test` |
+| Magnetico / cold / sleep / vagus variants | matching `src/lib/*` modules + `protocol-variants.ts` | `npm test` |
 | Permanent auto-logs | `src/db/seed-data.ts` (`permanent`), `permanent-completions.ts` | — |
 | Starter onboarding set | `src/lib/onboarding.ts` | — |
 | Region list / scores | `src/db/region-seeds.ts` + `region-scoring.ts` | `npm run db:seed` |
@@ -621,7 +633,9 @@ Use this section as a working scratchpad. Check when decided; note the rule in t
 | LWM pillars / keystones | `src/lib/lwm.ts` | — |
 | Sitewide disclaimer | `src/components/site-disclaimer.tsx` | — |
 | Auth rate limits | `src/lib/rate-limit.ts` | — |
-| Admin capabilities | `src/lib/actions/admin.ts`, `admin-panel.tsx` | — |
+| Admin capabilities | `src/lib/actions/admin.ts`, `admin-panel.tsx`, `admin-content-tab.tsx` | — |
+
+**Forbidden:** merge scripts writing survivor activity/article definitions into Neon `content_overrides`. Favorites remap + `protocols` FK upsert only.
 
 After structural product changes, **update this document in the same PR** so it stays the source of intent.
 
