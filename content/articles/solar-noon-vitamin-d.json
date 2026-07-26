@@ -1,0 +1,41 @@
+{
+  "id": "solar-noon-vitamin-d",
+  "title": "Solar noon sun for vitamin D",
+  "pillar": "light",
+  "summary": "Why UVB on skin near solar noon is the natural vitamin D pathway, how it differs from morning eye light, and when sun comes before routine pills.",
+  "relatedProtocolIds": [
+    "sun-exposure",
+    "sunrise-horizon"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What this habit is",
+      "body": "Solar noon sun for vitamin D means short, non-burning outdoor skin exposure when the sun is high—arms, legs, or more when season and skin type allow. Morning outdoor light to the eyes trains circadian clocks (Sunrise). Vitamin D is a separate solar product: UVB on skin converts 7-dehydrocholesterol toward vitamin D₃, which liver and kidney further activate. Eyes do not make meaningful vitamin D; skin does."
+    },
+    {
+      "heading": "Why solar noon matters",
+      "body": "When the sun is highest, more UVB reaches the ground than at low solar angles. Local solar noon on Place is the practical window for efficient D synthesis per minute, latitude and season permitting. Mid-morning and late afternoon often feel pleasant but deliver more UVA relative to UVB. That does not mean burn yourself at noon—it means prefer a short outdoor block near solar noon over random indoor time when UV season allows. High-latitude winters may not provide enough UVB for repletion."
+    },
+    {
+      "heading": "What mainstream physiology says",
+      "body": "Dermatology and endocrinology agree: sensible sun helps vitamin D status; deficiency is common indoors and at high latitude. Oral vitamin D₃ raises blood 25(OH)D and is standard care when labs show deficiency, in deep winter, or when sun is impractical. Synthesis and supplements both work in clinical medicine. Responsible sun hygiene means non-burning exposure, gradual build, and respect for skin type, medications, and skin-cancer history—ask a clinician for labs and dermatology advice."
+    },
+    {
+      "heading": "Practical solar noon habit",
+      "body": "Check solar noon on Place. When UV season allows, get outdoors with unprotected skin for a short interval—often roughly 10–20 minutes for lighter skin at mid-latitudes in summer, shorter in strong sun, longer for darker melanin. Build gradually. Window glass blocks UVB; indoor “sun” does not count. Log Outside Time in the peak-sun slot (±1.5 hours around local solar noon), full sun when you can, with duration. Pair with the Sunrise check-in so the Light arc is eyes at dawn plus skin at noon."
+    },
+    {
+      "heading": "When supplements still belong",
+      "body": "Winter at high latitude, night-shift life, malabsorption, osteoporosis plans, or confirmed low 25(OH)D are legitimate supplement contexts—follow your clinician. The lifestyle ordering here is: default to solar noon skin when UV exists; do not use a daily gummy to excuse zero outdoor UV all summer. Re-test labs if you change sun habits or doses. Seafood and fortified foods add dietary D but do not replace the UVB message for skin synthesis."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: UVB on skin makes vitamin D; solar angle and latitude matter; supplements raise 25(OH)D when sun cannot. Framework / teaching layer: that chronic high-dose oral D without UV “short-circuits” natural production or that pills miss essential solar frequencies the capsule cannot carry. Dr. Jack Kruse’s public work ranks full-spectrum solar UV at the right time of day over routine capsules and ties skin photoproduction to broader mitochondrial signaling. Those anti-supplement-default claims are his teaching layer—stronger than standard endocrinology’s “sun plus supplement when needed.”"
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Outside Time near solar noon when season and latitude allow safe UV. Use Sunrise separately for circadian morning light. Place’s solar noon line and coach hints help timing. This app does not track 25(OH)D labs. Educational only—not medical advice; do not stop prescribed vitamin D without your doctor."
+    }
+  ]
+}

@@ -6,6 +6,10 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { dailyCompletions, protocols, users, type TimeOfDay } from "@/db/schema";
 import { getMergedCatalogProtocolById } from "@/lib/catalog-server";
+import {
+  loadContentOverrides,
+  mergeProtocolMeta,
+} from "@/lib/content-overrides";
 import { getUserDayStats } from "@/lib/data";
 import { getTodayIsoForTimezone } from "@/lib/date-server";
 import {
@@ -255,6 +259,7 @@ async function recomputeDayPoints(
       ),
     );
 
+  const overrides = await loadContentOverrides();
   for (const row of rows) {
     let basePoints: number | undefined;
     if (isSunriseKeystoneProtocolId(row.protocolId)) {
@@ -264,10 +269,12 @@ async function recomputeDayPoints(
         row.durationMinutes,
       );
     } else {
+      const modeOptions = mergeProtocolMeta(row.protocolId, overrides).options;
       basePoints = variantBasePoints(
         row.protocolId,
         row.variantValue,
         row.protocol.points,
+        modeOptions,
       );
     }
     const next = pointsForLog(row.protocol, row.durationMinutes, {
@@ -452,11 +459,19 @@ export async function logCompletionAction(
   } else if (isGroundingProtocolId(protocolId)) {
     const mode = parseGroundingMode(options?.groundingMode ?? "barefoot");
     variantValue = encodeGroundingVariant(mode);
-    basePoints = groundingModePoints(mode);
+    const modeOptions = mergeProtocolMeta(
+      protocolId,
+      await loadContentOverrides(),
+    ).options;
+    basePoints = groundingModePoints(mode, modeOptions);
   } else if (isVagusNerveProtocolId(protocolId)) {
     const mode = parseVagusMode(options?.vagusMode ?? "cold_face_immersion");
     variantValue = encodeVagusVariant(mode);
-    basePoints = vagusModePoints(mode);
+    const modeOptions = mergeProtocolMeta(
+      protocolId,
+      await loadContentOverrides(),
+    ).options;
+    basePoints = vagusModePoints(mode, modeOptions);
   } else if (isMovementSettingProtocolId(protocolId)) {
     const setting = parseMovementSetting(
       options?.movementSetting ?? "outside",

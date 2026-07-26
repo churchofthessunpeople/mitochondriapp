@@ -1,0 +1,40 @@
+{
+  "id": "deuterium-atp-synthase",
+  "title": "Deuterium, mitochondrial water, and ATP synthase",
+  "pillar": "water",
+  "summary": "What deuterium is, how ATP synthase works in standard bioenergetics, and where lifestyle “low-D” habits sit on top of that science.",
+  "relatedProtocolIds": [
+    "low-d-hydration",
+    "deuterium-aware-meal",
+    "drinking-water",
+    "seafood-meal",
+    "hydration-timing"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What deuterium is",
+      "body": "Hydrogen’s common form is protium. Deuterium is a stable heavier isotope—one proton plus one neutron. Natural water and organic molecules always contain some deuterium; the fraction varies with geography, altitude, and food webs. Chemists know deuterium can slow certain proton-transfer and hydrogen-bond dynamics relative to protium (kinetic isotope effects). That chemistry is established; how much everyday diet variation matters for healthy people is contested."
+    },
+    {
+      "heading": "ATP synthase in standard bioenergetics",
+      "body": "In mitochondria, the electron transport chain builds a proton gradient across the inner membrane. ATP synthase is the rotary enzyme that lets protons return and couples that flow to ATP from ADP and phosphate. Textbooks describe this proton-motive force and rotary catalysis in detail. Mitochondrial water and proton pathways are real biophysics topics—independent of any single lifestyle author."
+    },
+    {
+      "heading": "Heavy water research vs ordinary drinks",
+      "body": "High concentrations of heavy water (D₂O) disrupt biology in experimental settings; that does not mean ordinary environmental deuterium variation equals the same effect. Researchers have studied deuterium depletion and isotope ratios in specialized contexts. Evidence quality and practical relevance for healthy people remain debated. Separate carefully: isotope chemistry is real; clinical “deuterium depletion protocols” as disease treatment are not established standard of care."
+    },
+    {
+      "heading": "Practical habits this stack tracks",
+      "body": "Water keystones—low-D–aware morning hydration, mineralized drinking water, daylight-aligned timing, deuterium-aware meals, seafood-forward plates—are behavioral checkboxes. They encourage attention to water and food quality inside a mitochondrial lifestyle stack. They do not prove your cellular deuterium fraction changed. Geography of spring water and meal patterns are levers you can choose; this app does not assay body-water δD."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: deuterium exists; kinetic isotope effects exist; ATP synthase is a proton-powered rotary enzyme; natural waters differ by place. Framework / teaching layer: that dietary and drinking choices reliably “de-grit” ATP synthase in daily life the way essay-level claims describe. Dr. Jack Kruse’s public teaching popularizes environmental and dietary deuterium as grit in mitochondrial water and proton circuits, tied tightly to light timing and magnetism. Those mechanistic lifestyle claims are his synthesis—not a measured D/H ratio from this app, and not a substitute for clinical nutrition or medicine."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Low-D morning hydration, Drinking water, Daylight-aligned hydration, Deuterium-aware meal, and Seafood-forward meals when those habits are intentional. Read Why high-latitude glacial water is low in deuterium for the isotope-hydrology companion. Educational only—not medical advice or isotope testing guidance."
+    }
+  ]
+}

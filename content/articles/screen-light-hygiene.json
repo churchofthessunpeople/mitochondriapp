@@ -1,0 +1,44 @@
+{
+  "id": "screen-light-hygiene",
+  "title": "Screen light hygiene",
+  "pillar": "light",
+  "summary": "Strip blue from phones and computers after sunset—Night Shift, Night Light, IRIS, or f.lux—and how that differs from room-level evening blue hygiene.",
+  "relatedProtocolIds": [
+    "screen-light-hygiene",
+    "blue-light-hygiene",
+    "sunset-viewing",
+    "dark-bedroom",
+    "phone-away-sleep"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What this habit is",
+      "body": "Screen light hygiene means stripping as much blue as possible from phones, tablets, and computers—especially after sunset. Cool white panels hit melanopsin-rich cells in the eye and can delay melatonin. Warm, amber, or red-shifted displays send a dim-evening signal instead of noon sky on glass. This is the display-specific layer; room bulbs and glasses live under Evening blue-light hygiene."
+    },
+    {
+      "heading": "Why it matters",
+      "body": "Evening screen light is one of the most common ways modern nights stay “day-like.” Even if the room is otherwise calm, a bright cool phone or laptop can keep circadian drive awake. Controlled studies link blue-enriched evening light to later melatonin onset and sleep disruption. You cannot fix that with willpower alone—you change the spectrum and brightness of every screen you still use after dark."
+    },
+    {
+      "heading": "Built-in night modes",
+      "body": "Turn native warm-screen settings up aggressively and schedule them at or before sunset: iPhone/iPad Night Shift, Mac Night Shift, Windows Night Light, Android Night Light / Eye Comfort. Lower brightness too—color temperature alone fails if the panel is blinding. Apply the same rules to every device you touch after dark, not only the one next to the bed."
+    },
+    {
+      "heading": "IRIS, f.lux, and stronger desktop tools",
+      "body": "On laptops and desktops, built-in toggles help but often leave residual blue. IRIS (iris-tech.com) can push screens much warmer, follow sunset, and adjust per monitor. f.lux is a similar long-standing option. Pick one stack and run it everywhere you work after dark so you are not undoing phone hygiene with a cold white monitor."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "After outdoor sunset when you can, keep warm-screen settings on, brightness down, and avoid “temporary disable” for whole evenings. Pair with sunset viewing outdoors first, then Evening blue-light hygiene for bulbs and blockers, then true dark sleep. Phone away from the bed still matters: a warm screen in bed is better than a cold one, but no phone is better still."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: evening blue-rich light can delay melatonin; warmer, dimmer screens reduce that dose; consistent evening light hygiene supports sleep timing. Framework: that a software filter alone restores full mitochondrial night recovery without morning outdoor light and a dark bedroom. Filters are tools, not a cure for a broken light day."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Screen light hygiene each evening your device use ran with blue stripped—night modes on, IRIS/f.lux active, brightness down. Pair with Evening blue-light hygiene for the room and Sunset viewing for the outdoor handoff. Educational only—not a treatment for insomnia; fix morning outdoor light and bedroom darkness too."
+    }
+  ]
+}

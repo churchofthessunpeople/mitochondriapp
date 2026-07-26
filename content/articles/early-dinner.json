@@ -1,0 +1,34 @@
+{
+  "id": "early-dinner",
+  "title": "Earlier last meal",
+  "pillar": "water",
+  "summary": "Finish eating with a buffer before sleep—meal timing that supports circadian recovery and deeper rest.",
+  "relatedProtocolIds": [
+    "early-dinner",
+    "consistent-sleep-window",
+    "dark-bedroom"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What it is",
+      "body": "Earlier last meal means finishing your last substantial food with a real buffer before bed—commonly three or more hours for many people, adjusted to what lets you sleep well. You log when you actually ate earlier than your old default, not when you only wished you had."
+    },
+    {
+      "heading": "Why meal timing matters at night",
+      "body": "Late heavy meals shift digestion, core temperature, and glucose into the sleep window. That can lighten sleep and blunt morning clarity. Circadian biology favors a quieter gut at night while melatonin and repair programs run. Food can shift some peripheral clocks; light still leads, but dinner timing is a lever you control."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Move dinner earlier when your schedule allows. Keep late snacks small if you need them. Pair with a consistent sleep window and a dark, cool bedroom so meal timing is not the only night habit. Travel and social meals will break the rule sometimes—resume the next day without guilt spirals."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: late large meals can impair sleep for many people; a buffer before bed is common sleep-hygiene advice. Framework: that a fixed clock-time dinner is mandatory mitochondrial law regardless of chronotype, work, or medical needs. Adjust to what you can sustain."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Earlier last meal when you finished substantial eating with a real buffer before sleep. Pair with Circadian sleep window and True dark inside Sleep Space. Educational only—not medical advice for GERD, diabetes meal timing, or eating disorders."
+    }
+  ]
+}

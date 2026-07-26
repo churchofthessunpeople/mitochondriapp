@@ -239,14 +239,66 @@ export function mergeMitoEntry(
   return mergeRecord(entry, patch);
 }
 
+/** Full article document from content/articles/<id>.json (preferred source). */
+function mitoEntryFromArticleFile(
+  id: string,
+  raw: unknown,
+): MitoEntry | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const patch = raw as MitoEntryOverride & Partial<MitoEntry>;
+  if (typeof patch.title !== "string" || typeof patch.summary !== "string") {
+    return null;
+  }
+  if (!Array.isArray(patch.sections) || patch.sections.length === 0) {
+    return null;
+  }
+  const pillar = patch.pillar;
+  if (
+    pillar !== "light" &&
+    pillar !== "water" &&
+    pillar !== "magnetism" &&
+    pillar !== "support"
+  ) {
+    return null;
+  }
+  return {
+    id,
+    title: patch.title,
+    summary: patch.summary,
+    pillar,
+    sections: patch.sections,
+    relatedProtocolIds: Array.isArray(patch.relatedProtocolIds)
+      ? patch.relatedProtocolIds.filter((x): x is string => typeof x === "string")
+      : undefined,
+    flatArticle: patch.flatArticle !== false,
+  };
+}
+
 export function mergeMitoEntries(overrides: OverrideMap): MitoEntry[] {
-  const seeded = MITOVERSITY_ENTRIES.map((e) => mergeMitoEntry(e, overrides)).filter(
-    (entry) => !isMitoDeleted(overrides, entry.id),
-  );
+  const fromFiles: MitoEntry[] = [];
+  const fileIds = new Set<string>();
+
+  for (const [key, value] of overrides) {
+    if (!key.startsWith("mito:")) continue;
+    const id = key.slice("mito:".length);
+    if (isMitoDeleted(overrides, id)) continue;
+    const full = mitoEntryFromArticleFile(id, value);
+    if (!full) continue;
+    fileIds.add(id);
+    fromFiles.push(full);
+  }
+
+  // TS seeds only for ids not yet migrated to content/articles/
+  const seeded = MITOVERSITY_ENTRIES.filter((e) => !fileIds.has(e.id))
+    .map((e) => mergeMitoEntry(e, overrides))
+    .filter((entry) => !isMitoDeleted(overrides, entry.id));
+
   const custom = getRegistryIds(overrides, REGISTRY_CUSTOM_MITO)
+    .filter((id) => !fileIds.has(id))
     .map((id) => customMitoEntryFromOverride(id, overrides))
     .filter((entry): entry is MitoEntry => entry != null);
-  return [...seeded, ...custom];
+
+  return [...fromFiles, ...seeded, ...custom];
 }
 
 export function mergeCategoryMeta(

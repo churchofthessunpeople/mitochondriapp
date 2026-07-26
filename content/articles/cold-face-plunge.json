@@ -1,0 +1,37 @@
+{
+  "id": "cold-face-plunge",
+  "title": "Cold face and head immersion",
+  "pillar": "support",
+  "summary": "Entry-level cold via face or brief head immersion—the diving-reflex pathway—logged as Cold face immersion under Vagus nerve stimulation (3 rounds, 5 pts).",
+  "relatedProtocolIds": [
+    "vagus-nerve-stimulation",
+    "cold-thermogenesis"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Why face cold is the on-ramp",
+      "body": "Full-body cold plunges ask for composure, access to water, and recovery bandwidth. Face or brief head immersion is a smaller dose: cold water on the trigeminal territory that can trigger the diving reflex (slower heart rate, breath-hold pattern) without immersing the whole body. It is a practical vagus-adjacent entry and a bridge toward longer thermogenesis work."
+    },
+    {
+      "heading": "Trigeminal cold pathway in plain language",
+      "body": "Cold on the face activates sensory nerves that feed brainstem circuits linked to the dive response. People often feel a sharp inhale, then a calmer pulse if they stay soft in the shoulders. That autonomic shift is why lifestyle stacks group face cold with other parasympathetic practices. It is not the same as earning ~50 °F skin for 10+ minutes on the trunk—that lives under Cold thermogenesis."
+    },
+    {
+      "heading": "How to practice",
+      "body": "Fill a basin with cool-to-cold water. Start milder (e.g. ~70 °F) and progress cooler as tolerance grows. Dunk the face (eyes optional) for roughly 10–20 seconds; rest about a minute; repeat for 3 rounds—the app’s default session. Morning for alertness or evening for wind-down both appear in community practice; pick one window you will repeat. Breathe calmly between rounds; do not force long breath-holds if you feel panicky."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s cold teaching emphasizes thermodynamics and full-body skin targets, but face immersion shows up as an accessible autonomic tool and stepping stone. Community vagus lists often prescribe three rounds. Treat exact timing recipes as teaching culture; treat graded cold on the face as the durable habit before you chase plunge PRs."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: facial cold can elicit dive-reflex responses; graded exposure is safer than shock martyrdom; unstable heart disease and cold-triggered conditions need clinician clearance. Framework: that three face dunks equal medical VNS or replace full cold thermogenesis adaptation. Use face cold as Support entry; use the cold-thermogenesis article for heat-engine and ~50 °F skin progression."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Vagus nerve stimulation → Cold face immersion (3 rounds, 5 pts). When ready for shoulders-in water, log Cold thermogenesis (plunge or shower) with skin temperature and duration. Educational only—not emergency or cardiac care."
+    }
+  ]
+}

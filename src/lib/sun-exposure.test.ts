@@ -39,16 +39,16 @@ const SAMPLE = fakeSun({
 const CTX = { sun: SAMPLE, timeZone: "UTC" };
 
 describe("sunExposureSlotBounds", () => {
-  it("places noon window 1h before to 2h after solar noon", () => {
+  it("places peak-sun window ±1.5h around solar noon", () => {
     const b = sunExposureSlotBounds(SAMPLE, "UTC");
     assert.equal(b.solarNoonMins, 13 * 60);
-    assert.equal(b.noonStartMins, 12 * 60); // 1h before
-    assert.equal(b.noonEndMins, 15 * 60); // 2h after
+    assert.equal(b.noonStartMins, 13 * 60 - 90); // 11:30
+    assert.equal(b.noonEndMins, 13 * 60 + 90); // 14:30
   });
 });
 
 describe("sunSlotFromLocalHour", () => {
-  it("maps sunrise → 1h before noon / noon window / to sunset", () => {
+  it("maps sunrise → peak window → sunset", () => {
     assert.equal(sunSlotFromLocalHour(6, CTX), "morning");
     assert.equal(sunSlotFromLocalHour(9, CTX), "morning");
     assert.equal(sunSlotFromLocalHour(11, CTX), "morning");
@@ -61,20 +61,20 @@ describe("sunSlotFromLocalHour", () => {
 });
 
 describe("sunSlotFromLocalHm", () => {
-  it("parses HH:mm against solar-relative windows", () => {
-    assert.equal(sunSlotFromLocalHm("11:59", CTX), "morning");
-    assert.equal(sunSlotFromLocalHm("12:00", CTX), "noon");
-    assert.equal(sunSlotFromLocalHm("14:59", CTX), "noon");
-    assert.equal(sunSlotFromLocalHm("15:00", CTX), "afternoon");
+  it("parses HH:mm against symmetrical UVB windows", () => {
+    assert.equal(sunSlotFromLocalHm("11:29", CTX), "morning");
+    assert.equal(sunSlotFromLocalHm("11:30", CTX), "noon");
+    assert.equal(sunSlotFromLocalHm("14:29", CTX), "noon");
+    assert.equal(sunSlotFromLocalHm("14:30", CTX), "afternoon");
     assert.equal(sunSlotFromLocalHm("07:05", CTX), "morning");
   });
 
   it("falls back to 12:00 solar noon without sun times", () => {
-    // noon window = 11:00–14:00 when solar noon defaults to 12:00
-    assert.equal(sunSlotFromLocalHm("10:30"), "morning");
-    assert.equal(sunSlotFromLocalHm("11:00"), "noon");
-    assert.equal(sunSlotFromLocalHm("13:59"), "noon");
-    assert.equal(sunSlotFromLocalHm("14:00"), "afternoon");
+    // noon window = 10:30–13:30 when solar noon defaults to 12:00
+    assert.equal(sunSlotFromLocalHm("10:29"), "morning");
+    assert.equal(sunSlotFromLocalHm("10:30"), "noon");
+    assert.equal(sunSlotFromLocalHm("13:29"), "noon");
+    assert.equal(sunSlotFromLocalHm("13:30"), "afternoon");
   });
 });
 
@@ -82,15 +82,15 @@ describe("sunExposureSlotClockLabel", () => {
   it("shows place-relative clock ranges", () => {
     assert.equal(
       sunExposureSlotClockLabel("morning", SAMPLE, "UTC"),
-      "6 am – 12 pm",
+      "6 am – 11:30 am",
     );
     assert.equal(
       sunExposureSlotClockLabel("noon", SAMPLE, "UTC"),
-      "12 pm – 3 pm",
+      "11:30 am – 2:30 pm",
     );
     assert.equal(
       sunExposureSlotClockLabel("afternoon", SAMPLE, "UTC"),
-      "3 pm – 8 pm",
+      "2:30 pm – 8 pm",
     );
   });
 });

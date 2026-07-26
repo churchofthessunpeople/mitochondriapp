@@ -1,7 +1,11 @@
 /**
  * Grounding — barefoot earth contact or “Make like the Sphinx” belly contact.
  * Flat points per log (no duration blocks).
+ *
+ * Labels / points can be overridden via content/activities.json `options`.
  */
+
+import type { ActivityModeOption } from "@/lib/protocol-meta";
 
 export const GROUNDING_PROTOCOL_ID = "barefoot-earth";
 
@@ -26,6 +30,27 @@ export const GROUNDING_MODE_OPTIONS: {
     points: 10,
   },
 ];
+
+/** Merge content overlay options onto built-in modes (ids stay fixed). */
+export function resolveGroundingOptions(
+  options?: ActivityModeOption[] | null,
+): typeof GROUNDING_MODE_OPTIONS {
+  if (!options?.length) return GROUNDING_MODE_OPTIONS;
+  const byId = new Map(options.map((o) => [o.id, o]));
+  return GROUNDING_MODE_OPTIONS.map((def) => {
+    const o = byId.get(def.id);
+    if (!o) return def;
+    return {
+      id: def.id,
+      label: o.label?.trim() || def.label,
+      detail: o.detail?.trim() || def.detail,
+      points:
+        typeof o.points === "number" && Number.isFinite(o.points)
+          ? o.points
+          : def.points,
+    };
+  });
+}
 
 const MODE_INDEX: Record<GroundingMode, number> = {
   barefoot: 0,
@@ -64,18 +89,29 @@ export function parseGroundingMode(value: unknown): GroundingMode {
   return "barefoot";
 }
 
-export function groundingModePoints(mode: GroundingMode): number {
+export function groundingModePoints(
+  mode: GroundingMode,
+  options?: ActivityModeOption[] | null,
+): number {
   return (
-    GROUNDING_MODE_OPTIONS.find((o) => o.id === mode)?.points ?? 5
+    resolveGroundingOptions(options).find((o) => o.id === mode)?.points ?? 5
   );
 }
 
-export function groundingModeLabel(mode: GroundingMode): string {
-  return GROUNDING_MODE_OPTIONS.find((o) => o.id === mode)?.label ?? mode;
+export function groundingModeLabel(
+  mode: GroundingMode,
+  options?: ActivityModeOption[] | null,
+): string {
+  return (
+    resolveGroundingOptions(options).find((o) => o.id === mode)?.label ?? mode
+  );
 }
 
-export function formatGroundingLabel(variantValue: unknown): string | null {
+export function formatGroundingLabel(
+  variantValue: unknown,
+  options?: ActivityModeOption[] | null,
+): string | null {
   const mode = decodeGroundingVariant(variantValue);
   if (!mode) return null;
-  return `${groundingModeLabel(mode)} · ${groundingModePoints(mode)} pts`;
+  return `${groundingModeLabel(mode, options)} · ${groundingModePoints(mode, options)} pts`;
 }

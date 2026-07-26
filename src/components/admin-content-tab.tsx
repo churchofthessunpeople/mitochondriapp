@@ -721,7 +721,7 @@ function ProtocolForm({
         run(async () => {
           try {
             await saveAdminProtocolAction(editor.id, raw);
-            push("Activity saved to content/");
+            push("Activity saved to content/activities.json");
             await onSaved();
           } catch (err) {
             push(err instanceof Error ? err.message : "Save failed", "err");
@@ -902,7 +902,7 @@ function CreateProtocolForm({
         run(async () => {
           try {
             const id = await createAdminProtocolAction(raw);
-            push("Activity created in content/");
+            push("Activity created in content/activities.json");
             await onCreated(id);
           } catch (err) {
             push(err instanceof Error ? err.message : "Create failed", "err");
@@ -1191,7 +1191,7 @@ function MitoForm({
         run(async () => {
           try {
             await saveAdminMitoAction(editor.entry.id, raw);
-            push("Article saved to content/mitoversity.json");
+            push("Article saved to content/articles/");
             await onSaved();
           } catch (err) {
             push(err instanceof Error ? err.message : "Save failed", "err");
@@ -1323,7 +1323,7 @@ function CreateMitoForm({
         run(async () => {
           try {
             const id = await createAdminMitoAction(raw);
-            push("Article created in content/mitoversity.json");
+            push("Article created in content/articles/");
             await onCreated(id);
           } catch (err) {
             push(err instanceof Error ? err.message : "Create failed", "err");

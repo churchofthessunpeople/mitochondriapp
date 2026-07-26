@@ -24,12 +24,18 @@ import {
 import { formatVariantLabel } from "@/lib/protocol-variants";
 import { formatPoints } from "@/lib/utils";
 
-function ActivityRow({ r }: { r: DayDetailRow }) {
+function ActivityRow({
+  r,
+  modeOptions,
+}: {
+  r: DayDetailRow;
+  modeOptions?: { id: string; label: string; detail: string; points: number }[];
+}) {
   const variant =
     r.protocolId &&
     r.variantValue != null &&
     !isSunriseKeystoneProtocolId(r.protocolId)
-      ? formatVariantLabel(r.protocolId, r.variantValue)
+      ? formatVariantLabel(r.protocolId, r.variantValue, 10, modeOptions)
       : null;
   const sunriseDetail =
     r.protocolId && isSunriseKeystoneProtocolId(r.protocolId)

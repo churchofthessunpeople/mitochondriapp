@@ -117,7 +117,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "sun-exposure",
     name: "Outside Time",
     description:
-      "Time outdoors — pick morning, solar noon, or afternoon (from your place sun times), full sun or shaded, and how long you stayed.",
+      "Time outdoors — pick morning, peak sun, or afternoon (from your place sun times), full sun or shaded, and how long you stayed.",
     points: 8,
     category: "light",
     timeOfDay: "anytime",
@@ -257,7 +257,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "vagus-nerve-stimulation",
     name: "Vagus nerve stimulation",
     description:
-      "Cold face immersion (5), baking soda water (4), or castor oil navel (6) — practices that stimulate the vagus nerve.",
+      "Cold face immersion (5), baking soda water (4), castor oil navel (6), or tuning forks (5) — practices that stimulate the vagus nerve.",
     points: 5,
     category: "other",
     timeOfDay: "anytime",
@@ -490,7 +490,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "tuning-forks",
     name: "Tuning forks",
     description:
-      "Intentional sound/vibration session with tuning forks — 40 Hz recommended; C128 (128 Hz) weighted fork for on-body parasympathetic work. Equipment required.",
+      "Now part of Vagus nerve stimulation — choose Tuning forks (40 Hz / C128).",
     points: 5,
     category: "other",
     timeOfDay: "anytime",
@@ -499,6 +499,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     referenceMinutes: 15,
     maxDurationMinutes: 45,
     sortOrder: 56,
+    retired: true,
   }),
   p({
     id: "blue-light-hygiene",

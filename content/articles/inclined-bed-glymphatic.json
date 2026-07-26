@@ -1,0 +1,45 @@
+{
+  "id": "inclined-bed-glymphatic",
+  "title": "Inclined bed therapy & glymphatic drainage",
+  "pillar": "support",
+  "summary": "What inclined bed therapy is, what the glymphatic system does during sleep, plausible overlap—and where evidence is strong, suggestive, or still anecdotal.",
+  "relatedProtocolIds": [
+    "dark-bedroom",
+    "consistent-sleep-window",
+    "sleep-space",
+    "phone-away-sleep",
+    "cool-bedroom-sleep",
+    "blue-light-hygiene"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What inclined bed therapy (IBT) is",
+      "body": "Inclined bed therapy means sleeping on a flat plane tilted head-up—typically about 3–6° (often by raising the head end of the bed roughly 15–20 cm / 6–8 inches with sturdy blocks, not just a thick wedge pillow that only bends the neck). The whole mattress should incline as one surface so the spine stays neutral. Reported anecdotes include easier morning clarity, leg comfort, reflux relief, and better sleep. Rigorous randomized trials of IBT for brain health are limited; much of the conversation is mechanistic reasoning plus user reports."
+    },
+    {
+      "heading": "The glymphatic system in mainstream neuroscience",
+      "body": "Since work by Maiken Nedergaard and colleagues, the brain’s glymphatic clearance pathway has been mapped in animals: CSF enters along arterial perivascular spaces, mixes with interstitial fluid carrying metabolic waste, and exits along venous routes—much of it during deep slow-wave sleep. Human evidence is growing but still less granular than rodent work. Glymphatic failure is discussed as one contributor among many in neurodegeneration—not a single switch you flip with one hack."
+    },
+    {
+      "heading": "Why posture at night might matter",
+      "body": "Animal studies show sleep position changes clearance rates; lateral sleeping was associated with faster transport than supine or prone in a classic mouse report. Head-of-bed elevation in humans is established for intracranial pressure management, venous drainage, and reflux—not originally as a glymphatic protocol. Gravity alters CSF and venous pressure gradients. The plausible IBT story is that a slight sustained head-up tilt might favor cranial outflow over eight hours versus dead-flat supine stagnation—biologically conceivable, not yet proven as “IBT → measured glymphatic flux in humans.”"
+    },
+    {
+      "heading": "How to set up safely—and who should be cautious",
+      "body": "Raise both head legs of the bed frame or use rated risers—stable, not wobbly. Aim near 5° as a common community target; measure with a phone inclinometer on the mattress plane. Avoid slippery sheets that slide you footward. Side-sleeping remains compatible if the whole surface is tilted. Trial short naps first if you have back or hip pain. Heart failure positioning, pregnancy, post-surgical instructions, and positional vertigo need clinician guidance—not forum defaults. Snoring/apnea: get evaluated; elevation helps some people and worsens others."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s sleep material emphasizes glymphatic clearance as part of nightly brain maintenance—linking darkness, cold room temperature, nnEMF removal, and deep sleep to lowered neurodegenerative risk in his framework. He discusses CSF flow and strict sleep environment more often than Fletcher-style IBT by name; overlapping communities sometimes adopt inclined beds as an added gravity lever. Treat that coupling as lifestyle synthesis compatible with “sleep depth matters,” not as neurology care."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: deep sleep supports clearance biology; head elevation helps many reflux cases; sleep position can matter in animals. Framework: IBT as proven human glymphatic therapy or Alzheimer’s prevention. Stronger established levers first: adequate deep sleep, regular timing, exercise, less alcohol before bed, true dark, cool room, phone away."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "There is no separate inclined-bed checkbox; if you adopt IBT, keep logging Sleep Space options (true dark, circadian window, cool bedroom, phone away) consistently and note your angle in personal journaling. Read Fully dark sleep environment and Cool bedroom sleep for the baseline night protocol. Educational only—not medical advice for reflux, ICP, apnea, or neurodegeneration."
+    }
+  ]
+}

@@ -22,7 +22,7 @@ await sql`
   values (
     'vagus-nerve-stimulation',
     'Vagus nerve stimulation',
-    'Cold face immersion (5), baking soda water (4), or castor oil navel (6) — practices that stimulate the vagus nerve.',
+    'Cold face immersion (5), baking soda water (4), castor oil navel (6), or tuning forks (5) — practices that stimulate the vagus nerve.',
     5,
     'other',
     'anytime',
@@ -50,6 +50,7 @@ const legacyIds = [
   "castor-oil-navel",
   "baking-soda-water",
   "cold-face-plunge",
+  "tuning-forks",
 ];
 
 const usersWithLegacy = await sql`
@@ -57,7 +58,8 @@ const usersWithLegacy = await sql`
   where protocol_id in (
     'castor-oil-navel',
     'baking-soda-water',
-    'cold-face-plunge'
+    'cold-face-plunge',
+    'tuning-forks'
   )
 `;
 for (const row of usersWithLegacy) {
@@ -72,7 +74,8 @@ await sql`
   where protocol_id in (
     'castor-oil-navel',
     'baking-soda-water',
-    'cold-face-plunge'
+    'cold-face-plunge',
+    'tuning-forks'
   )
 `;
 await sql`
@@ -80,8 +83,16 @@ await sql`
   where protocol_id in (
     'castor-oil-navel',
     'baking-soda-water',
-    'cold-face-plunge'
+    'cold-face-plunge',
+    'tuning-forks'
   )
+`;
+
+// Soft-retire standalone tuning forks in Neon FK table if present.
+await sql`
+  update protocols
+  set active = false
+  where id = 'tuning-forks'
 `;
 
 console.log("vagus nerve merge (favorites remap + FK only)", {

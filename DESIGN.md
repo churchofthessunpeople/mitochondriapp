@@ -196,7 +196,7 @@ A catalog item you can log:
 
 **Do not author catalog copy in Neon.** Merge scripts may remap favorites and upsert FK rows; they must **not** write activity/article definition patches into `content_overrides`.
 
-**Extra UX copy (how / equipment):** baseline in `src/lib/protocol-meta.ts`; Admin edits land in `content/protocol-meta.json`.
+**Extra UX copy (how / equipment / options):** baseline in `src/lib/protocol-meta.ts`; Admin edits land in `content/activities.json` (same object as the activity definition).
 
 **Morning-light keystones** (`sunrise-horizon`, `sunrise-open-sky`, `sunrise-outside`) are **not catalog-selectable** — logged only via daily check-in and the fixed **Morning light** checklist row.
 
@@ -615,7 +615,8 @@ Use this section as a working scratchpad. Check when decided; note the rule in t
 
 | Want to change… | Edit… | Then… |
 |-----------------|-------|--------|
-| Activity name / points / how-to (day-to-day) | Admin → Content (local) → saves `content/protocols.json` + `content/protocol-meta.json` | Commit `content/`, deploy |
+| Activity name / points / how-to / options (day-to-day) | Admin → Content (local) → saves `content/activities.json` | Commit `content/`, deploy |
+| Articles (day-to-day) | `content/articles/<id>.json` (flat format) or Admin → Content | Commit `content/`, deploy |
 | Article sections | Admin → Content → Articles (section list UI) → `content/mitoversity.json` | Commit + deploy |
 | Baseline protocol list (git default) | `src/db/seed-data.ts` | Restart dev; optional fold Admin overlays back into seeds later |
 | Baseline how-to / equipment | `src/lib/protocol-meta.ts` | Refresh app |

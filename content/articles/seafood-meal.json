@@ -1,0 +1,33 @@
+{
+  "id": "seafood-meal",
+  "title": "Seafood-forward meals",
+  "pillar": "water",
+  "summary": "Cold-water seafood as the main protein—marine fats, DHA context, and a practical lower-deuterium meal pattern in this stack.",
+  "relatedProtocolIds": [
+    "seafood-meal",
+    "deuterium-aware-meal"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What it is",
+      "body": "A seafood-forward meal centers cold-water seafood or high-quality marine fats as the main protein—salmon, sardines, mackerel, and similar—not a garnish of shrimp on a plate of something else. You log when that was the intent of the meal."
+    },
+    {
+      "heading": "Why seafood shows up in the Water pillar",
+      "body": "Marine food webs often carry fats and proteins discussed in deuterium-aware eating and in DHA/retinal nutrition frameworks. In this app, seafood-forward meals are a practical lower-deuterium meal pattern and a nutrient-dense protein habit. They sit beside Deuterium-aware meal, which can include seafood plus other lower-D choices such as quality animal fats and many fruits and vegetables."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Build real meals around seafood a few times a week when access and budget allow. Prefer oily cold-water fish when you can. Mind mercury and pregnancy guidance from your clinician for high-trophic species. Pair with morning light and sensible meal timing so food is not fighting a broken circadian day."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: oily fish provide EPA/DHA and high-quality protein; seafood can displace ultra-processed meals. Framework / teaching layer: that every seafood plate reliably lowers body deuterium or “charges” retinal mitochondria in a measured way. Dr. Jack Kruse’s food rules often favor seafood and place-based eating inside the light–water–magnetism stack—treat strong deuterium claims as his teaching layer."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Seafood-forward meal when seafood was the main protein. Use Deuterium-aware meal when the broader low-D plate was the intent. Read Deuterium, mitochondrial water, and ATP synthase for the water-story companion. Educational only—not a prescription diet for disease."
+    }
+  ]
+}

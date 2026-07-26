@@ -7,11 +7,21 @@ import { PROTOCOL_ARTICLE_IDS } from "@/lib/protocol-article-map";
 
 export type EquipmentNeed = "none" | "optional" | "required";
 
+/** Flat choice for multi-option activities (Grounding, Vagus, etc.). */
+export type ActivityModeOption = {
+  id: string;
+  label: string;
+  detail: string;
+  points: number;
+};
+
 export type ProtocolMeta = {
   equipment: EquipmentNeed;
   how?: string;
   /** Primary Mitoversity article for this activity */
   articleId?: string;
+  /** Editable mode list for simple multi-option activities */
+  options?: ActivityModeOption[];
 };
 
 const DEFAULT: ProtocolMeta = { equipment: "none" };
@@ -31,7 +41,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "sun-exposure": {
     equipment: "none",
-    how: "Log outdoor time: pick morning, solar noon, or afternoon (from Place sun times), whether you were in full sun or shade, and how long you stayed.\n\nSlots: morning (sunrise → 1 hour before solar noon), solar noon (1 hour before → 2 hours after), afternoon (then → sunset). Full sun scores higher than shade. Stay within a non-burning window. Sunrise check-in is separate — it unlocks the day boost.",
+    how: "Log outdoor time: pick morning, peak sun, or afternoon (from Place sun times), whether you were in full sun or shade, and how long you stayed.\n\nSlots: morning (sunrise → 1.5 hours before solar noon), peak sun (±1.5 hours around solar noon — the symmetrical UVB window), afternoon (then → sunset). Full sun scores higher than shade. Stay within a non-burning window. Sunrise check-in is separate — it unlocks the day boost.",
   },
   "sunset-viewing": {
     equipment: "none",
@@ -79,7 +89,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "vagus-nerve-stimulation": {
     equipment: "optional",
-    how: "Pick one vagus-stimulating practice per log:\n\n• Cold face immersion — 3 rounds of cold water on the face or brief head immersion (5 pts).\n• Baking soda water — ¼ tsp sodium bicarbonate in a glass, ≥2 hours from meals (4 pts).\n• Castor oil navel — organic cold-pressed castor oil drops in the belly button (6 pts).\n\nYou can log more than one practice in a day. Ask a clinician before baking soda if you have sodium restrictions or kidney/heart disease. Castor: external navel use only.",
+    how: "Pick one vagus-stimulating practice per log:\n\n• Cold face immersion — 3 rounds of cold water on the face or brief head immersion (5 pts).\n• Baking soda water — ¼ tsp sodium bicarbonate in a glass, ≥2 hours from meals (4 pts).\n• Castor oil navel — organic cold-pressed castor oil drops in the belly button (6 pts).\n• Tuning forks — real metal forks (40 Hz listening / weighted C128 on-body circuit) (5 pts).\n\nYou can log more than one practice in a day. Ask a clinician before baking soda if you have sodium restrictions or kidney/heart disease. Castor: external navel use only. Forks: stop if dizzy, ear pain, or joint discomfort.",
   },
   "deuterium-aware-meal": {
     equipment: "none",
@@ -155,7 +165,7 @@ const PROTOCOL_META_RAW: Record<string, ProtocolMeta> = {
   },
   "tuning-forks": {
     equipment: "required",
-    how: "Use real metal tuning forks (not phone apps alone). Recommended: 40 Hz for a short listening / near-field vibration session. Suggested body-contact fork: weighted C128 (128 Hz).\n\nActivate by striking the fork on the palm (or a soft activator), then hold near the ears or place the stem/base on bone. For a C128 parasympathetic circuit: crown, forehead, mastoid behind each ear (3 activations per side), TMJ in front of each ear (3 per side), manubrium (~1 in below the top of the breastbone), xiphoid (lower sternum where the ribs meet), and sacrum between the posterior dimples — 3 activations per spot.\n\nEach log adds 15 minutes; use +/− for more or less in 15-minute blocks. Stop if you feel dizzy, ear pain, or joint discomfort. Educational only — not treatment for anxiety, cortisol disorders, or neurological disease.",
+    how: "Now part of Vagus nerve stimulation. Choose Tuning forks.\n\nUse real metal tuning forks (not phone apps alone). Recommended: 40 Hz for a short listening / near-field vibration session. Suggested body-contact fork: weighted C128 (128 Hz).\n\nActivate by striking the fork on the palm (or a soft activator), then hold near the ears or place the stem/base on bone. For a C128 parasympathetic circuit: crown, forehead, mastoid behind each ear (3 activations per side), TMJ in front of each ear (3 per side), manubrium (~1 in below the top of the breastbone), xiphoid (lower sternum where the ribs meet), and sacrum between the posterior dimples — 3 activations per spot.\n\nStop if you feel dizzy, ear pain, or joint discomfort. Educational only — not treatment for anxiety, cortisol disorders, or neurological disease.",
   },
   "blue-light-hygiene": {
     equipment: "optional",

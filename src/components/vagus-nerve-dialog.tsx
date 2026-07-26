@@ -3,12 +3,13 @@
 import { Activity, X } from "lucide-react";
 import { useMemo } from "react";
 import type { Protocol } from "@/db/schema";
+import { useAppContentOptional } from "@/components/app-content-context";
 import {
   OptionListChoice,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
-  VAGUS_MODE_OPTIONS,
+  resolveVagusOptions,
   vagusModePoints,
   type VagusMode,
 } from "@/lib/vagus-nerve";
@@ -29,15 +30,25 @@ export function VagusNerveDialog({
   onLog,
   onCancel,
 }: Props) {
+  const content = useAppContentOptional();
+  const modeOptions = useMemo(
+    () =>
+      resolveVagusOptions(
+        content?.protocolMeta?.[protocol.id]?.options ??
+          content?.protocolMeta?.["vagus-nerve-stimulation"]?.options,
+      ),
+    [content?.protocolMeta, protocol.id],
+  );
+
   const options: ClickThroughOption[] = useMemo(
     () =>
-      VAGUS_MODE_OPTIONS.map((o) => ({
+      modeOptions.map((o) => ({
         id: o.id,
         title: o.label,
-        subtitle: `${o.detail} · ${vagusModePoints(o.id)} pts`,
+        subtitle: `${o.detail} · ${vagusModePoints(o.id, modeOptions)} pts`,
         highlight: o.id === "cold_face_immersion",
       })),
-    [],
+    [modeOptions],
   );
 
   return (

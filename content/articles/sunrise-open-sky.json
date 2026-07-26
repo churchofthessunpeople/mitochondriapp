@@ -1,0 +1,34 @@
+{
+  "id": "sunrise-open-sky",
+  "title": "Open-sky morning light",
+  "pillar": "light",
+  "summary": "Full outdoor morning light under a wide sky—strong circadian dose when you cannot see a clear horizon disk.",
+  "relatedProtocolIds": [
+    "sunrise-open-sky",
+    "sunrise-horizon",
+    "sunrise-outside"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What this tier is",
+      "body": "Open-sky morning light means you get outside near sunrise under a reasonably wide sky—yard, park, balcony, or trail—even when cloud, haze, or terrain hides the solar disk. You still receive high melanopsin drive compared with indoor lighting. This is the middle sunrise tier: stronger than limited-sky porch light, below a clear horizon disk."
+    },
+    {
+      "heading": "Why open sky still counts",
+      "body": "Circadian dose depends on outdoor intensity and spectrum at the eyes, not only on seeing a crisp sun disk. A broad sky floods the retina with natural morning light. Glass filters that dose; sunglasses blunt it. Urban canyons and heavy tree cover push you toward the limited-sky tier; a park or rooftop with open sky belongs here."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Eyes open to outdoor light without sunglasses when safe. A few minutes counts; longer is fine. Avoid glass between you and the sky when you can. Log in the sunrise phase when this is your best available signal. Upgrade to horizon viewing on clear days when the disk is visible."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: outdoor morning light under open sky strongly entrains circadian timing versus indoor LEDs. Framework: that open sky is “almost worthless” without a visible disk, or that cloudy open sky does nothing. Overcast outdoor dawn still beats staying inside."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Open-sky morning light when that was your sunrise check-in. It unlocks a 1.5× day boost—below horizon sunrise, above limited-sky outside light. Use it honestly when the sky is open even if the sun is not visible. Educational only—not medical advice."
+    }
+  ]
+}

@@ -45,10 +45,14 @@ export type OutsideCoverDef = {
   detail: string;
 };
 
-/** Minutes before solar noon that the solar-noon slot begins. */
-export const SUN_EXPOSURE_NOON_LEAD_MINUTES = 60;
-/** Minutes after solar noon that the solar-noon slot ends. */
-export const SUN_EXPOSURE_NOON_TRAIL_MINUTES = 120;
+/**
+ * Symmetrical UVB peak around solar noon (±1.5h).
+ * UV intensity tracks solar elevation, not air temperature, so the window
+ * is centered on solar noon rather than skewed into the afternoon.
+ */
+export const SUN_EXPOSURE_NOON_LEAD_MINUTES = 90;
+/** Minutes after solar noon that the peak-sun slot ends. */
+export const SUN_EXPOSURE_NOON_TRAIL_MINUTES = 90;
 
 /** Fallback solar noon when Place sun times are missing. */
 export const SUN_EXPOSURE_FALLBACK_SOLAR_NOON_HM = "12:00";
@@ -57,19 +61,19 @@ export const SUN_EXPOSURE_SLOTS: readonly SunExposureSlotDef[] = [
   {
     id: "morning",
     label: "Morning",
-    clockLabel: "Sunrise – 1h before solar noon",
+    clockLabel: "Sunrise – 1.5h before solar noon",
     timeOfDay: "morning",
   },
   {
     id: "noon",
-    label: "Solar noon",
-    clockLabel: "1h before – 2h after solar noon",
+    label: "Peak sun",
+    clockLabel: "±1.5h around solar noon (UVB window)",
     timeOfDay: "afternoon",
   },
   {
     id: "afternoon",
     label: "Afternoon",
-    clockLabel: "2h after solar noon – sunset",
+    clockLabel: "1.5h after solar noon – sunset",
     timeOfDay: "evening",
   },
 ] as const;
@@ -208,9 +212,9 @@ export type SunExposureSlotBounds = {
   sunriseMins: number;
   sunsetMins: number;
   solarNoonMins: number;
-  /** Start of solar-noon slot (1h before solar noon). */
+  /** Start of peak-sun slot (1.5h before solar noon). */
   noonStartMins: number;
-  /** End of solar-noon slot / start of afternoon (2h after solar noon). */
+  /** End of peak-sun slot / start of afternoon (1.5h after solar noon). */
   noonEndMins: number;
 };
 
@@ -269,9 +273,9 @@ export function sunSlotFromLocalHour(
 
 /**
  * Parse HH:mm → slot using solar-relative windows:
- * morning = sunrise → 1h before solar noon
- * noon = 1h before → 2h after solar noon
- * afternoon = 2h after solar noon → sunset
+ * morning = sunrise → 1.5h before solar noon
+ * noon (peak sun) = ±1.5h around solar noon
+ * afternoon = 1.5h after solar noon → sunset
  */
 export function sunSlotFromLocalHm(
   hm: string,

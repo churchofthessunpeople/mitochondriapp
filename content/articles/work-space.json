@@ -1,0 +1,41 @@
+{
+  "id": "work-space",
+  "title": "Work Space — desk / office hygiene stack",
+  "pillar": "magnetism",
+  "summary": "Permanent daytime desk stack: office breakers, grounding mat, negative ions, and low artificial field—sum scoring, no fixed clock time.",
+  "relatedProtocolIds": [
+    "work-space",
+    "sleep-space",
+    "breaker-off-office",
+    "reduce-nnemf-block",
+    "air-tube-headphones",
+    "grounding-mats-earth-stake"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Why Work Space",
+      "body": "Most nnEMF and dirty-electricity exposure for desk workers happens in the workday environment. Rolling breakers-when-unused, grounding, optional ions, and low-field desk habits into one permanent activity mirrors Sleep Space without forcing a morning-only log. Enable only what you actually run."
+    },
+    {
+      "heading": "How scoring works",
+      "body": "Points sum from enabled options: office breakers 6, grounding mat 10, negative ion generator 10, low artificial field 5. Auto-logs daily with no locked time of day while on your available list. Air-tube headphones remain a separate permanent for call hygiene."
+    },
+    {
+      "heading": "What each option means in practice",
+      "body": "Breakers off: work circuits powered down when the room is unused (safe labeling first). Grounding mat: desk or floor mat on a verified Earth reference—prefer an exterior stake over blind outlet ground. Negative ions: ionizer during work hours in a ventilated spot, cleaned per maker guidance. Low artificial field: phone off lap, router distance or airplane mode when practical, chargers not coiled on the torso—intentional desk hygiene, not perfection every minute."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse extends nnEMF discipline into the workday: long hours next to radios, dirty wiring, and metal-dense desks are framed as load on the same mitochondrial story as the bedroom. Work Space is the app composite for that daytime half. Brand-level desk prescriptions in forums are culture; distance and power-down are the durable habits."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: distance from transmitters, killing unused loads, and safer grounding references are engineering hygiene. Framework: that a desk ionizer or mat points score equals clinical recovery. Pair Work Space with Sleep Space for a full indoor loop—not as medical treatment."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Add Work Space from Edit activities. Tap to configure options. Pair with Sleep Space nightly and Air tube headphones for calls. Log separate nnEMF reduction blocks when you run timed airplane-mode hours away from the desk. Educational only."
+    }
+  ]
+}

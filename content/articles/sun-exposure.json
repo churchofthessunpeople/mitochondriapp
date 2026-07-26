@@ -1,0 +1,33 @@
+{
+  "id": "sun-exposure",
+  "title": "Outside Time",
+  "pillar": "light",
+  "summary": "Daytime outdoor light by morning, peak sun, or afternoon—full sun or shade, with duration—separate from the Sunrise check-in.",
+  "relatedProtocolIds": [
+    "sun-exposure",
+    "sunrise-horizon"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What Outside Time is",
+      "body": "Outside Time is the daytime outdoor-light habit: you go outdoors after the sunrise slot and log when, whether you were in full sun or shade, and how long you stayed. It is not the Sunrise check-in. Sunrise unlocks the day boost from morning eye light; Outside Time tracks the rest of the solar day for skin, spectrum, and place-timed UV."
+    },
+    {
+      "heading": "Why one activity, three slots",
+      "body": "Morning, peak sun, and afternoon are different jobs. Place sun times route each log: morning from sunrise until 1.5 hours before solar noon; peak sun for the symmetrical ±1.5-hour window around solar noon (the UVB-centered band); afternoon from then until sunset. Peak sun is where vitamin D synthesis is most efficient per minute when season allows. Morning and afternoon still train outdoor spectrum and movement—just with different UV profiles."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Step outside on purpose. Prefer full sun when safe and non-burning; shade still counts at lower points. Build duration gradually. Glass does not count as outside. Pair peak-sun logs with the solar-noon vitamin D lesson when repletion is your goal. Log another session anytime you go out again in a different slot."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: outdoor daylight differs from indoor LEDs in intensity and spectrum; solar noon UVB matters for vitamin D; non-burning exposure is the safe pattern. Framework: that every shaded minute is worthless, or that Outside Time replaces sunrise eye light. They are complementary—eyes at dawn, skin and day spectrum through Outside Time."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Outside Time: choose morning, peak sun, or afternoon, full sun or shaded, and duration. Sunrise check-in stays separate. Read Solar noon sun for vitamin D for the peak-sun skin story. Educational only—not dermatology or burn guidance; respect your skin type and clinician advice."
+    }
+  ]
+}

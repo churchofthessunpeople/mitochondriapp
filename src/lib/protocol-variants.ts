@@ -56,12 +56,14 @@ import {
   parseVagusMode,
   vagusModePoints,
 } from "@/lib/vagus-nerve";
+import type { ActivityModeOption } from "@/lib/protocol-meta";
 
 /** Effective base points when a protocol log carries a variant (gauss, °F, etc.). */
 export function variantBasePoints(
   protocolId: string,
   variantValue: unknown,
   catalogBase = 10,
+  modeOptions?: ActivityModeOption[] | null,
 ): number | undefined {
   if (isMagneticoProtocolId(protocolId)) {
     return pointsForMagneticoGauss(
@@ -84,10 +86,10 @@ export function variantBasePoints(
     return exerciseBasePoints(decoded, catalogBase);
   }
   if (isGroundingProtocolId(protocolId)) {
-    return groundingModePoints(parseGroundingMode(variantValue));
+    return groundingModePoints(parseGroundingMode(variantValue), modeOptions);
   }
   if (isVagusNerveProtocolId(protocolId)) {
-    return vagusModePoints(parseVagusMode(variantValue));
+    return vagusModePoints(parseVagusMode(variantValue), modeOptions);
   }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return pointsForSleepRoomTemp(parseSleepRoomTempF(variantValue));
@@ -113,6 +115,7 @@ export function formatVariantLabel(
   protocolId: string,
   variantValue: unknown,
   catalogBase = 10,
+  modeOptions?: ActivityModeOption[] | null,
 ): string | null {
   if (isMagneticoProtocolId(protocolId)) {
     const gauss = parseMagneticoGauss(variantValue);
@@ -131,10 +134,10 @@ export function formatVariantLabel(
     return formatExerciseLabel(variantValue);
   }
   if (isGroundingProtocolId(protocolId)) {
-    return formatGroundingLabel(variantValue);
+    return formatGroundingLabel(variantValue, modeOptions);
   }
   if (isVagusNerveProtocolId(protocolId)) {
-    return formatVagusLabel(variantValue);
+    return formatVagusLabel(variantValue, modeOptions);
   }
   if (isSleepRoomTempProtocolId(protocolId)) {
     return formatSleepRoomTemp(parseSleepRoomTempF(variantValue));

@@ -26,6 +26,7 @@
     "db:migrate-space-hygiene": "node scripts/migrate-space-hygiene.mjs",
     "db:migrate-vagus": "node scripts/migrate-vagus-merge.mjs",
     "content:export-from-db": "node scripts/export-content-overrides-to-files.mjs",
+    "content:export-articles": "npx tsx scripts/export-mito-articles.mjs",
     "email:probe": "node scripts/probe-email.mjs",
     "test": "tsx --test src/lib/sun.test.ts src/lib/scoring.test.ts src/lib/geomag.test.ts src/lib/artificial-em.test.ts src/lib/magnetico.test.ts src/lib/cold-thermo-skin-temp.test.ts src/lib/drinking-water.test.ts src/lib/grounding.test.ts src/lib/vagus-nerve.test.ts src/lib/inclination-drop-zones.test.ts src/lib/format-day-activities.test.ts src/lib/sun-exposure.test.ts src/lib/zip-place-cache.test.ts src/lib/username.test.ts src/lib/display-name.test.ts src/lib/display-name-policy.test.ts src/lib/week-range.test.ts src/lib/levels.test.ts src/lib/movement-setting.test.ts src/lib/region-scoring.test.ts src/lib/mitoversity-reading-levels.test.ts src/lib/space-hygiene.test.ts src/lib/editable-day.test.ts"
   },

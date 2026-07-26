@@ -1,0 +1,34 @@
+{
+  "id": "sunrise-outside",
+  "title": "Outside morning light (limited sky)",
+  "pillar": "light",
+  "summary": "Any outdoor morning photons when trees, streets, or heavy cloud limit the view—still worth logging over staying inside.",
+  "relatedProtocolIds": [
+    "sunrise-outside",
+    "sunrise-open-sky",
+    "sunrise-horizon"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What this tier is",
+      "body": "Outside morning light with limited sky is the entry sunrise tier: you step outdoors near dawn even when trees, buildings, narrow streets, or heavy cloud constrain the view. Porches, tree-lined blocks, and overcast dawns belong here. It is real outdoor light—just not open-sky or horizon quality."
+    },
+    {
+      "heading": "Why it still matters",
+      "body": "Even constrained outdoor morning light beats indoor brightness and spectrum for circadian entrainment. Showing up outside anchors timing when horizon or open-sky tiers are impossible. The app’s tier system rewards honesty: limited sky earns credit without pretending you saw the disk through a canyon."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Step outside in the morning. Eyes open; avoid sunglasses if safe. A short stop before indoor work helps. Skip logging glass-through-window “outdoor” light. When weather or travel opens a park or clear horizon, upgrade to open-sky or horizon tiers."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: any outdoor morning light is usually better than none for circadian timing. Framework: that limited-sky mornings are pointless, or that they equal horizon sunrise. They are a valid floor—not the ceiling."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Log Outside morning light (limited sky) when that was your sunrise check-in. It unlocks a 1.25× day boost. Upgrade to open-sky or horizon when conditions allow. Read Why sunrise is the most important part of the day for the full lesson. Educational only—not medical advice."
+    }
+  ]
+}

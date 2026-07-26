@@ -14,6 +14,7 @@ describe("encode/decode vagus variant", () => {
       "cold_face_immersion",
       "baking_soda_water",
       "castor_oil_navel",
+      "tuning_forks",
     ] as const) {
       assert.equal(decodeVagusVariant(encodeVagusVariant(mode)), mode);
     }
@@ -25,6 +26,7 @@ describe("vagusModePoints", () => {
     assert.equal(vagusModePoints("cold_face_immersion"), 5);
     assert.equal(vagusModePoints("baking_soda_water"), 4);
     assert.equal(vagusModePoints("castor_oil_navel"), 6);
+    assert.equal(vagusModePoints("tuning_forks"), 5);
   });
 });
 
@@ -42,5 +44,6 @@ describe("remapVagusFavoriteId", () => {
     assert.equal(remapVagusFavoriteId("castor-oil-navel"), "vagus-nerve-stimulation");
     assert.equal(remapVagusFavoriteId("baking-soda-water"), "vagus-nerve-stimulation");
     assert.equal(remapVagusFavoriteId("cold-face-plunge"), "vagus-nerve-stimulation");
+    assert.equal(remapVagusFavoriteId("tuning-forks"), "vagus-nerve-stimulation");
   });
 });

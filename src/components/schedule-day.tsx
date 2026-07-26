@@ -3,6 +3,7 @@
 import { Check, ChevronDown, Flame, Minus, Pencil, Plus, Sun, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import type { Protocol } from "@/db/schema";
+import { useAppContentOptional } from "@/components/app-content-context";
 import { AddActivityDialog } from "@/components/add-activity-dialog";
 import { ColdThermoDialog } from "@/components/cold-thermo-dialog";
 import { DrinkingWaterDialog } from "@/components/drinking-water-dialog";
@@ -58,10 +59,10 @@ import {
   type ExerciseLogInput,
 } from "@/lib/exercise";
 import {
-  GROUNDING_MODE_OPTIONS,
   groundingModeLabel,
   groundingModePoints,
   isGroundingProtocolId,
+  resolveGroundingOptions,
   type GroundingMode,
 } from "@/lib/grounding";
 import {
@@ -288,6 +289,14 @@ export function ScheduleDay({
   workSpaceConfig: initialWorkSpaceConfig = null,
 }: Props) {
   const completedOn = completedOnProp ?? todayIso;
+  const content = useAppContentOptional();
+  const groundingOptions = useMemo(
+    () =>
+      resolveGroundingOptions(
+        content?.protocolMeta?.["barefoot-earth"]?.options,
+      ),
+    [content?.protocolMeta],
+  );
   const { push } = useToast();
   const [, start] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -1548,11 +1557,11 @@ export function ScheduleDay({
                 />
               ) : choicePicker.kind === "grounding" ? (
                 <OptionListChoice
-                  options={GROUNDING_MODE_OPTIONS.map(
+                  options={groundingOptions.map(
                     (opt): ClickThroughOption => ({
                       id: opt.id,
                       title: opt.label,
-                      subtitle: `${opt.detail} · ${groundingModePoints(opt.id)} pts`,
+                      subtitle: `${opt.detail} · ${groundingModePoints(opt.id, groundingOptions)} pts`,
                       highlight: opt.id === "sphinx",
                     }),
                   )}

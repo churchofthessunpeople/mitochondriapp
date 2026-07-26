@@ -22,6 +22,7 @@ import {
   isMitoDeleted,
   isProtocolDeleted,
   loadContentOverrides,
+  mergeMitoEntries,
   mergeMitoEntry,
   mergeProtocolMeta,
   mergeProtocolSeed,
@@ -102,7 +103,6 @@ async function ensureMitoArticleForProtocol(
 ): Promise<void> {
   const overrides = await loadContentOverrides();
   if (
-    MITOVERSITY_ENTRIES.some((e) => e.id === articleId) ||
     isCustomMitoId(overrides, articleId) ||
     overrides.has(contentKey.mito(articleId))
   ) {
@@ -116,6 +116,7 @@ async function ensureMitoArticleForProtocol(
     pillar: categoryToMitoPillar(category),
     summary,
     relatedProtocolIds: [protocolId],
+    flatArticle: true,
     sections: [
       {
         heading: "How to",
@@ -124,6 +125,10 @@ async function ensureMitoArticleForProtocol(
       {
         heading: "Learn more over time",
         body: "Expand this article in Admin → Content → Articles with deeper sections when ready.",
+      },
+      {
+        heading: "How to use it here",
+        body: "Log the related activity when you complete this habit. Educational only—not medical advice.",
       },
     ],
   };
@@ -427,33 +432,40 @@ export async function listAdminMitoEditorsAction(
 > {
   await requireAdmin();
   const overrides = await loadContentOverrides();
-  const rows = MITOVERSITY_ENTRIES.map((entry) => {
-    const merged = mergeMitoEntry(entry, overrides);
-    return {
-      id: entry.id,
-      title: merged.title,
-      pillar: merged.pillar,
-      deleted: isMitoDeleted(overrides, entry.id),
-      isCustom: false,
-    };
-  });
+  const live = mergeMitoEntries(overrides);
+  const customIds = new Set(getRegistryIds(overrides, REGISTRY_CUSTOM_MITO));
+  const rows = live.map((entry) => ({
+    id: entry.id,
+    title: entry.title,
+    pillar: entry.pillar,
+    deleted: false,
+    isCustom: customIds.has(entry.id),
+  }));
 
-  for (const id of getRegistryIds(overrides, REGISTRY_CUSTOM_MITO)) {
-    const raw = overrides.get(contentKey.mito(id)) as MitoEntryOverride | undefined;
-    if (!raw || typeof raw.title !== "string" || typeof raw.pillar !== "string") {
-      continue;
+  if (includeDeleted) {
+    for (const [key, value] of overrides) {
+      if (!key.startsWith("mito:")) continue;
+      const id = key.slice("mito:".length);
+      if (!isMitoDeleted(overrides, id)) continue;
+      if (rows.some((r) => r.id === id)) continue;
+      const raw = value as MitoEntryOverride | undefined;
+      rows.push({
+        id,
+        title: typeof raw?.title === "string" ? raw.title : id,
+        pillar:
+          raw?.pillar === "light" ||
+          raw?.pillar === "water" ||
+          raw?.pillar === "magnetism" ||
+          raw?.pillar === "support"
+            ? raw.pillar
+            : "support",
+        deleted: true,
+        isCustom: customIds.has(id),
+      });
     }
-    rows.push({
-      id,
-      title: raw.title,
-      pillar: raw.pillar as MitoPillar,
-      deleted: false,
-      isCustom: true,
-    });
   }
 
-  const visible = includeDeleted ? rows : rows.filter((row) => !row.deleted);
-  return visible.sort((a, b) => a.title.localeCompare(b.title));
+  return rows.sort((a, b) => a.title.localeCompare(b.title));
 }
 
 export async function getAdminMitoEditorAction(
@@ -461,42 +473,40 @@ export async function getAdminMitoEditorAction(
 ): Promise<AdminMitoEditorData | null> {
   await requireAdmin();
   const overrides = await loadContentOverrides();
-  const base = MITOVERSITY_ENTRIES.find((e) => e.id === entryId);
   const isCustom = isCustomMitoId(overrides, entryId);
-
-  if (!base && !isCustom) return null;
-
-  let entry: MitoEntry;
-  if (base) {
-    entry = mergeMitoEntry(base, overrides);
-  } else {
-    const raw = overrides.get(contentKey.mito(entryId)) as MitoEntryOverride | undefined;
-    if (
-      !raw ||
-      typeof raw.title !== "string" ||
-      typeof raw.summary !== "string" ||
-      typeof raw.pillar !== "string" ||
-      !Array.isArray(raw.sections)
-    ) {
-      return null;
-    }
-    entry = {
-      id: entryId,
-      title: raw.title,
-      summary: raw.summary,
-      pillar: raw.pillar as MitoPillar,
-      sections: raw.sections,
-      relatedProtocolIds: raw.relatedProtocolIds,
-    };
-  }
-
-  const patch = overrides.get(contentKey.mito(entryId)) as
-    | MitoEntryOverride
+  const live = mergeMitoEntries(overrides).find((e) => e.id === entryId);
+  const raw = overrides.get(contentKey.mito(entryId)) as
+    | (MitoEntryOverride & Partial<MitoEntry>)
     | undefined;
+
+  let entry: MitoEntry | null = live ?? null;
+  if (!entry && raw) {
+    if (
+      typeof raw.title === "string" &&
+      typeof raw.summary === "string" &&
+      typeof raw.pillar === "string" &&
+      Array.isArray(raw.sections)
+    ) {
+      entry = {
+        id: entryId,
+        title: raw.title,
+        summary: raw.summary,
+        pillar: raw.pillar as MitoPillar,
+        sections: raw.sections,
+        relatedProtocolIds: raw.relatedProtocolIds,
+        flatArticle: raw.flatArticle !== false,
+      };
+    }
+  }
+  if (!entry) {
+    const base = MITOVERSITY_ENTRIES.find((e) => e.id === entryId);
+    if (base) entry = mergeMitoEntry(base, overrides);
+  }
+  if (!entry) return null;
 
   return {
     entry,
-    hasOverride: patch != null,
+    hasOverride: raw != null,
     isCustom,
     deleted: isMitoDeleted(overrides, entryId),
   };
@@ -572,9 +582,14 @@ export async function saveAdminMitoAction(
 ): Promise<void> {
   await requireAdmin();
   const overrides = await loadContentOverrides();
-  const base = MITOVERSITY_ENTRIES.find((e) => e.id === entryId);
+  const existing =
+    mergeMitoEntries(overrides).find((e) => e.id === entryId) ??
+    MITOVERSITY_ENTRIES.find((e) => e.id === entryId) ??
+    null;
   const isCustom = isCustomMitoId(overrides, entryId);
-  if (!base && !isCustom) throw new Error("Unknown article id");
+  if (!existing && !isCustom && !overrides.has(contentKey.mito(entryId))) {
+    throw new Error("Unknown article id");
+  }
 
   const parsed = mitoOverrideSchema.safeParse(raw);
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message);
@@ -582,35 +597,21 @@ export async function saveAdminMitoAction(
   const sections = parseMitoSections(raw);
   const relatedProtocolIds = parseRelatedProtocolIds(raw);
 
-  if (isCustom) {
-    const entry: MitoEntry = {
-      id: entryId,
-      title: parsed.data.title ?? "New article",
-      summary: parsed.data.summary ?? "Summary",
-      pillar: parsed.data.pillar ?? "support",
-      sections:
-        sections ?? [{ heading: "Overview", body: "Add article content here." }],
-      relatedProtocolIds: relatedProtocolIds ?? [],
-    };
-    await upsertContentOverrideAction(contentKey.mito(entryId), {
-      ...entry,
-    });
-    return;
-  }
+  const entry: MitoEntry = {
+    id: entryId,
+    title: parsed.data.title ?? existing?.title ?? "New article",
+    summary: parsed.data.summary ?? existing?.summary ?? "Summary",
+    pillar: parsed.data.pillar ?? existing?.pillar ?? "support",
+    sections:
+      sections ??
+      existing?.sections ?? [
+        { heading: "Overview", body: "Add article content here." },
+      ],
+    relatedProtocolIds: relatedProtocolIds ?? existing?.relatedProtocolIds ?? [],
+    flatArticle: true,
+  };
 
-  const patch: MitoEntryOverride = {};
-  if (parsed.data.title) patch.title = parsed.data.title;
-  if (parsed.data.summary) patch.summary = parsed.data.summary;
-  if (parsed.data.pillar) patch.pillar = parsed.data.pillar;
-  if (relatedProtocolIds !== undefined) {
-    patch.relatedProtocolIds = relatedProtocolIds;
-  }
-  if (sections) patch.sections = sections;
-
-  if (Object.keys(patch).length === 0) {
-    throw new Error("No changes to save");
-  }
-  await upsertContentOverrideAction(contentKey.mito(entryId), patch);
+  await upsertContentOverrideAction(contentKey.mito(entryId), entry);
 }
 
 export async function createAdminMitoAction(
@@ -621,10 +622,6 @@ export async function createAdminMitoAction(
   if (!CONTENT_ID_RE.test(id)) {
     throw new Error("Id must use lowercase letters, numbers, and hyphens only");
   }
-  if (MITOVERSITY_ENTRIES.some((entry) => entry.id === id)) {
-    throw new Error("That id is already used by a built-in article");
-  }
-
   const overrides = await loadContentOverrides();
   if (isCustomMitoId(overrides, id) || overrides.has(contentKey.mito(id))) {
     throw new Error("An article with that id already exists");
@@ -646,6 +643,7 @@ export async function createAdminMitoAction(
     pillar: parsed.data.pillar ?? "support",
     sections,
     relatedProtocolIds,
+    flatArticle: true,
   };
 
   const registry = getRegistryIds(overrides, REGISTRY_CUSTOM_MITO);
@@ -658,6 +656,7 @@ export async function deleteAdminMitoAction(entryId: string): Promise<void> {
   await requireAdmin();
   const overrides = await loadContentOverrides();
   const isCustom = isCustomMitoId(overrides, entryId);
+  const hasFile = overrides.has(contentKey.mito(entryId));
 
   if (isCustom) {
     const registry = getRegistryIds(overrides, REGISTRY_CUSTOM_MITO).filter(
@@ -665,10 +664,12 @@ export async function deleteAdminMitoAction(entryId: string): Promise<void> {
     );
     await setCustomMitoRegistry(registry);
     await deleteContentOverrideAction(contentKey.mito(entryId));
-  } else if (!MITOVERSITY_ENTRIES.some((entry) => entry.id === entryId)) {
+  } else if (!hasFile && !MITOVERSITY_ENTRIES.some((entry) => entry.id === entryId)) {
     throw new Error("Unknown article id");
   } else {
+    const existing = overrides.get(contentKey.mito(entryId));
     await upsertContentOverrideAction(contentKey.mito(entryId), {
+      ...(typeof existing === "object" && existing ? existing : {}),
       deleted: true,
       hidden: true,
     });
@@ -681,10 +682,18 @@ export async function restoreAdminMitoAction(entryId: string): Promise<void> {
   if (isCustomMitoId(overrides, entryId)) {
     throw new Error("Custom articles cannot be restored — create them again");
   }
-  if (!MITOVERSITY_ENTRIES.some((entry) => entry.id === entryId)) {
+  const existing = overrides.get(contentKey.mito(entryId));
+  if (!existing || typeof existing !== "object") {
     throw new Error("Unknown article id");
   }
-  await deleteContentOverrideAction(contentKey.mito(entryId));
+  const { deleted: _d, hidden: _h, ...rest } = existing as Record<
+    string,
+    unknown
+  >;
+  await upsertContentOverrideAction(contentKey.mito(entryId), {
+    ...rest,
+    flatArticle: true,
+  });
 }
 
 export async function resetAdminMitoOverrideAction(
@@ -695,7 +704,8 @@ export async function resetAdminMitoOverrideAction(
   if (isCustomMitoId(overrides, entryId)) {
     throw new Error("Custom articles cannot be reset — delete them instead");
   }
-  await deleteContentOverrideAction(contentKey.mito(entryId));
+  // File-backed articles are the source of truth — reset clears soft-delete flags.
+  await restoreAdminMitoAction(entryId);
 }
 
 export async function listAdminCategoryEditorsAction() {

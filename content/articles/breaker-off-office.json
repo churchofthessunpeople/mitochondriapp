@@ -1,0 +1,40 @@
+{
+  "id": "breaker-off-office",
+  "title": "Office breakers off when unused",
+  "pillar": "magnetism",
+  "summary": "Cut work-area circuits when the room is unused to lower daytime artificial field load from chargers, monitors, and networking gear. Now an option inside Work Space.",
+  "relatedProtocolIds": [
+    "breaker-off-office",
+    "work-space",
+    "reduce-nnemf-block",
+    "grounding-mats-earth-stake",
+    "air-tube-headphones"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Daytime field hygiene",
+      "body": "Home offices accumulate chargers, monitors, docks, and networking gear that stay energized for hours. Switching labeled office circuits off when the room is unused—or using a shutdown ritual with power strips—reduces chronic low-level electrical and RF-adjacent load for people optimizing nnEMF. Distance helps too: keep active electronics several feet from where you sit when you can."
+    },
+    {
+      "heading": "Practical shutdown ritual",
+      "body": "Label desk and office circuits with help if needed. End-of-day: save work, power down or unplug what you can, flip breakers or kill the strip feeding the desk cluster. Some people run a shielded extension into a room with wall circuits off so only chosen loads are live—advanced and electrician-dependent. Skip on travel days or shared offices you do not control."
+    },
+    {
+      "heading": "Pair with desk habits while working",
+      "body": "Breakers-off when unused is the empty-room half. While working, use Work Space options: grounding mat (verified Earth), low artificial field (phone off lap, router distance), and air-tube headphones for calls. nnEMF reduction blocks cover intentional airplane-mode hours anywhere in the day."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s nnEMF teaching extends beyond the bedroom: long desk days in dirty electrical environments are framed as mitochondrial load. Community gear lists emphasize distance, wired Ethernet, and killing unused circuits. Treat product absolutism as culture; treat “power down what you do not need” as ordinary engineering sense inside his stack."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: idle electronics still draw and radiate or couple noise; labeled shutdowns reduce continuous exposure; shared walls and apartments limit what you can cut. Framework: that office breaker habits alone reverse metabolic disease. Use as Work Space hygiene."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Enable Office breakers off inside Work Space on days the room stayed powered down when unused. Work Space auto-logs daily while on your available list—skip when traveling. Pair with Sleep Space for the night counterpart. Educational only—not electrical code advice."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "sleep-space",
+  "title": "Sleep Space — bedroom hygiene stack",
+  "pillar": "magnetism",
+  "summary": "One permanent night stack: cool temp, Magnetico, true dark, circadian sleep window, breakers, phone away, grounding mat, and negative ions—points add up from what you enable.",
+  "relatedProtocolIds": [
+    "sleep-space",
+    "work-space",
+    "cool-bedroom-sleep",
+    "dark-bedroom",
+    "consistent-sleep-window",
+    "phone-away-sleep",
+    "breaker-off-bedroom",
+    "magnetico-sleep-pad"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Why one Sleep Space row",
+      "body": "Bedroom recovery is a stack, not a single checkbox. Cool temperature, unidirectional sleep magnetism, true dark, a consistent sleep–wake window, cut AC circuits, phone distance, grounding, and optional negative ions all belong to the same night environment. Sleep Space keeps them under one permanent habit so setup matches how you actually sleep—enable only what you run."
+    },
+    {
+      "heading": "How scoring works",
+      "body": "Points are the sum of enabled options. Cool bedroom follows the °F curve (65°F = 10 pts; warmer costs points). Magnetico is 10 / 25 / 50 by gauss (5 / 10 / 20 G). Flat options: true dark 8, circadian sleep window 7, bedroom breakers 6, phone away 5, grounding mat 10, negative ion generator 10. The activity auto-logs nightly while on your available list; skip when traveling."
+    },
+    {
+      "heading": "Build the stack in order",
+      "body": "Start with high-leverage, low-drama pieces: true dark, phone away, cool room, consistent window. Add breakers only with safe labeling. Add a grounding mat only after stake-vs-outlet checks (see grounding-mats lesson). Add Magnetico only if you own a unidirectional under-mattress system and set polarity correctly. Negative ions are optional air-side gear—not a substitute for darkness or RF hygiene."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s night rules—darkness, cold sleep, phone out, low artificial fields, and often sleep magnetism—are the teaching backbone of this composite. Sleep Space is the app’s way to log that stack without eight separate permanent rows. Exact gauss targets, ion claims, and disease narratives remain his or community framework layered on ordinary sleep hygiene."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: dark, cool, quiet, regular timing, and fewer bedside radios improve sleep for many people; electrical safety matters for breakers and mats. Framework: that summing option points measures mitochondrial recovery, or that every option is mandatory for health. Use Sleep Space as a configurable night checklist."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Add Sleep Space once from Edit activities. Tap the row anytime to change options and temps/gauss. Work Space is the daytime desk counterpart; air-tube headphones stay separate for calls. Open linked lessons (cool sleep, true dark, phone away, breakers, Magnetico, grounding mats) for depth. Educational only."
+    }
+  ]
+}

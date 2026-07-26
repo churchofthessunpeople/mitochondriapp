@@ -10,6 +10,33 @@ import {
 } from "@/lib/mitoversity-reading-levels";
 import { cn } from "@/lib/utils";
 
+const URL_IN_TEXT =
+  /(https?:\/\/[^\s<>"')\]]+)/g;
+
+/** Split plain body text so http(s) URLs render as outbound links. */
+function LinkedBody({ text }: { text: string }) {
+  const parts = text.split(URL_IN_TEXT);
+  return (
+    <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted">
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a
+            key={`${part}-${i}`}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-accent underline-offset-2 hover:underline"
+          >
+            {part}
+          </a>
+        ) : (
+          <span key={`${i}-${part.slice(0, 12)}`}>{part}</span>
+        ),
+      )}
+    </p>
+  );
+}
+
 function ArticleSections({
   sections,
 }: {
@@ -20,7 +47,7 @@ function ArticleSections({
       {sections.map((s) => (
         <section key={s.heading} className="space-y-1.5">
           <h4 className="text-sm font-semibold text-foreground">{s.heading}</h4>
-          <p className="text-sm leading-relaxed text-muted">{s.body}</p>
+          <LinkedBody text={s.body} />
         </section>
       ))}
     </div>

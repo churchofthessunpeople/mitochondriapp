@@ -89,13 +89,13 @@ A “key file on this PC” does not work well for a hosted web app: the server 
 
 | Layer | Where |
 |-------|--------|
-| Baseline | `src/db/seed-data.ts`, `src/lib/protocol-meta.ts`, `src/lib/mitoversity*.ts` |
-| Day-to-day edits | Admin → Content (local `npm run dev`) → writes `content/*.json` |
+| Activities | `content/activities.json` — definition, how-to, equipment, article link, mode `options` |
+| Articles | `content/articles/<id>.json` — one flat article per file |
 | Neon | User logs, favorites, schedule + thin `protocols` FK rows only |
 
-1. Run `npm run dev` as an admin  
-2. Open Admin → Content — edit activities (points, how-to) or articles (section list)  
-3. Save updates `content/` on disk — commit those files and deploy  
+1. Edit `content/activities.json` (or Admin → Content in local `npm run dev`)  
+2. Edit articles under `content/articles/`  
+3. Commit and deploy  
 
 Production Admin Save is blocked (filesystem is read-only). One-time migrate from old Neon overrides:
 

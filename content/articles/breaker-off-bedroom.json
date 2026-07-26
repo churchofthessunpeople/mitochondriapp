@@ -1,0 +1,40 @@
+{
+  "id": "breaker-off-bedroom",
+  "title": "Bedroom breakers off overnight",
+  "pillar": "magnetism",
+  "summary": "Cut bedroom circuits at the panel overnight to lower AC electric fields and dirty-electricity paths near sleep—only when safe. Now an option inside Sleep Space.",
+  "relatedProtocolIds": [
+    "breaker-off-bedroom",
+    "sleep-space",
+    "phone-away-sleep",
+    "grounding-mats-earth-stake",
+    "reduce-nnemf-block"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What this targets",
+      "body": "Bedroom circuits can carry AC electric fields from wiring and plugged loads even when lamps and chargers look “off.” Switching labeled bedroom breakers off at the panel removes that energized path overnight. The alternative some people use is sleeping several feet from walls with active wiring—less complete, sometimes more practical in rentals."
+    },
+    {
+      "heading": "Safety first",
+      "body": "Do not disable circuits that power smoke or CO detectors, medical devices, heat/AC needed for safety, refrigerators on shared legs, or required egress lighting. Label breakers with a licensed electrician if you are unsure. Panel work and mislabeled circuits are real hazards—this is environment design, not a DIY dare."
+    },
+    {
+      "heading": "Practical night ritual",
+      "body": "With safe circuits identified: flip bedroom breakers off as part of the wind-down, confirm lights/outlets in the sleep zone are dead, sleep, restore power in the morning. Skip when traveling or when someone needs a powered medical device in the room. Body-voltage meters can show before/after AC volts relative to earth if you want feedback—optional, not required to try a careful setup."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s nnEMF sleep rules emphasize killing artificial electrical environments at night so recovery happens under a quieter field—often alongside phone removal, darkness, and optional sleep magnetism tools. Community practice popularized breaker-off bedrooms; treat extreme “all circuits always” slogans as framework. Your house wiring and code come first."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: energized conductors create AC electric fields; distance and de-energizing reduce them; life-safety circuits must stay on. Framework: that breaker-off nights are proven therapy for specific diseases. Use as field hygiene inside a broader sleep stack."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Enable Bedroom breakers off inside Sleep Space when this is your overnight standard. Tap to skip when the panel is inaccessible. Pair with Phone away and True dark in the same stack. Read Grounding mats for stake vs outlet caveats if you also earth-connect a sleep mat. Educational only—not electrical installation advice."
+    }
+  ]
+}
