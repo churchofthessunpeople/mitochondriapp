@@ -181,7 +181,8 @@ export function OnboardingWizard({
             Optimize mitochondria daily
           </h1>
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-muted">
-            Learn about a track the habits that support optimal mitochondrial function, as taught by Dr. Jack Kruse and his three legged stool of {" "}
+            Learn about and track the habits that support optimal mitochondrial
+            function, as taught by Dr. Jack Kruse and his three-legged stool of{" "}
             <strong className="text-foreground">Light</strong>,{" "}
             <strong className="text-foreground">Water</strong>, and{" "}
             <strong className="text-foreground">Magnetism</strong>.
@@ -190,19 +191,22 @@ export function OnboardingWizard({
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               <span>
-                <strong className="text-foreground">Light</strong> - Sunrise and various outdoor spectrums according to your latitude
+                <strong className="text-foreground">Light</strong> — sunrise and
+                outdoor spectrum by your latitude
               </span>
             </li>
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               <span>
-                <strong className="text-foreground">Water</strong> - Lower Deuterium content
+                <strong className="text-foreground">Water</strong> — lower
+                deuterium (heavy hydrogen) in drinks and food
               </span>
             </li>
             <li className="flex gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
               <span>
-                <strong className="text-foreground">Magnetism</strong> - Grounding, EMF hygiene, lower RF exposure
+                <strong className="text-foreground">Magnetism</strong> —
+                grounding, EMF hygiene, lower RF exposure
               </span>
             </li>
           </ul>
@@ -213,8 +217,7 @@ export function OnboardingWizard({
               rel="noopener noreferrer"
               className="font-medium text-accent underline-offset-2 transition hover:underline"
             >
-              Click Here to visit Dr. Jack Kruse's website
-              for more information about his three legged stool of health.
+              Getting started with Dr. Jack Kruse
             </a>
           </p>
           <button
@@ -231,14 +234,15 @@ export function OnboardingWizard({
       {step === "location" && (
         <section>
           <p className="text-xs uppercase tracking-[0.2em] text-accent">
-            Step 1 of 3
+            Location
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">
             Where are you?
           </h1>
           <p className="mt-2 text-sm text-muted">
             A US ZIP gives sunrise/sunset at your coordinates and the nearest
-            lifestyle score. You can change this anytime.
+            lifestyle score. Outside the US? Skip for now — sun times need a US
+            ZIP today; everything else still works. You can change this anytime.
           </p>
 
           <div className="glass mt-6 rounded-3xl p-5">
@@ -291,14 +295,6 @@ export function OnboardingWizard({
                   : "Continue without ZIP"}
               {!locationPending && <ChevronRight className="h-4 w-4" />}
             </button>
-            <button
-              type="button"
-              disabled={locationPending}
-              onClick={() => setStep("activities")}
-              className="btn-secondary inline-flex h-12 flex-1 items-center justify-center rounded-2xl text-sm font-semibold disabled:opacity-60"
-            >
-              Skip for now
-            </button>
           </div>
         </section>
       )}
@@ -306,7 +302,7 @@ export function OnboardingWizard({
       {step === "activities" && (
         <section>
           <p className="text-xs uppercase tracking-[0.2em] text-accent">
-            Step 2 of 3
+            Activities
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">
             What can you do?
@@ -390,7 +386,7 @@ export function OnboardingWizard({
       {step === "firstwin" && (
         <section>
           <p className="text-xs uppercase tracking-[0.2em] text-accent">
-            Step 3 of 4
+            First win
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">
             Log one thing now

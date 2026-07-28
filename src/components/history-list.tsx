@@ -107,13 +107,8 @@ export function HistoryList({
   if (rows.length === 0) {
     return (
       <div className="space-y-4">
-        <WeekCopyBar
-          weekShortLabel={weekShortLabel}
-          copyingWeek={copyingWeek}
-          onCopy={copyPreviousWeek}
-        />
         <div className="glass rounded-3xl px-6 py-12 text-center text-sm text-muted">
-          No history yet. Log today&apos;s protocols to start.
+          No history yet. Log today&apos;s activities to start.
         </div>
       </div>
     );

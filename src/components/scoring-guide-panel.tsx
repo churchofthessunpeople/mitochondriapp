@@ -53,12 +53,12 @@ export function ScoringGuidePanel() {
 
       <section className="glass space-y-3 rounded-3xl p-5">
         <h2 className="text-lg font-semibold">
-          2. Magnetism score (active magma / volcanoes)
+          2. Geology score (active magma / volcanoes)
         </h2>
         <p className="text-sm text-muted">
           Distance to the nearest Holocene volcano or major magma system
           (Smithsonian GVP catalog + USGS US volcanoes + arc/hotspot midpoints).
-          Boost uses inverse-square falloff (1/r²): full influence within ~
+          Shown as “Geology” on the Place card. Boost uses inverse-square falloff (1/r²): full influence within ~
           {MAGMA_FULL_INFLUENCE_KM} km, zero boost past ~
           {MAGMA_ZERO_INFLUENCE_KM} km. Lifestyle proxy — not a real-time
           eruption alert.
@@ -104,10 +104,10 @@ export function ScoringGuidePanel() {
 
       <section className="glass space-y-3 rounded-3xl p-5">
         <h2 className="text-lg font-semibold">
-          3. Politics / monetary freedom score
+          3. Freedom / politics score
         </h2>
         <p className="text-sm text-muted">
-          Starts at 3 (mixed free-world baseline), then adjusts:
+          Shown as “Freedom” on the Place card. Starts at 3 (mixed free-world baseline), then adjusts:
         </p>
         <ul className="space-y-1 text-sm">
           <li>

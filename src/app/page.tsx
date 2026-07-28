@@ -71,7 +71,8 @@ export default async function HomePage() {
             Sign in
           </Link>
           <p className="pt-1 text-center text-xs text-muted">
-            Guest mode keeps today&apos;s progress — save an account anytime
+            Guest mode lasts 24 hours — create an account before then to keep
+            your logs
           </p>
         </div>
       </main>

@@ -516,7 +516,7 @@ export function ScheduleDay({
       return `plunge · shower · tap to log`;
     }
     if (isDrinkingWaterProtocolId(p.id)) {
-      return `${p.points} pts · RO · spring · DDW · salt · carbonated · tap to log`;
+      return `${p.points} pts · filtered · spring · lower-D · salt · sparkling · tap to log`;
     }
     if (isExerciseProtocolId(p.id)) {
       return `${p.points} pts / 15 min · rebound · bands · walk · in/out`;
@@ -531,9 +531,9 @@ export function ScheduleDay({
       return `${p.points} pts / 15 min · morning · noon · afternoon · sun or shade`;
     }
     const parts: string[] = [`${p.points} pts`];
-    if (isSunriseKeystoneProtocol(p)) parts.push("Light keystone");
-    else if (isWaterKeystoneId(p.id)) parts.push("Water keystone");
-    else if (isMagnetismKeystoneId(p.id)) parts.push("Magnetism keystone");
+    if (isSunriseKeystoneProtocol(p)) parts.push("Daily light habit");
+    else if (isWaterKeystoneId(p.id)) parts.push("Daily water habit");
+    else if (isMagnetismKeystoneId(p.id)) parts.push("Daily magnetism habit");
     if (isPermanentProtocol(p)) parts.push("automatic daily");
     if (p.durationEnabled) {
       parts.push(`${p.points} pts / 15 min`);
@@ -1379,7 +1379,7 @@ export function ScheduleDay({
           ) : (
             renderEmptyHint(
               protocols.length === 0
-                ? "Tap Edit activities to build your list."
+                ? "Nothing selected yet — tap Edit activities to add what you can do."
                 : "Everything on your list is already performed.",
             )
           )}

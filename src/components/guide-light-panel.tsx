@@ -14,7 +14,7 @@ export function GuideLightPanel() {
 
       <section className="glass space-y-2 rounded-3xl p-5">
         <h2 className="text-base font-semibold text-foreground">
-          Daily keystone · Sunrise
+          Daily light habit · Sunrise
         </h2>
         <ul className="list-inside list-disc space-y-1.5">
           <li>

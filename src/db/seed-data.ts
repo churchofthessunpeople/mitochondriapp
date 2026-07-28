@@ -154,7 +154,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "barefoot-earth",
     name: "Grounding",
     description:
-      "Earth contact — barefoot (5 pts) or Make like the Sphinx belly contact (10 pts). Magnetism keystone.",
+      "Earth contact — barefoot (5 pts) or lie belly-down on earth / “Make like the Sphinx” (10 pts).",
     points: 5,
     category: "grounding",
     timeOfDay: "morning",
@@ -225,7 +225,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "drinking-water",
     name: "Drinking water",
     description:
-      "Log a glass: RO, spring, or deuterium-depleted; optional salt remineralization; still or carbonated. DDW includes deuterium PPM.",
+      "Log a glass of filtered, spring, or lower-deuterium water — optional pinch of salt; still or sparkling.",
     points: 4,
     category: "water_food",
     timeOfDay: "anytime",
@@ -374,7 +374,7 @@ export const PROTOCOL_SEEDS: ProtocolSeed[] = [
     id: "sleep-space",
     name: "Sleep Space",
     description:
-      "Bedroom hygiene stack — cool temp, Magnetico, dark, circadian sleep window, breakers, phone away, grounding mat, negative ions. Points = sum of enabled options. Permanent: auto-logs nightly while on your available list.",
+      "Bedroom hygiene stack — cool, dark, Magnetico, sleep window, breakers, phone away, grounding mat. Points = sum of options. Auto-logs nightly while on your list.",
     points: 0,
     category: "emf",
     timeOfDay: "night",

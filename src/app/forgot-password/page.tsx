@@ -18,6 +18,8 @@ export default function ForgotPasswordPage() {
         <h1 className="text-2xl font-semibold">Reset password</h1>
         <p className="mt-2 text-sm text-muted">
           Requires a recovery email saved on your account (Account settings).
+          Username-only accounts without a recovery email cannot reset a
+          password online — add one after you sign in.
         </p>
         <form action={action} className="mt-6 space-y-4">
           <input

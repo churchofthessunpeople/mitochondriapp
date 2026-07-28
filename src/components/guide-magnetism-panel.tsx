@@ -54,15 +54,17 @@ export function GuideMagnetismPanel() {
         <ul className="list-inside list-disc space-y-1.5">
           <li>
             <strong className="text-foreground">Grounding</strong> — barefoot
-            (5 pts) or Make like the Sphinx (10 pts)
+            (5 pts) or Make like the Sphinx — lie belly-down on earth (10 pts)
           </li>
           <li>
             <strong className="text-foreground">Low artificial field hour</strong>{" "}
             — outdoors or lower EM environment
           </li>
           <li>
-            <strong className="text-foreground">nnEMF reduction block</strong> —
-            airplane mode, distance from routers, outdoor low-RF
+            <strong className="text-foreground">
+              Non-native EMF (nnEMF) reduction
+            </strong>{" "}
+            — airplane mode, distance from routers, outdoor low-RF
           </li>
           <li>Nature immersion away from dense RF and artificial light</li>
         </ul>

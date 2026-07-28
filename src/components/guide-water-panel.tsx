@@ -16,24 +16,26 @@ export function GuideWaterPanel() {
 
       <section className="glass space-y-2 rounded-3xl p-5">
         <h2 className="text-base font-semibold text-foreground">
-          Daily keystone · Low-D hydration or meal
+          Daily water habit · Hydration or meal
         </h2>
         <ul className="list-inside list-disc space-y-1.5">
           <li>
-            <strong className="text-foreground">Low-D morning hydration</strong>{" "}
+            <strong className="text-foreground">Morning hydration</strong>{" "}
             — mineralized water in daylight (preferred first water of the day)
           </li>
           <li>
-            <strong className="text-foreground">Deuterium-aware meal</strong> —
-            seafood, quality fats, C3 produce where practical
+            <strong className="text-foreground">Lower-deuterium meal</strong> —
+            seafood, quality fats, C3 plants (most trees/grains; vs C4 like corn)
+            where practical
           </li>
           <li>
-            <strong className="text-foreground">Mineralized water</strong> —
-            not only deionized / empty water all day
+            <strong className="text-foreground">Drinking water</strong> —
+            filtered, spring, or lower-deuterium water — not only empty water all
+            day
           </li>
         </ul>
         <p className="text-xs">
-          Logging any water keystone counts toward today&apos;s water progress.
+          Logging any water habit counts toward today&apos;s water progress.
         </p>
       </section>
 

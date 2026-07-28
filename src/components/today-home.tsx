@@ -94,6 +94,8 @@ type Props = {
   isGuest?: boolean;
   /** Tour can force Checklist / Place while the coachmark is running */
   tourSection?: TodaySection | null;
+  /** Expand the day overview (tour “Today at a glance” step). */
+  tourForceOverview?: boolean;
 };
 
 const TABS: {
@@ -102,7 +104,7 @@ const TABS: {
   shortLabel: string;
   icon: typeof ClipboardList;
 }[] = [
-  { id: "checklist", label: "Checklist", shortLabel: "Log", icon: ClipboardList },
+  { id: "checklist", label: "Today", shortLabel: "Today", icon: ClipboardList },
   { id: "place", label: "Place", shortLabel: "Place", icon: MapPin },
   {
     id: "leaderboard",
@@ -157,13 +159,10 @@ export function TodayHome({
   onAdminEditContent,
   isGuest = false,
   tourSection = null,
+  tourForceOverview = false,
 }: Props) {
   const hasPlace = Boolean(placeLabel || region);
-  const sectionTabs = useMemo(
-    () =>
-      isGuest ? TABS.filter((t) => t.id !== "leaderboard") : TABS,
-    [isGuest],
-  );
+  const sectionTabs = useMemo(() => TABS, []);
   const [section, setSection] = useState<TodaySection>(() => {
     if (initialSection === "catalog") return "checklist";
     if (isGuest && initialSection === "leaderboard") {
@@ -174,10 +173,13 @@ export function TodayHome({
 
   useEffect(() => {
     if (!tourSection) return;
-    if (tourSection === "leaderboard" && isGuest) return;
     setSection(tourSection === "catalog" ? "checklist" : tourSection);
-  }, [tourSection, isGuest]);
+  }, [tourSection]);
   const [overviewOpen, setOverviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (tourForceOverview) setOverviewOpen(true);
+  }, [tourForceOverview]);
   const [viewDayIso, setViewDayIso] = useState(todayIso);
   const [daySwitchPending, setDaySwitchPending] = useState(false);
   const [liveCounts, setLiveCounts] = useState(completionCounts);
@@ -294,7 +296,6 @@ export function TodayHome({
   }, [initialSection]);
 
   function selectSection(next: TodaySection) {
-    if (isGuest && next === "leaderboard") return;
     const resolved = next === "catalog" ? "checklist" : next;
     setSection(resolved);
     try {
@@ -460,8 +461,8 @@ export function TodayHome({
       {isGuest && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3">
           <p className="min-w-0 flex-1 text-sm text-foreground/90">
-            Guest mode — save an account to keep history and join the
-            leaderboard.
+            Guest mode expires in 24 hours — save an account to keep history and
+            join the leaderboard.
           </p>
           {onOpenSheet && (
             <button
@@ -702,7 +703,26 @@ export function TodayHome({
 
       <div role="tabpanel" className="min-h-[12rem]">
         {section === "checklist" && (
-          <ScheduleDay
+          <div className="space-y-3">
+            {onOpenSheet ? (
+              <p className="text-xs text-muted">
+                Points add up to your level.{" "}
+                <button
+                  type="button"
+                  onClick={() => onOpenSheet({ id: "scoring" })}
+                  className="font-medium text-accent hover:underline"
+                >
+                  How points work
+                </button>
+                {showMorningLightTip ? (
+                  <>
+                    {" "}
+                    · Sunrise can multiply the rest of today&apos;s points.
+                  </>
+                ) : null}
+              </p>
+            ) : null}
+            <ScheduleDay
             key={viewDayIso}
             protocols={availableProtocols}
             completionCounts={liveCounts}
@@ -737,6 +757,7 @@ export function TodayHome({
             workSpaceConfig={workSpaceConfig}
             onStatsChange={onStatsChange}
           />
+          </div>
         )}
 
         {section === "place" && (
@@ -793,14 +814,16 @@ export function TodayHome({
                 <p className="font-medium text-foreground">No location yet</p>
                 <p className="mt-1">
                   Enter a US ZIP for sunrise/sunset and the nearest lifestyle
-                  score.
+                  score. Outside the US? Sun times need a US ZIP for now —
+                  checklist and articles still work.
                 </p>
               </div>
             )}
 
             {placeMagnetismLoading ? (
               <p className="text-center text-xs text-muted">
-                Loading WMM magnetic field for your ZIP…
+                Loading World Magnetic Model (Earth&apos;s main field) for your
+                ZIP…
               </p>
             ) : null}
 
@@ -822,6 +845,27 @@ export function TodayHome({
                 </button>
               </p>
             ) : null}
+          </div>
+        )}
+
+        {section === "leaderboard" && isGuest && (
+          <div className="glass space-y-3 rounded-3xl border border-dashed border-border px-5 py-8 text-center">
+            <p className="text-sm font-medium text-foreground">
+              Leaderboard unlocks with an account
+            </p>
+            <p className="text-sm text-muted">
+              Save your guest progress to keep history and see how you rank.
+              Guest data expires after 24 hours.
+            </p>
+            {onOpenSheet && (
+              <button
+                type="button"
+                onClick={() => onOpenSheet({ id: "convertGuest" })}
+                className="btn-primary mx-auto mt-2 rounded-xl px-4 py-2.5 text-sm font-semibold"
+              >
+                Save progress
+              </button>
+            )}
           </div>
         )}
 

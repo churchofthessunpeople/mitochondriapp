@@ -118,7 +118,8 @@ export function PlaceExpand({
                   <p className="font-medium text-foreground">No location yet</p>
                   <p className="mt-1">
                     Enter a US ZIP for sunrise/sunset and the nearest lifestyle
-                    score.
+                    score. Outside the US? Sun times need a US ZIP for now —
+                    checklist and articles still work.
                   </p>
                 </div>
               )}

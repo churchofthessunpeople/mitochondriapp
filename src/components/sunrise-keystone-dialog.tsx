@@ -29,6 +29,7 @@ import {
   computeSunriseSessionOffsets,
   currentLocalHm,
   formatSunriseWindow,
+  isPastSunriseMorningWindow,
   isSunriseSessionOptimal,
   minutesBeyondOptimalWindow,
   optimalWindowHm,
@@ -72,7 +73,7 @@ function defaultSessionHm(
   timeZone: string,
   sunrise: Date | string | null | undefined,
 ): { startHm: string; endHm: string } {
-  if (sunrise) {
+  if (sunrise && !isPastSunriseMorningWindow(sunrise, timeZone)) {
     try {
       return optimalWindowHm(sunrise, timeZone);
     } catch {
@@ -320,9 +321,13 @@ export function SunriseKeystoneDialog({
     step === "confirm" ||
     (step === "sky" && !initialTier);
 
+  const pastMorning = isPastSunriseMorningWindow(sun?.sunrise, timeZone);
+
   const title =
     step === "tier"
-      ? "Sunrise — how did you do?"
+      ? pastMorning
+        ? "Morning light — log or skip?"
+        : "Sunrise — how did you do?"
       : step === "sky"
         ? "Sky conditions"
         : step === "grounded"
@@ -336,7 +341,9 @@ export function SunriseKeystoneDialog({
   const subtitle =
     step === "tier" ? (
       <>
-        First light sets the day. Tap the sky view that fits.
+        {pastMorning
+          ? "The morning window has passed. Log if you caught sunrise earlier, or skip until tomorrow."
+          : "First light sets the day. Tap the sky view that fits."}
         {riseLabel ? (
           <>
             {" "}
@@ -349,7 +356,9 @@ export function SunriseKeystoneDialog({
               </>
             ) : null}
           </>
-        ) : null}
+        ) : (
+          <> Set a US ZIP in Place for accurate sunrise times.</>
+        )}
       </>
     ) : step === "sky" ? (
       <>
@@ -422,6 +431,16 @@ export function SunriseKeystoneDialog({
               onChoose={pickTier}
               footer={
                 <div className="mt-1 flex flex-col gap-2">
+                  {pastMorning && onDismissDay ? (
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={onDismissDay}
+                      className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
+                    >
+                      Missed it today — ask again tomorrow
+                    </button>
+                  ) : null}
                   {onDismissSession ? (
                     <button
                       type="button"
@@ -432,7 +451,7 @@ export function SunriseKeystoneDialog({
                       Not yet — ask me later
                     </button>
                   ) : null}
-                  {onDismissDay ? (
+                  {!pastMorning && onDismissDay ? (
                     <button
                       type="button"
                       disabled={pending}

@@ -43,7 +43,7 @@ export function PlaceStrip({
         <span className="min-w-0 flex-1">
           <span className="font-medium text-foreground">Set your location</span>
           <span className="mt-0.5 block text-xs text-muted">
-            ZIP unlocks sunrise/sunset for your day
+            US ZIP unlocks sunrise/sunset for your day
           </span>
         </span>
         {showChevron ? (

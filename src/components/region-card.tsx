@@ -86,9 +86,9 @@ export function RegionCard({
           <span className="font-semibold text-amber-200/90">
             Inclination drop context ·{" "}
           </span>
-          {placeFactors.inclinationZone.summaryLine}. April 2026 Kruse-framework
-          place map from your ZIP — see Magnetism layers below and Mitoversity
-          for full zone profiles.
+          {placeFactors.inclinationZone.summaryLine}. Place map from your ZIP —
+          educational context, not a medical rating — see Magnetism layers below
+          and Mitoversity for full zone profiles.
         </p>
       )}
 
@@ -116,16 +116,19 @@ export function RegionCard({
               label="Sun"
               value={String(region.sunScore)}
               valueClassName={scoreColor(region.sunScore)}
+              hint="Latitude / UV"
             />
             <StatCell
-              label="Magnetism"
+              label="Geology"
               value={String(region.magnetismScore)}
               valueClassName={scoreColor(region.magnetismScore)}
+              hint="Volcano proximity"
             />
             <StatCell
-              label="Policy"
+              label="Freedom"
               value={String(region.policyScore)}
               valueClassName={scoreColor(region.policyScore)}
+              hint="Outdoor / policy"
             />
           </>
         )}
@@ -318,10 +321,12 @@ function StatCell({
   label,
   value,
   valueClassName,
+  hint,
 }: {
   label: string;
   value: string;
   valueClassName?: string;
+  hint?: string;
 }) {
   return (
     <div className="flex min-w-0 flex-col items-center justify-center rounded-2xl border border-border bg-foreground/[0.03] px-2 py-2.5 text-center">
@@ -334,6 +339,9 @@ function StatCell({
       >
         {value}
       </p>
+      {hint ? (
+        <p className="mt-0.5 text-[9px] leading-snug text-muted">{hint}</p>
+      ) : null}
     </div>
   );
 }

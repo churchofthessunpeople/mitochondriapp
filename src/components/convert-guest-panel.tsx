@@ -30,8 +30,9 @@ export function ConvertGuestPanel() {
   return (
     <div className="space-y-5">
       <p className="text-sm leading-relaxed text-muted">
-        Choose a username and password to keep your logs, history, and place
-        settings. You&apos;ll unlock Account and the leaderboard.
+        Guest data is deleted after 24 hours. Choose a username and password now
+        to keep your logs, history, and place settings — and unlock Account and
+        the leaderboard.
       </p>
 
       <form action={formAction} className="space-y-4">

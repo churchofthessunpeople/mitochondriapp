@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { eq, sql } from "drizzle-orm";
 import { AuthError, CredentialsSignin } from "next-auth";
+import { cookies } from "next/headers";
 import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -22,6 +23,22 @@ import { ROUTES } from "@/lib/routes";
 import { getDisplayNameConflictError } from "@/lib/display-name-availability";
 import { getUsernameConflictError } from "@/lib/username-availability";
 import { usernameSchema } from "@/lib/username";
+import { GUEST_SESSION_COOKIE } from "@/lib/guest-cookie";
+
+async function markGuestBrowser() {
+  const jar = await cookies();
+  jar.set(GUEST_SESSION_COOKIE, "1", {
+    path: "/",
+    maxAge: 60 * 60 * 48,
+    sameSite: "lax",
+    httpOnly: true,
+  });
+}
+
+async function clearGuestBrowserMark() {
+  const jar = await cookies();
+  jar.delete(GUEST_SESSION_COOKIE);
+}
 
 /**
  * Auth.js signIn/signOut with redirectTo can absolute-ize using AUTH_URL
@@ -239,6 +256,10 @@ export async function resendVerificationAction(
 }
 
 export async function logoutAction() {
+  const session = await auth();
+  if (session?.user?.isGuest) {
+    await clearGuestBrowserMark();
+  }
   await signOut({ redirect: false });
   redirect("/");
 }
@@ -316,6 +337,7 @@ export async function startGuestAction(): Promise<void> {
     redirect(`${ROUTES.login}?guestError=1`);
   }
 
+  await markGuestBrowser();
   redirect(ROUTES.onboarding);
 }
 
@@ -419,6 +441,8 @@ export async function convertGuestAction(
       sessionVersion: sql`${users.sessionVersion} + 1`,
     })
     .where(eq(users.id, userId));
+
+  await clearGuestBrowserMark();
 
   try {
     await signOut({ redirect: false });

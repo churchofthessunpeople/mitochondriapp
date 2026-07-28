@@ -144,11 +144,11 @@ export function computeLwmProgress(
     magnetism,
     lightLabel: light ? "Sunrise logged" : "Need sunrise / AM light",
     waterLabel: water
-      ? "Water keystone logged"
-      : "Need low-D hydration or meal",
+      ? "Water habit logged"
+      : "Need a water habit (drink or meal)",
     magnetismLabel: magnetism
       ? "Magnetism action logged"
-      : "Need ground / low-RF hour",
+      : "Need grounding or low-RF time",
     allThree: doneCount === 3,
     doneCount,
   };

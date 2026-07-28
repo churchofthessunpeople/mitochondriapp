@@ -124,11 +124,12 @@ export function AddActivityDialog({
   useEffect(() => {
     if (open) {
       setQuery("");
-      setNotOnOpen(false);
-      setOnListOpen(false);
+      const empty = initialIds.length === 0;
+      setNotOnOpen(empty);
+      setOnListOpen(!empty);
       setPermanentOpen(false);
     }
-  }, [open]);
+  }, [open, initialIds.length]);
 
   const q = query.trim().toLowerCase();
 

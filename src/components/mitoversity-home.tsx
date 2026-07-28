@@ -24,6 +24,13 @@ const PILLAR_FILTERS: { id: MitoPillar | "all"; label: string }[] = [
   { id: "support", label: "Support" },
 ];
 
+/** Beginner on-ramp — one pillar each, pinned above the list when browsing All. */
+const START_HERE_IDS = [
+  "sunrise-why",
+  "deuterium-and-water",
+  "magnetic-excursion-oxygen",
+] as const;
+
 /**
  * Mitoversity: research-style lessons on mitochondrial lifestyle levers.
  * Expand entries in src/lib/mitoversity.ts.
@@ -61,6 +68,19 @@ export function MitoversityHome({
       return true;
     });
   }, [pillar, titleQuery, allEntries]);
+
+  const startHere = useMemo(() => {
+    if (pillar !== "all" || titleQuery.trim()) return [];
+    return START_HERE_IDS.map((id) => allEntries.find((e) => e.id === id)).filter(
+      (e): e is MitoEntry => Boolean(e),
+    );
+  }, [pillar, titleQuery, allEntries]);
+
+  const listEntries = useMemo(() => {
+    if (startHere.length === 0) return entries;
+    const pinned = new Set(startHere.map((e) => e.id));
+    return entries.filter((e) => !pinned.has(e.id));
+  }, [entries, startHere]);
 
   const openEntry = openId
     ? allEntries.find((e) => e.id === openId) ?? null
@@ -151,23 +171,58 @@ export function MitoversityHome({
             : "No lessons in this category yet. Check back as Mitoversity grows."}
         </div>
       ) : (
-        <ul className="space-y-3">
-          {entries.map((entry) => (
-            <li key={entry.id}>
-              <EntryListCard
-                entry={entry}
-                pillarLabel={pillarLabels[entry.pillar]}
-                onOpen={() => setOpenId(entry.id)}
-                isAdmin={isAdmin}
-                onAdminEdit={
-                  onAdminEditContent
-                    ? () => onAdminEditContent(`mito:${entry.id}`)
-                    : undefined
-                }
-              />
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-5">
+          {startHere.length > 0 ? (
+            <div className="space-y-3">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-accent">
+                Start here
+              </p>
+              <ul className="space-y-3">
+                {startHere.map((entry) => (
+                  <li key={entry.id}>
+                    <EntryListCard
+                      entry={entry}
+                      pillarLabel={pillarLabels[entry.pillar]}
+                      onOpen={() => setOpenId(entry.id)}
+                      isAdmin={isAdmin}
+                      onAdminEdit={
+                        onAdminEditContent
+                          ? () => onAdminEditContent(`mito:${entry.id}`)
+                          : undefined
+                      }
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {listEntries.length > 0 ? (
+            <ul className="space-y-3">
+              {startHere.length > 0 ? (
+                <li className="list-none pt-1">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-muted">
+                    More articles
+                  </p>
+                </li>
+              ) : null}
+              {listEntries.map((entry) => (
+                <li key={entry.id}>
+                  <EntryListCard
+                    entry={entry}
+                    pillarLabel={pillarLabels[entry.pillar]}
+                    onOpen={() => setOpenId(entry.id)}
+                    isAdmin={isAdmin}
+                    onAdminEdit={
+                      onAdminEditContent
+                        ? () => onAdminEditContent(`mito:${entry.id}`)
+                        : undefined
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       )}
 
       <p className="text-center text-[11px] leading-relaxed text-muted">

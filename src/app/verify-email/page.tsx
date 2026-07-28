@@ -49,7 +49,7 @@ export default async function VerifyEmailPage({ searchParams }: Props) {
           {status === "ok"
             ? "Your account is active. You can sign in now."
             : status === "bad"
-              ? "Request a new verification link from the sign-in page."
+              ? "This verification link is invalid or expired. If your account needs verification, create a new account or contact support — email verification is not required for username sign-in."
               : "Open the link from your email to activate your account."}
         </p>
         <div className="mt-8 space-y-3">

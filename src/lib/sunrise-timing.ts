@@ -159,6 +159,24 @@ export function currentLocalHm(timeZone: string, now = new Date()): string {
   return `${h}:${m}`;
 }
 
+/**
+ * True when morning light window is effectively over (~3h after sunrise,
+ * or after local noon when sunrise is unknown).
+ */
+export function isPastSunriseMorningWindow(
+  sunrise: Date | string | null | undefined,
+  timeZone: string,
+  now = new Date(),
+): boolean {
+  const rise = asDate(sunrise);
+  if (rise) {
+    return now.getTime() > rise.getTime() + 3 * 60 * 60 * 1000;
+  }
+  const hm = currentLocalHm(timeZone, now);
+  const [h] = hm.split(":").map(Number);
+  return (h ?? 0) >= 12;
+}
+
 /** UTC instant for local HH:mm on a civil date in an IANA timezone. */
 export function viewedAtFromLocalHm(
   dateIso: string,

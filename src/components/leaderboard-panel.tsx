@@ -63,25 +63,25 @@ const TABS: {
     key: "day",
     label: "Yesterday",
     blurb: "Previous UTC day — full closed totals.",
-    empty: "No points logged yesterday.",
+    empty: "No points logged yesterday. Log sunrise or an activity on Today to earn points.",
   },
   {
     key: "week",
     label: "Week",
     blurb: "Last 7 closed UTC days (through yesterday).",
-    empty: "No weekly points yet.",
+    empty: "No weekly points yet. Log on Today — ranks refresh once a day.",
   },
   {
     key: "month",
     label: "Month",
     blurb: "Last 30 closed UTC days (through yesterday).",
-    empty: "No monthly points yet.",
+    empty: "No monthly points yet. Log on Today to start climbing.",
   },
   {
     key: "allTime",
     label: "All time",
     blurb: "Lifetime totals through yesterday.",
-    empty: "Leaderboard is empty.",
+    empty: "Leaderboard is empty. Log activities on Today to appear here.",
   },
 ];
 

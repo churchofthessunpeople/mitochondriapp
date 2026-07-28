@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+import { GUEST_SESSION_COOKIE } from "@/lib/guest-cookie";
 import { LEGACY_REDIRECTS, ROUTES } from "@/lib/routes";
 
 export default auth((req) => {
@@ -39,6 +40,12 @@ export default auth((req) => {
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL(ROUTES.login, req.nextUrl.origin);
     loginUrl.searchParams.set("callbackUrl", pathname);
+    if (req.cookies.get(GUEST_SESSION_COOKIE)?.value) {
+      loginUrl.searchParams.set("guestError", "expired");
+      const expired = NextResponse.redirect(loginUrl);
+      expired.cookies.delete(GUEST_SESSION_COOKIE);
+      return expired;
+    }
     return NextResponse.redirect(loginUrl);
   }
 

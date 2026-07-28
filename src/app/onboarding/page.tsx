@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { OnboardingExitButton } from "@/components/onboarding-exit-button";
 import { OnboardingWizard } from "@/components/onboarding-wizard";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { getActiveProtocols } from "@/lib/data";
 import { getUserFavoriteIds } from "@/lib/favorites";
 import { STARTER_PROTOCOL_IDS } from "@/lib/onboarding";
 import { getOnboardingStatus } from "@/lib/require-onboarding";
-import { logoutAction } from "@/lib/actions/auth";
 import { ROUTES } from "@/lib/routes";
 
 export const metadata = { title: "Get started" };
@@ -34,14 +34,7 @@ export default async function OnboardingPage() {
   return (
     <div className="min-h-dvh pb-[calc(2.5rem+var(--site-disclaimer-offset))]">
       <div className="flex items-center justify-between px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
-        <form action={logoutAction}>
-          <button
-            type="submit"
-            className="text-sm text-muted hover:text-foreground"
-          >
-            Log out
-          </button>
-        </form>
+        <OnboardingExitButton isGuest={Boolean(session.user.isGuest)} />
         <ThemeToggle size="sm" />
       </div>
       <OnboardingWizard

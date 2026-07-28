@@ -259,6 +259,7 @@ export function AppShell({
   );
   const [tourTodaySection, setTourTodaySection] =
     useState<TodaySection | null>(null);
+  const [tourForceOverview, setTourForceOverview] = useState(false);
   const [adminContentFocus, setAdminContentFocus] = useState<string | null>(
     null,
   );
@@ -386,6 +387,7 @@ export function AppShell({
       } else {
         setTourTodaySection(null);
       }
+      setTourForceOverview(step.id === "overview");
     },
     [],
   );
@@ -400,6 +402,7 @@ export function AppShell({
             setShowTutorial(false);
             setTab("schedule");
             setTourTodaySection("checklist");
+            setTourForceOverview(false);
           }}
           onPrepareStep={prepareTourStep}
         />
@@ -599,7 +602,7 @@ export function AppShell({
         {sheet?.id === "guideWater" && (
           <AppSheet
             title="Water"
-            subtitle="Deuterium-aware hydration & fuel · lifestyle frame for ATP synthase"
+            subtitle="Hydration & food choices that lower deuterium (heavy hydrogen)"
             onClose={closeSheet}
           >
             <GuideWaterPanel />
@@ -609,7 +612,7 @@ export function AppShell({
         {sheet?.id === "guideMagnetism" && (
           <AppSheet
             title="Magnetism"
-            subtitle="Earth / geology context · grounding · nnEMF hygiene"
+            subtitle="Earth / geology context · grounding · non-native EMF (phones/Wi‑Fi) hygiene"
             onClose={closeSheet}
           >
             <GuideMagnetismPanel />
@@ -619,7 +622,7 @@ export function AppShell({
         {sheet?.id === "convertGuest" && (
           <AppSheet
             title="Save your progress"
-            subtitle="Create a username to keep history and unlock the leaderboard"
+            subtitle="Guest data expires in 24 hours — create a username to keep it"
             onClose={closeSheet}
           >
             <ConvertGuestPanel />
@@ -669,6 +672,7 @@ export function AppShell({
             onAdminEditContent={openAdminContent}
             isGuest={isGuest}
             tourSection={tourTodaySection}
+            tourForceOverview={tourForceOverview}
           />
         )}
 

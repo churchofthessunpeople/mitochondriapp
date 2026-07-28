@@ -63,8 +63,8 @@ export function AuthForm({
         </h1>
         <p className="mt-2 text-sm text-muted">
           {mode === "login"
-            ? "Sign in with your username to log today’s protocols."
-            : "Pick a unique username and password — no email required."}
+            ? "Sign in to log today’s activities."
+            : "Pick a unique username and password — no email required. Add a recovery email later in Account so you can reset a forgotten password."}
         </p>
       </div>
 
@@ -229,6 +229,10 @@ export function AuthForm({
             >
               Sign in
             </Link>
+            <span className="mt-3 block">
+              Or{" "}
+              <GuestStartButton className="font-semibold text-foreground underline-offset-2 hover:underline" />
+            </span>
           </>
         )}
       </p>

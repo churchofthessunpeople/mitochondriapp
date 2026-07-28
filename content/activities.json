@@ -212,7 +212,7 @@
     "permanent": false,
     "sortOrder": 50,
     "timeOfDay": "anytime",
-    "description": "Log a glass: RO, spring, or deuterium-depleted; optional salt remineralization; still or carbonated. DDW includes deuterium PPM.",
+    "description": "Log a glass of filtered, spring, or lower-deuterium water — optional pinch of salt; still or sparkling.",
     "allowsMultiple": true,
     "durationEnabled": false,
     "lockedTimeOfDay": null,

@@ -12,6 +12,26 @@ function Form() {
   const token = sp.get("token") ?? "";
   const uid = sp.get("uid") ?? "";
   const [state, action, pending] = useActionState(resetPasswordAction, {});
+  const linkMissing = !token || !uid;
+
+  if (linkMissing) {
+    return (
+      <div className="mt-6 space-y-4">
+        <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          This reset link is invalid or incomplete.
+        </p>
+        <p className="text-center text-sm">
+          <Link href="/forgot-password" className="text-accent hover:underline">
+            Request a new reset link
+          </Link>
+          {" · "}
+          <Link href={ROUTES.login} className="text-accent hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form action={action} className="mt-6 space-y-4">
@@ -36,7 +56,7 @@ function Form() {
       )}
       <button
         type="submit"
-        disabled={pending || !token || !uid}
+        disabled={pending}
         className="btn-primary flex h-12 w-full items-center justify-center rounded-2xl font-semibold disabled:opacity-50"
       >
         {pending ? "Saving…" : "Update password"}

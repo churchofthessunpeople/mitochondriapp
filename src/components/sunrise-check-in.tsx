@@ -11,6 +11,7 @@ import {
   type SunriseTier,
 } from "@/lib/scoring";
 import type { SunTimes } from "@/lib/sun";
+import { isPastSunriseMorningWindow } from "@/lib/sunrise-timing";
 import { useToast } from "@/components/toast";
 
 const dayKey = (userId: string, date: string) =>
@@ -77,6 +78,13 @@ export function SunriseCheckIn({
       setOpen(false);
       return;
     }
+    const pastMorning = isPastSunriseMorningWindow(sun?.sunrise, timeZone);
+    // After the morning window, don't auto-popup (including post-onboarding force).
+    // Users can still open sunrise from the checklist row.
+    if (pastMorning) {
+      setOpen(false);
+      return;
+    }
     if (forceOpen) {
       setOpen(true);
       return;
@@ -101,6 +109,8 @@ export function SunriseCheckIn({
     morningLightLogged,
     forceOpen,
     paused,
+    sun?.sunrise,
+    timeZone,
   ]);
 
   function dismissSession() {

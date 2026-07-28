@@ -18,6 +18,9 @@ export default async function LoginPage({ searchParams }: Props) {
     banner = "Password updated. Sign in with your username and new password.";
   } else if (params.guestError === "rate") {
     banner = "Too many guest starts from this network. Try again later, or create an account.";
+  } else if (params.guestError === "expired") {
+    banner =
+      "Your guest session expired after 24 hours and progress was cleared. Create an account next time to keep your logs.";
   } else if (params.guestError) {
     banner = "Could not start guest mode. Try again or create an account.";
   }

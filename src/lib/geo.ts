@@ -115,7 +115,7 @@ export async function geocodeUsZip(rawZip: string): Promise<GeocodedPlace> {
     throw new Error(`ZIP ${code} was not found.`);
   }
   if (!res.ok) {
-    throw new Error(`Lookup lookup failed (${res.status}). Try again.`);
+    throw new Error(`Lookup failed (${res.status}). Try again.`);
   }
 
   const data = (await res.json()) as {

@@ -169,7 +169,7 @@ export function RecoveryEmailForm({
     <AccountSection
       id="recovery-email"
       title="Recovery email"
-      description="Optional. Used only for password reset. Confirm with your current password."
+      description="Optional but recommended — used only for password reset. Without it, a forgotten password cannot be reset online. Confirm with your current password."
       expanded={expand.expanded}
       onToggle={expand.onToggle}
     >
