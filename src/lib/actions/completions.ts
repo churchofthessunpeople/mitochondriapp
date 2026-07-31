@@ -141,6 +141,11 @@ export type EditableDaySnapshot = {
   dayPoints: number;
   completionCounts: Record<string, number>;
   completionDurations: Record<string, number>;
+  completionSessions: {
+    protocolId: string;
+    variantValue: number | null;
+    durationMinutes: number | null;
+  }[];
   sunriseMultiplier: number;
   sunriseTierLabel: string | null;
   streak: { current: number; best: number };
@@ -167,6 +172,7 @@ export async function loadEditableDayAction(
     dayPoints: stats.points,
     completionCounts: Object.fromEntries(stats.completionCounts),
     completionDurations: Object.fromEntries(stats.completionDurations),
+    completionSessions: stats.completionSessions,
     sunriseMultiplier: buff.multiplier,
     sunriseTierLabel: buff.tier?.shortLabel ?? null,
     streak,
@@ -192,6 +198,12 @@ export type CompletionResult = {
   count: number;
   /** Sum of logged minutes today for timed activities */
   durationMinutesTotal: number;
+  /** Per-log specifics for the day (variant + duration). */
+  completionSessions: {
+    protocolId: string;
+    variantValue: number | null;
+    durationMinutes: number | null;
+  }[];
   /** Best morning-light multiplier for the day (1 = none) */
   sunriseMultiplier: number;
   sunriseTierLabel: string | null;
@@ -210,6 +222,7 @@ async function daySnapshot(
     | "streak"
     | "count"
     | "durationMinutesTotal"
+    | "completionSessions"
     | "sunriseMultiplier"
     | "sunriseTierLabel"
     | "sunriseBuffActive"
@@ -225,6 +238,7 @@ async function daySnapshot(
     streak,
     count: stats.completionCounts.get(protocolId) ?? 0,
     durationMinutesTotal: stats.completionDurations.get(protocolId) ?? 0,
+    completionSessions: stats.completionSessions,
     sunriseMultiplier: buff.multiplier,
     sunriseTierLabel: buff.tier?.shortLabel ?? null,
     sunriseBuffActive: buff.multiplier > 1,
@@ -604,6 +618,7 @@ export async function logCompletionAction(
     streak,
     count: stats.completionCounts.get(protocolId) ?? 0,
     durationMinutesTotal: stats.completionDurations.get(protocolId) ?? 0,
+    completionSessions: stats.completionSessions,
     sunriseMultiplier: buffAfter.multiplier,
     sunriseTierLabel: buffAfter.tier?.shortLabel ?? null,
     sunriseBuffActive: buffAfter.multiplier > 1,

@@ -168,6 +168,15 @@ export function isPerLogVariantProtocolId(protocolId: string): boolean {
   );
 }
 
+/** Protocols whose Performed / History rows should surface per-log specifics. */
+export function isSessionDetailProtocolId(protocolId: string): boolean {
+  return (
+    isSunExposureProtocolId(protocolId) ||
+    isPerLogVariantProtocolId(protocolId) ||
+    isMovementSettingProtocolId(protocolId)
+  );
+}
+
 export function isMovementSettingVariantValue(
   variantValue: unknown,
 ): boolean {

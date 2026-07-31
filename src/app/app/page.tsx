@@ -285,6 +285,7 @@ export default async function AppPage({
       availableIds={[...availableIds]}
       completionCounts={Object.fromEntries(dayStats.completionCounts)}
       completionDurations={Object.fromEntries(dayStats.completionDurations)}
+      completionSessions={dayStats.completionSessions}
       dayPoints={dayStats.points}
       streak={streak}
       placeLabel={loc.placeLabel ?? null}

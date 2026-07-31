@@ -6,7 +6,10 @@ import {
   HISTORY_SECTIONS,
   type DayActivityRow,
 } from "@/lib/history-sections";
-import { formatVariantLabel } from "@/lib/protocol-variants";
+import {
+  formatVariantLabel,
+  isSessionDetailProtocolId,
+} from "@/lib/protocol-variants";
 import {
   formatSunriseLogDetail,
   isSunriseKeystoneProtocolId,
@@ -14,6 +17,70 @@ import {
 import { formatPoints } from "@/lib/utils";
 
 export type { DayActivityRow } from "@/lib/history-sections";
+
+/** Slim completion projection for Performed session summaries. */
+export type CompletionSession = {
+  protocolId: string;
+  variantValue: number | null;
+  durationMinutes: number | null;
+};
+
+/**
+ * Compact Performed subtitle for multi-option activities, e.g.
+ * "1h Morning · Full sun · 30 min Peak sun · Shaded" or
+ * "RO water · Salt ⅛ tsp · carbonated · Spring water · still".
+ */
+export function formatPerformedSessionsSummary(
+  protocolId: string,
+  sessions: readonly CompletionSession[],
+): string | null {
+  if (!isSessionDetailProtocolId(protocolId)) return null;
+  const mine = sessions.filter((s) => s.protocolId === protocolId);
+  if (mine.length === 0) return null;
+
+  const byVariant = new Map<
+    string,
+    { variantValue: number | null; mins: number; count: number }
+  >();
+  for (const s of mine) {
+    const key =
+      s.variantValue != null && Number.isFinite(s.variantValue)
+        ? `v${Math.trunc(s.variantValue)}`
+        : "none";
+    const mins =
+      s.durationMinutes != null && s.durationMinutes > 0
+        ? s.durationMinutes
+        : 0;
+    const existing = byVariant.get(key);
+    if (existing) {
+      existing.mins += mins;
+      existing.count += 1;
+    } else {
+      byVariant.set(key, {
+        variantValue: s.variantValue,
+        mins,
+        count: 1,
+      });
+    }
+  }
+
+  const parts: string[] = [];
+  for (const g of byVariant.values()) {
+    const label =
+      g.variantValue != null
+        ? formatVariantLabel(protocolId, g.variantValue)
+        : null;
+    if (!label) continue;
+    if (g.mins > 0) {
+      parts.push(`${formatLoggedMinutes(g.mins)} ${label}`);
+    } else if (g.count > 1) {
+      parts.push(`${label} ×${g.count}`);
+    } else {
+      parts.push(label);
+    }
+  }
+  return parts.length > 0 ? parts.join(" · ") : null;
+}
 
 /** e.g. 1 log, 3 logs */
 export function formatMultiLogCount(count: number): string {

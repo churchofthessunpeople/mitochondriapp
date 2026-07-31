@@ -55,18 +55,32 @@ export function historySectionForActivity(
   return "day";
 }
 
+/**
+ * Group key for history rows. Includes variant so distinct Outside Time /
+ * water / exercise mixes stay separate instead of collapsing to the first label.
+ */
+export function activityAggregateKey(r: DayActivityRow): string {
+  const base =
+    r.protocolId ??
+    `name:${r.protocolName?.trim() || "Activity"}`;
+  if (r.variantValue != null && Number.isFinite(r.variantValue)) {
+    return `${base}:v${Math.trunc(r.variantValue)}`;
+  }
+  return base;
+}
+
 export function aggregateDayActivities(
   rows: DayActivityRow[],
   displayName: (row: DayActivityRow) => string,
   permanentIds?: ReadonlySet<string>,
 ): AggregatedActivity[] {
   const activities = rows.filter((r) => !r.isStreakBonus);
-  const byProtocol = new Map<string, AggregatedActivity>();
+  const byKey = new Map<string, AggregatedActivity>();
   let order = 0;
 
   for (const r of activities) {
     const name = displayName(r);
-    const key = r.protocolId ?? `name:${name}`;
+    const key = activityAggregateKey(r);
     const mins =
       r.protocolId && isSunriseKeystoneProtocolId(r.protocolId)
         ? 0
@@ -74,7 +88,7 @@ export function aggregateDayActivities(
     const pts = r.pointsEarned;
     const allowsMultiple = protocolAllowsMultiple(r.protocolId);
     const showsLogCount = protocolShowsLogCount(r.protocolId);
-    const existing = byProtocol.get(key);
+    const existing = byKey.get(key);
     if (existing) {
       if (allowsMultiple) {
         existing.totalMins += mins;
@@ -84,7 +98,7 @@ export function aggregateDayActivities(
       continue;
     }
 
-    byProtocol.set(key, {
+    byKey.set(key, {
       key,
       name,
       totalMins: mins,
@@ -95,7 +109,7 @@ export function aggregateDayActivities(
     });
   }
 
-  return [...byProtocol.values()].sort((a, b) => a.order - b.order);
+  return [...byKey.values()].sort((a, b) => a.order - b.order);
 }
 
 /** Sum activity totals across multiple days (e.g. weekly copy). */
@@ -105,19 +119,19 @@ export function aggregatePeriodActivities(
   permanentIds?: ReadonlySet<string>,
 ): AggregatedActivity[] {
   const activities = rows.filter((r) => !r.isStreakBonus);
-  const byProtocol = new Map<string, AggregatedActivity>();
+  const byKey = new Map<string, AggregatedActivity>();
   let order = 0;
 
   for (const r of activities) {
     const name = displayName(r);
-    const key = r.protocolId ?? `name:${name}`;
+    const key = activityAggregateKey(r);
     const mins =
       r.protocolId && isSunriseKeystoneProtocolId(r.protocolId)
         ? 0
         : (r.durationMinutes ?? 0);
     const pts = r.pointsEarned;
     const showsLogCount = protocolShowsLogCount(r.protocolId);
-    const existing = byProtocol.get(key);
+    const existing = byKey.get(key);
     if (existing) {
       existing.totalMins += mins;
       existing.totalPoints += pts;
@@ -125,7 +139,7 @@ export function aggregatePeriodActivities(
       continue;
     }
 
-    byProtocol.set(key, {
+    byKey.set(key, {
       key,
       name,
       totalMins: mins,
@@ -136,7 +150,7 @@ export function aggregatePeriodActivities(
     });
   }
 
-  return [...byProtocol.values()].sort((a, b) => a.order - b.order);
+  return [...byKey.values()].sort((a, b) => a.order - b.order);
 }
 
 export function groupAggregatedBySection(

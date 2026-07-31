@@ -1,12 +1,18 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  encodeDrinkingWaterVariant,
+  normalizeDrinkingWaterInput,
+} from "./drinking-water";
+import {
   formatDayActivitiesCopy,
   formatLoggedMinutes,
   formatMultiLogCount,
+  formatPerformedSessionsSummary,
   formatTodayMultiLogStatus,
   formatWeekActivitiesCopy,
 } from "./format-day-activities";
+import { encodeSunExposureVariant } from "./sun-exposure";
 
 describe("formatLoggedMinutes", () => {
   it("formats sub-hour and hour+ durations", () => {
@@ -220,6 +226,170 @@ describe("formatDayActivitiesCopy", () => {
     ]);
     assert.match(text, /• Streak bonus — 2 pts/);
     assert.match(text, /Total: 2 pts/);
+  });
+});
+
+describe("formatDayActivitiesCopy variants", () => {
+  it("keeps distinct Outside Time and water mixes on separate lines", () => {
+    const morningFull = encodeSunExposureVariant({
+      slot: "morning",
+      cover: "full_sun",
+    });
+    const noonShaded = encodeSunExposureVariant({
+      slot: "noon",
+      cover: "shaded",
+    });
+    const roSaltCarb = encodeDrinkingWaterVariant(
+      normalizeDrinkingWaterInput({
+        source: "reverse_osmosis",
+        carbonation: "carbonated",
+        mineral: "salt",
+        mineralAmount: "eighth_tsp",
+      }),
+    );
+    const springStill = encodeDrinkingWaterVariant(
+      normalizeDrinkingWaterInput({
+        source: "spring",
+        carbonation: "still",
+        mineral: "none",
+      }),
+    );
+    const text = formatDayActivitiesCopy("2026-07-14", [
+      {
+        protocolName: "Outside Time",
+        protocolId: "sun-exposure",
+        variantValue: morningFull,
+        durationMinutes: 60,
+        pointsEarned: 10,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Outside Time",
+        protocolId: "sun-exposure",
+        variantValue: noonShaded,
+        durationMinutes: 30,
+        pointsEarned: 6,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Drinking water",
+        protocolId: "drinking-water",
+        variantValue: roSaltCarb,
+        durationMinutes: null,
+        pointsEarned: 4,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Drinking water",
+        protocolId: "drinking-water",
+        variantValue: springStill,
+        durationMinutes: null,
+        pointsEarned: 4,
+        isStreakBonus: false,
+      },
+    ]);
+
+    assert.match(text, /Outside Time \(Morning · Full sun\) \(1h\)/);
+    assert.match(text, /Outside Time \(Peak sun · Shaded\) \(30 min\)/);
+    assert.match(
+      text,
+      /Drinking water \(Reverse osmosis · Salt ⅛ tsp · carbonated\) \(1 log\)/,
+    );
+    assert.match(text, /Drinking water \(Spring water · still\) \(1 log\)/);
+    assert.match(text, /Total: 24 pts · 1h 30 min logged/);
+  });
+
+  it("stacks identical Outside Time variants into one timed line", () => {
+    const morningFull = encodeSunExposureVariant({
+      slot: "morning",
+      cover: "full_sun",
+    });
+    const text = formatDayActivitiesCopy("2026-07-14", [
+      {
+        protocolName: "Outside Time",
+        protocolId: "sun-exposure",
+        variantValue: morningFull,
+        durationMinutes: 60,
+        pointsEarned: 10,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Outside Time",
+        protocolId: "sun-exposure",
+        variantValue: morningFull,
+        durationMinutes: 30,
+        pointsEarned: 5,
+        isStreakBonus: false,
+      },
+    ]);
+
+    assert.match(text, /Outside Time \(Morning · Full sun\) \(1h 30 min\) — 15 pts/);
+    assert.equal((text.match(/Outside Time/g) ?? []).length, 1);
+  });
+});
+
+describe("formatPerformedSessionsSummary", () => {
+  it("summarizes Outside Time and water sessions for Performed", () => {
+    const summaryOutside = formatPerformedSessionsSummary("sun-exposure", [
+      {
+        protocolId: "sun-exposure",
+        variantValue: encodeSunExposureVariant({
+          slot: "morning",
+          cover: "full_sun",
+        }),
+        durationMinutes: 60,
+      },
+      {
+        protocolId: "sun-exposure",
+        variantValue: encodeSunExposureVariant({
+          slot: "noon",
+          cover: "full_sun",
+        }),
+        durationMinutes: 60,
+      },
+      {
+        protocolId: "sun-exposure",
+        variantValue: encodeSunExposureVariant({
+          slot: "noon",
+          cover: "shaded",
+        }),
+        durationMinutes: 30,
+      },
+    ]);
+    assert.equal(
+      summaryOutside,
+      "1h Morning · Full sun · 1h Peak sun · Full sun · 30 min Peak sun · Shaded",
+    );
+
+    const summaryWater = formatPerformedSessionsSummary("drinking-water", [
+      {
+        protocolId: "drinking-water",
+        variantValue: encodeDrinkingWaterVariant(
+          normalizeDrinkingWaterInput({
+            source: "reverse_osmosis",
+            carbonation: "carbonated",
+            mineral: "salt",
+            mineralAmount: "eighth_tsp",
+          }),
+        ),
+        durationMinutes: null,
+      },
+      {
+        protocolId: "drinking-water",
+        variantValue: encodeDrinkingWaterVariant(
+          normalizeDrinkingWaterInput({
+            source: "spring",
+            carbonation: "still",
+            mineral: "none",
+          }),
+        ),
+        durationMinutes: null,
+      },
+    ]);
+    assert.equal(
+      summaryWater,
+      "Reverse osmosis · Salt ⅛ tsp · carbonated · Spring water · still",
+    );
   });
 });
 

@@ -33,6 +33,12 @@ export async function getCompletionsForUserDay(userId: string, date: string) {
   }
 }
 
+export type DayCompletionSession = {
+  protocolId: string;
+  variantValue: number | null;
+  durationMinutes: number | null;
+};
+
 export async function getUserDayStats(userId: string, date: string) {
   const completions = await getCompletionsForUserDay(userId, date);
   const real = completions.filter((c) => !c.isStreakBonus);
@@ -42,6 +48,7 @@ export async function getUserDayStats(userId: string, date: string) {
   const points = completions.reduce((acc, c) => acc + c.pointsEarned, 0);
   const counts = new Map<string, number>();
   const durationTotals = new Map<string, number>();
+  const completionSessions: DayCompletionSession[] = [];
   for (const c of real) {
     counts.set(c.protocolId, (counts.get(c.protocolId) ?? 0) + 1);
     if (c.durationMinutes && c.durationMinutes > 0) {
@@ -52,12 +59,18 @@ export async function getUserDayStats(userId: string, date: string) {
         );
       }
     }
+    completionSessions.push({
+      protocolId: c.protocolId,
+      variantValue: c.variantValue ?? null,
+      durationMinutes: c.durationMinutes ?? null,
+    });
   }
   return {
     completions,
     completedIds: new Set(real.map((c) => c.protocolId)),
     completionCounts: counts,
     completionDurations: durationTotals,
+    completionSessions,
     points,
     activityPoints: points - bonus,
     streakBonus: bonus,

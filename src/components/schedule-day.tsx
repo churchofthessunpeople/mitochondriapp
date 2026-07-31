@@ -125,7 +125,11 @@ import {
 import type { WeeklySummary } from "@/lib/weekly";
 import type { SunTimes } from "@/lib/sun";
 import { useToast } from "@/components/toast";
-import { formatTodayMultiLogStatus } from "@/lib/format-day-activities";
+import {
+  formatPerformedSessionsSummary,
+  formatTodayMultiLogStatus,
+  type CompletionSession,
+} from "@/lib/format-day-activities";
 import { cn, formatPoints } from "@/lib/utils";
 
 type Phase = "night" | "sunrise" | "day" | "sunset";
@@ -134,6 +138,7 @@ type Props = {
   protocols: Protocol[];
   completionCounts: Record<string, number>;
   completionDurations?: Record<string, number>;
+  completionSessions?: CompletionSession[];
   dayPoints: number;
   streak: { current: number; best: number };
   dateLabel: string;
@@ -173,6 +178,7 @@ type Props = {
   /** Live checklist counts for L·W·M strip */
   onCompletionCountsChange?: (counts: Record<string, number>) => void;
   onCompletionDurationsChange?: (durations: Record<string, number>) => void;
+  onCompletionSessionsChange?: (sessions: CompletionSession[]) => void;
   magneticoGauss?: number;
   sleepRoomTempF?: number;
   sleepSpaceConfig?: string | null;
@@ -258,6 +264,7 @@ export function ScheduleDay({
   protocols,
   completionCounts,
   completionDurations = {},
+  completionSessions = [],
   dayPoints: initialPoints,
   streak: initialStreak,
   dateLabel,
@@ -283,6 +290,7 @@ export function ScheduleDay({
   onStatsChange,
   onCompletionCountsChange,
   onCompletionDurationsChange,
+  onCompletionSessionsChange,
   magneticoGauss: initialMagneticoGauss = 10,
   sleepRoomTempF: initialSleepRoomTempF = 65,
   sleepSpaceConfig: initialSleepSpaceConfig = null,
@@ -356,17 +364,22 @@ export function ScheduleDay({
     setSectionsOpen((s) => ({ ...s, [id]: !s[id] }));
   }
 
-  // Parent-owned counts/durations — optimistic updates flow up via callbacks.
+  // Parent-owned counts/durations/sessions — optimistic updates flow up via callbacks.
   const countsRef = useRef(completionCounts);
   const durationsRef = useRef(completionDurations);
+  const sessionsRef = useRef(completionSessions);
   useEffect(() => {
     countsRef.current = completionCounts;
   }, [completionCounts]);
   useEffect(() => {
     durationsRef.current = completionDurations;
   }, [completionDurations]);
+  useEffect(() => {
+    sessionsRef.current = completionSessions;
+  }, [completionSessions]);
   const counts = completionCounts;
   const durations = completionDurations;
+  const sessions = completionSessions;
 
   function bumpDurations(update: {
     protocolId: string;
@@ -452,6 +465,7 @@ export function ScheduleDay({
     action?: "added" | "removed";
     count?: number;
     durationMinutesTotal?: number;
+    completionSessions?: CompletionSession[];
     protocolId?: string;
     sunriseMultiplier?: number;
     sunriseTierLabel?: string | null;
@@ -484,6 +498,10 @@ export function ScheduleDay({
         delta: 0,
         absolute: snap.durationMinutesTotal,
       });
+    }
+    if (snap.completionSessions) {
+      sessionsRef.current = snap.completionSessions;
+      onCompletionSessionsChange?.(snap.completionSessions);
     }
   }
 
@@ -1069,6 +1087,9 @@ export function ScheduleDay({
     const isDone = count > 0;
     const multi = p.allowsMultiple;
     const rowBusy = busyId === p.id;
+    const sessionSummary = isDone
+      ? formatPerformedSessionsSummary(p.id, sessions)
+      : null;
 
     if (multi) {
       const multiBody = (
@@ -1104,7 +1125,9 @@ export function ScheduleDay({
               ) : null}
             </span>
             <span className="mt-0.5 block text-xs text-muted">
-              {showsMultiLogCount(p) && count > 0
+              {sessionSummary
+                ? sessionSummary
+                : showsMultiLogCount(p) && count > 0
                 ? formatTodayMultiLogStatus(p.points, count)
                 : (
                   <>

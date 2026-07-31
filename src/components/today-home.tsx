@@ -59,6 +59,11 @@ type Props = {
   onAvailableIdsChange: (ids: string[]) => void;
   completionCounts: Record<string, number>;
   completionDurations?: Record<string, number>;
+  completionSessions?: {
+    protocolId: string;
+    variantValue: number | null;
+    durationMinutes: number | null;
+  }[];
   dayPoints: number;
   streak: { current: number; best: number };
   lifetimePoints: number;
@@ -125,6 +130,7 @@ export function TodayHome({
   onAvailableIdsChange,
   completionCounts,
   completionDurations,
+  completionSessions = [],
   dayPoints,
   streak,
   lifetimePoints,
@@ -184,6 +190,7 @@ export function TodayHome({
   const [daySwitchPending, setDaySwitchPending] = useState(false);
   const [liveCounts, setLiveCounts] = useState(completionCounts);
   const [liveDurations, setLiveDurations] = useState(completionDurations ?? {});
+  const [liveSessions, setLiveSessions] = useState(completionSessions);
   const [livePoints, setLivePoints] = useState(dayPoints);
   const [todayPoints, setTodayPoints] = useState(dayPoints);
   const [liveStreak, setLiveStreak] = useState(streak);
@@ -212,6 +219,11 @@ export function TodayHome({
   type DayCache = {
     counts: Record<string, number>;
     durations: Record<string, number>;
+    sessions: {
+      protocolId: string;
+      variantValue: number | null;
+      durationMinutes: number | null;
+    }[];
     points: number;
     mult: number;
     tier: string | null;
@@ -219,6 +231,7 @@ export function TodayHome({
   const todayCacheRef = useRef<DayCache>({
     counts: completionCounts,
     durations: completionDurations ?? {},
+    sessions: completionSessions,
     points: dayPoints,
     mult: sunriseMultiplier,
     tier: sunriseTierLabel ?? null,
@@ -319,6 +332,7 @@ export function TodayHome({
     if (viewDayIso !== todayIso) return;
     setLiveCounts(completionCounts);
     setLiveDurations(completionDurations ?? {});
+    setLiveSessions(completionSessions);
     setLivePoints(dayPoints);
     setTodayPoints(dayPoints);
     setLiveStreak(streak);
@@ -327,6 +341,7 @@ export function TodayHome({
     todayCacheRef.current = {
       counts: completionCounts,
       durations: completionDurations ?? {},
+      sessions: completionSessions,
       points: dayPoints,
       mult: sunriseMultiplier,
       tier: sunriseTierLabel ?? null,
@@ -335,6 +350,7 @@ export function TodayHome({
     dateLabel,
     completionCounts,
     completionDurations,
+    completionSessions,
     dayPoints,
     streak,
     sunriseMultiplier,
@@ -351,6 +367,7 @@ export function TodayHome({
       todayCacheRef.current = {
         counts: liveCounts,
         durations: liveDurations,
+        sessions: liveSessions,
         points: livePoints,
         mult: liveSunriseMult,
         tier: liveSunriseTierLabel,
@@ -364,6 +381,7 @@ export function TodayHome({
         const c = todayCacheRef.current;
         setLiveCounts(c.counts);
         setLiveDurations(c.durations);
+        setLiveSessions(c.sessions);
         setLivePoints(c.points);
         setTodayPoints(c.points);
         setLiveSunriseMult(c.mult);
@@ -374,6 +392,7 @@ export function TodayHome({
       const snap = await loadEditableDayAction(iso);
       setLiveCounts(snap.completionCounts);
       setLiveDurations(snap.completionDurations);
+      setLiveSessions(snap.completionSessions);
       setLivePoints(snap.dayPoints);
       setLiveSunriseMult(snap.sunriseMultiplier);
       setLiveSunriseTierLabel(snap.sunriseTierLabel);
@@ -396,6 +415,19 @@ export function TodayHome({
   const onCompletionDurationsChange = useCallback(
     (durations: Record<string, number>) => {
       setLiveDurations(durations);
+    },
+    [],
+  );
+
+  const onCompletionSessionsChange = useCallback(
+    (
+      sessions: {
+        protocolId: string;
+        variantValue: number | null;
+        durationMinutes: number | null;
+      }[],
+    ) => {
+      setLiveSessions(sessions);
     },
     [],
   );
@@ -727,6 +759,7 @@ export function TodayHome({
             protocols={availableProtocols}
             completionCounts={liveCounts}
             completionDurations={liveDurations}
+            completionSessions={liveSessions}
             dayPoints={livePoints}
             streak={liveStreak}
             dateLabel={viewDateLabel}
@@ -751,6 +784,7 @@ export function TodayHome({
             allProtocols={allProtocols}
             onCompletionCountsChange={onCompletionCountsChange}
             onCompletionDurationsChange={onCompletionDurationsChange}
+            onCompletionSessionsChange={onCompletionSessionsChange}
             magneticoGauss={magneticoGauss}
             sleepRoomTempF={sleepRoomTempF}
             sleepSpaceConfig={sleepSpaceConfig}

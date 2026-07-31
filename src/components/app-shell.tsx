@@ -129,6 +129,11 @@ export type AppShellProps = {
   availableIds: string[];
   completionCounts: Record<string, number>;
   completionDurations?: Record<string, number>;
+  completionSessions?: {
+    protocolId: string;
+    variantValue: number | null;
+    durationMinutes: number | null;
+  }[];
   dayPoints: number;
   streak: { current: number; best: number };
   placeLabel: string | null;
@@ -198,6 +203,7 @@ export function AppShell({
   availableIds: initialAvailableIds,
   completionCounts,
   completionDurations,
+  completionSessions,
   dayPoints,
   streak,
   placeLabel,
@@ -638,6 +644,7 @@ export function AppShell({
             onAvailableIdsChange={setAvailableIds}
             completionCounts={completionCounts}
             completionDurations={completionDurations}
+            completionSessions={completionSessions}
             dayPoints={dayPoints}
             streak={streak}
             lifetimePoints={lifetimePoints}
