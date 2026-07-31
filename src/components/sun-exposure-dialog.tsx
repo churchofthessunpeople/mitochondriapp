@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft, Trees, X } from "lucide-react";
+import { Trees, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  OptionListChoice,
+  OptionGroup,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import { currentLocalHm } from "@/lib/sunrise-timing";
@@ -21,8 +21,6 @@ import {
   type SunExposureSlot,
 } from "@/lib/sun-exposure";
 
-type Step = "slot" | "cover" | "duration";
-
 type Props = {
   protocol: Protocol;
   timeZone: string;
@@ -33,7 +31,7 @@ type Props = {
   onCancel: () => void;
 };
 
-/** Outside Time: slot → full sun / shaded → duration. */
+/** Outside Time — slot, cover, and duration on one screen. */
 export function SunExposureDialog({
   protocol,
   timeZone,
@@ -48,7 +46,6 @@ export function SunExposureDialog({
     [sun, timeZone],
   );
 
-  const [step, setStep] = useState<Step>("slot");
   const [slot, setSlot] = useState<SunExposureSlot>(suggestedSlot);
   const [cover, setCover] = useState<OutsideCover>("full_sun");
   const [durationMins, setDurationMins] = useState(DURATION_BLOCK_MINUTES);
@@ -79,9 +76,8 @@ export function SunExposureDialog({
         id: s.id,
         title: s.label,
         subtitle: sunExposureSlotClockLabel(s.id, sun, timeZone),
-        highlight: s.id === suggestedSlot,
       })),
-    [sun, timeZone, suggestedSlot],
+    [sun, timeZone],
   );
 
   const coverOptions: ClickThroughOption[] = useMemo(
@@ -93,7 +89,6 @@ export function SunExposureDialog({
           slot,
           cover: c.id,
         })} pts / ${DURATION_BLOCK_MINUTES} min`,
-        highlight: c.id === "full_sun",
       })),
     [protocol.points, slot],
   );
@@ -106,59 +101,30 @@ export function SunExposureDialog({
         subtitle: `≈ ${pointsForLog(protocol, m, {
           sunriseMultiplier,
           basePoints,
-        })} pts this log`,
-        highlight: m === DURATION_BLOCK_MINUTES,
+        })} pts`,
       })),
     [durationChoices, protocol, sunriseMultiplier, basePoints],
   );
 
-  function goBack() {
-    if (step === "cover") setStep("slot");
-    else if (step === "duration") setStep("cover");
-  }
-
-  const slotLabel =
-    SUN_EXPOSURE_SLOTS.find((s) => s.id === slot)?.label ?? slot;
-  const coverLabel =
-    OUTSIDE_COVER_OPTIONS.find((c) => c.id === cover)?.label ?? cover;
-
-  const stepHint =
-    step === "slot"
-      ? "When were you outside?"
-      : step === "cover"
-        ? `${slotLabel} · full sun or shade?`
-        : `${slotLabel} · ${coverLabel} · ${basePoints} pts / ${DURATION_BLOCK_MINUTES} min`;
-
   return (
     <div className="fixed inset-0 z-[110] flex items-end justify-center bg-black/50 p-4 sm:items-center">
       <div
-        className="glass max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl p-5"
+        className="glass flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="outside-time-title"
       >
-        <div className="flex items-start gap-2">
-          {step !== "slot" ? (
-            <button
-              type="button"
-              onClick={goBack}
-              className="mt-0.5 rounded-lg p-1 text-muted"
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          ) : null}
+        <div className="flex shrink-0 items-start gap-2 px-5 pt-5">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <Trees className="h-4 w-4 shrink-0 text-accent" />
-              <p
-                id="outside-time-title"
-                className="font-semibold leading-snug"
-              >
+              <p id="outside-time-title" className="font-semibold leading-snug">
                 {protocol.name}
               </p>
             </div>
-            <p className="mt-1 text-xs text-muted">{stepHint}</p>
+            <p className="mt-1 text-xs text-muted">
+              Set time of day, sun or shade, and how long
+            </p>
           </div>
           <button
             type="button"
@@ -170,54 +136,48 @@ export function SunExposureDialog({
           </button>
         </div>
 
-        {step === "slot" ? (
-          <div className="mt-4">
-            <OptionListChoice
-              options={slotOptions}
-              selectedId={suggestedSlot}
-              disabled={pending}
-              onChoose={(id) => {
-                setSlot(id as SunExposureSlot);
-                setStep("cover");
-              }}
-            />
-          </div>
-        ) : step === "cover" ? (
-          <div className="mt-4">
-            <OptionListChoice
-              options={coverOptions}
-              selectedId={cover}
-              disabled={pending}
-              onChoose={(id) => {
-                setCover(id as OutsideCover);
-                setStep("duration");
-              }}
-            />
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            <OptionListChoice
-              options={durationOptions}
-              selectedId={String(durationMins)}
-              disabled={pending}
-              onChoose={(id) => {
-                const mins = Number(id);
-                setDurationMins(mins);
-                onLog(
-                  {
-                    slot,
-                    cover,
-                    startHm: currentLocalHm(timeZone),
-                  },
-                  mins,
-                );
-              }}
-            />
-            <p className="text-center text-xs text-accent">
-              Preview ≈ {previewPts} pts at {durationMins} min
-            </p>
-          </div>
-        )}
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 py-4">
+          <OptionGroup
+            label="Time of day"
+            options={slotOptions}
+            selectedId={slot}
+            disabled={pending}
+            onChoose={(id) => setSlot(id as SunExposureSlot)}
+          />
+          <OptionGroup
+            label="Sun or shade"
+            options={coverOptions}
+            selectedId={cover}
+            disabled={pending}
+            onChoose={(id) => setCover(id as OutsideCover)}
+          />
+          <OptionGroup
+            label="Duration"
+            options={durationOptions}
+            selectedId={String(durationMins)}
+            disabled={pending}
+            onChoose={(id) => setDurationMins(Number(id))}
+          />
+        </div>
+
+        <div className="shrink-0 space-y-2 border-t border-border px-5 py-4">
+          <p className="text-center text-xs text-accent">
+            Preview ≈ {previewPts} pts
+          </p>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              onLog(
+                { slot, cover, startHm: currentLocalHm(timeZone) },
+                durationMins,
+              )
+            }
+            className="btn-primary h-12 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
+          >
+            {pending ? "Logging…" : "Log Outside Time"}
+          </button>
+        </div>
       </div>
     </div>
   );

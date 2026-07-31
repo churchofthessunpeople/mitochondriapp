@@ -7,7 +7,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useToast } from "@/components/toast";
 import { getDayDetailAction, getPreviousWeekCopyAction } from "@/lib/actions/history";
 import { formatDayActivitiesCopy } from "@/lib/format-day-activities";
-import { getPreviousWeekRange } from "@/lib/week-range";
+import { getLastSevenDaysRange } from "@/lib/week-range";
 import { cn, formatPoints } from "@/lib/utils";
 
 function WeekCopyBar({
@@ -22,7 +22,7 @@ function WeekCopyBar({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <p className="text-xs text-muted">
-        Previous week · Sun–Sun · {weekShortLabel}
+        Last 7 days · {weekShortLabel}
       </p>
       <button
         type="button"
@@ -34,7 +34,7 @@ function WeekCopyBar({
         )}
       >
         <Copy className="h-3.5 w-3.5" strokeWidth={2.25} />
-        {copyingWeek ? "Copying…" : "Copy last week"}
+        {copyingWeek ? "Copying…" : "Copy last 7 days"}
       </button>
     </div>
   );
@@ -60,18 +60,15 @@ export function HistoryList({
   const [copyingWeek, setCopyingWeek] = useState(false);
   const [, startCopy] = useTransition();
 
-  const previousWeek = useMemo(
-    () => getPreviousWeekRange(timeZone),
+  const lastSevenDays = useMemo(
+    () => getLastSevenDaysRange(timeZone),
     [timeZone],
   );
   const weekShortLabel = useMemo(() => {
-    const start = format(parseISO(previousWeek.start), "MMM d");
-    const end = format(
-      parseISO(previousWeek.endExclusive),
-      "MMM d",
-    );
+    const start = format(parseISO(lastSevenDays.start), "MMM d");
+    const end = format(parseISO(lastSevenDays.endInclusive), "MMM d");
     return `${start} – ${end}`;
-  }, [previousWeek]);
+  }, [lastSevenDays]);
 
   function copyDay(date: string) {
     setCopyingDate(date);
@@ -95,9 +92,9 @@ export function HistoryList({
       try {
         const { text } = await getPreviousWeekCopyAction(timeZone);
         await navigator.clipboard.writeText(text);
-        push("Last week copied");
+        push("Last 7 days copied");
       } catch {
-        push("Could not copy last week", "err");
+        push("Could not copy last 7 days", "err");
       } finally {
         setCopyingWeek(false);
       }

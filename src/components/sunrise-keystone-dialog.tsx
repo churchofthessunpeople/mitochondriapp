@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft, Sun } from "lucide-react";
+import { Sun } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  OptionListChoice,
+  OptionGroup,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
@@ -56,11 +56,9 @@ type Props = {
   onDismissSession?: () => void;
   onDismissDay?: () => void;
   onCancel?: () => void;
-  /** When set, skip tier pick and open modifiers for this protocol */
+  /** When set, pre-select this sunrise tier */
   initialProtocol?: Protocol | null;
 };
-
-type Step = "tier" | "sky" | "grounded" | "skin" | "sunglasses" | "confirm";
 
 const DEFAULT_MODIFIERS: SunriseModifiers = {
   grounded: true,
@@ -85,7 +83,7 @@ function defaultSessionHm(
 }
 
 /**
- * Morning-light keystone flow: one choice at a time through tier + modifiers → confirm.
+ * Morning-light check-in — all choices on one screen, then log.
  */
 export function SunriseKeystoneDialog({
   todayIso,
@@ -105,9 +103,13 @@ export function SunriseKeystoneDialog({
   );
 
   const initialTier = useMemo(() => {
-    if (!initialProtocol) return null;
+    if (!initialProtocol) {
+      return tiersAvailable.find((x) => x.tier.id === "horizon") ?? tiersAvailable[0] ?? null;
+    }
     return (
-      tiersAvailable.find((x) => x.protocol.id === initialProtocol.id) ?? null
+      tiersAvailable.find((x) => x.protocol.id === initialProtocol.id) ??
+      tiersAvailable[0] ??
+      null
     );
   }, [initialProtocol, tiersAvailable]);
 
@@ -116,7 +118,6 @@ export function SunriseKeystoneDialog({
     [timeZone, sun?.sunrise],
   );
 
-  const [step, setStep] = useState<Step>(initialTier ? "sky" : "tier");
   const [selected, setSelected] = useState<TierOption | null>(initialTier);
   const [modifiers, setModifiers] = useState<SunriseModifiers>(DEFAULT_MODIFIERS);
   const [startHm, setStartHm] = useState(initialHm.startHm);
@@ -129,6 +130,8 @@ export function SunriseKeystoneDialog({
       document.body.style.overflow = prev;
     };
   }, []);
+
+  const pastMorning = isPastSunriseMorningWindow(sun?.sunrise, timeZone);
 
   const sessionOffsets =
     todayIso && sun?.sunrise
@@ -194,7 +197,6 @@ export function SunriseKeystoneDialog({
         title: tier.shortLabel,
         subtitle: `${tier.description} · +${protocol.points} pts`,
         badge: `up to ${formatSunriseMultiplier(tier.multiplier)}`,
-        highlight: tier.id === "horizon",
       })),
     [tiersAvailable],
   );
@@ -215,7 +217,6 @@ export function SunriseKeystoneDialog({
         id: "yes",
         title: "Yes — barefoot earth",
         subtitle: "Soil, grass, sand, or stone",
-        highlight: true,
       },
       {
         id: "no",
@@ -232,7 +233,6 @@ export function SunriseKeystoneDialog({
         id: "full",
         title: "Mostly exposed",
         subtitle: "Arms, legs, or torso in open air",
-        highlight: true,
       },
       {
         id: "partial",
@@ -249,7 +249,6 @@ export function SunriseKeystoneDialog({
         id: "none",
         title: "No sunglasses",
         subtitle: "Eyes open to morning light",
-        highlight: true,
       },
       {
         id: "worn",
@@ -264,11 +263,6 @@ export function SunriseKeystoneDialog({
     const option = tiersAvailable.find((x) => x.tier.id === tierId);
     if (!option) return;
     setSelected(option);
-    setModifiers(DEFAULT_MODIFIERS);
-    const hm = defaultSessionHm(timeZone, sun?.sunrise);
-    setStartHm(hm.startHm);
-    setFinishHm(hm.endHm);
-    setStep("sky");
   }
 
   function confirm() {
@@ -306,79 +300,6 @@ export function SunriseKeystoneDialog({
     );
   }
 
-  function goBack() {
-    if (step === "sky" && !initialTier) setStep("tier");
-    else if (step === "grounded") setStep("sky");
-    else if (step === "skin") setStep("grounded");
-    else if (step === "sunglasses") setStep("skin");
-    else if (step === "confirm") setStep("sunglasses");
-  }
-
-  const canGoBack =
-    step === "grounded" ||
-    step === "skin" ||
-    step === "sunglasses" ||
-    step === "confirm" ||
-    (step === "sky" && !initialTier);
-
-  const pastMorning = isPastSunriseMorningWindow(sun?.sunrise, timeZone);
-
-  const title =
-    step === "tier"
-      ? pastMorning
-        ? "Morning light — log or skip?"
-        : "Sunrise — how did you do?"
-      : step === "sky"
-        ? "Sky conditions"
-        : step === "grounded"
-          ? "Were you grounded?"
-          : step === "skin"
-            ? "Skin exposure"
-            : step === "sunglasses"
-              ? "Sunglasses"
-              : "Confirm Sunrise";
-
-  const subtitle =
-    step === "tier" ? (
-      <>
-        {pastMorning
-          ? "The morning window has passed. Log if you caught sunrise earlier, or skip until tomorrow."
-          : "First light sets the day. Tap the sky view that fits."}
-        {riseLabel ? (
-          <>
-            {" "}
-            Local sunrise ≈{" "}
-            <span className="text-foreground">{riseLabel}</span>
-            {optimalWindow ? (
-              <>
-                . Optimal window{" "}
-                <span className="text-foreground">{optimalWindow}</span>.
-              </>
-            ) : null}
-          </>
-        ) : (
-          <> Set a US ZIP in Place for accurate sunrise times.</>
-        )}
-      </>
-    ) : step === "sky" ? (
-      <>
-        Clear skies need 30 min for full points and boost; cloudier skies need
-        longer.
-      </>
-    ) : step === "grounded" ? (
-      <>Barefoot contact with earth can raise your day boost.</>
-    ) : step === "skin" ? (
-      <>More open skin in morning light can raise your day boost.</>
-    ) : step === "sunglasses" ? (
-      <>Sunglasses lower how much morning light reaches your eyes.</>
-    ) : (
-      <>
-        Logging{" "}
-        <span className="text-foreground">{selected?.tier.shortLabel}</span>{" "}
-        with {describeSunriseModifiers(modifiers)}.
-      </>
-    );
-
   if (tiersAvailable.length === 0) return null;
 
   return (
@@ -389,7 +310,7 @@ export function SunriseKeystoneDialog({
       aria-labelledby="sunrise-check-title"
     >
       <div className="glass flex max-h-[min(90dvh,calc(100vh-2rem))] w-full max-w-md flex-col overflow-hidden rounded-3xl shadow-xl">
-        <div className="shrink-0 p-5 sm:p-6">
+        <div className="shrink-0 p-5 pb-3 sm:p-6 sm:pb-3">
           <div className="flex items-start gap-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-accent/40 bg-accent/15 text-accent">
               <Sun className="h-5 w-5" />
@@ -402,264 +323,221 @@ export function SunriseKeystoneDialog({
                 id="sunrise-check-title"
                 className="mt-1 text-xl font-semibold tracking-tight"
               >
-                {title}
+                {pastMorning
+                  ? "Morning light — log or skip?"
+                  : "Sunrise — how did you do?"}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-muted">
-                {subtitle}
+                {pastMorning
+                  ? "The morning window has passed. Log if you caught sunrise earlier, or skip until tomorrow."
+                  : "First light sets the day. Set your sky view and conditions, then log."}
+                {riseLabel ? (
+                  <>
+                    {" "}
+                    Local sunrise ≈{" "}
+                    <span className="text-foreground">{riseLabel}</span>
+                    {optimalWindow ? (
+                      <>
+                        . Optimal window{" "}
+                        <span className="text-foreground">{optimalWindow}</span>.
+                      </>
+                    ) : null}
+                  </>
+                ) : (
+                  <> Set a US ZIP in Place for accurate sunrise times.</>
+                )}
               </p>
             </div>
           </div>
-          {canGoBack ? (
+        </div>
+
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 pb-4 sm:px-6">
+          <OptionGroup
+            label="Sky view"
+            options={tierOptions}
+            selectedId={selected?.tier.id}
+            disabled={pending}
+            onChoose={pickTier}
+          />
+          <OptionGroup
+            label="Sky conditions"
+            options={skyOptions}
+            selectedId={modifiers.sky}
+            disabled={pending}
+            onChoose={(id) =>
+              setModifiers((m) => ({
+                ...m,
+                sky: id as SunriseModifiers["sky"],
+              }))
+            }
+          />
+          <OptionGroup
+            label="Grounded?"
+            options={groundedOptions}
+            selectedId={modifiers.grounded ? "yes" : "no"}
+            disabled={pending}
+            onChoose={(id) =>
+              setModifiers((m) => ({ ...m, grounded: id === "yes" }))
+            }
+          />
+          <OptionGroup
+            label="Skin exposure"
+            options={skinOptions}
+            selectedId={modifiers.skin}
+            disabled={pending}
+            onChoose={(id) =>
+              setModifiers((m) => ({
+                ...m,
+                skin: id as SunriseModifiers["skin"],
+              }))
+            }
+          />
+          <OptionGroup
+            label="Sunglasses"
+            options={sunglassesOptions}
+            selectedId={modifiers.sunglasses}
+            disabled={pending}
+            onChoose={(id) =>
+              setModifiers((m) => ({
+                ...m,
+                sunglasses: id as SunriseModifiers["sunglasses"],
+              }))
+            }
+          />
+
+          <div className="rounded-2xl border border-border bg-foreground/[0.02] px-4 py-3 text-sm">
+            <p>
+              <span className="font-semibold text-foreground">
+                {selected?.tier.shortLabel ?? "Sunrise"}
+              </span>
+              <span className="text-muted">
+                {" "}
+                · {describeSunriseModifiers(modifiers)}
+              </span>
+            </p>
+            <p className="mt-2 text-xs text-muted">
+              {modifiers.sky === "clear" ? "Clear" : "Your"} skies need{" "}
+              <span className="text-foreground">{requiredSkyMinutes} min</span>{" "}
+              for full points and boost.
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  Start
+                </span>
+                <input
+                  type="time"
+                  value={startHm}
+                  onChange={(e) => setStartHm(e.target.value)}
+                  disabled={pending}
+                  className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  Finish
+                </span>
+                <input
+                  type="time"
+                  value={finishHm}
+                  onChange={(e) => setFinishHm(e.target.value)}
+                  disabled={pending}
+                  className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
+                />
+              </label>
+            </div>
+            <p
+              className={cn(
+                "mt-2 text-xs",
+                timingOptimal && skyDurationFactor >= 1
+                  ? "text-accent"
+                  : "text-muted",
+              )}
+            >
+              {sessionMinutes != null ? (
+                <>
+                  Session length:{" "}
+                  <span className="text-foreground">{sessionMinutes} min</span>
+                  {skyDurationFactor >= 1 ? (
+                    timingOptimal ? (
+                      " — optimal timing & full sky duration"
+                    ) : (
+                      " — full sky duration"
+                    )
+                  ) : (
+                    ` — need ${requiredSkyMinutes} min for full credit (${Math.round(skyDurationFactor * 100)}%)`
+                  )}
+                  {!timingOptimal && sessionOffsets != null ? (
+                    <>
+                      {" "}
+                      ·{" "}
+                      {Math.max(
+                        minutesBeyondOptimalWindow(sessionOffsets.startOffset),
+                        minutesBeyondOptimalWindow(sessionOffsets.endOffset),
+                      )}{" "}
+                      min outside sunrise window
+                    </>
+                  ) : null}
+                </>
+              ) : (
+                `+${timingPoints} pts`
+              )}
+            </p>
+            <p className="mt-2 text-accent">
+              {formatSunriseMultiplier(effectiveBoost)} day boost · +
+              {timingPoints} pts
+            </p>
+          </div>
+        </div>
+
+        <div className="shrink-0 space-y-2 border-t border-border px-5 py-4 sm:px-6">
+          <button
+            type="button"
+            disabled={pending || !selected}
+            onClick={confirm}
+            className="btn-primary h-12 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
+          >
+            {pending ? "Logging…" : "Log Sunrise"}
+          </button>
+          {pastMorning && onDismissDay ? (
             <button
               type="button"
               disabled={pending}
-              onClick={goBack}
-              className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-muted hover:text-foreground disabled:opacity-60"
+              onClick={onDismissDay}
+              className="btn-secondary h-11 w-full rounded-2xl text-sm font-semibold"
             >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Back
+              Missed it today — ask again tomorrow
             </button>
           ) : null}
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-5 sm:px-6 sm:pb-6">
-          {step === "tier" ? (
-            <OptionListChoice
-              options={tierOptions}
-              selectedId={selected?.tier.id ?? "horizon"}
+          {onDismissSession ? (
+            <button
+              type="button"
               disabled={pending}
-              onChoose={pickTier}
-              footer={
-                <div className="mt-1 flex flex-col gap-2">
-                  {pastMorning && onDismissDay ? (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={onDismissDay}
-                      className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
-                    >
-                      Missed it today — ask again tomorrow
-                    </button>
-                  ) : null}
-                  {onDismissSession ? (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={onDismissSession}
-                      className="btn-secondary h-11 rounded-2xl text-sm font-semibold"
-                    >
-                      Not yet — ask me later
-                    </button>
-                  ) : null}
-                  {!pastMorning && onDismissDay ? (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={onDismissDay}
-                      className="btn-secondary h-10 rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
-                    >
-                      Missed it today — don&apos;t ask again until tomorrow
-                    </button>
-                  ) : null}
-                  {onCancel ? (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={onCancel}
-                      className="h-10 rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
-                    >
-                      Cancel
-                    </button>
-                  ) : null}
-                </div>
-              }
-            />
+              onClick={onDismissSession}
+              className="btn-secondary h-11 w-full rounded-2xl text-sm font-semibold"
+            >
+              Not yet — ask me later
+            </button>
           ) : null}
-
-          {step === "sky" && selected ? (
-            <OptionListChoice
-              options={skyOptions}
-              selectedId={modifiers.sky}
+          {!pastMorning && onDismissDay ? (
+            <button
+              type="button"
               disabled={pending}
-              onChoose={(id) => {
-                setModifiers((m) => ({
-                  ...m,
-                  sky: id as SunriseModifiers["sky"],
-                }));
-                setStep("grounded");
-              }}
-            />
+              onClick={onDismissDay}
+              className="h-10 w-full rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
+            >
+              Missed it today — don&apos;t ask again until tomorrow
+            </button>
           ) : null}
-
-          {step === "grounded" && selected ? (
-            <OptionListChoice
-              options={groundedOptions}
-              selectedId={modifiers.grounded ? "yes" : "no"}
+          {onCancel ? (
+            <button
+              type="button"
               disabled={pending}
-              onChoose={(id) => {
-                setModifiers((m) => ({ ...m, grounded: id === "yes" }));
-                setStep("skin");
-              }}
-            />
-          ) : null}
-
-          {step === "skin" && selected ? (
-            <OptionListChoice
-              options={skinOptions}
-              selectedId={modifiers.skin}
-              disabled={pending}
-              onChoose={(id) => {
-                setModifiers((m) => ({
-                  ...m,
-                  skin: id as SunriseModifiers["skin"],
-                }));
-                setStep("sunglasses");
-              }}
-            />
-          ) : null}
-
-          {step === "sunglasses" && selected ? (
-            <OptionListChoice
-              options={sunglassesOptions}
-              selectedId={modifiers.sunglasses}
-              disabled={pending}
-              onChoose={(id) => {
-                setModifiers((m) => ({
-                  ...m,
-                  sunglasses: id as SunriseModifiers["sunglasses"],
-                }));
-                setStep("confirm");
-              }}
-            />
-          ) : null}
-
-          {step === "confirm" && selected ? (
-            <div className="flex flex-col gap-3">
-              <div className="rounded-2xl border border-border bg-foreground/[0.02] px-4 py-3 text-sm">
-                <p>
-                  <span className="font-semibold text-foreground">
-                    {selected.tier.shortLabel}
-                  </span>
-                  <span className="text-muted">
-                    {" "}
-                    · {describeSunriseModifiers(modifiers)}
-                  </span>
-                </p>
-                {optimalWindow ? (
-                  <p className="mt-2 text-xs text-muted">
-                    Best timing within{" "}
-                    <span className="text-foreground">{optimalWindow}</span>
-                    {riseLabel ? (
-                      <span> (sunrise {riseLabel})</span>
-                    ) : null}
-                    . {modifiers.sky === "clear" ? "Clear" : "Your"} skies need{" "}
-                    <span className="text-foreground">
-                      {requiredSkyMinutes} min
-                    </span>{" "}
-                    for full points and boost.
-                  </p>
-                ) : (
-                  <p className="mt-2 text-xs text-muted">
-                    {modifiers.sky === "clear" ? "Clear" : "Your"} skies need{" "}
-                    <span className="text-foreground">
-                      {requiredSkyMinutes} min
-                    </span>{" "}
-                    for full points and boost.
-                  </p>
-                )}
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  <label className="block">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      Start
-                    </span>
-                    <input
-                      type="time"
-                      value={startHm}
-                      onChange={(e) => setStartHm(e.target.value)}
-                      disabled={pending}
-                      className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
-                    />
-                  </label>
-                  <label className="block">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      Finish
-                    </span>
-                    <input
-                      type="time"
-                      value={finishHm}
-                      onChange={(e) => setFinishHm(e.target.value)}
-                      disabled={pending}
-                      className="mt-1.5 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground"
-                    />
-                  </label>
-                </div>
-                <p
-                  className={cn(
-                    "mt-2 text-xs",
-                    timingOptimal && skyDurationFactor >= 1
-                      ? "text-accent"
-                      : "text-muted",
-                  )}
-                >
-                  {sessionMinutes != null ? (
-                    <>
-                      Session length:{" "}
-                      <span className="text-foreground">
-                        {sessionMinutes} min
-                      </span>
-                      {skyDurationFactor >= 1 ? (
-                        timingOptimal ? (
-                          " — optimal timing & full sky duration"
-                        ) : (
-                          " — full sky duration"
-                        )
-                      ) : (
-                        ` — need ${requiredSkyMinutes} min for full credit (${Math.round(skyDurationFactor * 100)}%)`
-                      )}
-                      {!timingOptimal && sessionOffsets != null ? (
-                        <>
-                          {" "}
-                          ·{" "}
-                          {Math.max(
-                            minutesBeyondOptimalWindow(
-                              sessionOffsets.startOffset,
-                            ),
-                            minutesBeyondOptimalWindow(
-                              sessionOffsets.endOffset,
-                            ),
-                          )}{" "}
-                          min outside sunrise window
-                        </>
-                      ) : null}
-                    </>
-                  ) : (
-                    `+${timingPoints} pts`
-                  )}
-                </p>
-                <p className="mt-2 text-accent">
-                  {formatSunriseMultiplier(effectiveBoost)} day boost · +
-                  {timingPoints} pts
-                </p>
-              </div>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={confirm}
-                className="btn-primary h-11 rounded-2xl text-sm font-semibold"
-              >
-                Log Sunrise
-              </button>
-              {initialTier && onCancel ? (
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={onCancel}
-                  className="btn-secondary h-10 rounded-2xl text-sm font-medium"
-                >
-                  Cancel
-                </button>
-              ) : null}
-            </div>
+              onClick={onCancel}
+              className="h-10 w-full rounded-2xl text-xs font-medium text-muted transition hover:text-foreground"
+            >
+              Cancel
+            </button>
           ) : null}
         </div>
       </div>

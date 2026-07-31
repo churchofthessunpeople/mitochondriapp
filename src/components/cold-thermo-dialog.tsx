@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft, Snowflake, X } from "lucide-react";
+import { Snowflake, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  OptionListChoice,
+  OptionGroup,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
@@ -12,15 +12,12 @@ import {
   COLD_THERMO_SKIN_TEMP_OPTIONS,
   OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
   coldThermoBasePoints,
-  coldThermoModeLabel,
   formatColdThermoSkinTemp,
   type ColdThermoLogInput,
   type ColdThermoMode,
   type ColdThermoSkinTempF,
 } from "@/lib/cold-thermo-skin-temp";
 import { DURATION_BLOCK_MINUTES, pointsForLog } from "@/lib/scoring";
-
-type Step = "mode" | "temp" | "duration";
 
 type Props = {
   protocol: Protocol;
@@ -43,10 +40,7 @@ export function coldThermoDurationChoices(maxMinutes: number): number[] {
   return picked;
 }
 
-/**
- * Cold thermogenesis: mode → skin temperature → duration.
- * Face immersion is logged under Vagus nerve stimulation.
- */
+/** Cold thermogenesis — mode, skin temp, and duration on one screen. */
 export function ColdThermoDialog({
   protocol,
   pending,
@@ -55,7 +49,6 @@ export function ColdThermoDialog({
   onLog,
   onCancel,
 }: Props) {
-  const [step, setStep] = useState<Step>("mode");
   const [mode, setMode] = useState<ColdThermoMode>("plunge");
   const [tempF, setTempF] = useState<ColdThermoSkinTempF>(initialTempF);
   const [durationMins, setDurationMins] = useState(
@@ -90,7 +83,6 @@ export function ColdThermoDialog({
         id: o.id,
         title: o.label,
         subtitle: o.detail,
-        highlight: o.id === "plunge",
       })),
     [],
   );
@@ -108,7 +100,6 @@ export function ColdThermoDialog({
           subtitle: `${pts} pts / ${DURATION_BLOCK_MINUTES} min${
             t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F ? " · target" : ""
           }`,
-          highlight: t === OPTIMAL_COLD_THERMO_SKIN_TEMP_F,
         };
       }),
     [mode, protocol.points],
@@ -122,54 +113,30 @@ export function ColdThermoDialog({
         subtitle: `≈ ${pointsForLog(protocol, m, {
           sunriseMultiplier,
           basePoints,
-        })} pts this log`,
-        highlight: m === 10 || m === DURATION_BLOCK_MINUTES,
+        })} pts`,
       })),
     [durationChoices, protocol, sunriseMultiplier, basePoints],
   );
 
-  function goBack() {
-    if (step === "temp") setStep("mode");
-    else if (step === "duration") setStep("temp");
-  }
-
-  const stepHint =
-    step === "mode"
-      ? "Cold plunge or cold shower?"
-      : step === "temp"
-        ? `${coldThermoModeLabel(mode)} · skin surface temperature?`
-        : `${coldThermoModeLabel(mode)} · ${formatColdThermoSkinTemp(tempF)} · ${basePoints} pts / ${DURATION_BLOCK_MINUTES} min`;
-
   return (
     <div className="fixed inset-0 z-[110] flex items-end justify-center bg-black/50 p-4 sm:items-center">
       <div
-        className="glass max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl p-5"
+        className="glass flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="cold-thermo-title"
       >
-        <div className="flex items-start gap-2">
-          {step !== "mode" ? (
-            <button
-              type="button"
-              onClick={goBack}
-              className="mt-0.5 rounded-lg p-1 text-muted"
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          ) : null}
+        <div className="flex shrink-0 items-start gap-2 px-5 pt-5">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <Snowflake className="h-4 w-4 shrink-0 text-accent" />
-              <p
-                id="cold-thermo-title"
-                className="font-semibold leading-snug"
-              >
+              <p id="cold-thermo-title" className="font-semibold leading-snug">
                 {protocol.name}
               </p>
             </div>
-            <p className="mt-1 text-xs text-muted">{stepHint}</p>
+            <p className="mt-1 text-xs text-muted">
+              Set mode, skin temperature, and duration
+            </p>
           </div>
           <button
             type="button"
@@ -181,47 +148,43 @@ export function ColdThermoDialog({
           </button>
         </div>
 
-        {step === "mode" ? (
-          <div className="mt-4">
-            <OptionListChoice
-              options={modeOptions}
-              selectedId={mode}
-              disabled={pending}
-              onChoose={(id) => {
-                setMode(id as ColdThermoMode);
-                setStep("temp");
-              }}
-            />
-          </div>
-        ) : step === "temp" ? (
-          <div className="mt-4">
-            <OptionListChoice
-              options={tempOptions}
-              selectedId={String(tempF)}
-              disabled={pending}
-              onChoose={(id) => {
-                setTempF(Number(id) as ColdThermoSkinTempF);
-                setStep("duration");
-              }}
-            />
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            <OptionListChoice
-              options={durationOptions}
-              selectedId={String(durationMins)}
-              disabled={pending}
-              onChoose={(id) => {
-                const mins = Number(id);
-                setDurationMins(mins);
-                onLog({ mode, skinTempF: tempF }, mins);
-              }}
-            />
-            <p className="text-center text-xs text-muted">
-              ≈ {previewPts} pts at {durationMins} min
-            </p>
-          </div>
-        )}
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 py-4">
+          <OptionGroup
+            label="Mode"
+            options={modeOptions}
+            selectedId={mode}
+            disabled={pending}
+            onChoose={(id) => setMode(id as ColdThermoMode)}
+          />
+          <OptionGroup
+            label="Skin temperature"
+            options={tempOptions}
+            selectedId={String(tempF)}
+            disabled={pending}
+            onChoose={(id) => setTempF(Number(id) as ColdThermoSkinTempF)}
+          />
+          <OptionGroup
+            label="Duration"
+            options={durationOptions}
+            selectedId={String(durationMins)}
+            disabled={pending}
+            onChoose={(id) => setDurationMins(Number(id))}
+          />
+        </div>
+
+        <div className="shrink-0 space-y-2 border-t border-border px-5 py-4">
+          <p className="text-center text-xs text-muted">
+            ≈ {previewPts} pts at {durationMins} min
+          </p>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => onLog({ mode, skinTempF: tempF }, durationMins)}
+            className="btn-primary h-12 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
+          >
+            {pending ? "Logging…" : "Log Cold Thermogenesis"}
+          </button>
+        </div>
       </div>
     </div>
   );

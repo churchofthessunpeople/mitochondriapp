@@ -72,6 +72,71 @@ export function OptionListChoice({
   );
 }
 
+type GroupProps = ListProps & {
+  /** Section heading above the choices */
+  label: string;
+};
+
+/**
+ * Labeled option section for single-screen multi-choice dialogs.
+ * Selecting updates state only — parent provides a confirm/log action.
+ */
+export function OptionGroup({
+  label,
+  options,
+  selectedId,
+  onChoose,
+  disabled = false,
+  className,
+  footer,
+}: GroupProps) {
+  if (options.length === 0) return null;
+
+  return (
+    <fieldset className={cn("min-w-0 space-y-2", className)}>
+      <legend className="px-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
+        {label}
+      </legend>
+      <div className="flex flex-col gap-1.5">
+        {options.map((option) => {
+          const selected = selectedId === option.id;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              disabled={disabled}
+              onClick={() => onChoose(option.id)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left transition disabled:opacity-60",
+                selected
+                  ? "border-accent/40 bg-accent/10"
+                  : "border-border bg-foreground/[0.02] hover:border-accent/30",
+              )}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-sm font-medium text-foreground">
+                  {option.title}
+                </span>
+                {option.badge ? (
+                  <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent">
+                    {option.badge}
+                  </span>
+                ) : null}
+              </div>
+              {option.subtitle ? (
+                <p className="mt-0.5 text-[11px] leading-snug text-muted">
+                  {option.subtitle}
+                </p>
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+      {footer}
+    </fieldset>
+  );
+}
+
 type CarouselProps = {
   options: readonly ClickThroughOption[];
   /** Prefer starting on this option id when present */

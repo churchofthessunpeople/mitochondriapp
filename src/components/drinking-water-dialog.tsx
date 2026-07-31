@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft, Droplets, X } from "lucide-react";
+import { Droplets, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  OptionListChoice,
+  OptionGroup,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
@@ -15,8 +15,6 @@ import {
   WATER_SOURCE_OPTIONS,
   drinkingWaterBasePoints,
   normalizeDrinkingWaterInput,
-  waterMineralLabel,
-  waterSourceLabel,
   type DeuteriumPpm,
   type DrinkingWaterLogInput,
   type WaterCarbonation,
@@ -26,8 +24,6 @@ import {
 } from "@/lib/drinking-water";
 import { pointsForLog } from "@/lib/scoring";
 
-type Step = "source" | "ppm" | "mineral" | "amount" | "carbonation";
-
 type Props = {
   protocol: Protocol;
   pending?: boolean;
@@ -36,9 +32,7 @@ type Props = {
   onCancel: () => void;
 };
 
-/**
- * Drinking water: source → (DDW ppm) → minerals → (amount) → still/carbonated.
- */
+/** Drinking water — source, minerals, and carbonation on one screen. */
 export function DrinkingWaterDialog({
   protocol,
   pending,
@@ -46,7 +40,6 @@ export function DrinkingWaterDialog({
   onLog,
   onCancel,
 }: Props) {
-  const [step, setStep] = useState<Step>("source");
   const [source, setSource] = useState<WaterSource>("spring");
   const [deuteriumPpm, setDeuteriumPpm] = useState<DeuteriumPpm>(50);
   const [mineral, setMineral] = useState<WaterMineral>("none");
@@ -82,7 +75,6 @@ export function DrinkingWaterDialog({
         id: o.id,
         title: o.label,
         subtitle: o.detail,
-        highlight: o.id === "spring",
       })),
     [],
   );
@@ -98,7 +90,6 @@ export function DrinkingWaterDialog({
             : ppm <= 105
               ? "Moderately depleted"
               : "Near natural (~150 ppm)",
-        highlight: ppm === 50,
       })),
     [],
   );
@@ -109,7 +100,6 @@ export function DrinkingWaterDialog({
         id: o.id,
         title: o.label,
         subtitle: o.detail,
-        highlight: o.id === "salt",
       })),
     [],
   );
@@ -120,7 +110,6 @@ export function DrinkingWaterDialog({
         id: o.id,
         title: o.label,
         subtitle: o.detail,
-        highlight: o.id === "quarter_tsp",
       })),
     [],
   );
@@ -130,52 +119,20 @@ export function DrinkingWaterDialog({
       WATER_CARBONATION_OPTIONS.map((o) => ({
         id: o.id,
         title: o.label,
-        subtitle: `${o.detail} · ≈ ${previewPts} pts`,
-        highlight: o.id === "still",
+        subtitle: o.detail,
       })),
-    [previewPts],
+    [],
   );
-
-  function goBack() {
-    if (step === "ppm") setStep("source");
-    else if (step === "mineral") {
-      setStep(source === "deuterium_depleted" ? "ppm" : "source");
-    } else if (step === "amount") setStep("mineral");
-    else if (step === "carbonation") {
-      setStep(mineral === "none" ? "mineral" : "amount");
-    }
-  }
-
-  const stepHint =
-    step === "source"
-      ? "What kind of water?"
-      : step === "ppm"
-        ? `${waterSourceLabel(source)} · deuterium concentration?`
-        : step === "mineral"
-          ? `${waterSourceLabel(source)} · remineralized?`
-          : step === "amount"
-            ? `${waterMineralLabel(mineral)} · how much?`
-            : `${waterSourceLabel(source)} · still or carbonated?`;
 
   return (
     <div className="fixed inset-0 z-[110] flex items-end justify-center bg-black/50 p-4 sm:items-center">
       <div
-        className="glass max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl p-5"
+        className="glass flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="drinking-water-title"
       >
-        <div className="flex items-start gap-2">
-          {step !== "source" ? (
-            <button
-              type="button"
-              onClick={goBack}
-              className="mt-0.5 rounded-lg p-1 text-muted"
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          ) : null}
+        <div className="flex shrink-0 items-start gap-2 px-5 pt-5">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <Droplets className="h-4 w-4 shrink-0 text-accent" />
@@ -186,7 +143,9 @@ export function DrinkingWaterDialog({
                 {protocol.name}
               </p>
             </div>
-            <p className="mt-1 text-xs text-muted">{stepHint}</p>
+            <p className="mt-1 text-xs text-muted">
+              Set source, minerals, and still or sparkling
+            </p>
           </div>
           <button
             type="button"
@@ -198,79 +157,61 @@ export function DrinkingWaterDialog({
           </button>
         </div>
 
-        {step === "source" ? (
-          <div className="mt-4">
-            <OptionListChoice
-              options={sourceOptions}
-              selectedId={source}
-              disabled={pending}
-              onChoose={(id) => {
-                const next = id as WaterSource;
-                setSource(next);
-                setStep(next === "deuterium_depleted" ? "ppm" : "mineral");
-              }}
-            />
-          </div>
-        ) : step === "ppm" ? (
-          <div className="mt-4">
-            <OptionListChoice
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 py-4">
+          <OptionGroup
+            label="Source"
+            options={sourceOptions}
+            selectedId={source}
+            disabled={pending}
+            onChoose={(id) => setSource(id as WaterSource)}
+          />
+          {source === "deuterium_depleted" ? (
+            <OptionGroup
+              label="Deuterium PPM"
               options={ppmOptions}
               selectedId={String(deuteriumPpm)}
               disabled={pending}
-              onChoose={(id) => {
-                setDeuteriumPpm(Number(id) as DeuteriumPpm);
-                setStep("mineral");
-              }}
+              onChoose={(id) => setDeuteriumPpm(Number(id) as DeuteriumPpm)}
             />
-          </div>
-        ) : step === "mineral" ? (
-          <div className="mt-4">
-            <OptionListChoice
-              options={mineralOptions}
-              selectedId={mineral}
-              disabled={pending}
-              onChoose={(id) => {
-                const next = id as WaterMineral;
-                setMineral(next);
-                if (next === "none") setStep("carbonation");
-                else setStep("amount");
-              }}
-            />
-          </div>
-        ) : step === "amount" ? (
-          <div className="mt-4">
-            <OptionListChoice
+          ) : null}
+          <OptionGroup
+            label="Minerals"
+            options={mineralOptions}
+            selectedId={mineral}
+            disabled={pending}
+            onChoose={(id) => setMineral(id as WaterMineral)}
+          />
+          {mineral !== "none" ? (
+            <OptionGroup
+              label="Amount"
               options={amountOptions}
               selectedId={mineralAmount}
               disabled={pending}
-              onChoose={(id) => {
-                setMineralAmount(id as WaterMineralAmount);
-                setStep("carbonation");
-              }}
+              onChoose={(id) => setMineralAmount(id as WaterMineralAmount)}
             />
-          </div>
-        ) : (
-          <div className="mt-4">
-            <OptionListChoice
-              options={carbonationOptions}
-              selectedId={carbonation}
-              disabled={pending}
-              onChoose={(id) => {
-                const next = id as WaterCarbonation;
-                setCarbonation(next);
-                onLog(
-                  normalizeDrinkingWaterInput({
-                    source,
-                    carbonation: next,
-                    mineral,
-                    mineralAmount,
-                    deuteriumPpm,
-                  }),
-                );
-              }}
-            />
-          </div>
-        )}
+          ) : null}
+          <OptionGroup
+            label="Still or carbonated"
+            options={carbonationOptions}
+            selectedId={carbonation}
+            disabled={pending}
+            onChoose={(id) => setCarbonation(id as WaterCarbonation)}
+          />
+        </div>
+
+        <div className="shrink-0 space-y-2 border-t border-border px-5 py-4">
+          <p className="text-center text-xs text-accent">
+            Preview ≈ {previewPts} pts
+          </p>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => onLog(draft)}
+            className="btn-primary h-12 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
+          >
+            {pending ? "Logging…" : "Log Drinking Water"}
+          </button>
+        </div>
       </div>
     </div>
   );

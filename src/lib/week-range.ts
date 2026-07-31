@@ -25,34 +25,43 @@ export function addIsoDays(isoDate: string, days: number): string {
 }
 
 export type WeekRange = {
-  /** Inclusive start (Sunday) */
+  /** Inclusive start */
   start: string;
-  /** Exclusive end (following Sunday) — use `completedOn < endExclusive` */
+  /** Exclusive end — use `completedOn < endExclusive` */
   endExclusive: string;
+  /** Inclusive last day (for labels) */
+  endInclusive: string;
   label: string;
 };
 
 /**
- * Previous complete week in the user's timezone: Sunday through Saturday,
- * labeled Sun–Sun (closing Sunday is the day after the last logged day).
+ * Rolling previous 7 calendar days in the user's timezone, ending yesterday
+ * (excludes today so the window is only completed days).
  */
-export function getPreviousWeekRange(
+export function getLastSevenDaysRange(
   timeZone: string,
   referenceToday?: string,
 ): WeekRange {
   const today = referenceToday ?? getTodayIsoForTimezone(timeZone);
-  const dow = weekdayIndexInTimezone(today, timeZone);
-
-  const thisWeekSunday = addIsoDays(today, -dow);
-  const start = addIsoDays(thisWeekSunday, -7);
-  const endExclusive = addIsoDays(start, 7);
+  const endInclusive = addIsoDays(today, -1);
+  const start = addIsoDays(endInclusive, -6);
+  const endExclusive = today;
 
   const startLabel = format(parseISO(start), "EEEE, MMMM d");
-  const endLabel = format(parseISO(endExclusive), "EEEE, MMMM d, yyyy");
+  const endLabel = format(parseISO(endInclusive), "EEEE, MMMM d, yyyy");
 
   return {
     start,
     endExclusive,
+    endInclusive,
     label: `${startLabel} – ${endLabel}`,
   };
+}
+
+/** @deprecated Prefer getLastSevenDaysRange — kept for older imports. */
+export function getPreviousWeekRange(
+  timeZone: string,
+  referenceToday?: string,
+): WeekRange {
+  return getLastSevenDaysRange(timeZone, referenceToday);
 }

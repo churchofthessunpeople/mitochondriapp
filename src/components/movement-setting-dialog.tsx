@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft, Footprints, X } from "lucide-react";
+import { Footprints, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Protocol } from "@/db/schema";
 import {
-  OptionListChoice,
+  OptionGroup,
   type ClickThroughOption,
 } from "@/components/click-through-choice";
 import {
@@ -14,8 +14,6 @@ import {
 } from "@/lib/movement-setting";
 import { DURATION_BLOCK_MINUTES, pointsForLog } from "@/lib/scoring";
 
-type Step = "setting" | "duration";
-
 type Props = {
   protocol: Protocol;
   pending?: boolean;
@@ -24,10 +22,7 @@ type Props = {
   onCancel: () => void;
 };
 
-/**
- * Movement / exercise: environment → duration.
- * Multi-choice steps show one option at a time.
- */
+/** Movement / exercise — environment and duration on one screen. */
 export function MovementSettingDialog({
   protocol,
   pending,
@@ -35,7 +30,6 @@ export function MovementSettingDialog({
   onLog,
   onCancel,
 }: Props) {
-  const [step, setStep] = useState<Step>("setting");
   const [setting, setSetting] = useState<MovementSetting>("full_sunlight");
   const [durationMins, setDurationMins] = useState(DURATION_BLOCK_MINUTES);
 
@@ -63,7 +57,6 @@ export function MovementSettingDialog({
         id: opt.id,
         title: opt.label,
         subtitle: `${opt.detail} · ${movementSettingBasePoints(opt.id, protocol.points)} pts / ${DURATION_BLOCK_MINUTES} min`,
-        highlight: opt.id === "full_sunlight",
       })),
     [protocol.points],
   );
@@ -76,35 +69,20 @@ export function MovementSettingDialog({
         subtitle: `≈ ${pointsForLog(protocol, m, {
           sunriseMultiplier,
           basePoints,
-        })} pts this log`,
-        highlight: m === DURATION_BLOCK_MINUTES,
+        })} pts`,
       })),
     [durationChoices, protocol, sunriseMultiplier, basePoints],
   );
 
-  function goBack() {
-    if (step === "duration") setStep("setting");
-  }
-
   return (
     <div className="fixed inset-0 z-[110] flex items-end justify-center bg-black/50 p-4 sm:items-center">
       <div
-        className="glass max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl p-5"
+        className="glass flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="movement-setting-title"
       >
-        <div className="flex items-start gap-2">
-          {step === "duration" ? (
-            <button
-              type="button"
-              onClick={goBack}
-              className="mt-0.5 rounded-lg p-1 text-muted"
-              aria-label="Back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          ) : null}
+        <div className="flex shrink-0 items-start gap-2 px-5 pt-5">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <Footprints className="h-4 w-4 shrink-0 text-accent" />
@@ -116,9 +94,7 @@ export function MovementSettingDialog({
               </p>
             </div>
             <p className="mt-1 text-xs text-muted">
-              {step === "setting"
-                ? "Where did you do this session?"
-                : `${MOVEMENT_SETTING_OPTIONS.find((o) => o.id === setting)?.label ?? setting} · ${basePoints} pts / ${DURATION_BLOCK_MINUTES} min`}
+              Set where you moved and for how long
             </p>
           </div>
           <button
@@ -131,35 +107,36 @@ export function MovementSettingDialog({
           </button>
         </div>
 
-        {step === "setting" ? (
-          <div className="mt-4">
-            <OptionListChoice
-              options={settingOptions}
-              selectedId={setting}
-              disabled={pending}
-              onChoose={(id) => {
-                setSetting(id as MovementSetting);
-                setStep("duration");
-              }}
-            />
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            <OptionListChoice
-              options={durationOptions}
-              selectedId={String(durationMins)}
-              disabled={pending}
-              onChoose={(id) => {
-                const mins = Number(id);
-                setDurationMins(mins);
-                onLog(setting, mins);
-              }}
-            />
-            <p className="text-center text-xs text-accent">
-              Preview ≈ {previewPts} pts at {durationMins} min
-            </p>
-          </div>
-        )}
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-5 py-4">
+          <OptionGroup
+            label="Setting"
+            options={settingOptions}
+            selectedId={setting}
+            disabled={pending}
+            onChoose={(id) => setSetting(id as MovementSetting)}
+          />
+          <OptionGroup
+            label="Duration"
+            options={durationOptions}
+            selectedId={String(durationMins)}
+            disabled={pending}
+            onChoose={(id) => setDurationMins(Number(id))}
+          />
+        </div>
+
+        <div className="shrink-0 space-y-2 border-t border-border px-5 py-4">
+          <p className="text-center text-xs text-accent">
+            Preview ≈ {previewPts} pts
+          </p>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => onLog(setting, durationMins)}
+            className="btn-primary h-12 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
+          >
+            {pending ? "Logging…" : "Log session"}
+          </button>
+        </div>
       </div>
     </div>
   );

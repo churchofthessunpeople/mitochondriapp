@@ -9,7 +9,7 @@ import {
 } from "@/lib/data";
 import { formatWeekActivitiesCopy } from "@/lib/format-day-activities";
 import { buildPermanentProtocolIds } from "@/lib/permanent-activities";
-import { getPreviousWeekRange } from "@/lib/week-range";
+import { getLastSevenDaysRange } from "@/lib/week-range";
 
 export type DayDetailRow = {
   id: string;
@@ -58,7 +58,7 @@ export async function getPreviousWeekCopyAction(
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const week = getPreviousWeekRange(timeZone);
+  const week = getLastSevenDaysRange(timeZone);
   const [rows, protocols] = await Promise.all([
     getCompletionsForUserDateRange(
       session.user.id,
@@ -70,7 +70,7 @@ export async function getPreviousWeekCopyAction(
   const permanentIds = new Set(buildPermanentProtocolIds(protocols));
 
   const text = formatWeekActivitiesCopy(
-    `Week total · ${week.label}`,
+    `Last 7 days · ${week.label}`,
     mapCompletionRows(rows),
     permanentIds,
   );
