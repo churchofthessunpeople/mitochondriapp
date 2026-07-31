@@ -21,6 +21,7 @@ export type DayDetailRow = {
   isStreakBonus: boolean;
   protocolName: string | null;
   protocolId: string | null;
+  completedOn: string | null;
 };
 
 export async function getDayDetailAction(
@@ -49,6 +50,7 @@ function mapCompletionRows(
     isStreakBonus: completion.isStreakBonus,
     protocolName: protocol?.name ?? null,
     protocolId: completion.protocolId,
+    completedOn: completion.completedOn ?? null,
   }));
 }
 

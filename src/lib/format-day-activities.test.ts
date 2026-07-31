@@ -394,11 +394,122 @@ describe("formatPerformedSessionsSummary", () => {
 });
 
 describe("formatWeekActivitiesCopy", () => {
+  it("lists each day then week totals with variant splits", () => {
+    const morning = encodeSunExposureVariant({
+      slot: "morning",
+      cover: "full_sun",
+    });
+    const noon = encodeSunExposureVariant({
+      slot: "noon",
+      cover: "shaded",
+    });
+    const ro = encodeDrinkingWaterVariant(
+      normalizeDrinkingWaterInput({
+        source: "reverse_osmosis",
+        carbonation: "carbonated",
+        mineral: "salt",
+        mineralAmount: "eighth_tsp",
+      }),
+    );
+    const spring = encodeDrinkingWaterVariant(
+      normalizeDrinkingWaterInput({
+        source: "spring",
+        carbonation: "still",
+        mineral: "none",
+      }),
+    );
+
+    const text = formatWeekActivitiesCopy("Last 7 days · test", [
+      {
+        protocolName: "Open-sky morning light",
+        protocolId: "sunrise-open-sky",
+        completedOn: "2026-07-20",
+        durationMinutes: 25150,
+        variantValue: -15,
+        sunriseBuffMultiplier: 1.5,
+        pointsEarned: 5,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Outside Time",
+        protocolId: "sun-exposure",
+        completedOn: "2026-07-20",
+        variantValue: morning,
+        durationMinutes: 60,
+        pointsEarned: 10,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Drinking water",
+        protocolId: "drinking-water",
+        completedOn: "2026-07-20",
+        variantValue: ro,
+        durationMinutes: null,
+        pointsEarned: 4,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Open-sky morning light",
+        protocolId: "sunrise-open-sky",
+        completedOn: "2026-07-21",
+        durationMinutes: 25150,
+        variantValue: -10,
+        sunriseBuffMultiplier: 1.13,
+        pointsEarned: 5,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Outside Time",
+        protocolId: "sun-exposure",
+        completedOn: "2026-07-21",
+        variantValue: noon,
+        durationMinutes: 30,
+        pointsEarned: 6,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Drinking water",
+        protocolId: "drinking-water",
+        completedOn: "2026-07-21",
+        variantValue: spring,
+        durationMinutes: null,
+        pointsEarned: 4,
+        isStreakBonus: false,
+      },
+      {
+        protocolName: "Drinking water",
+        protocolId: "drinking-water",
+        completedOn: "2026-07-21",
+        variantValue: spring,
+        durationMinutes: null,
+        pointsEarned: 4,
+        isStreakBonus: false,
+      },
+    ]);
+
+    assert.match(text, /Monday, July 20, 2026/);
+    assert.match(text, /Tuesday, July 21, 2026/);
+    assert.match(text, /Open-sky morning light \(Open-sky light/);
+    assert.doesNotMatch(text, /Horizon/);
+
+    assert.match(text, /Week totals/);
+    assert.match(text, /• Open-sky morning light \(2 days\) — 10 pts/);
+    assert.match(text, /Outside Time \(Morning · Full sun\) \(1h\)/);
+    assert.match(text, /Outside Time \(Peak sun · Shaded\) \(30 min\)/);
+    assert.match(
+      text,
+      /Drinking water \(Reverse osmosis · Salt ⅛ tsp · carbonated\) \(1 log\)/,
+    );
+    assert.match(text, /Drinking water \(Spring water · still\) \(2 logs\)/);
+    assert.match(text, /Total: 38 pts · 1h 30 min logged/);
+  });
+
   it("sums timed and count activities across days", () => {
     const text = formatWeekActivitiesCopy("Week total · Sun–Sun", [
       {
         protocolName: "Barefoot earth",
         protocolId: "barefoot-earth",
+        completedOn: "2026-07-20",
         durationMinutes: 15,
         pointsEarned: 5,
         isStreakBonus: false,
@@ -406,6 +517,7 @@ describe("formatWeekActivitiesCopy", () => {
       {
         protocolName: "Barefoot earth",
         protocolId: "barefoot-earth",
+        completedOn: "2026-07-21",
         durationMinutes: 20,
         pointsEarned: 6,
         isStreakBonus: false,
@@ -413,6 +525,7 @@ describe("formatWeekActivitiesCopy", () => {
       {
         protocolName: "Deuterium-aware meal",
         protocolId: "deuterium-aware-meal",
+        completedOn: "2026-07-20",
         durationMinutes: null,
         pointsEarned: 8,
         isStreakBonus: false,
@@ -420,12 +533,14 @@ describe("formatWeekActivitiesCopy", () => {
       {
         protocolName: "Deuterium-aware meal",
         protocolId: "deuterium-aware-meal",
+        completedOn: "2026-07-21",
         durationMinutes: null,
         pointsEarned: 8,
         isStreakBonus: false,
       },
     ]);
 
+    assert.match(text, /Week totals/);
     assert.match(text, /• Barefoot earth \(35 min\) — 11 pts/);
     assert.match(text, /• Deuterium-aware meal \(2 logs\) — 16 pts/);
     assert.match(text, /Total: 27 pts · 35 min logged/);

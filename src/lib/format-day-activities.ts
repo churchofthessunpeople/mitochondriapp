@@ -130,18 +130,41 @@ export function displayName(r: DayActivityRow): string {
   return base;
 }
 
+/**
+ * Week-total label: sunrise is tier-only (no one day's sky/timing),
+ * other activities keep their variant specifics.
+ */
+export function periodDisplayName(r: DayActivityRow): string {
+  if (r.protocolId && isSunriseKeystoneProtocolId(r.protocolId)) {
+    return r.protocolName?.trim() || "Morning light";
+  }
+  return displayName(r);
+}
+
+export function formatCountLabel(
+  count: number,
+  unit: "logs" | "days" = "logs",
+): string {
+  if (count <= 0) return "";
+  if (unit === "days") {
+    return count === 1 ? "1 day" : `${count} days`;
+  }
+  return formatMultiLogCount(count);
+}
+
 export function formatLine(
   name: string,
   totalMins: number,
   totalPoints: number,
   logCount = 0,
+  countUnit: "logs" | "days" = "logs",
 ): string {
   const pts = `${formatPoints(totalPoints)} pts`;
   if (totalMins > 0) {
     return `• ${name} (${formatLoggedMinutes(totalMins)}) — ${pts}`;
   }
   if (logCount > 0) {
-    return `• ${name} (${formatMultiLogCount(logCount)}) — ${pts}`;
+    return `• ${name} (${formatCountLabel(logCount, countUnit)}) — ${pts}`;
   }
   return `• ${name} — ${pts}`;
 }
@@ -171,7 +194,13 @@ export function formatDayActivitiesCopy(
     lines.push(section.label);
     for (const item of items) {
       lines.push(
-        formatLine(item.name, item.totalMins, item.totalPoints, item.logCount),
+        formatLine(
+          item.name,
+          item.totalMins,
+          item.totalPoints,
+          item.logCount,
+          item.countUnit,
+        ),
       );
     }
   }
@@ -197,31 +226,29 @@ export function formatDayActivitiesCopy(
   return `${header}\n${lines.join("\n")}`;
 }
 
-/** Plain-text weekly totals (Sunday–Sunday) for clipboard. */
-export function formatWeekActivitiesCopy(
-  weekLabel: string,
-  rows: DayActivityRow[],
-  permanentIds?: ReadonlySet<string>,
-): string {
-  const streakRows = rows.filter((r) => r.isStreakBonus);
-  const streakPoints = streakRows.reduce((s, r) => s + r.pointsEarned, 0);
-  const aggregated = aggregatePeriodActivities(rows, displayName, permanentIds);
+function appendAggregatedSections(
+  lines: string[],
+  aggregated: ReturnType<typeof aggregatePeriodActivities>,
+  streakPoints: number,
+  opts?: { includeSectionHeaders?: boolean },
+): void {
+  const includeHeaders = opts?.includeSectionHeaders !== false;
   const grouped = groupAggregatedBySection(aggregated);
-
-  if (aggregated.length === 0 && streakPoints === 0) {
-    return `${weekLabel}\n(no activities logged)`;
-  }
-
-  const lines: string[] = [];
 
   for (const section of HISTORY_SECTIONS) {
     const items = grouped.get(section.id) ?? [];
     if (items.length === 0) continue;
     if (lines.length > 0) lines.push("");
-    lines.push(section.label);
+    if (includeHeaders) lines.push(section.label);
     for (const item of items) {
       lines.push(
-        formatLine(item.name, item.totalMins, item.totalPoints, item.logCount),
+        formatLine(
+          item.name,
+          item.totalMins,
+          item.totalPoints,
+          item.logCount,
+          item.countUnit,
+        ),
       );
     }
   }
@@ -230,10 +257,62 @@ export function formatWeekActivitiesCopy(
     if (lines.length > 0) lines.push("");
     lines.push(`• Streak bonus — ${formatPoints(streakPoints)} pts`);
   }
+}
 
-  const activityPoints = aggregated.reduce((s, row) => s + row.totalPoints, 0);
+/**
+ * Last-7-days clipboard copy: each day with logs (variant-split), then
+ * week totals (sunrise by tier only; Outside Time / water by mix).
+ */
+export function formatWeekActivitiesCopy(
+  weekLabel: string,
+  rows: DayActivityRow[],
+  permanentIds?: ReadonlySet<string>,
+): string {
+  const streakRows = rows.filter((r) => r.isStreakBonus);
+  const streakPoints = streakRows.reduce((s, r) => s + r.pointsEarned, 0);
+  const activityRows = rows.filter((r) => !r.isStreakBonus);
+
+  if (activityRows.length === 0 && streakPoints === 0) {
+    return `${weekLabel}\n(no activities logged)`;
+  }
+
+  const byDate = new Map<string, DayActivityRow[]>();
+  for (const r of activityRows) {
+    const date = r.completedOn?.trim();
+    if (!date) continue;
+    const list = byDate.get(date);
+    if (list) list.push(r);
+    else byDate.set(date, [r]);
+  }
+  const dates = [...byDate.keys()].sort();
+
+  const lines: string[] = [];
+
+  for (const date of dates) {
+    const dayRows = byDate.get(date) ?? [];
+    const dayAgg = aggregateDayActivities(dayRows, displayName, permanentIds);
+    if (dayAgg.length === 0) continue;
+    if (lines.length > 0) lines.push("");
+    lines.push(format(parseISO(date), "EEEE, MMMM d, yyyy"));
+    appendAggregatedSections(lines, dayAgg, 0);
+  }
+
+  // Rows missing completedOn still contribute to week totals only.
+  const weekAgg = aggregatePeriodActivities(
+    activityRows,
+    periodDisplayName,
+    permanentIds,
+  );
+
+  if (weekAgg.length > 0 || streakPoints > 0) {
+    if (lines.length > 0) lines.push("");
+    lines.push("Week totals");
+    appendAggregatedSections(lines, weekAgg, streakPoints);
+  }
+
+  const activityPoints = weekAgg.reduce((s, row) => s + row.totalPoints, 0);
   const totalPoints = activityPoints + streakPoints;
-  const totalMins = aggregated.reduce((s, row) => s + row.totalMins, 0);
+  const totalMins = weekAgg.reduce((s, row) => s + row.totalMins, 0);
 
   lines.push("");
   if (totalMins > 0) {

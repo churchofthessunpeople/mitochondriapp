@@ -10,6 +10,8 @@ import { isSunriseKeystoneProtocolId } from "@/lib/scoring";
 export type DayActivityRow = {
   protocolName: string | null;
   protocolId?: string | null;
+  /** YYYY-MM-DD — required for week-by-day history copy */
+  completedOn?: string | null;
   durationMinutes: number | null;
   timeOfDay?: string | null;
   variantValue?: number | null;
@@ -34,8 +36,10 @@ export type AggregatedActivity = {
   name: string;
   totalMins: number;
   totalPoints: number;
-  /** Times logged for multi-log activities without a timer. */
+  /** Times logged for multi-log activities without a timer (or days for sunrise week totals). */
   logCount: number;
+  /** How to label logCount in copy — sunrise week rollups use days. */
+  countUnit: "logs" | "days";
   order: number;
   section: HistorySectionId;
 };
@@ -55,16 +59,42 @@ export function historySectionForActivity(
   return "day";
 }
 
+/** Coerce DB / JSON variant values to a truncated int key piece. */
+export function coerceVariantValue(variantValue: unknown): number | null {
+  if (typeof variantValue === "number" && Number.isFinite(variantValue)) {
+    return Math.trunc(variantValue);
+  }
+  if (typeof variantValue === "string" && variantValue.trim() !== "") {
+    const n = Number(variantValue);
+    if (Number.isFinite(n)) return Math.trunc(n);
+  }
+  return null;
+}
+
 /**
  * Group key for history rows. Includes variant so distinct Outside Time /
  * water / exercise mixes stay separate instead of collapsing to the first label.
+ *
+ * Period (week) mode keys sunrise by protocol/tier only so one week's Open-sky
+ * logs roll into a single total instead of one weather-specific line.
  */
-export function activityAggregateKey(r: DayActivityRow): string {
+export function activityAggregateKey(
+  r: DayActivityRow,
+  mode: "day" | "period" = "day",
+): string {
   const base =
     r.protocolId ??
     `name:${r.protocolName?.trim() || "Activity"}`;
-  if (r.variantValue != null && Number.isFinite(r.variantValue)) {
-    return `${base}:v${Math.trunc(r.variantValue)}`;
+  if (
+    mode === "period" &&
+    r.protocolId &&
+    isSunriseKeystoneProtocolId(r.protocolId)
+  ) {
+    return base;
+  }
+  const variant = coerceVariantValue(r.variantValue);
+  if (variant != null) {
+    return `${base}:v${variant}`;
   }
   return base;
 }
@@ -104,6 +134,7 @@ export function aggregateDayActivities(
       totalMins: mins,
       totalPoints: pts,
       logCount: showsLogCount ? 1 : 0,
+      countUnit: "logs",
       order: order++,
       section: historySectionForActivity(r.protocolId, permanentIds),
     });
@@ -124,18 +155,19 @@ export function aggregatePeriodActivities(
 
   for (const r of activities) {
     const name = displayName(r);
-    const key = activityAggregateKey(r);
-    const mins =
-      r.protocolId && isSunriseKeystoneProtocolId(r.protocolId)
-        ? 0
-        : (r.durationMinutes ?? 0);
+    const key = activityAggregateKey(r, "period");
+    const isSunrise =
+      !!r.protocolId && isSunriseKeystoneProtocolId(r.protocolId);
+    const mins = isSunrise ? 0 : (r.durationMinutes ?? 0);
     const pts = r.pointsEarned;
     const showsLogCount = protocolShowsLogCount(r.protocolId);
+    const countUnit: "logs" | "days" = isSunrise ? "days" : "logs";
+    const countsEntries = showsLogCount || isSunrise;
     const existing = byKey.get(key);
     if (existing) {
       existing.totalMins += mins;
       existing.totalPoints += pts;
-      if (showsLogCount) existing.logCount += 1;
+      if (countsEntries) existing.logCount += 1;
       continue;
     }
 
@@ -144,7 +176,8 @@ export function aggregatePeriodActivities(
       name,
       totalMins: mins,
       totalPoints: pts,
-      logCount: showsLogCount ? 1 : 0,
+      logCount: countsEntries ? 1 : 0,
+      countUnit,
       order: order++,
       section: historySectionForActivity(r.protocolId, permanentIds),
     });
