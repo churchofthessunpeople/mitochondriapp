@@ -1,0 +1,36 @@
+{
+  "id": "magnetic-excursion-oxygen",
+  "title": "The Magnetic Excursion, Singlet vs Triplet Oxygen, and the Deuterium Purge",
+  "pillar": "magnetism",
+  "summary": "Start here for Magnetism: why Earth's magnetic field matters for life, the difference between triplet and singlet oxygen, and how Dr. Jack Kruse frames a weakening field, the South Atlantic Anomaly, and deuterium.",
+  "relatedProtocolIds": [
+    "barefoot-earth",
+    "sun-exposure",
+    "blue-light-hygiene",
+    "sleep-space",
+    "magnetico-sleep-pad"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Start here",
+      "body": "Most people think of \"magnetism\" as fridge magnets and compasses. As this guide's third pillar, it means something bigger: you live inside Earth's magnetic field, and that field is not constant. It drifts, weakens, and sometimes reverses entirely. A large, temporary weakening is called a magnetic excursion. Dr. Jack Kruse teaches that these shifts are not just a satellite problem because they change the environment your cells operate in. This lesson explains the core idea in plain terms."
+    },
+    {
+      "heading": "Triplet vs singlet oxygen",
+      "body": "The oxygen you breathe (O₂) normally exists in a calm, stable form called triplet oxygen. Its two outer electrons spin in parallel, which makes it relatively unreactive and safe fuel your mitochondria can meter out carefully. Under stress, oxygen can flip into an excited form called singlet oxygen, where the spins pair up. Singlet oxygen is highly reactive and damaging. It drives the kind of free-radical chemistry that ages tissue. Keeping oxygen in its safe triplet state, rather than letting it flip to singlet, is one of the quiet jobs your cells do all day. Kruse explains that Earth's magnetic field helps hold oxygen in that safe triplet state. When the field weakens, the balance tips toward the destructive singlet form."
+    },
+    {
+      "heading": "The South Atlantic Anomaly",
+      "body": "Earth's dipole field has weakened measurably in recent centuries, and there is a large weak spot called the South Atlantic Anomaly (SAA), which stretches from South America across the South Atlantic toward Africa, where the inner Van Allen radiation belt dips closest to the surface of the Earth. NASA, NOAA and ESA all track it, and the ISS powers down sensitive electronics when passing through it to avoid damage. Kruse connects the modern decline and the SAA to a rising environmental deuterium load and more \"singlet\" stress on human biology."
+    },
+    {
+      "heading": "Sleep and the Deuterium Purge",
+      "body": "In Kruse's framework, a strong magnetic field and good grounding help your cells at night run a \"deuterium purge\", using the field as a reference to sort light hydrogen from heavy deuterium and keep the mitochondrial motors (ATP synthase) spinning cleanly. When you sleep under artificial light and nnEMF (non-native EMF from phones, Wi-Fi, wiring) and disconnected from the Earth, he argues that sorting fails, oxygen tips toward the singlet state, and damage accumulates."
+    },
+    {
+      "heading": "What to do daily",
+      "body": "You don't need to understand the physics to act on it. If your area has been strongly affected by the magnetic excursion, you may need to consider relocating to an area which still has a strong, stable magnetic field. Wherever you are, be sure to get outside to see the sunrise, and into the direct sunlight while grounded as often as you can tolerate. In this way, Kruse teaches you to reclaim your Magnetic Sovereignty, and in so doing, reclaim your health."
+    }
+  ]
+}

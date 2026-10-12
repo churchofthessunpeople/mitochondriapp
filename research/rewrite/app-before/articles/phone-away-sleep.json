@@ -1,0 +1,41 @@
+{
+  "id": "phone-away-sleep",
+  "title": "Phone away from bed",
+  "pillar": "magnetism",
+  "summary": "Keep the phone out of the sleeping space—or far away on airplane mode—to cut night RF, standby light, and notification arousals. Described alongside Sleep Space.",
+  "relatedProtocolIds": [
+    "phone-away-sleep",
+    "sleep-space",
+    "reduce-nnemf-block",
+    "dark-bedroom",
+    "blue-light-hygiene",
+    "consistent-sleep-window"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Why distance at night matters",
+      "body": "Phones combine three sleep spoilers inches from your head: radiofrequency transmitters, standby LEDs and screen glow, and notification arousals that fragment deep sleep. Another room—or maximum distance with radios off—reduces all three at once. This is both Magnetism (nnEMF) and Light (photons that fight melatonin)."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Charge and store the phone outside the bedroom, or at least six feet away on airplane mode with the screen face-down. Set an alarm clock if you need a wake cue. Build the setup before you get into bed so a 3 a.m. wake-up does not become a scroll. Guests and travel: airplane mode in a bag across the room is the minimum viable version."
+    },
+    {
+      "heading": "Stack with the rest of the night",
+      "body": "Phone distance alone does not fix a bright streetlight, a warm room, or a chaotic sleep schedule. Pair with true dark, cool bedroom (~65 °F), and a consistent sleep window. Bedroom breaker-off habits cut wiring fields; phone-away cuts the personal radio at the pillow."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse lists phone removal from the sleep environment among non-negotiable night rules in his mitochondrial stack—often with true darkness and cold room temperature. He frames night RF and blue light as recovery sabotage. Treat disease-level claims as his teaching layer; treat phone-out-of-bed as ordinary sleep hygiene with an nnEMF emphasis."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: screens and alerts disrupt sleep; melanopsin responds to light at night; phones are radios. Framework: that nightstand distance alone reverses chronic disease. Use the habit for cleaner sleep architecture, not as a medical device."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Keep the phone away from the bed when practical. Combine that habit with true darkness, a cool room, and regular sleep timing, and adapt it when traveling. Read True dark and Cool bedroom lessons for the full night arc. Educational only."
+    }
+  ]
+}

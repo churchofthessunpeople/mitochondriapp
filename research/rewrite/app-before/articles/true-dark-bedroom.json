@@ -1,0 +1,40 @@
+{
+  "id": "true-dark-bedroom",
+  "title": "True dark sleep environment",
+  "pillar": "light",
+  "summary": "Why pitch-black nights belong in the Light pillar—melanopsin, melatonin, and removing glow so darkness matches what your clock expects after sunset.",
+  "relatedProtocolIds": [
+    "dark-bedroom",
+    "blue-light-hygiene",
+    "phone-away-sleep",
+    "consistent-sleep-window",
+    "sleep-space"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What true dark means",
+      "body": "True dark is not “I closed my eyes.” It means the room stays dark if you open them: no street glow through curtains, no TV standby LEDs, no charger indicators, no bright clock faces. Practical tools: blackout curtains or shades, tape or covers on status LEDs, phone in another room or far from the bed on airplane mode, and an eye mask when travel or partners make perfect blackout impossible."
+    },
+    {
+      "heading": "Why darkness is half the light story",
+      "body": "The Light pillar is not only sunrise and outdoor day spectrum—it is also denying wrong light at night. Circadian biology trains on contrast: bright, blue-rich outdoor day versus dim, warm evening versus true dark during sleep. When street glow or a phone screen keeps melanopsin-active signals after sunset, melatonin suppression and sleep fragmentation follow in controlled studies. Sleep medicine ranks a dark bedroom with morning light and stable timing as baseline hygiene. Here darkness is under Light because you are managing photons."
+    },
+    {
+      "heading": "Melatonin, sleep depth, and night glow",
+      "body": "Melatonin rises in dim evening light and is blunted by blue-enriched screens or bright room light. Light leaks can lighten sleep and shrink deep-stage time in some lab work. Pair bedroom darkness with evening blue-light hygiene so you are not fighting an hour of bright phone before you expect pitch black. Standby LEDs inches from the face count as light pollution; routers and TVs add RF noise too. Phone away from bed is both a light and field habit."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Walk the room once with lights off and eyes open. Cover every emitter you can see. Prefer blackout over “pretty sheer.” Keep chargers and glowing clocks out of the sight line of the pillow. When you travel, pack an eye mask. Cool room temperature and a consistent sleep window amplify the same night recovery story—darkness alone is not the whole stack."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: dark sleep supports melatonin timing; even low bedroom light can matter for sensitive people; morning outdoor light plus night dark is the core contrast. Framework / teaching layer: that every LED is actively harmful nnEMF-adjacent stress that wrecks mitochondrial recovery unless removed. Dr. Jack Kruse stresses true darkness—not dim—plus removing phones and routers from the sleep space in his night stack. Mainstream chronobiology already agrees on dark sleep; his coupling to redox and nnEMF is the stronger teaching layer."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Keep the bedroom truly dark, using an eye mask if helpful. Practice Evening blue-light hygiene and keep the phone away from the bed when practical. Pair with sunrise and sunset habits for the full Light day. Educational only—not medical advice for insomnia or sleep apnea."
+    }
+  ]
+}

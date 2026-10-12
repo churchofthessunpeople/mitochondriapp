@@ -1,0 +1,41 @@
+{
+  "id": "consistent-sleep-window",
+  "title": "Circadian sleep window",
+  "pillar": "support",
+  "summary": "Consistent bed and wake times aligned with night—anchor for hormone timing and deep-sleep stability. Described alongside Sleep Space.",
+  "relatedProtocolIds": [
+    "consistent-sleep-window",
+    "sleep-space",
+    "dark-bedroom",
+    "cool-bedroom-sleep",
+    "phone-away-sleep",
+    "blue-light-hygiene"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Regularity beats perfection",
+      "body": "Sleep medicine emphasizes consistent sleep–wake timing—even on weekends within reason—for circadian entrainment and more stable deep sleep. A shifting midnight-to-noon pattern fights the same biology that morning outdoor light tries to set. The habit is a repeatable window, not a perfect 8.0 hours every night."
+    },
+    {
+      "heading": "Align with night, not only with exhaustion",
+      "body": "In this lifestyle stack, the target window leans toward sleeping in true night—roughly after sunset wind-down and waking near morning light—rather than only collapsing when depleted. Aim for the circadian sleep window regularly, not only after exhaustion catches up with you. Social jet lag (late weekends, early Mondays) is the common failure mode."
+    },
+    {
+      "heading": "Stack the environment",
+      "body": "A consistent clock fails if the room is bright, hot, and phone-lit. Pair the window with true dark, cool bedroom (~65 °F), phone away, and evening blue-light hygiene. Optional inclined-bed experiments and Magnetico live in the same night conversation but do not replace timing and darkness."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse binds sleep timing to latitude, season, and leptin/circadian narratives—often urging earlier nights and morning light as non-negotiables in the mitochondrial stack. Community “sleep by solar time” slogans are his teaching layer. Mainstream chronobiology still agrees: regularity and light timing matter."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: irregular schedules impair sleep quality and daytime alertness in many people; morning light helps entrainment. Framework: that a single clock time cures metabolic disease, or that every latitude must share one bedtime. Use the window as Support + Sleep Space hygiene."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Aim for a consistent sleep window aligned with local night. Combine it with a cool, dark, quiet bedroom and distance from the phone. Read Sleep Space, True dark, and Cool bedroom for the full night protocol. Educational only—not insomnia treatment."
+    }
+  ]
+}

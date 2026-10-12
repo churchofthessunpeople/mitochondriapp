@@ -1,0 +1,40 @@
+{
+  "id": "cool-sleep-65",
+  "title": "Cool bedroom sleep (~65 °F)",
+  "pillar": "support",
+  "summary": "Thermoregulation at night: why a bedroom near 65 °F (18 °C) supports sleep onset, deep stages, and recovery—and how to tune it without over-chilling. Included in the Sleep Space discussion.",
+  "relatedProtocolIds": [
+    "cool-bedroom-sleep",
+    "sleep-space",
+    "consistent-sleep-window",
+    "dark-bedroom",
+    "cold-thermogenesis"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Sleep onset needs a falling core temperature",
+      "body": "Circadian timing drives a drop in core body temperature before sleep. Heat leaves through hands, feet, and skin. A bedroom that is too warm forces sweating, kicked-off covers, and restless thermoregulation. A cool room lets the gradient do its job. That is standard physiology: most people sleep worse during heat waves."
+    },
+    {
+      "heading": "Why ~65 °F (18 °C) keeps appearing",
+      "body": "Sleep literature often cites roughly 60–67 °F (15–19 °C) as supportive for onset and maintenance, with variation for age, bedding, and health. Sixty-five Fahrenheit (~18 °C) sits mid-band: cool enough to encourage the overnight drop, warm enough that most adults under a light duvet are not shivering. Principle: cool, not cold—comfortable under covers. Fans, breathable linen, and a warm shower before a cool room are low-tech tools."
+    },
+    {
+      "heading": "Deep sleep and tuning your room",
+      "body": "Slow-wave sleep concentrates recovery processes that heat stress can fragment. Start near 65 °F and adjust over a week: faster sleep onset and fewer wake-ups suggest you are close. Too cold → muscle tension and early waking; too warm → difficulty falling asleep. Daytime cold thermogenesis is a separate lever; night cool room is passive thermal hygiene. Pair with darkness and a consistent sleep window—temperature does not fix light leaks."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse lists a cold sleep environment among non-negotiable night rules—often alongside true darkness and phone removal—and couples thermoregulation to seasonal light at latitude in forum material. Exact Fahrenheit targets in community practice vary; 65 °F is a mainstream-compatible anchor inside his stricter environment design."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: cool rooms aid sleep onset for many adults; overheating fragments sleep; infants, older adults, and some medications need warmer setpoints. Framework: that 65 °F is a metabolic cure or that bedroom HVAC replaces morning light and food timing. Use cool sleep as night hygiene."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Choose a cool, comfortable bedroom temperature that supports sleep. Pair with True dark and Circadian sleep window in the same stack. Use Cold thermogenesis only for deliberate daytime cold exposure, not bedroom HVAC. Educational only; see a clinician for night sweats, fever, or insomnia unresponsive to basics."
+    }
+  ]
+}

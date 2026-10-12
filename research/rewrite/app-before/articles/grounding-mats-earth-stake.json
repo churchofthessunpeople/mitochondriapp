@@ -1,0 +1,47 @@
+{
+  "id": "grounding-mats-earth-stake",
+  "title": "Grounding mats, earth stakes & clean grounding",
+  "pillar": "magnetism",
+  "summary": "Outdoor barefoot vs indoor mats, why many protocols stake into real soil instead of wall outlets, how to test body voltage, and where ferrite beads fit for cable RF.",
+  "relatedProtocolIds": [
+    "barefoot-earth",
+    "magnetic-awareness",
+    "reduce-nnemf-block",
+    "phone-away-sleep",
+    "breaker-off-bedroom",
+    "breaker-off-office",
+    "sleep-space",
+    "work-space"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Two different ideas called “grounding”",
+      "body": "In this guide’s Magnetism pillar, grounding means restoring contact with Earth’s surface—bare feet on soil, grass, sand, or stone—and reducing non-native EMF load. Commercial earthing mats extend that indoors: conductive sheets or desk pads connected by wire to a reference Earth potential. Mainstream medicine does not treat earthing mats as proven therapy for inflammation or sleep; small pilot studies exist with mixed quality. Electrical safety and honest measurement, however, are engineering facts."
+    },
+    {
+      "heading": "Outlet ground vs stake in the earth",
+      "body": "A three-prong wall outlet’s ground pin is bonded to your building’s grounding electrode system—legally tied to neutral at the service panel. That network carries fault current and, in many homes, also bleeds noise from switched-mode supplies and dirty electricity. Plug-in kits that only use the outlet ground connect you to building Earth, not necessarily quiet Earth. Advocates of outdoor stakes drive a separate rod into soil and bring only that conductor to the mat. Wet, mineralized soil lowers resistance. Use outdoor-rated wire and call 811 / local locate before digging."
+    },
+    {
+      "heading": "Test before you trust",
+      "body": "Do not sleep on a new mat blind. Useful checks: (1) Body voltage—Volts AC between skin and a reference earth rod; compare insulated floor vs mat contact; stop if the mat raises AC volts or you feel tingling. (2) Outlet tester—catches dangerous miswiring, not noise. (3) Resistance from mat snap to stake—very high ohms means bad clip, dry soil, or corrosion. Retest after storms or electrical work. Document numbers; anecdotes without meters are guesswork."
+    },
+    {
+      "heading": "Barefoot outdoors and ferrite beads",
+      "body": "Barefoot earth contact remains the zero-hardware baseline. Mats are convenience for desk work, winter, or apartments without safe outdoor access. Ferrite clamps on USB/charger/Ethernet cables tame conducted RF on wires—they do not turn off the phone’s radio. Combine ferrites with distance: airplane mode, powered-down Wi‑Fi at night, and phone away from bed."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s nnEMF material stresses that mitochondrial recovery is fought by artificial fields at night and that grounding must be real Earth contact—not symbolic wellness. He warns about dirty electricity and sleeping with mains voltage references that are not true Earth. Product-specific mat brands and aggressive body-voltage targets appear more in community practice than in peer-reviewed medicine. Still verify with meters locally because building wiring varies."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: outlet grounds can be noisy; dedicated earth rods need proper install; body-voltage testing is real electrical measurement; outdoor skin-to-earth needs no kit. Framework: that mats treat chronic disease, or that any untested outlet kit is automatically “healing.” Prefer verified Earth references; hire licensed electricians for panel and electrode work."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Practice Grounding for real outdoor contact. A verified grounding mat can be an optional convenience in a bedroom or workspace, while nnEMF reduction and lower artificial-field exposure can support quieter surroundings. Educational only—not electrical installation advice."
+    }
+  ]
+}

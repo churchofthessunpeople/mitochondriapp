@@ -1,0 +1,38 @@
+{
+  "id": "high-latitude-low-deuterium-water",
+  "title": "Why high-latitude glacial water is low in deuterium",
+  "pillar": "water",
+  "summary": "Isotope hydrology behind polar and alpine precipitation, why Icelandic glacial springs run light, and how that fits low-D–aware hydration here.",
+  "relatedProtocolIds": [
+    "low-d-hydration",
+    "drinking-water",
+    "deuterium-aware-meal"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What “low deuterium” water means",
+      "body": "Hydrologists measure the deuterium-to-hydrogen ratio in water versus a standard (VSMOW) and express it as δD in per mil (‰). More negative δD means less deuterium relative to ordinary hydrogen—“deuterium-depleted” or “light” water. All natural water contains some deuterium; the question is how much. Rain near the equator is generally heavier than snow that formed under cold polar skies. Food and body water inherit those signatures through what you drink and eat. This guide does not measure δD; it teaches why geography of your water source matters in the lifestyle conversation."
+    },
+    {
+      "heading": "Why high latitude and glaciers run light",
+      "body": "The mainstream explanation is progressive rainout along storm tracks (Rayleigh distillation). When ocean water evaporates, lighter isotopes preferentially enter vapor. As clouds move poleward or upslope and precipitation falls repeatedly, heavier isotopes drop out first. What eventually falls as snow in Iceland, Greenland, or the Alps is isotopically lighter than tropical rain. Colder condensation temperatures reinforce the bias. High elevation adds another depletion step. Glaciers store that snow until melt; springs fed by glacial melt can carry light signatures—not warm lowland recharge. That is textbook isotope meteorology, independent of any mitochondrial brand."
+    },
+    {
+      "heading": "Icelandic glacial spring water in particular",
+      "body": "Iceland sits near 64–66°N on the North Atlantic storm track. Cool precipitation feeds glaciers and ice caps; melt percolates through young basalt before emerging as springs. Commercial Icelandic glacial spring sources often combine high-latitude meteoric depletion with glacial recharge. Published δD values are commonly more negative than temperate-city tap or tropical bottled water—batch and lab dependent. Treat a brand’s marketing sheet as weaker evidence than a third-party isotope analysis if you are buying specifically for δD."
+    },
+    {
+      "heading": "Practical sourcing without obsession",
+      "body": "If you care about the isotope argument: prioritize naturally cold, high-latitude or alpine spring waters with glacial recharge when you can; compare δD only with real assay data. High-latitude Canadian, Nordic, or alpine European springs follow the same meteorology in principle. Reverse osmosis removes minerals and microbes but does not automatically deplete deuterium. Morning first water in outdoor light is behavior you control wherever you live. Do not confuse TDS, pH, or silica marketing with deuterium."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: latitude, altitude, and cold condensation deplete deuterium in precipitation; glacial springs can be isotopically light; everyday δD shifts between natural waters are tiny compared with lab D₂O experiments. Framework / teaching layer: that switching to Icelandic water for a month guarantees measured body-water depletion or ATP gains. Dr. Jack Kruse’s public prescriptions often name Icelandic glacial spring water and high-latitude melt as Water-pillar tools tied to mitochondrial matrix water and ATP synthase choreography—stronger causal language than isotope hydrology alone provides. Treat sourcing as practical; treat mechanistic certainty as his teaching layer."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Practice Low-D morning hydration when your first daylight water is intentionally from a low-deuterium-aware source or habit. Practice Drinking water for mineralized spring glasses (Icelandic glacial fits both stories when that is what you drink). Pair with Deuterium-aware meal and the lesson Deuterium, mitochondrial water, and ATP synthase. Place shows your sun latitude, not your water δD. Educational only—not medical or isotope testing advice."
+    }
+  ]
+}

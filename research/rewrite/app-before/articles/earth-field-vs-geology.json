@@ -1,0 +1,44 @@
+{
+  "id": "earth-field-vs-geology",
+  "title": "Earth’s magnetic field, crustal geology, and artificial EM",
+  "pillar": "magnetism",
+  "summary": "Three different “magnetism” ideas kept separate on purpose: planetary main field models, crustal/volcanic place context, and human infrastructure—plus how to read them in Place.",
+  "relatedProtocolIds": [
+    "barefoot-earth",
+    "magnetic-awareness",
+    "reduce-nnemf-block",
+    "nature-contact",
+    "sleep-space"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Main field (what Place may show as µT / dip)",
+      "body": "The World Magnetic Model (WMM) and related services estimate Earth’s core-dominated magnetic field at a latitude, longitude, and elevation. Typical surface total intensity is tens of microtesla; inclination (dip) increases toward the poles; declination offsets magnetic from true north. These quantities change slowly (secular variation). They are geophysical estimates—not a reading of your body or of Wi‑Fi."
+    },
+    {
+      "heading": "Crustal anomalies vs smooth models",
+      "body": "Finer models and grids (e.g. Enhanced Magnetic Model / EMAG-type products) add shorter-wavelength crustal magnetic anomalies from rock magnetization. Resolution is still regional (tens of kilometers class), not house-by-house. That is solid-Earth science used in geology and navigation error budgets—not a health meter for your bedroom."
+    },
+    {
+      "heading": "Geology context in this guide (volcano / magma proximity)",
+      "body": "Separately, this guide estimates “geological vitality” from distance to Holocene volcanic and magma-system anchors (Smithsonian GVP–derived catalogs and USGS lists). The estimate uses a short Gaussian-style distance falloff: it is strongest within roughly 40 km, reaches half strength around 100 km, and becomes negligible by about 250 km. That is a transparent lifestyle proxy for nearby crustal systems, not the same number as total field F from WMM and not a volcanic hazard product. Volcanic proximity should not be read as a direct measurement of magnetic intensity."
+    },
+    {
+      "heading": "Artificial EM infrastructure",
+      "body": "Cell sites, masts, power plants, and dense urban electronics create non-native electromagnetic environments. They do not appear in WMM. This guide’s artificial-EM estimate is an open-map proxy (e.g. OpenCelliD when available, OpenStreetMap masts and plants) plus a soft population/device-density bump from mapped building counts—useful for “how built-up is the RF/power landscape,” not a personal V/m measurement at your pillow."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s public work often binds latitude, geomagnetic environment, geology, and non-native EMF into one mitochondrial place story, including space-weather narratives in popular teaching. Those integrated lifestyle conclusions are his. This guide separates the layers—main field model, magma proximity, infrastructure proxy, and daily habits—so you can see data sources without treating them as one medical conclusion."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: WMM-style main field and crustal anomaly science; volcano catalogs; cell/mast maps as rough built-environment proxies. Framework: merging those layers into a personal disease-risk number, or treating Place summaries as body magnetometry. Daily levers remain habits: grounding, nature time, nnEMF reduction, and sleep hygiene."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Set your ZIP in Where you are and read main field, geology, and artificial EM as separate rows. Practice Grounding, Nature immersion, Low artificial field hour, and nnEMF reduction blocks when you practice them. Pair with the magnetosphere/SAA and North American inclination-drop lessons for regional context. Educational only—not relocation or medical advice."
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "magnetosphere-saa-deuterium",
+  "title": "Weakening magnetosphere, South Atlantic Anomaly & deuterium",
+  "pillar": "magnetism",
+  "summary": "Solid-Earth and space physics of geomagnetic decline and the South Atlantic Anomaly, how Van Allen belts interact with a weaker field—and where the deuterium-in-the-environment story is mainstream vs Kruse-specific.",
+  "relatedProtocolIds": [
+    "barefoot-earth",
+    "magnetic-awareness",
+    "deuterium-aware-meal",
+    "low-d-hydration",
+    "magnetico-sleep-pad",
+    "sleep-space"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Earth’s magnetic field is not static",
+      "body": "Earth’s core-generated magnetic field has varied for billions of years, including full reversals preserved in ocean-floor magnetization. On human-relevant timescales, satellite missions (e.g. ESA Swarm) track secular variation: strength and geometry change decade to decade. Global dipole moment has weakened on the order of roughly 5–10% per century in recent centuries in many models. That does not mean a reversal is imminent. For lifestyle education, the factual anchor is simple: the planetary field you live under today is measurably softer in some regions than historical baselines in the geologic record."
+    },
+    {
+      "heading": "What the South Atlantic Anomaly (SAA) is",
+      "body": "The South Atlantic Anomaly is a large region—roughly from South America across the South Atlantic toward Africa—where the main field is unusually weak and the inner Van Allen radiation belt dips closest to Earth. Satellites and the ISS monitor elevated particle flux there. Maps from NOAA, ESA, and NASA show lower total field intensity and higher radiation at a given altitude than at the same latitude elsewhere. Living at sea level under the SAA is not the same as being in orbit, but the anomaly is real geophysics—not a metaphor."
+    },
+    {
+      "heading": "Van Allen belts and surface chemistry caveats",
+      "body": "The Van Allen belts are trapped energetic charged particles held by Earth’s field lines. Where the field weakens or distorts (as in the SAA), the inner belt’s proton flux reaches lower altitudes. Space weather further compresses the magnetosphere on storm days. High-energy particles that penetrate the upper atmosphere can drive cosmogenic isotope production—established at the top of the atmosphere. The jump from “more particle precipitation when the field is weak” to “your local drinking water has more deuterium this decade” is not a single proven step in standard hydrology. Natural deuterium already varies with latitude, altitude, and water source."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s light–water–magnetism framework connects a weakening geomagnetic field, the SAA, solar/cosmic particle flux, and Van Allen geometry to a modern rise in environmental deuterium load—framed as part of why mitochondrial water chemistry and ATP synthase struggle. He binds that to seafood vs terrestrial food, cold, light timing, and grounding. Those causal chains are his synthesis bridging space physics and deuterium lifestyle medicine—not something this guide measures, and not consensus isotope hydrology or clinical nutrition."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: field weakening and the SAA are observed; radiation belts respond to field geometry and solar wind; deuterium in precipitation varies by geography. Framework / contested: that recent field decline has materially shifted everyday dietary deuterium for the average person in a way that overrides latitude, diet, and water source. Prudent posture: treat magnetosphere decline as real place context; treat deuterium-aware eating and hydration as Water-pillar attention—not as a personal space-weather assay."
+    },
+    {
+      "heading": "Place, latitude, and daily habits",
+      "body": "The guide’s Place view shows WMM-style main field parameters and geology/volcano proximity separately from artificial EM infrastructure—see Earth field vs geology. Lifestyle responses in this stack: barefoot earth contact and low artificial-field hours, optional sleep-field tools if you use them, deuterium-aware meals and mineralized hydration, and strong morning light. None require accepting every step of the Van Allen → deuterium narrative to be useful daily habits."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Read alongside Deuterium, mitochondrial water, and ATP synthase and Earth field vs geology. Practice magnetism habits (grounding, nnEMF blocks, nature time) and water keystones when you practice them. Mitoversity documents where solid geophysics ends and lifestyle deuterium framing begins. Educational only—not space-weather forecasting or medical isotope advice."
+    }
+  ]
+}

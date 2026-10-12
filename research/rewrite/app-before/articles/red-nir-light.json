@@ -1,0 +1,34 @@
+{
+  "id": "red-nir-light",
+  "title": "Red and near-infrared light",
+  "pillar": "light",
+  "summary": "Natural dusk red/NIR and optional panels—evening spectrum for wind-down, not a substitute for outdoor light timing.",
+  "relatedProtocolIds": [
+    "red-nir-light",
+    "sunset-viewing",
+    "blue-light-hygiene"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What it is",
+      "body": "Red and near-infrared (NIR) light sit at the long-wavelength end of the solar band people discuss for evening wind-down and recovery. Twilight and sunset naturally carry more red/NIR relative to midday blue sky. Therapeutic red/NIR panels are optional gear that overlap that spectrum conversation—they are not a substitute for outdoor light timing."
+    },
+    {
+      "heading": "Why it shows up in the Light pillar",
+      "body": "Evening outdoor light is warmer and lower intensity than noon. Lifestyle communities treat that band as friendlier for skin and wind-down than mid-day UV burn risk. Photobiomodulation research studies red/NIR devices for tissue recovery in clinical and sports settings with mixed, dose-dependent results. This guide’s habit starts with free dusk outdoors; panels are optional when you already own them."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Prefer natural dusk outdoors when weather allows—same window as sunset viewing. If you use a red/NIR panel, follow the device’s distance and time guidance; do not stare into high-intensity LEDs. Practice duration in 15-minute blocks or custom minutes. Keep evening blue hygiene after you come indoors so a panel session is not followed by a cold white laptop for hours."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: sunset and twilight are redder than noon sky; some red/NIR device studies show local tissue effects at specific doses. Framework / teaching layer: that any home panel recreates solar dusk biology, or that red light alone fixes circadian timing without morning outdoor light and true dark sleep. Panels are tools; solar timing is still the spine of the Light pillar."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Practice Red / near-IR light for natural dusk exposure or a panel session with duration. Pair with Sunset viewing and Evening blue-light hygiene: outdoor solar signal first, then dim artificial light indoors. Educational only—not a medical phototherapy prescription."
+    }
+  ]
+}

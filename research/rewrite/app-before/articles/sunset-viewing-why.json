@@ -1,0 +1,39 @@
+{
+  "id": "sunset-viewing-why",
+  "title": "Why watching the sunset matters",
+  "pillar": "light",
+  "summary": "Evening outdoor light as the circadian wind-down: warmer spectrum, melatonin timing, and the Light habit of bare-eye sunset before true dark.",
+  "relatedProtocolIds": [
+    "sunset-viewing",
+    "blue-light-hygiene",
+    "red-nir-light",
+    "dark-bedroom"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What sunset viewing is",
+      "body": "Sunset viewing means being outdoors as the sun goes down—patio, yard, walk, or west-facing view—with bare eyes when glare allows. Morning outdoor light advances the day clock; sunset closes the outdoor arc before true dark. You do not need a perfect horizon disk the way the sunrise keystone tiers work. Being outside while the sky dims is the habit this guide describes."
+    },
+    {
+      "heading": "Why it matters for circadian timing",
+      "body": "As the sun lowers, the spectrum shifts toward longer wavelengths—more red and near-infrared relative to blue—and intensity falls. Melanopsin-rich retinal cells are less driven by that warm, lower light than by noon blue sky, which is part of why evening outdoor viewing feels calmer than a laptop screen. Chronobiology research emphasizes structure: bright day, dim warm evening, dark night. Sunset is the last natural outdoor photon dose, signaling “day is ending” to clocks that never read wall-clock time."
+    },
+    {
+      "heading": "Melatonin, screens, and the handoff indoors",
+      "body": "Melatonin onset is delayed by evening blue-enriched artificial light. Watching the actual sun go down outdoors gives a natural, lower-blue signal before you move inside. The useful stack is sunset outdoors first, then dim warm bulbs and warmer screens—not jumping from bright kitchen LEDs straight into bed. Skipping sunset and living under cool LEDs all evening fights the gradient your body expects."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Be outside 10–20 minutes bracketing local sunset when weather allows. Bare eyes; skip sunglasses in that window unless glare forces them. Afterward, dim indoor lighting rather than snapping back to bright LEDs. Cloudy days still count: open-sky dimming trains timing even without a visible solar disk. Reminders can use “30 min before sunset” or “At sunset” from your ZIP sun times."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: evening blue-rich light can delay melatonin; dim, warm evenings and dark nights support sleep timing; outdoor light at dusk is a natural wind-down cue. Framework / teaching layer: mandatory horizon-disk sunset rituals, exact minute prescriptions, and stronger UV-A exhaustion claims at sunset as mitochondrial rules. Dr. Jack Kruse’s public material treats sunset as the bookend to sunrise—outdoor natural light at both transitions, then blocking artificial blue after the solar signal ends. Mainstream sleep medicine agrees on dim evenings without requiring a ritual disk sighting."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Watch the sunset when you viewed sunset light outdoors with bare eyes. It belongs to the Light pillar and pairs with sunrise keystones for a full Light day. Stack next with Evening blue-light hygiene, Screen light hygiene, and True dark sleep (Sleep Space). Educational lifestyle practice only—not medical advice for insomnia or circadian disorders."
+    }
+  ]
+}

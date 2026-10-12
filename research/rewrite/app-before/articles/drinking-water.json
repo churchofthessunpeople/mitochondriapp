@@ -1,0 +1,38 @@
+{
+  "id": "drinking-water",
+  "title": "Drinking water",
+  "pillar": "water",
+  "summary": "Practice each intentional glass: RO, spring, or deuterium-depleted source; optional salt; still or carbonated.",
+  "relatedProtocolIds": [
+    "drinking-water",
+    "low-d-hydration",
+    "hydration-timing"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What this habit is",
+      "body": "Drinking water in this guide is one intentional glass at a time—not a vague “I hydrated today.” Each practice asks for source, remineralization, and still versus carbonated. The focus is attention to water quality and minerals inside the Water pillar, spread through the day."
+    },
+    {
+      "heading": "Source choices",
+      "body": "Reverse osmosis and similar purified water are fine when remineralized. Spring or mineral water already carries minerals. Deuterium-depleted water (DDW) is practiced with the label’s deuterium PPM—natural water is roughly ~150 ppm; lower numbers mean more depleted. Processing removes microbes and minerals; it does not automatically deplete deuterium unless a dedicated isotope step was used."
+    },
+    {
+      "heading": "Remineralization and carbonation",
+      "body": "Add sea or electrolyte salt when you use RO or other stripped water, and pick the amount. Still versus carbonated is the final choice—unsweetened sparkling is fine; sugary soda is a different drink. Baking soda water is a separate vagus habit, not a Drinking water option."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Practice each intentional glass. Spread servings through daylight hours. Pair first daylight water with Low-D morning hydration when that is your keystone, and use Daylight-aligned hydration to avoid late-night chugging. Quality and timing beat obsessive brand chasing."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: minerals matter for electrolyte balance; purified water often needs remineralization; unsweetened fluids hydrate; natural springs differ by place. Framework: that every glass of a marketed “structured” or low-D bottle rewires ATP synthase. See the deuterium and high-latitude articles for the isotope teaching layer versus hydrology facts."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Practice Drinking water for each glass: source → DDW PPM if applicable → remineralization → still or carbonated. Pair with Low-D morning hydration and Daylight-aligned hydration. Educational only—not medical hydration orders for kidney or heart disease."
+    }
+  ]
+}

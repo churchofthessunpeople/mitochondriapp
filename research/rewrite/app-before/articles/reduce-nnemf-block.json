@@ -1,0 +1,41 @@
+{
+  "id": "reduce-nnemf-block",
+  "title": "nnEMF reduction blocks",
+  "pillar": "magnetism",
+  "summary": "Deliberate low-RF time—airplane mode, router distance, and outdoor blocks away from dense electronics—as a Magnetism hygiene habit, not a personal field meter.",
+  "relatedProtocolIds": [
+    "reduce-nnemf-block",
+    "magnetic-awareness",
+    "phone-away-sleep",
+    "sleep-space",
+    "work-space",
+    "air-tube-headphones"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What nnEMF means here",
+      "body": "Non-native EMF (nnEMF) in this stack means human-made radiofrequency and electrical noise—phones, Wi‑Fi, routers, Bluetooth, dense urban RF, and “dirty” switching noise on wiring. This guide describes behavioral reduction practices: times you intentionally lower that load. It does not measure V/m or µW/m² at your pillow."
+    },
+    {
+      "heading": "Why blocks beat vague worry",
+      "body": "Constant low-level RF anxiety without a practice does little. A timed block—airplane mode for an hour, router farther from the desk, outdoor time away from dense electronics—turns the idea into a habit you can repeat. Night stacks (phone away, bedroom breakers) and daytime Work Space low-field options are the same hygiene idea at different hours."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "Run an intentional low-RF hour: phone on airplane mode (or powered down), router distance or Wi‑Fi off when practical, and/or outdoor time away from dense electronics. Practice duration in 15-minute blocks up to the cap. For calls, prefer air-tube headphones or speakerphone at arm’s length. Ferrite beads on charger cables are optional desk cleanup—not a substitute for turning the radio off."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse’s teaching is specific",
+      "body": "Kruse’s nnEMF material treats artificial microwave and dirty-electricity environments as major mitochondrial stressors—especially at night when recovery should dominate. He often pairs RF reduction with darkness, cold sleep, grounding, and place awareness. Quantitative risk claims and “safe” distance slogans in community lists are framework layered on real radios; This guide only describes the behavior."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid ground: phones and Wi‑Fi are radio transmitters; distance and airplane mode reduce exposure at the body; sleep fragmentation from notifications is real behavioral hygiene. Framework: that a practiced hour proves cellular repair or that every household must hit a specific µW/m² target. Prudent posture: reduce what you control; do not panic about towers you cannot move."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Practice nnEMF reduction block for deliberate low-RF sessions. Lower unnecessary artificial-field exposure at the desk, and keep the phone away from the bed at night when practical. Pair with Air tube headphones for calls. Educational only—not EMF survey or medical advice."
+    }
+  ]
+}

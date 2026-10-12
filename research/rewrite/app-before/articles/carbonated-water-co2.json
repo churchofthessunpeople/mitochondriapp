@@ -1,0 +1,38 @@
+{
+  "id": "carbonated-water-co2",
+  "title": "Carbonated water and CO₂",
+  "pillar": "water",
+  "summary": "Why CO₂ is more than a waste gas, what sparkling water actually does, and how unsweetened carbonation fits Drinking water in this guide.",
+  "relatedProtocolIds": [
+    "drinking-water",
+    "low-d-hydration",
+    "hydration-timing"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What this habit is",
+      "body": "Carbonated water here means unsweetened sparkling or carbonated mineral water—not sugary soda. Dissolved CO₂ under pressure makes the drink mildly acidic and fizzy. In this guide you choose Still or Carbonated as the last step when practicing Drinking water. Bubbles are optional; clean source and minerals still come first."
+    },
+    {
+      "heading": "CO₂ in normal physiology",
+      "body": "Cells produce carbon dioxide as a normal end product of aerobic metabolism. In blood, CO₂ rides largely as bicarbonate and dissolved gas and participates in acid–base balance via carbonic anhydrase. Far from being only pollution to blow off, CO₂ is a regulated signal. Very low CO₂—as in chronic over-breathing in some contexts—can shift oxygen unloading and vascular tone. Clinicians already use CO₂-related blood gases in critical care. That baseline is standard medical science."
+    },
+    {
+      "heading": "The Bohr effect in plain language",
+      "body": "Hemoglobin’s affinity for oxygen falls when CO₂ rises and pH falls in active tissues (Bohr effect), which helps unload oxygen where metabolism is high. In the lungs, high oxygen and lower CO₂ favor loading. This textbook physiology explains why “more oxygen always” is incomplete without context for CO₂ and blood flow. It does not by itself prove that a can of seltzer rewrites your ATP budget."
+    },
+    {
+      "heading": "What sparkling water actually does",
+      "body": "Ingested sparkling water can produce transient fullness or burping and small, short-lived changes in gastric and systemic acid–base handling as CO₂ is absorbed or expelled. Evidence on long-term metabolic outcomes of sparkling versus still water is mixed and modest. Hydration still depends mainly on fluid volume and minerals. Natural mineral waters that are both carbonated and mineral-rich differ from plain seltzer in electrolytes. Some people simply drink more when they like the taste."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: CO₂ is a regulated metabolic gas; Bohr physiology is real; unsweetened sparkling water can be a pleasant hydration form; mineral content matters more than bubbles alone. Framework / teaching layer: that sparkling water meaningfully optimizes mitochondrial oxygen economics the way lifestyle essays describe. Dr. Jack Kruse’s light–water–magnetism frame treats CO₂ as a beneficial ally and has promoted carbonated mineral water as a lifestyle tool. Those strong causal claims are his teaching layer—beyond the cautious clinical reading of Bohr physiology."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Practice Drinking water and choose Carbonated on the last step for unsweetened sparkling or carbonated mineral water. Pair with Low-D morning hydration and Daylight-aligned hydration. Prefer mineral-rich sources when you can; skip sugary sodas. Baking soda water is a different habit under Vagus nerve stimulation. Educational only—not a blood-gas prescription."
+    }
+  ]
+}

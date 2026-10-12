@@ -1,0 +1,234 @@
+/**
+ * Place context for Kruse-aligned lifestyle UX (educational framework).
+ * Facts + simple labels — not medical advice.
+ */
+
+import { formatDistanceKm } from "@/lib/geo";
+import {
+  lookupInclinationDropZones,
+  type InclinationZoneContext,
+} from "@/lib/inclination-drop-zones";
+import {
+  fetchArtificialEmQuick,
+  type ArtificialEmSnapshot,
+} from "@/lib/artificial-em";
+import {
+  fetchGeomagFieldQuick,
+  formatGeomagDisplay,
+  type GeomagDisplay,
+} from "@/lib/geomag";
+import {
+  geologyScoreFromLocation,
+  MAGMA_ZERO_INFLUENCE_KM,
+} from "@/lib/region-scoring";
+import { formatTimeInZone, type SunTimes } from "@/lib/sun";
+
+export type PlaceFactors = {
+  latitude: number;
+  longitude: number;
+  /** e.g. 25.8°N */
+  latitudeLabel: string;
+  /** e.g. Subtropical */
+  bandLabel: string;
+  /** e.g. Long UV season (most of year) */
+  uvSeasonLabel: string;
+  /** Local solar noon clock time */
+  solarNoonLabel: string;
+  elevationM: number | null;
+  /** e.g. 12 ft (4 m) */
+  elevationLabel: string | null;
+  nearestVolcano: string;
+  nearestVolcanoKm: number;
+  /** Primary: system name */
+  geologyLabel: string;
+  /** Secondary: distance + why we show it */
+  geologyDetail: string;
+  /**
+   * Earth's main magnetic field (WMM) at this lat/lng — separate from geology score.
+   * Null only if never requested.
+   */
+  geomag: GeomagDisplay | null;
+  /** Infrastructure / artificial EM load proxy (cells, masts, plants). */
+  artificialEm: ArtificialEmSnapshot | null;
+  /**
+   * April 2026 NA inclination-drop education zones (Kruse-framework place context).
+   * Null when ZIP is outside tracked zones and the decay corridor.
+   */
+  inclinationZone: InclinationZoneContext | null;
+};
+
+/** Latitude climate band (aligned with sun-score bands). */
+export function latitudeBand(latitude: number): {
+  bandLabel: string;
+  uvSeasonLabel: string;
+} {
+  const a = Math.abs(latitude);
+  if (a <= 12) {
+    return {
+      bandLabel: "Deep tropics",
+      uvSeasonLabel: "Year-round strong UV potential",
+    };
+  }
+  if (a <= 23.5) {
+    return {
+      bandLabel: "Tropics",
+      uvSeasonLabel: "Year-round UV season",
+    };
+  }
+  if (a <= 35) {
+    return {
+      bandLabel: "Subtropical",
+      uvSeasonLabel: "Long UV season (most of year)",
+    };
+  }
+  if (a <= 48) {
+    return {
+      bandLabel: "Mid-latitude",
+      uvSeasonLabel: "Seasonal UV — peak late spring–early fall",
+    };
+  }
+  return {
+    bandLabel: "High latitude",
+    uvSeasonLabel: "Short UV season — long dark winters",
+  };
+}
+
+export function formatLatitude(latitude: number): string {
+  const hemi = latitude >= 0 ? "N" : "S";
+  return `${Math.abs(latitude).toFixed(1)}°${hemi}`;
+}
+
+export function formatElevation(meters: number): string {
+  const ft = Math.round(meters * 3.28084);
+  const m = Math.round(meters);
+  if (Math.abs(m) < 5) return `~sea level (${m} m)`;
+  return `${ft.toLocaleString()} ft (${m.toLocaleString()} m)`;
+}
+
+/**
+ * Elevation via free APIs (no key). Cached by rounded coords.
+ * Fails soft — null if network/API unavailable.
+ * Short timeout so Place never waits long on tab switch.
+ */
+export async function fetchElevationMeters(
+  latitude: number,
+  longitude: number,
+): Promise<number | null> {
+  // ~1 km buckets so nearby ZIPs share cache entries
+  const lat = Math.round(latitude * 100) / 100;
+  const lng = Math.round(longitude * 100) / 100;
+  const cache = { next: { revalidate: 60 * 60 * 24 * 30 } as const };
+
+  try {
+    const res = await fetch(
+      `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`,
+      {
+        ...cache,
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(900),
+      },
+    );
+    if (res.ok) {
+      const data = (await res.json()) as {
+        results?: Array<{ elevation?: number }>;
+      };
+      const el = data.results?.[0]?.elevation;
+      if (typeof el === "number" && Number.isFinite(el)) return el;
+    }
+  } catch {
+    /* skip fallback on timeout — don't stack two slow APIs on tab open */
+  }
+
+  return null;
+}
+
+export function buildPlaceFactors(opts: {
+  latitude: number;
+  longitude: number;
+  sun: SunTimes;
+  timeZone: string;
+  elevationM?: number | null;
+  geomag?: GeomagDisplay | null;
+  artificialEm?: ArtificialEmSnapshot | null;
+}): PlaceFactors {
+  const { latitude, longitude, sun, timeZone } = opts;
+  const { bandLabel, uvSeasonLabel } = latitudeBand(latitude);
+  const geology = geologyScoreFromLocation(latitude, longitude);
+  const elevationM =
+    opts.elevationM === undefined ? null : opts.elevationM;
+
+  return {
+    latitude,
+    longitude,
+    latitudeLabel: formatLatitude(latitude),
+    bandLabel,
+    uvSeasonLabel,
+    solarNoonLabel: formatTimeInZone(sun.solarNoon, timeZone),
+    elevationM,
+    elevationLabel:
+      elevationM != null ? formatElevation(elevationM) : null,
+    nearestVolcano: geology.nearestName,
+    nearestVolcanoKm: geology.nearestKm,
+    // Clearest for users: this is the closest catalog anchor, not "under your feet"
+    geologyLabel: geology.nearestName,
+    geologyDetail:
+      geology.boost <= 0
+        ? `${formatDistanceKm(geology.nearestKm)} away · geology ${geology.score}/5 · outside the local proxy range (~${MAGMA_ZERO_INFLUENCE_KM} km)`
+        : `${formatDistanceKm(geology.nearestKm)} away · geology ${geology.score}/5 · +${geology.boost} local geology proxy (GVP/USGS catalog)`,
+    geomag: opts.geomag ?? null,
+    artificialEm: opts.artificialEm ?? null,
+    inclinationZone: lookupInclinationDropZones(latitude, longitude),
+  };
+}
+
+/**
+ * Elevation + main-field geomag + artificial EM proxy (best-effort).
+ */
+export async function buildPlaceFactorsWithElevation(opts: {
+  latitude: number;
+  longitude: number;
+  sun: SunTimes;
+  timeZone: string;
+  elevationM?: number | null;
+}): Promise<PlaceFactors> {
+  const elevationM =
+    opts.elevationM !== undefined
+      ? opts.elevationM
+      : await Promise.race([
+          fetchElevationMeters(opts.latitude, opts.longitude),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 700)),
+        ]);
+
+  const [geomagRaw, artificialEm] = await Promise.all([
+    fetchGeomagFieldQuick(opts.latitude, opts.longitude, {
+      elevationM,
+    }),
+    fetchArtificialEmQuick(opts.latitude, opts.longitude),
+  ]);
+
+  const geomag = formatGeomagDisplay(geomagRaw);
+
+  return buildPlaceFactors({
+    ...opts,
+    elevationM,
+    geomag,
+    artificialEm,
+  });
+}
+
+/** Short copy for the current sun phase (Today protocol hint). */
+export function sunPhaseHint(
+  phase: "night" | "sunrise" | "day" | "sunset",
+): string {
+  switch (phase) {
+    case "sunrise":
+      return "Sunrise window — prioritize outdoor morning light before screens.";
+    case "sunset":
+      return "Sunset window — dim indoor LEDs; get last natural light if you can.";
+    case "night":
+      return "Night phase — protect darkness; avoid bright overhead light.";
+    case "day":
+    default:
+      return "Day phase — outdoor light and movement when possible.";
+  }
+}

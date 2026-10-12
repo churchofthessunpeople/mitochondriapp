@@ -1,0 +1,39 @@
+{
+  "id": "blue-light-hygiene",
+  "title": "Evening blue-light hygiene",
+  "pillar": "light",
+  "summary": "Dim screens, warm bulbs, and blue blockers after sunset so evening light matches wind-down—not noon sky indoors.",
+  "relatedProtocolIds": [
+    "blue-light-hygiene",
+    "screen-light-hygiene",
+    "sunset-viewing",
+    "dark-bedroom"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "What it is",
+      "body": "Evening blue-light hygiene is the intentional shift after sunset: warmer bulbs, lower brightness, less cool LED overhead, and blue-blocking glasses when you still need screens. It is the room-and-behavior layer. Screen light hygiene is the software/hardware layer on phones and computers. Together they keep evening spectrum from pretending it is midday."
+    },
+    {
+      "heading": "Why it matters",
+      "body": "Melanopsin cells stay sensitive to blue-rich light after sunset. Screens and cool LEDs can delay melatonin and fragment sleep architecture in controlled studies. A bright white kitchen or bathroom right before bed undoes a calm outdoor sunset. The goal is a gradient: outdoor dusk → dim warm indoors → true dark sleep."
+    },
+    {
+      "heading": "Practical habit",
+      "body": "After outdoor sunset when possible, dim overheads, switch to warm lamps, and lower device brightness. Use blue blockers if work forces screens. Avoid “just one more hour” under cool white light. You practice the intentional evening routine—not every minute of compliance."
+    },
+    {
+      "heading": "How it stacks with other Light habits",
+      "body": "Sunset viewing → Screen light hygiene (Night Shift / IRIS) → Evening blue-light hygiene → True dark bedroom is the Light pillar night arc. Morning outdoor light still comes first the next day; evening hygiene cannot rescue a fully indoor light day."
+    },
+    {
+      "heading": "What is solid vs framework",
+      "body": "Solid ground: evening blue-enriched light can delay melatonin; dimmer, warmer evenings support sleep timing. Framework: that blue blockers alone replace outdoor dusk or that any residual LED ruins recovery. Tools help; darkness and morning light still dominate."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Practice Evening blue-light hygiene when you ran your after-sunset routine—warm bulbs, dim screens, blockers if used. Pair with Screen light hygiene for device settings and True dark in Sleep Space. Educational only—not treatment for insomnia."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "solar-flares-space-weather",
+  "title": "Solar flares, geomagnetic storms & the brain",
+  "pillar": "light",
+  "summary": "What solar flares and geomagnetic storms physically do, what has been measured about brain rhythms and Earth-strength fields, and where Dr. Jack Kruse's storm-day headache and intracranial pressure framework goes beyond the evidence.",
+  "relatedProtocolIds": [
+    "space-weather-days",
+    "sunrise-horizon",
+    "sun-exposure",
+    "barefoot-earth",
+    "sleep-space"
+  ],
+  "flatArticle": true,
+  "sections": [
+    {
+      "heading": "Flares, CMEs, and storms are different events",
+      "body": "A solar flare is a burst of light from the Sun—mostly X-ray and extreme ultraviolet. It arrives in about 8 minutes, is absorbed high in the atmosphere on the sunlit side of Earth, and can black out shortwave radio there for minutes to hours. NOAA rates these blackouts R1 (minor, M1 flares) to R5 (extreme, X20). A coronal mass ejection (CME) is different: a cloud of magnetized plasma that sometimes launches with a large flare and takes roughly 1–3 days to reach Earth. If its field is oriented southward, it compresses the magnetosphere and drives a geomagnetic storm, measured by the Kp index and rated G1 (Kp 5) to G5 (Kp 9). Storms bring auroras, ULF waves, and induced currents in the ground and in power lines. Not every flare has a CME, and not every CME hits Earth."
+    },
+    {
+      "heading": "What reaches you at ground level",
+      "body": "The atmosphere absorbs flare X-rays long before they reach the ground, so the direct flare effect is on the upper atmosphere, not on skin or eyes. Storm-time changes in the magnetic field at the surface are typically tens to a few hundred nanotesla—usually under 1% of the roughly 25,000–65,000 nT main field shown in the Place view—though they can change quickly, and they are larger at high latitudes. That is a small but real change in the field you live in, and it is the part of space weather most relevant to any biological effect."
+    },
+    {
+      "heading": "What this app shows",
+      "body": "The home screen shows an alert when an X-class flare (R3 strong blackout or larger) has peaked in the last 24 hours. The Place view lists the largest flares of the past day and week, the number of M- and X-class flares this week, the current and 24-hour peak Kp, and whether your ZIP code was on the sunlit side when the latest flare peaked. Data come from NOAA's Space Weather Prediction Center. A flare alert is a heads-up that a storm may follow in 1–3 days; the Kp value tells you whether one is actually under way."
+    },
+    {
+      "heading": "Brain rhythms and Earth's field: what has been measured",
+      "body": "The brain's alpha rhythm (about 8–12 Hz) is generated largely by thalamocortical circuits. The Schumann resonance—electromagnetic standing waves in the cavity between Earth and the ionosphere—has its fundamental near 7.83 Hz. The overlap in frequency has been noted for decades; a causal coupling between the two has not been demonstrated. The strongest direct evidence that human brains register Earth-strength fields is Wang, Kirschvink and colleagues (eNeuro, 2019): in a shielded lab, rotating a field of geomagnetic strength produced drops in alpha-band power in some participants, with substantial differences between people. That study did not test solar storms, headaches, or health outcomes. Population studies have reported associations between geomagnetic activity and migraine, cardiovascular events, and hospital admissions, but results are mixed and effects are small."
+    },
+    {
+      "heading": "Where Dr. Jack Kruse's teaching is specific",
+      "body": "In a recent forum post, Kruse describes a severe solar storm as a geomagnetic induction front rather than just a radio disturbance. In his account, the compressed magnetosphere drives telluric currents and ULF waves that phase-jam the Schumann resonance. The thalamus then loses its spatial reference frame: alpha pacing drops in amplitude and desynchronizes, structured water around neurons loses capacitance (he describes its dielectric constant falling from about 160 to 78), cerebrospinal fluid thickens, glymphatic drainage slows, and intracranial pressure rises. He presents this as the cause of storm-day headaches and circadian disruption in healthy people. For people with glioma, he argues the same storm pushes already damaged mitochondria into failure, producing edema, severe headaches, and seizures. He cites Petrov (2002), Cifra (2014), Wang (2019), Michaeli (2019), and Picard (2019), and he tied two large Panama earthquakes to the same storm."
+    },
+    {
+      "heading": "What is solid, what is framework",
+      "body": "Solid: flares, CMEs, and geomagnetic storms; their effects on the ionosphere, radio, satellites, and power grids; and lab evidence that some human brains respond to changes in Earth-strength fields. Suggestive but mixed: population associations between storm days and headaches or cardiovascular events. Framework: the step-by-step chain from storm to Schumann phase-jam to thalamic decoupling to water capacitance to intracranial pressure, the specific dielectric values, and the glioma mechanism—none of these have been measured in people during storms. Earthquakes: seismologists have repeatedly tested whether solar or geomagnetic activity triggers earthquakes and have not found a reliable link. Panama sits where the Cocos, Nazca, and Caribbean plates meet, so large earthquakes there are expected regardless of space weather."
+    },
+    {
+      "heading": "On storm days",
+      "body": "None of the useful responses depend on settling the mechanism. When a flare alert appears or Kp reaches 5 or higher, keep the day simple: morning light outdoors, time outside, barefoot ground contact, earlier darkness, a regular sleep window, and steady hydration. If you get headaches, note them alongside the date and Kp to see whether a pattern actually holds for you. A sudden severe headache, a new seizure, confusion, vision loss, or weakness needs urgent medical care, whatever the space weather. If you live with a brain tumor, seizure disorder, or migraine, follow your care team's plan and do not change medication based on a space-weather forecast."
+    },
+    {
+      "heading": "How to use it here",
+      "body": "Read alongside Weakening magnetosphere, South Atlantic Anomaly & deuterium and Earth's magnetic field, crustal geology, and artificial EM for the geomagnetic side, Why sunrise is the most important part of the day for the light side, and Marcus theory and the inverted region for the chemistry behind “Marcus inversion.” Use the solar alert and the Place view's solar section as context, not as a diagnosis. Educational only—not space-weather forecasting, seismology, or medical advice."
+    }
+  ]
+}
