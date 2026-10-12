@@ -2,6 +2,13 @@ import rawContent from "../../content/public-content.json";
 
 export type PublicPillar = "light" | "water" | "magnetism" | "support";
 export type PublicEquipment = "none" | "optional" | "required";
+export type SupportGroup =
+  | "food"
+  | "vagus-sound"
+  | "breathing"
+  | "sleep-cold-movement"
+  | "body-model"
+  | "other";
 
 export type PublicSource = {
   label: string;
@@ -13,6 +20,7 @@ export type PublicActivity = {
   name: string;
   summary: string;
   pillar: PublicPillar;
+  group: SupportGroup | null;
   steps: string[];
   equipment: PublicEquipment;
   equipmentDetail: string | null;
@@ -30,6 +38,7 @@ export type PublicArticle = {
   id: string;
   title: string;
   pillar: PublicPillar;
+  group: SupportGroup | null;
   summary: string;
   sections: PublicArticleSection[];
   relatedProtocolIds: string[];
@@ -54,7 +63,7 @@ export const PUBLIC_PILLARS: readonly {
   {
     id: "water",
     label: "Water",
-    blurb: "Hydration, minerals, food, and the water around ATP.",
+    blurb: "Hydration, minerals, deuterium, and the water around ATP.",
   },
   {
     id: "magnetism",
@@ -64,13 +73,24 @@ export const PUBLIC_PILLARS: readonly {
   {
     id: "support",
     label: "Support",
-    blurb: "Sleep, cold, movement, and practices that complete the picture.",
+    blurb: "Food, breath, sound, sleep, cold, and the ideas that tie it together.",
   },
+] as const;
+
+// Order here is the order of the Support filter buttons.
+export const SUPPORT_GROUPS: readonly { id: SupportGroup; label: string }[] = [
+  { id: "food", label: "Food and fasting" },
+  { id: "vagus-sound", label: "Vagus and sound" },
+  { id: "breathing", label: "Breathing" },
+  { id: "sleep-cold-movement", label: "Sleep, cold and movement" },
+  { id: "body-model", label: "How the body works" },
+  { id: "other", label: "Other" },
 ] as const;
 
 const PILLAR_IDS = new Set<PublicPillar>(
   PUBLIC_PILLARS.map((pillar) => pillar.id),
 );
+const GROUP_IDS = new Set<SupportGroup>(SUPPORT_GROUPS.map((group) => group.id));
 const EQUIPMENT_IDS = new Set<PublicEquipment>([
   "none",
   "optional",
@@ -106,6 +126,21 @@ function pillarOf(value: unknown, context: string): PublicPillar {
     throw new Error(`Invalid public pillar: ${context}`);
   }
   return value as PublicPillar;
+}
+
+function groupOf(
+  value: unknown,
+  pillar: PublicPillar,
+  context: string,
+): SupportGroup | null {
+  if (pillar !== "support") {
+    if (value != null) throw new Error(`Group outside Support: ${context}`);
+    return null;
+  }
+  if (typeof value !== "string" || !GROUP_IDS.has(value as SupportGroup)) {
+    throw new Error(`Invalid Support group: ${context}`);
+  }
+  return value as SupportGroup;
 }
 
 function idList(value: unknown, context: string): string[] {
@@ -163,10 +198,12 @@ function parseContent(value: unknown): PublicContentBundle {
       };
     });
 
+    const pillar = pillarOf(rawArticle.pillar, id);
     return {
       id,
       title: requiredString(rawArticle.title, "title", id),
-      pillar: pillarOf(rawArticle.pillar, id),
+      pillar,
+      group: groupOf(rawArticle.group, pillar, id),
       summary: requiredString(rawArticle.summary, "summary", id),
       sections,
       relatedProtocolIds: idList(rawArticle.relatedProtocolIds, `${id}.relatedProtocolIds`),
@@ -190,11 +227,13 @@ function parseContent(value: unknown): PublicContentBundle {
       throw new Error(`Public activity has no steps: ${id}`);
     }
 
+    const pillar = pillarOf(rawActivity.pillar, id);
     return {
       id,
       name: requiredString(rawActivity.name, "name", id),
       summary: requiredString(rawActivity.summary, "summary", id),
-      pillar: pillarOf(rawActivity.pillar, id),
+      pillar,
+      group: groupOf(rawActivity.group, pillar, id),
       steps: rawActivity.steps.map((step, stepIndex) =>
         requiredString(step, `steps[${stepIndex}]`, id),
       ),

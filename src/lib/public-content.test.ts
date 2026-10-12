@@ -6,6 +6,7 @@ import {
   getPublicContent,
   getPublicArticleById,
 } from "./public-content";
+import { PLACE_TERMS } from "./place-terms";
 
 test("every activity has steps, sources and existing articles", () => {
   const content = getPublicContent();
@@ -77,6 +78,32 @@ test("activities remain grouped into the four public pillars", () => {
   assert.ok(getActivitiesForPillar("water").length > 0);
   assert.ok(getActivitiesForPillar("magnetism").length > 0);
   assert.ok(getActivitiesForPillar("support").length > 0);
+});
+
+test("every Support item has a topic group and no other pillar does", () => {
+  const content = getPublicContent();
+  for (const item of [...content.activities, ...content.articles]) {
+    if (item.pillar === "support") assert.ok(item.group, item.id);
+    else assert.equal(item.group, null, item.id);
+  }
+});
+
+test("condition-specific articles stay out of the public app", () => {
+  for (const id of [
+    "cancer-voltage",
+    "diabetes-light-field",
+    "heart-and-cholesterol",
+    "pregnancy-and-birth",
+    "children-and-autism",
+  ]) {
+    assert.equal(getPublicArticleById(id), undefined, id);
+  }
+});
+
+test("every place-screen term opens a published article", () => {
+  for (const [id, term] of Object.entries(PLACE_TERMS)) {
+    assert.ok(getPublicArticleById(term.articleId), `${id} -> ${term.articleId}`);
+  }
 });
 
 test("public activity fields exclude tracker mechanics", () => {

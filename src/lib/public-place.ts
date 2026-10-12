@@ -1,3 +1,6 @@
+import type { PublicSource } from "./public-content";
+import type { SunPhases } from "./sun-phases";
+
 export type PublicSunTimes = {
   sunrise: string | null;
   sunset: string | null;
@@ -24,6 +27,43 @@ export type PublicArtificialEm = {
   sources: string[];
 };
 
+export type PublicBedrock = {
+  unitName: string;
+  rockLabel: string;
+  ageLabel: string | null;
+  note: string | null;
+  source: string;
+};
+
+export type PublicDipZone = {
+  inCorridor: boolean;
+  corridorSummary: string;
+  zone: {
+    rank: number;
+    name: string;
+    nickname: string;
+    summary: string;
+    distanceKm: number;
+  } | null;
+  mitigation: readonly string[];
+  source: PublicSource;
+};
+
+export type PublicVolcano = {
+  /** Closest volcano active since `activeSinceYear`, if within `radiusKm`. */
+  nearest: {
+    name: string;
+    country: string;
+    lastEruptionYear: number;
+    rock: string | null;
+    distanceKm: number;
+  } | null;
+  radiusKm: number;
+  activeSinceYear: number;
+  note: string | null;
+  source: string;
+};
+
 export type PublicPlaceFactors = {
   latitudeLabel: string;
   bandLabel: string;
@@ -31,7 +71,9 @@ export type PublicPlaceFactors = {
   solarNoonLabel: string;
   elevationLabel: string | null;
   geologyLabel: string;
-  geologyDetail: string;
+  volcano: PublicVolcano;
+  bedrock: PublicBedrock | null;
+  dipZone: PublicDipZone | null;
   geomag: PublicGeomag | null;
   artificialEm: PublicArtificialEm | null;
 };
@@ -45,6 +87,7 @@ export type PublicPlaceResult = {
   longitude: number;
   timezone: string;
   sun: PublicSunTimes;
+  sunPhases: SunPhases;
   factors: PublicPlaceFactors;
 };
 

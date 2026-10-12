@@ -15,18 +15,22 @@ import {
 } from "lucide-react";
 import {
   useEffect,
+  useId,
   useRef,
   useState,
   type FormEvent,
 } from "react";
 import {
   PUBLIC_PILLARS,
+  SUPPORT_GROUPS,
   type PublicActivity,
   type PublicArticle,
   type PublicContentBundle,
   type PublicPillar,
   type PublicSource,
+  type SupportGroup,
 } from "@/lib/public-content";
+import { PLACE_TERMS, type PlaceTermId } from "@/lib/place-terms";
 import {
   formatPublicPlaceLabel,
   type PublicPlaceResult,
@@ -39,6 +43,7 @@ import {
   type SolarFlare,
 } from "@/lib/solar-activity";
 import { isSunlitAt } from "@/lib/sun";
+import type { SunPhaseWindow, UvbSeason } from "@/lib/sun-phases";
 
 type Icon = LucideIcon;
 type OpenPanel = PublicPillar | "place" | null;
@@ -48,8 +53,18 @@ type DialogView =
   | { kind: "list" }
   | { kind: "practice"; activity: PublicActivity }
   | { kind: "article"; article: PublicArticle };
+type DetailView = Exclude<DialogView, { kind: "list" }>;
+type OpenView = (view: DetailView) => void;
+type OpenTerm = (term: PlaceTermId) => void;
 
 const SOLAR_REFRESH_MS = 10 * 60 * 1000;
+/** NOAA G1 (minor) geomagnetic storm threshold. */
+const STORM_KP = 5;
+
+function stormKp(solar: SolarActivity): number | null {
+  const kp = Math.max(solar.kp?.value ?? 0, solar.maxKp24h ?? 0);
+  return kp >= STORM_KP ? kp : null;
+}
 
 const ORBIT_CONTROLS: {
   id: Exclude<PublicPillar, "support">;
@@ -139,7 +154,25 @@ function PlaceContext({
   pillar: Exclude<PublicPillar, "support">;
 }) {
   const isLight = pillar === "light";
-  const geomag = place.factors.geomag;
+  const { geomag, bedrock, dipZone } = place.factors;
+  const uvb = place.sunPhases?.uvbWindow;
+
+  const lightLine = `Sunrise ${formatClock(place.sun.sunrise, place.timezone)} · ${
+    uvb
+      ? `UV-B window ${formatWindow(uvb, place.timezone)}`
+      : "no UV-B window today"
+  } · sunset ${formatClock(place.sun.sunset, place.timezone)}.`;
+  const magnetismLine = [
+    geomag ? `${geomag.summaryLine}.` : "Magnetic field detail is temporarily unavailable.",
+    bedrock ? `Bedrock: ${bedrock.rockLabel}.` : null,
+    dipZone?.zone
+      ? `Inside Kruse's dip-change zone #${dipZone.zone.rank} (${dipZone.zone.name}).`
+      : dipZone?.inCorridor
+        ? "Inside Kruse's fastest-falling dip corridor."
+        : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className="place-context" aria-label={`${PILLAR_LABELS[pillar]} place context`}>
@@ -147,13 +180,7 @@ function PlaceContext({
         <MapPin aria-hidden="true" size={14} strokeWidth={1.8} />
         <span>{formatPublicPlaceLabel(place)}</span>
       </div>
-      <p>
-        {isLight
-          ? `${place.factors.latitudeLabel} · ${place.factors.uvSeasonLabel}. Sunrise ${formatClock(place.sun.sunrise, place.timezone)} · sunset ${formatClock(place.sun.sunset, place.timezone)}.`
-          : geomag
-            ? `${geomag.summaryLine}. ${place.factors.geologyLabel} is the nearest geology anchor.`
-            : `${place.factors.latitudeLabel} · ${place.factors.geologyLabel}. Magnetic field detail is temporarily unavailable.`}
-      </p>
+      <p>{isLight ? lightLine : magnetismLine}</p>
     </div>
   );
 }
@@ -169,6 +196,54 @@ function formatClock(value: string | null, timeZone: string): string {
   } catch {
     return "—";
   }
+}
+
+function formatWindow(window: SunPhaseWindow, timeZone: string): string {
+  return `${formatClock(window.start, timeZone)} – ${formatClock(window.end, timeZone)}`;
+}
+
+/** `YYYY-MM-DD` (+ day offset) → "Oct 23". */
+function formatCalendarDay(isoDay: string, offsetDays = 0): string {
+  const date = new Date(`${isoDay}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + offsetDays);
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
+function uvbSeasonLine(season: UvbSeason): string {
+  switch (season.kind) {
+    case "ends":
+      return `Until ~${formatCalendarDay(season.date, -1)}`;
+    case "returns":
+      return `Returns ~${formatCalendarDay(season.date)}`;
+    case "all-year":
+      return "All year";
+    case "never":
+      return "Never here";
+  }
+}
+
+function PlaceTermLabel({ term, onOpen }: { term: PlaceTermId; onOpen: OpenTerm }) {
+  const tipId = useId();
+  const { label, tip } = PLACE_TERMS[term];
+  return (
+    <>
+      <button
+        type="button"
+        className="place-term"
+        aria-describedby={tipId}
+        onClick={() => onOpen(term)}
+      >
+        {label}
+      </button>
+      <span role="tooltip" id={tipId} className="place-term__tip">
+        {tip}
+      </span>
+    </>
+  );
 }
 
 function formatAgo(iso: string, referenceMs: number): string {
@@ -230,19 +305,40 @@ function SolarFlareAlert({
   );
 }
 
+function StormAlert({ kp, onOpen }: { kp: number; onOpen: () => void }) {
+  return (
+    <div className="solar-alert" role="status">
+      <button
+        type="button"
+        className="solar-alert__button"
+        onClick={onOpen}
+        aria-haspopup="dialog"
+        aria-label={`Geomagnetic storm: Kp ${kp.toFixed(1)}. Open recent solar activity.`}
+      >
+        <Zap aria-hidden="true" size={14} strokeWidth={2} />
+        <span>Geomagnetic storm · Kp {kp.toFixed(1)}</span>
+      </button>
+    </div>
+  );
+}
+
 function SolarActivitySection({
   solar,
   unavailable,
   place,
+  onTerm,
 }: {
   solar: SolarState | null;
   unavailable: boolean;
   place: PublicPlaceResult | null;
+  onTerm: OpenTerm;
 }) {
   if (!solar) {
     return (
       <section className="place-result__section solar-section" id="solar-activity">
-        <p className="eyebrow">Recent solar activity</p>
+        <p className="eyebrow">
+          <PlaceTermLabel term="solar" onOpen={onTerm} />
+        </p>
         <p className="place-result__detail">
           {unavailable
             ? "Solar activity is temporarily unavailable."
@@ -255,6 +351,8 @@ function SolarActivitySection({
   const { data, receivedAt } = solar;
   const timeZone = place?.timezone;
   const largest = data.largestFlare24h;
+  const storm = stormKp(data);
+  const isStormDay = storm != null || data.alertFlare != null;
   const blackout = largest ? radioBlackoutLevel(largest.peakFlux) : null;
   const placeLabel = place ? formatPublicPlaceLabel(place) : null;
   const sunlitAtPeak =
@@ -266,16 +364,30 @@ function SolarActivitySection({
     <section
       className="place-result__section solar-section"
       id="solar-activity"
-      aria-labelledby="solar-activity-title"
+      aria-label="Recent solar activity"
     >
-      <p className="eyebrow" id="solar-activity-title">
-        Recent solar activity
+      <p className="eyebrow">
+        <PlaceTermLabel term="solar" onOpen={onTerm} />
       </p>
       {data.alertFlare ? (
         <p className="solar-section__alert">
           Large flare: {data.alertFlare.flareClass}{" "}
           {describeFlareTiming(data.alertFlare, receivedAt)}
         </p>
+      ) : null}
+      {isStormDay ? (
+        <div className="storm-day">
+          <p className="storm-day__title">
+            {storm != null
+              ? `Geomagnetic storm: Kp ${storm.toFixed(1)} in the past 24 hours`
+              : "Large flare in the past 24 hours"}
+          </p>
+          <p>
+            Treat today as a space-weather day: ground longer than your usual
+            20–60 minutes and keep morning sun strict. After a big flare, the
+            next 48 hours count too.
+          </p>
+        </div>
       ) : null}
       <div className="place-data-grid">
         <div>
@@ -364,9 +476,31 @@ function ActivityDialog({
   const panelRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isPlaceAware = pillar === "light" || pillar === "magnetism";
+  const groupRank = (item: { group: SupportGroup | null }) =>
+    SUPPORT_GROUPS.findIndex((entry) => entry.id === item.group);
   const pillarArticles = articles
     .filter((article) => article.pillar === pillar)
-    .sort((a, b) => a.title.localeCompare(b.title));
+    .sort(
+      (a, b) => groupRank(a) - groupRank(b) || a.title.localeCompare(b.title),
+    );
+  const pillarActivities = [...activities].sort(
+    (a, b) => groupRank(a) - groupRank(b),
+  );
+  const [group, setGroup] = useState<SupportGroup | "all">("all");
+  const tabItems: { group: SupportGroup | null }[] =
+    tab === "practices" ? activities : pillarArticles;
+  const groupsOnTab =
+    pillar === "support"
+      ? SUPPORT_GROUPS.map((item) => ({
+          ...item,
+          count: tabItems.filter((entry) => entry.group === item.id).length,
+        })).filter((item) => item.count > 0)
+      : [];
+  const activeGroup = groupsOnTab.some((item) => item.id === group)
+    ? group
+    : "all";
+  const inGroup = (item: { group: SupportGroup | null }) =>
+    activeGroup === "all" || item.group === activeGroup;
 
   function showView(update: (current: DialogView[]) => DialogView[]) {
     setHistory(update);
@@ -497,9 +631,35 @@ function ActivityDialog({
               <p className="dialog-intro">
                 {PUBLIC_PILLARS.find((item) => item.id === pillar)?.blurb}
               </p>
+              {groupsOnTab.length > 1 ? (
+                <div
+                  className="dialog-groups"
+                  role="group"
+                  aria-label={`${PILLAR_LABELS[pillar]} topics`}
+                >
+                  <button
+                    type="button"
+                    aria-pressed={activeGroup === "all"}
+                    onClick={() => setGroup("all")}
+                  >
+                    All
+                  </button>
+                  {groupsOnTab.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      aria-pressed={activeGroup === item.id}
+                      onClick={() => setGroup(item.id)}
+                    >
+                      {item.label}
+                      <span aria-hidden="true">{item.count}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               {tab === "articles" ? (
                 <div className="activity-list">
-                  {pillarArticles.map((article) => (
+                  {pillarArticles.filter(inGroup).map((article) => (
                     <ChoiceButton
                       key={article.id}
                       name={article.title}
@@ -520,7 +680,7 @@ function ActivityDialog({
                     />
                   ) : null}
                   <div className="activity-list">
-                    {activities.map((activity) => (
+                    {pillarActivities.filter(inGroup).map((activity) => (
                       <ChoiceButton
                         key={activity.id}
                         name={activity.name}
@@ -688,6 +848,8 @@ function PlaceDialog({
   solar,
   solarUnavailable,
   scrollToSolar,
+  activities,
+  articles,
   onResolved,
   onClose,
 }: {
@@ -696,12 +858,40 @@ function PlaceDialog({
   solar: SolarState | null;
   solarUnavailable: boolean;
   scrollToSolar: boolean;
+  activities: PublicActivity[];
+  articles: PublicArticle[];
   onResolved: (place: PublicPlaceResult) => void;
   onClose: () => void;
 }) {
   const [zip, setZip] = useState(initialZip);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<DetailView[]>([]);
+  const view = history.at(-1) ?? null;
+  const previous = history.at(-2) ?? null;
+  const panelRef = useRef<HTMLElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  function showView(update: (current: DetailView[]) => DetailView[]) {
+    setHistory(update);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    requestAnimationFrame(() => {
+      panelRef.current
+        ?.querySelector<HTMLElement>("[data-dialog-focus]")
+        ?.focus();
+    });
+  }
+  const openView: OpenView = (next) => showView((current) => [...current, next]);
+  const openTerm: OpenTerm = (term) => {
+    const article = articles.find((item) => item.id === PLACE_TERMS[term].articleId);
+    if (article) openView({ kind: "article", article });
+  };
+  const goBack = () => showView((current) => current.slice(0, -1));
+  const backLabel =
+    previous?.kind === "practice"
+      ? `Back to ${previous.activity.name}`
+      : previous?.kind === "article"
+        ? `Back to ${previous.article.title}`
+        : "Back to Where you are";
 
   useEffect(() => {
     if (!scrollToSolar) return;
@@ -757,6 +947,7 @@ function PlaceDialog({
   return (
     <div className="dialog-backdrop" role="presentation" onClick={onClose}>
       <section
+        ref={panelRef}
         className="dialog-panel dialog-panel--place"
         role="dialog"
         aria-modal="true"
@@ -764,24 +955,55 @@ function PlaceDialog({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="dialog-header">
-          <span className="dialog-pillar-mark" aria-hidden="true">
-            <MapPin size={18} />
-          </span>
+          {view ? (
+            <button
+              type="button"
+              className="dialog-icon-button"
+              onClick={goBack}
+              aria-label={backLabel}
+              data-dialog-focus
+            >
+              <ArrowLeft aria-hidden="true" size={18} />
+            </button>
+          ) : (
+            <span className="dialog-pillar-mark" aria-hidden="true">
+              <MapPin size={18} />
+            </span>
+          )}
           <div className="dialog-header__copy">
             <p className="eyebrow">Where you are</p>
+            {view ? (
+              <h2>
+                {view.kind === "practice" ? view.activity.name : view.article.title}
+              </h2>
+            ) : null}
           </div>
           <button
             type="button"
             className="dialog-icon-button"
             onClick={onClose}
             aria-label="Close place dialog"
-            data-dialog-focus
+            data-dialog-focus={view ? undefined : true}
           >
             <X aria-hidden="true" size={19} />
           </button>
         </div>
 
-        <div className="dialog-scroll">
+        <div className="dialog-scroll" ref={scrollRef}>
+          {view?.kind === "practice" ? (
+            <PracticeDetail
+              activity={view.activity}
+              articles={pickById(articles, view.activity.articleIds)}
+              onOpenArticle={(article) => openView({ kind: "article", article })}
+            />
+          ) : view?.kind === "article" ? (
+            <ArticleDetail
+              article={view.article}
+              practices={pickById(activities, view.article.relatedProtocolIds)}
+              onOpenPractice={(activity) => openView({ kind: "practice", activity })}
+            />
+          ) : (
+          <>
           <form className="zip-form" onSubmit={handleSubmit}>
             <label htmlFor="place-zip">US ZIP code</label>
             <div className="zip-form__row">
@@ -810,20 +1032,31 @@ function PlaceDialog({
               {error}
             </p>
           ) : null}
-          {place ? <PlaceResult place={place} /> : null}
+          {place ? <PlaceResult place={place} onTerm={openTerm} /> : null}
           <SolarActivitySection
             solar={solar}
             unavailable={solarUnavailable}
             place={place}
+            onTerm={openTerm}
           />
+          </>
+          )}
         </div>
       </section>
     </div>
   );
 }
 
-function PlaceResult({ place }: { place: PublicPlaceResult }) {
+function PlaceResult({
+  place,
+  onTerm,
+}: {
+  place: PublicPlaceResult;
+  onTerm: OpenTerm;
+}) {
   const { factors } = place;
+  const { bedrock, dipZone, volcano } = factors;
+  const phases = place.sunPhases;
   return (
     <div className="place-result" aria-live="polite">
       <div className="place-result__location">
@@ -836,39 +1069,135 @@ function PlaceResult({ place }: { place: PublicPlaceResult }) {
       </div>
       <div className="place-data-grid">
         <div>
-          <span>Sunrise</span>
+          <PlaceTermLabel term="sunrise" onOpen={onTerm} />
           <strong>{formatClock(place.sun.sunrise, place.timezone)}</strong>
         </div>
         <div>
-          <span>Sunset</span>
+          <PlaceTermLabel term="sunset" onOpen={onTerm} />
           <strong>{formatClock(place.sun.sunset, place.timezone)}</strong>
         </div>
         <div>
-          <span>Solar noon</span>
+          <PlaceTermLabel term="solarNoon" onOpen={onTerm} />
           <strong>{factors.solarNoonLabel}</strong>
         </div>
         <div>
-          <span>Day length</span>
+          <PlaceTermLabel term="dayLength" onOpen={onTerm} />
           <strong>
             {place.sun.dayLengthHours == null
               ? "—"
               : `${place.sun.dayLengthHours.toFixed(1)} h`}
           </strong>
         </div>
+        {phases ? (
+          <>
+            <div>
+              <PlaceTermLabel term="uva" onOpen={onTerm} />
+              <strong>
+                {phases.uvaPhase ? formatWindow(phases.uvaPhase, place.timezone) : "—"}
+              </strong>
+            </div>
+            <div>
+              <PlaceTermLabel term="uvb" onOpen={onTerm} />
+              <strong>
+                {phases.uvbWindow
+                  ? formatWindow(phases.uvbWindow, place.timezone)
+                  : "None today"}
+              </strong>
+              <small>{uvbSeasonLine(phases.uvbSeason)}</small>
+            </div>
+          </>
+        ) : null}
       </div>
       <div className="place-result__section">
-        <p className="eyebrow">Magnetism and geology</p>
+        <p className="eyebrow">
+          <PlaceTermLabel term="field" onOpen={onTerm} />
+        </p>
         <p>{factors.geomag?.summaryLine ?? "Field reading unavailable."}</p>
-        <p className="place-result__detail">{factors.geologyDetail}</p>
+      </div>
+      {dipZone ? (
+        <div className="place-result__section">
+          <p className="eyebrow">
+            <PlaceTermLabel term="dipZone" onOpen={onTerm} />
+          </p>
+          {dipZone.zone ? (
+            <>
+              <p>
+                Zone #{dipZone.zone.rank} of his 10: {dipZone.zone.name}, &ldquo;
+                {dipZone.zone.nickname}&rdquo; ({dipZone.zone.distanceKm} km from
+                the zone center).
+              </p>
+              <p className="place-result__detail">{dipZone.zone.summary}</p>
+            </>
+          ) : null}
+          {dipZone.inCorridor ? (
+            <p className="place-result__detail">{dipZone.corridorSummary}</p>
+          ) : null}
+          <p className="place-result__detail">If you can&apos;t move away, his steps are:</p>
+          <ul className="place-result__list">
+            {dipZone.mitigation.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          <p className="place-result__detail">
+            Source:{" "}
+            <a href={dipZone.source.url} target="_blank" rel="noopener noreferrer">
+              Post {dipZone.source.label}
+            </a>
+          </p>
+        </div>
+      ) : null}
+      <div className="place-result__section">
+        <p className="eyebrow">
+          <PlaceTermLabel term="ground" onOpen={onTerm} />
+        </p>
+        {bedrock ? (
+          <>
+            <p>
+              {bedrock.unitName}: {bedrock.rockLabel}
+              {bedrock.ageLabel ? ` (${bedrock.ageLabel})` : ""}.
+            </p>
+            {bedrock.note ? (
+              <p className="place-result__detail">{bedrock.note}</p>
+            ) : null}
+          </>
+        ) : (
+          <p>Bedrock reading unavailable.</p>
+        )}
+        {bedrock ? (
+          <p className="place-result__detail">Geology: {bedrock.source}.</p>
+        ) : null}
+      </div>
+      <div className="place-result__section">
+        <p className="eyebrow">
+          <PlaceTermLabel term="volcano" onOpen={onTerm} />
+        </p>
+        {volcano.nearest ? (
+          <p>
+            {volcano.nearest.name} ({volcano.nearest.country}), last erupted{" "}
+            {volcano.nearest.lastEruptionYear}
+            {volcano.nearest.rock ? `, ${volcano.nearest.rock}` : ""},{" "}
+            {volcano.nearest.distanceKm} km away.
+          </p>
+        ) : (
+          <p>
+            No volcano active since {volcano.activeSinceYear} within{" "}
+            {volcano.radiusKm} km.
+          </p>
+        )}
+        {volcano.note ? (
+          <p className="place-result__detail">{volcano.note}</p>
+        ) : null}
+        <p className="place-result__detail">Volcanoes: {volcano.source}.</p>
       </div>
       {factors.artificialEm ? (
         <div className="place-result__section">
-          <p className="eyebrow">Artificial-EM context</p>
+          <p className="eyebrow">
+            <PlaceTermLabel term="artificialEm" onOpen={onTerm} />
+          </p>
           <p>{factors.artificialEm.summaryLine}</p>
           <p className="place-result__detail">
             {factors.artificialEm.detailLine}
-          </p>
-        </div>
+          </p>        </div>
       ) : null}
     </div>
   );
@@ -963,6 +1292,14 @@ export function SwanHome({ content }: { content: PublicContentBundle }) {
                 setPanel("place");
               }}
             />
+          ) : solar && stormKp(solar.data) != null ? (
+            <StormAlert
+              kp={stormKp(solar.data) as number}
+              onOpen={() => {
+                setScrollToSolar(true);
+                setPanel("place");
+              }}
+            />
           ) : null}
         </div>
 
@@ -1044,6 +1381,8 @@ export function SwanHome({ content }: { content: PublicContentBundle }) {
             solar={solar}
             solarUnavailable={solarUnavailable}
             scrollToSolar={scrollToSolar}
+            activities={content.activities}
+            articles={content.articles}
             onResolved={(nextPlace) => {
               setPlace(nextPlace);
               setStoredZip(nextPlace.postalCode);

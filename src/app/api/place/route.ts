@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { BEDROCK_SOURCE, fetchBedrock, type Bedrock } from "@/lib/bedrock";
 import { geocodeUsZip } from "@/lib/geo";
+import { INCLINATION_DROP_SOURCE } from "@/lib/inclination-drop-zones.data";
+import type { InclinationZoneContext } from "@/lib/inclination-drop-zones";
 import {
   fetchArtificialEmQuick,
   type ArtificialEmSnapshot,
@@ -15,9 +18,20 @@ import {
 } from "@/lib/place-factors";
 import {
   normalizePublicZip,
+  type PublicBedrock,
+  type PublicDipZone,
   type PublicPlaceResult,
+  type PublicVolcano,
 } from "@/lib/public-place";
+import {
+  ACTIVE_VOLCANO_RADIUS_KM,
+  ACTIVE_VOLCANO_SOURCE,
+  isHawaii,
+  nearestActiveVolcano,
+} from "@/lib/active-volcanoes";
+import { ACTIVE_SINCE_YEAR } from "@/lib/active-volcanoes.data";
 import { getSunTimesForLocalDay } from "@/lib/sun";
+import { computeSunPhases } from "@/lib/sun-phases";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +83,63 @@ function serializeArtificialEm(
   };
 }
 
+function serializeBedrock(bedrock: Bedrock | null): PublicBedrock | null {
+  if (!bedrock) return null;
+  return {
+    unitName: bedrock.unitName,
+    rockLabel: bedrock.rockLabel,
+    ageLabel: bedrock.ageLabel,
+    note: bedrock.note,
+    source: BEDROCK_SOURCE,
+  };
+}
+
+function serializeVolcano(lat: number, lng: number): PublicVolcano {
+  const nearest = nearestActiveVolcano(lat, lng);
+  const note = isHawaii(lat, lng)
+    ? "Kruse rules out Hawaii even so: he says its rock froze in the reversed field before the last pole swap, about 780,000 years ago, so it can cancel today's field."
+    : nearest
+      ? "Kruse says active volcanoes pin the local field best, because every magnetic field needs moving charge."
+      : null;
+  return {
+    nearest: nearest
+      ? {
+          name: nearest.name,
+          country: nearest.country,
+          lastEruptionYear: nearest.lastEruptionYear,
+          rock: nearest.rock,
+          distanceKm: Math.round(nearest.distanceKm),
+        }
+      : null,
+    radiusKm: ACTIVE_VOLCANO_RADIUS_KM,
+    activeSinceYear: ACTIVE_SINCE_YEAR,
+    note,
+    source: ACTIVE_VOLCANO_SOURCE,
+  };
+}
+
+function serializeDipZone(
+  context: InclinationZoneContext | null,
+): PublicDipZone | null {
+  if (!context) return null;
+  const zone = context.nearestZone;
+  return {
+    inCorridor: context.inDecayCorridor,
+    corridorSummary: context.decayCorridorSummary,
+    zone: zone
+      ? {
+          rank: zone.rank,
+          name: zone.name,
+          nickname: zone.subtitle,
+          summary: zone.hazardSummary,
+          distanceKm: zone.distanceKm,
+        }
+      : null,
+    mitigation: context.mitigationLines,
+    source: { ...INCLINATION_DROP_SOURCE },
+  };
+}
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
@@ -101,7 +172,7 @@ export async function POST(request: Request) {
       place.timezone,
     );
 
-    const [elevationM, geomagRaw, artificialEm] = await Promise.all([
+    const [elevationM, geomagRaw, artificialEm, bedrock] = await Promise.all([
       withDeadline(
         fetchElevationMeters(place.latitude, place.longitude),
         1_200,
@@ -117,6 +188,7 @@ export async function POST(request: Request) {
         3_000,
         null,
       ),
+      withDeadline(fetchBedrock(place.latitude, place.longitude), 2_500, null),
     ]);
 
     const geomag = geomagRaw ? formatGeomagDisplay(geomagRaw) : null;
@@ -144,6 +216,12 @@ export async function POST(request: Request) {
         solarNoon: serializeTime(sun.solarNoon),
         dayLengthHours: sun.dayLengthHours,
       },
+      sunPhases: computeSunPhases(
+        new Date(),
+        place.latitude,
+        place.longitude,
+        place.timezone,
+      ),
       factors: {
         latitudeLabel: factors.latitudeLabel,
         bandLabel: factors.bandLabel,
@@ -151,7 +229,9 @@ export async function POST(request: Request) {
         solarNoonLabel: factors.solarNoonLabel,
         elevationLabel: factors.elevationLabel,
         geologyLabel: factors.geologyLabel,
-        geologyDetail: factors.geologyDetail,
+        volcano: serializeVolcano(place.latitude, place.longitude),
+        bedrock: serializeBedrock(bedrock),
+        dipZone: serializeDipZone(factors.inclinationZone),
         geomag: serializeGeomag(factors.geomag),
         artificialEm: serializeArtificialEm(factors.artificialEm),
       },

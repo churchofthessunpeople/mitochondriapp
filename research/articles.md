@@ -8,6 +8,7 @@ Each article presents his reasoning in his terms and cites the forum posts it dr
 ### Mitochondria as light- and field-driven electronics
 - **id:** mitochondria-quantum-devices
 - **pillar:** support
+- **group:** body-model
 - **summary:** Kruse treats each mitochondrion as an antenna, circuit and particle accelerator tuned by sunlight and Earth's magnetic field, not just a chemical furnace that burns food.
 - **protocols:** none
 
@@ -70,6 +71,7 @@ In practice, Kruse concludes that this is a hardware problem set by the environm
 ### The field, the genes and the clock in the cell
 - **id:** field-genes-telomeres
 - **pillar:** support
+- **group:** body-model
 - **summary:** In his model the environment sets the physics, the physics sets how genes behave, and DNA carries physical "mass" that light and the daily clock must keep low.
 - **protocols:** none
 
@@ -122,6 +124,7 @@ In practice, Kruse tells people not to rely on epigenetic "Horvath" clocks, sali
 ### Information, erasure and the chromosome 2 "safe mode"
 - **id:** landauer-erasure
 - **pillar:** support
+- **group:** body-model
 - **summary:** Kruse frames disease as lost information rather than low energy: corrupted proteins and falling voltage are "erased" at a cost in heat, and under enough stress a fuse on chromosome 2 drops the body into a primitive safe mode.
 - **protocols:** none
 
@@ -286,6 +289,7 @@ In practice, Kruse's answer is the "pin first" order: fix your magnetic and wire
 ### Marcus inversion and the Warburg shift
 - **id:** marcus-theory-inverted-region
 - **pillar:** support
+- **group:** body-model
 - **summary:** Kruse's core failure state: electron transfer stalls in Marcus's "inverted region," and cells retreat to fermentation as a protective emergency mode.
 - **protocols:** none
 
@@ -812,6 +816,7 @@ The linked protocols: drink carbonated water with DDW, favouring naturally carbo
 ### Seafood, DHA and careful iodine
 - **id:** seafood-meal
 - **pillar:** support
+- **group:** food
 - **summary:** Kruse favors wild seafood for DHA and minerals, prefers cold, well-mixed waters such as the Pacific Northwest, accepts antioxidants only within whole marine food, and says iodine is safe only for someone who is pinned.
 - **protocols:** seafood-meal
 
@@ -860,6 +865,7 @@ His seafood-meal guidance: eat wild-caught seafood for DHA and magnesium, favour
 ### Meal timing and the heme clock
 - **id:** early-dinner
 - **pillar:** support
+- **group:** food
 - **summary:** Kruse says when, and under what light, you eat drives diabetes more than what you eat, through a heme-based clock that should switch off the liver's night-time sugar output.
 - **protocols:** early-dinner
 
@@ -894,6 +900,7 @@ His early-dinner protocol: eat the main meal near solar noon, ideally outdoors; 
 ### Food: substrate, isotopes and local information
 - **id:** food-substrate-isotopes
 - **pillar:** support
+- **group:** food
 - **summary:** Kruse says food supplies fuel and isotopes but not the magnetic field the cell needs; he favors fat over glucose, low-deuterium plant parts and fresh local food, and rejects any diet as a fix for a location problem.
 - **protocols:** saturated-fat-fuel, zip-code-food
 
@@ -940,6 +947,7 @@ His saturated-fat-fuel protocol: favour ghee, coconut oil, lard and clarified bu
 ### Fat as a capacitor: obesity, fasting and the buffer
 - **id:** adipose-capacitor
 - **pillar:** support
+- **group:** food
 - **summary:** Kruse treats body fat as an electrical capacitor and deuterium store that protects heart and brain, so stripping it, or dry fasting without enough of it, backfires; obesity, in his view, is an efficiency failure rather than a calorie surplus.
 - **protocols:** saturated-fat-fuel, coherent-dry-fast, glp1-damage-offset, anorexia-recovery
 
@@ -1158,6 +1166,7 @@ In practice, the relocation checklist gathers his criteria: the three World Magn
 ### Electroculture: growing food in a weakening field
 - **id:** electroculture-food
 - **pillar:** support
+- **group:** food
 - **summary:** Kruse says a weakening magnetic field and deuterium-heavy water are cutting crop yields, and that electroculture, basalt and low-deuterium water can keep food growing where the field still holds, while melanized fungi keep the rain coming.
 - **protocols:** zip-code-food
 
@@ -1484,6 +1493,7 @@ In practice, the beeswax candle test protocol uses a rated pure-beeswax candle a
 ### Sleep sanctuary
 - **id:** sleep-space
 - **pillar:** support
+- **group:** sleep-cold-movement
 - **summary:** Kruse calls insomnia a light-and-magnetic hardware failure, so the bedroom must be dark, cold, grounded, wireless-free and aligned with the field.
 - **protocols:** sleep-space, north-south-bed
 
@@ -1506,6 +1516,7 @@ In practice, he calls the result a "magnetic sanctuary." His sleep-space protoco
 ### Sleep in his model: adenosine, myelin and the nightly flip
 - **id:** myelin-sleep-battery
 - **pillar:** support
+- **group:** sleep-cold-movement
 - **summary:** Kruse explains sleep as the nightly recharge of an electrical grid: adenosine signals the membrane is tiring, myelin recharges as a proton battery, the brain flips polarity to purge deuterium, and how you wake shows whether it worked.
 - **protocols:** sleep-space, binaural-sleep-audio
 
@@ -1546,6 +1557,7 @@ He points to his sleep-space protocol (a dark, cold, grounded, wireless-free bed
 ### Cold thermogenesis and the brain's fluid vortex
 - **id:** cold-thermogenesis-skin-50
 - **pillar:** support
+- **group:** sleep-cold-movement
 - **summary:** Kruse calls cold a "quantum vice" that compresses tissue to keep deuterium out — an override for poor sun or field, with lineage and timing caveats.
 - **protocols:** cold-thermogenesis
 
@@ -1582,6 +1594,7 @@ His cold-thermogenesis protocol is a daily 60–180 seconds of cold on bare skin
 ### Movement, and when exercise becomes a toxin
 - **id:** morning-movement
 - **pillar:** support
+- **group:** sleep-cold-movement
 - **summary:** Kruse supports daily outdoor movement but says exercise turns harmful when the body is deuterium-loaded or unpinned, or when it happens in sealed, high-CO₂ gyms, so environment comes before fitness.
 - **protocols:** exercise
 
@@ -1622,6 +1635,7 @@ His exercise protocol is daily movement outdoors, grounded and in sunlight, at m
 ### The vagus nerve: deuterium drain and its stimulation
 - **id:** vagus-nerve-stimulation
 - **pillar:** support
+- **group:** vagus-sound
 - **summary:** Kruse calls the vagus nerve the body's main deuterium drain, draws on what he saw when surgeons cut it, and tunes it with voice, sound and gentle stimulation, with firm guardrails on devices.
 - **protocols:** tens-vagus, vagus-nerve-stimulation, castor-oil-navel, vagus-and-device-therapies
 
@@ -1678,6 +1692,7 @@ He starts with daily slow belly breathing, humming or chanting, and nasal breath
 ### Tuning forks, binaural beats and sound
 - **id:** tuning-forks
 - **pillar:** support
+- **group:** vagus-sound
 - **summary:** Kruse treats sound and vibration as low-risk inputs that recharge the body's piezoelectric tissues, using two tuning forks, analog drums and bowls, humming, and a binaural sleep glide.
 - **protocols:** tuning-forks, binaural-sleep-audio
 
@@ -1724,6 +1739,7 @@ His tuning-fork protocol is a 128 Hz fork on stiff joints, the sciatic path or t
 ### The nose, palate and teeth
 - **id:** nasal-nitric-oxide
 - **pillar:** support
+- **group:** breathing
 - **summary:** Kruse calls the sinuses the body's nitric-oxide factory and an early-warning system, and treats congestion, palate, sleep-airway and dental choices through that lens.
 - **protocols:** mastic-gum, sinus-hum-reset, nasal-breathing, dental-care
 
@@ -1766,6 +1782,7 @@ He names four routines. One is mastic gum for congestion and airway strength. An
 ### Jade, the Maya and the solid-state skull
 - **id:** jade-maya-skull
 - **pillar:** support
+- **group:** vagus-sound
 - **summary:** Kruse reads the Maya's jade tooth inlays as a solid-state tool that kept teeth light-filled and decay-free, grounded the skull and helped the brain shed deuterium as the field failed, and he suggests jade against the temple as a test for some migraines.
 - **protocols:** dental-care
 
@@ -1802,6 +1819,7 @@ His dental-care approach favors gold inlays over plastic composites and amalgam,
 ### Releasing lattice lock: Volcano Protocol, hypnosis and shoreline air
 - **id:** lattice-lock-release
 - **pillar:** support
+- **group:** other
 - **summary:** Kruse's routines for releasing lattice lock: a body-scale copy of the planet's volcanic response, a water-and-salt flush, hypnosis working from the top down, and sunrise sea spray.
 - **protocols:** volcano-protocol, hypnosis-defrag, shoreline-wave-breathing, spinal-lattice-lock
 
@@ -1852,6 +1870,7 @@ His Volcano Protocol and spinal lattice lock protocols combine carbonated and de
 ### Time, mind and consciousness
 - **id:** time-and-consciousness
 - **pillar:** support
+- **group:** body-model
 - **summary:** Kruse ties the felt speed of time, memory, wisdom, belief and consciousness to light, water and oxygen's spin in the brain.
 - **protocols:** time-expansion-novelty
 
@@ -1896,6 +1915,7 @@ His time-expansion protocol pairs novelty with environmental repair. He recommen
 ### Drugs and supplements as "atomic impurities"
 - **id:** atomic-impurities
 - **pillar:** support
+- **group:** body-model
 - **summary:** Kruse says foreign compounds add electron traps to the body's semiconductors, that some drugs only seem to work in a deuterium-loaded body, and that pills skip the light-driven steps that make the body's own versions work.
 - **protocols:** pills-he-avoids
 
@@ -1956,6 +1976,7 @@ His "pills he avoids" list includes oral vitamin D3, chronic vitamin C, NMN, NR 
 ### His critique of "centralized medicine"
 - **id:** centralized-medicine
 - **pillar:** support
+- **group:** body-model
 - **summary:** Kruse argues that modern medicine dropped physics for biochemistry and drugs, recast the sun as a hazard, and urges members to verify for themselves and act on light, field and ground.
 - **protocols:** iv-fluids-acute-collapse
 
@@ -2002,6 +2023,7 @@ Kruse's prescriptions are about mindset rather than a protocol. "Verify, don't o
 ### Cancer as a voltage failure
 - **id:** cancer-voltage
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse says any lasting fall in the voltage of the mitochondria's inner membrane can produce cancer, a protective retreat and an electrical short circuit that the environment, not drugs, must reverse.
 - **protocols:** cancer-glioma
 
@@ -2048,6 +2070,7 @@ His priorities for cancer and glioma: get magnetically pinned first; ground; tak
 ### Diabetes and blood sugar
 - **id:** diabetes-light-field
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse treats insulin resistance as a protective circuit breaker, and type 1 and type 2 diabetes and the dawn sugar rise as light, deuterium and magnetic problems rather than food problems.
 - **protocols:** type-1-diabetes, type-2-dawn-sugar
 
@@ -2106,6 +2129,7 @@ For type 2 and the dawn rise, Kruse's protocol is to ground, strip out nnEMF (wi
 ### Heart, cholesterol and arteries
 - **id:** heart-and-cholesterol
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse calls cholesterol the membrane's insulator and light sensor, treats ApoB, Lp(a) and homocysteine as signs of repair and sludge, and traces heart and artery disease to lost melanin, lost field and missing sun.
 - **protocols:** heart-protocols
 
@@ -2162,6 +2186,7 @@ His heart protocol: get full sun on the chest, and for a high calcium score comb
 ### The heart's vortex: bicuspid valve, Lasix and rescue drips
 - **id:** aortic-vortex
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse treats the aortic valve as a vortex generator; he says a two-leaflet valve, salt-stripping diuretics or a heavy deuterium load break the vortex and starve the brain, while catecholamines, hypertonic saline and Lactated Ringer's can restart a stalled system.
 - **protocols:** heart-protocols, pregnancy-birth-children, iv-fluids-acute-collapse
 
@@ -2214,6 +2239,7 @@ Before conception, Kruse wants the mother on 92.5 ppm deuterium-depleted water a
 ### Neurodegeneration and MS
 - **id:** neurodegeneration
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse traces Alzheimer's, Parkinson's, ALS, MS and even depression to lost light, field and vagal tone, with deuterium backing up from the gut, misplaced copper and melanin breakdown doing the damage.
 - **protocols:** ms-agonic-therapy, brain-eye-ear-conditions
 
@@ -2274,6 +2300,7 @@ For MS his protocol puts relocation first: move to a low-latitude spot with a fl
 ### Immunity, inflammation and the body's barriers
 - **id:** immunity-barriers
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse describes the body's barriers as isotope filters that fail together, inflammation as a containment breach carried by positive charge, and infections and parasites as signs of a deuterated terrain.
 - **protocols:** mold-inflammation
 
@@ -2328,6 +2355,7 @@ Kruse's mold and inflammation protocol: move to a clean, low-nnEMF property (low
 ### Gut and liver: the light-and-deuterium axis
 - **id:** gut-liver-axis
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse treats the gut as a light-and-deuterium organ flushed each morning by pancreatic bicarbonate, and the liver as the first organ to fail, linked to brain and pelvis by one fluid axis.
 - **protocols:** none
 
@@ -2372,6 +2400,7 @@ No separate protocol is linked here, but Kruse's advice follows from the model. 
 ### Graves', thyroid and the eyes
 - **id:** graves-light-circuit
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse traces Graves' disease, thyroid and adrenal flares and several eye diseases to a broken eye-to-brain light circuit plus night light and wireless.
 - **protocols:** graves-and-eyes, brain-eye-ear-conditions
 
@@ -2410,6 +2439,7 @@ His Graves' and eye protocol: plenty of dawn sun into bare eyes while grounded i
 ### Nerves, head and pain
 - **id:** nerve-pain-head-injury
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse explains CRPS, head and facial trauma, Bell's palsy, voice and hearing loss, tinnitus, facial pain, headaches, spinal-cord softening and osteoporosis as local failures of light, field and fluid.
 - **protocols:** nerve-injury, brain-eye-ear-conditions
 
@@ -2458,6 +2488,7 @@ His nerve-injury protocol: for CRPS, secure grounding and a good field before pu
 ### Pregnancy and birth
 - **id:** pregnancy-and-birth
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse says a pregnant woman needs grounded sun more than extra calories, treats labor and nausea as functional signals, and links parents' deuterium load to birth defects and to the child's later insulin resistance.
 - **protocols:** pregnancy-sun, pregnancy-birth-children
 
@@ -2502,6 +2533,7 @@ His pregnancy protocols: plenty of grounded sun with UV and infrared, including 
 ### Children, infants and autism
 - **id:** children-and-autism
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse calls autism a "magnetic decline disease" and warns that indoor childhood, blue-light phototherapy, the newborn vitamin K shot and early deuterium load set children up for lifelong problems.
 - **protocols:** pregnancy-birth-children
 
@@ -2546,6 +2578,7 @@ His pregnancy, birth and childhood protocol: no blue-light phototherapy for newb
 ### Fertility, cycles and pelvic voltage
 - **id:** fertility-cycles-voltage
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse ties menstrual rhythm, egg and sperm quality, erections and orgasm to lunar ground currents, sunlight and pelvic voltage, which devices and indoor life collapse.
 - **protocols:** moon-cycle-routine, male-fertility
 
@@ -2594,6 +2627,7 @@ For men his protocol is to take phones and laptops out of pockets and off the la
 ### GLP-1 drugs, anorexia and the lost fat capacitor
 - **id:** glp1-drug-damage
 - **pillar:** support
+- **app:** hold
 - **summary:** Kruse says GLP-1 weight-loss drugs force a crude deuterium flush that ends in lost pleasure, lost muscle and collagen, a hijacked vagus, vision loss and a "welded-shut" exhaust, and that anorexia shares the damage without the fat buffer.
 - **protocols:** glp1-damage-offset, anorexia-recovery
 

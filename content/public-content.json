@@ -10,6 +10,7 @@
       "name": "Sunrise light on bare eyes and skin",
       "summary": "Be outside every morning as the sun rises, with its first light on bare eyes and skin.",
       "pillar": "light",
+      "group": null,
       "steps": [
         "Get up before sunrise so you are outside when the sun clears the horizon.",
         "Take off sunglasses, contact lenses and glasses, and don't watch from behind window glass.",
@@ -55,6 +56,7 @@
       "name": "Midday sun and UV-B, unfiltered",
       "summary": "Get regular midday sun, UV-B included, on bare skin with no sunscreen or sunglasses, stopping before any redness.",
       "pillar": "light",
+      "group": null,
       "steps": [
         "Go out near solar noon, when your shadow is shorter than you are.",
         "Expose torso and back; tan with bare skin, not through clothing.",
@@ -102,6 +104,7 @@
       "name": "Four-phase sun day (building a \"solar callus\")",
       "summary": "A timed daily light schedule — sunrise, mid-morning, midday and sunset — for adapting skin to strong or tropical sun without burning.",
       "pillar": "light",
+      "group": null,
       "steps": [
         "Sunrise phase: within 60–90 minutes after the sun clears the horizon, spend 30–45 minutes in its deep red and near-infrared light (no UV yet) with bare eyes and as much bare skin as possible, feet on volcanic basalt or wet black sand.",
         "Mid-morning UV-A phase (about 8:30–11:00, depending on season and place): 15–25 minutes with skin and eyes open to the sky while walking or moving; never sunglasses, contacts or glasses.",
@@ -139,6 +142,7 @@
       "name": "Sunset light",
       "summary": "Spend 20–30 minutes outside in the last hour of daylight, with bare skin and no sunglasses.",
       "pillar": "light",
+      "group": null,
       "steps": [
         "In the final hour of daylight, go outdoors for 20–30 minutes.",
         "Keep skin bare and wear no sunglasses.",
@@ -171,6 +175,7 @@
       "name": "Evening light: incandescent, red, dark",
       "summary": "After sunset, use only warm, blue-free light; in daylight, never block blue.",
       "pillar": "light",
+      "group": null,
       "steps": [
         "Replace LED and fluorescent bulbs with incandescent ones.",
         "In daylight, wear no blue blockers of any tint, red or yellow included.",
@@ -214,6 +219,7 @@
       "name": "Cut screen time",
       "summary": "Spend less time under blue-lit screens, above all before exercise and at night.",
       "pillar": "light",
+      "group": null,
       "steps": [
         "Cut indoor screen and wireless time, including feeds.",
         "When you do go online, use a wired connection and a low-blue \"daylight\" screen.",
@@ -256,6 +262,7 @@
       "name": "Sun first, red-light panels second",
       "summary": "Get red and near-infrared light from the sun first, and use a panel only where sun is lacking.",
       "pillar": "light",
+      "group": null,
       "steps": [
         "Get red and infrared from sunrise and daylight first; with hours of daily sun, a panel is unnecessary.",
         "In the tropics, skip light devices and use the sun.",
@@ -297,48 +304,11 @@
       ]
     },
     {
-      "id": "pregnancy-sun",
-      "name": "Grounded sun in pregnancy",
-      "summary": "In pregnancy, put grounded full-spectrum sun ahead of extra calories.",
-      "pillar": "light",
-      "steps": [
-        "Get plenty of sun with UV and infrared while grounded, including bare-eyed morning light; don't skip the grounding.",
-        "Don't use chemical sunscreen or avoid the sun.",
-        "Don't force a calorie surplus.",
-        "Skip synthetic prenatal pills.",
-        "Switch off wireless routers and smart devices at home, and keep your phone in airplane mode.",
-        "In a high-risk pregnancy, fix the environment first."
-      ],
-      "equipment": "none",
-      "equipmentDetail": null,
-      "cautions": null,
-      "articleIds": [
-        "pregnancy-and-birth"
-      ],
-      "sources": [
-        {
-          "label": "384323",
-          "url": "https://forum.jackkruse.com/posts/384323/"
-        },
-        {
-          "label": "382425",
-          "url": "https://forum.jackkruse.com/posts/382425/"
-        },
-        {
-          "label": "382424",
-          "url": "https://forum.jackkruse.com/posts/382424/"
-        },
-        {
-          "label": "374333",
-          "url": "https://forum.jackkruse.com/posts/374333/"
-        }
-      ]
-    },
-    {
       "id": "drinking-water",
       "name": "Drinking water: reverse osmosis plus UV",
       "summary": "Drink reverse-osmosis water with a UV stage, or clean deep-source water; avoid hard, mineral-heavy, fluoridated or surface water.",
       "pillar": "water",
+      "group": null,
       "steps": [
         "Filter drinking water by reverse osmosis followed by a UV stage.",
         "Avoid fluoride.",
@@ -384,6 +354,7 @@
       "name": "Deuterium-depleted water targets",
       "summary": "Drink deuterium-depleted water (DDW — water with less heavy hydrogen than tap water) within these ranges, once location and light are in place.",
       "pillar": "water",
+      "group": null,
       "steps": [
         "General range: 25–105 ppm deuterium (tap water is near 150 ppm); 25 ppm water is fine to drink.",
         "Treat 92.5 ppm as the most deuterium a depleted water should carry; go lower if you can afford it, but don't aim for 0 ppm.",
@@ -428,6 +399,7 @@
       "name": "Carbonated water with DDW",
       "summary": "Drink carbonated water together with DDW.",
       "pillar": "water",
+      "group": null,
       "steps": [
         "Drink carbonated water alongside DDW.",
         "Use plain soda water, or natural sparkling mineral water: Muszynianka (naturally carbonated volcanic spring water, the first choice) or San Pellegrino.",
@@ -470,6 +442,7 @@
       "name": "Sea salt with DDW (\"Jade and Salt\")",
       "summary": "Take unrefined sea salt, or clean seawater diluted to 3% salinity, with DDW at 92.5 ppm or lower, while grounded and in the sun.",
       "pillar": "water",
+      "group": null,
       "steps": [
         "Make DDW at 92.5 ppm or lower your base water (see “Deuterium-depleted water targets”).",
         "Add salt: unrefined sea salt, or clean ocean water diluted to 3% salinity (no daily amount is set).",
@@ -512,7 +485,8 @@
       "id": "seafood-meal",
       "name": "Wild seafood, DHA and careful iodine",
       "summary": "Get DHA, magnesium and antioxidants from wild seafood rather than pills, and keep iodine low unless you are pinned.",
-      "pillar": "water",
+      "pillar": "support",
+      "group": "food",
       "steps": [
         "Eat wild-caught seafood regularly for DHA (in its natural, un-esterified form) and magnesium. In North America, source from the Pacific: wild sockeye or halibut, or small, short-lived fish such as sardines and anchovies, rather than East Coast oysters.",
         "Take astaxanthin only as food — wild sockeye or krill — ideally after barefoot time in the morning surf.",
@@ -555,7 +529,8 @@
       "id": "early-dinner",
       "name": "Eat in daylight, nothing after dark",
       "summary": "Eat in daylight — a first meal in the morning and the main meal near solar noon — and nothing after dark.",
-      "pillar": "water",
+      "pillar": "support",
+      "group": "food",
       "steps": [
         "Eat a first meal in the morning, near the natural cortisol peak; don't skip it.",
         "Eat the main meal near solar noon, ideally outdoors in real sun.",
@@ -596,7 +571,8 @@
       "id": "saturated-fat-fuel",
       "name": "Saturated fat as main fuel",
       "summary": "Run mainly on saturated fat, keep carbs for full-sun equatorial living, and fix light and location before diet.",
-      "pillar": "water",
+      "pillar": "support",
+      "group": "food",
       "steps": [
         "Favor saturated fats: grass-fed ghee, coconut oil, lard, tallow, butter, clarified butter.",
         "Eat egg yolks for choline.",
@@ -642,7 +618,8 @@
       "id": "zip-code-food",
       "name": "Eat food from your own zip code",
       "summary": "Eat fresh, seasonal food grown where you live, ideally from your own garden.",
-      "pillar": "water",
+      "pillar": "support",
+      "group": "food",
       "steps": [
         "Grow or buy food from your own zip code; fresh-picked beats shipped produce displayed under LEDs.",
         "Eat in season and in the light the food grew under — no tropical fruit such as bananas in a northern winter.",
@@ -688,7 +665,8 @@
       "id": "coherent-dry-fast",
       "name": "Coherent dry fast",
       "summary": "Dry fast (no food or water) only if you carry enough body fat, grounded in morning sun, and never indoors.",
-      "pillar": "water",
+      "pillar": "support",
+      "group": "food",
       "steps": [
         "Check you have fat to draw on: not below about 20% body fat if you are in strong sun, and not with a BMI under about 24.",
         "Build your baseline beforehand on saturated fats (ghee, coconut oil, lard, clarified butter).",
@@ -722,6 +700,7 @@
       "name": "Barefoot grounding, done right",
       "summary": "Stand barefoot on natural, conductive ground every day, especially at dawn, and choose the ground with care.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "At dawn, go barefoot in surf, on wet sand, dewy grass, raw soil or basalt, for 20–60 minutes a day; more is fine. Be grounded whenever you're in the sun.",
         "At the shore, keep only feet and ankles in the water and as much skin as possible in the air, rather than standing neck-deep.",
@@ -770,6 +749,7 @@
       "name": "Pin first, then light, then exercise and diet",
       "summary": "Fix your magnetic and wireless environment first, add morning light second, and only then change exercise or diet.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Leave the wireless \"soup\": cut nnEMF (man-made electromagnetic fields) at home and work.",
         "Ground strictly — skin to earth, or a low-resistance indoor grounding system.",
@@ -814,6 +794,7 @@
       "name": "Relocation checklist",
       "summary": "How to judge where to live: local magnetic field first, then sun, ground and wireless load, weighed together.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Look up the place in the World Magnetic Model: total intensity above about 45,000 nT (ideally up to 60,000), inclination (how steeply field lines dip) 0–45°, declination (compass offset from true north) near 0°.",
         "Read the declination map: green (the agonic, zero-declination line) is best, red (east) acceptable, dark blue very bad; leave places where the lines bunch together.",
@@ -865,6 +846,7 @@
       "name": "El Salvador specifics",
       "summary": "Practical notes for moving to El Salvador: entry, where to live, land, water and schooling.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "For a quick move, contact the relocation attorney through forum member support and use the members-only \"Turn Key\" route.",
         "Flying in from the US you don't need a return ticket: tell customs you have no fixed departure date and keep your local address at hand; everyone gets 180 days. From Canada, Avianca flies direct from Toronto to San Salvador.",
@@ -915,6 +897,7 @@
       "name": "Track your local field",
       "summary": "Keep watching how the magnetic field is changing where you live, and move early if it worsens.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Start with ESA Swarm satellite data, then add USGS, NOAA and NASA sources. For a home readout, build a cheap fluxgate magnetometer (an optically pumped one is better).",
         "Check NOAA declination drift and secular-acceleration (\"jerk\" — a sudden change in how fast the field is shifting) charts for your zip code, comparing the same date across years.",
@@ -961,6 +944,7 @@
       "name": "Beeswax candle test",
       "summary": "Burn a rated beeswax candle where you live and compare its burn time with the rating, as a home check of local field quality.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Buy pure beeswax candles with a stated burn time (24-hour candles work well); never paraffin.",
         "Burn one at home, or on land you're considering, and time it to the end.",
@@ -998,6 +982,7 @@
       "name": "Live low: ground floor, or shield the bed",
       "summary": "Live and sleep no higher than the first floor; if you can't move yet, shield and ground the bed.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Choose a home on the ground or first floor.",
         "If you must stay higher for now, build a \"High-Altitude Counter-Faraday Shield\": conductive mesh around the bed, wired to dedicated ground rods driven into real earth.",
@@ -1035,6 +1020,7 @@
       "name": "Cut nnEMF, AC fields first",
       "summary": "Reduce nnEMF (\"non-native,\" man-made electromagnetic fields), dealing with low-frequency AC magnetic fields first.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "For any chronic problem, first look for AC magnetic fields under 100 kHz (wiring, appliances) and artificial blue light.",
         "Measure before mitigating, ideally with a credentialed assessor; cheap fixes do little.",
@@ -1080,6 +1066,7 @@
       "name": "Low-EMF, daylit work space",
       "summary": "Work in daylight with as few AC magnetic sources nearby as possible.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Move wiring, power supplies and appliances away from where you sit.",
         "Keep the laptop off your lap and the phone out of your pocket.",
@@ -1117,6 +1104,7 @@
       "name": "North–south bed",
       "summary": "Align the bed along the north–south geomagnetic axis, head to the north.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Find magnetic north with a compass.",
         "Turn the bed so its long axis runs north–south, head at the north end, and give it a full 8-hour night.",
@@ -1149,6 +1137,7 @@
       "name": "Magnetic sleep pad (Magnetico) guidance",
       "summary": "When a static magnetic sleep pad is worth using, and how to use one.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Choose a high-strength pad: about 20 gauss (such as the Magnetico Super Sleep Pad) rather than 5 gauss.",
         "Sleep on it all night — a full 8 hours in field-decline areas — not in short bursts.",
@@ -1194,6 +1183,7 @@
       "name": "Basalt stone and copper ring (passive alternative to TENS)",
       "summary": "Current-free alternatives to electrical nerve stimulation: basalt against the skull, an open copper ring, or a stone in the pillow.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Ground yourself first.",
         "Rest a smooth black basalt stone (or volcanic clay) on the bony ridge behind the ear (occipitomastoid suture) or on the side of the temple (pterion).",
@@ -1237,6 +1227,7 @@
       "name": "Flying and travel",
       "summary": "Fly as little as possible, and limit the harm when you must.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Skip unneeded flights, especially long east–west ones over the Atlantic and the SAA.",
         "When seriously ill, heal locally first rather than flying to treatment. Don't fly with a headache or other acute illness if you're already deuterium-loaded, and de-frag a sick person locally before putting them on a plane.",
@@ -1281,6 +1272,7 @@
       "name": "Space-weather days",
       "summary": "On days of strong solar or geomagnetic activity, ground longer than usual and keep strict morning habits.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Watch forecasts for M- and X-class solar flares and geomagnetic storms; brace for the 48 hours after big flares.",
         "Ground longer than your usual 20–60 minutes on storm days.",
@@ -1322,6 +1314,7 @@
       "name": "Air-tube headphones, never Bluetooth",
       "summary": "Listen through wired, shielded air-tube headphones or a speaker, never Bluetooth.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "For all audio, including sound routines, use air-tube headphones or a room speaker.",
         "Never use Bluetooth headphones or AirPods.",
@@ -1353,6 +1346,7 @@
       "name": "Live outdoors, not as an \"astronaut on Earth\"",
       "summary": "Spend your days outdoors on real ground, and raise children the same way.",
       "pillar": "magnetism",
+      "group": null,
       "steps": [
         "Move as much of daily life outdoors as you can.",
         "Take slow walks among green plants and trees.",
@@ -1395,6 +1389,7 @@
       "name": "Sleep sanctuary",
       "summary": "Make the bedroom cold, totally dark, grounded and wireless-free.",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "steps": [
         "Switch off Wi-Fi, routers and all wireless devices before sleep, and keep devices out of the room.",
         "Turn the lights off at a reasonable hour and make the room totally dark.",
@@ -1433,6 +1428,7 @@
       "name": "Cold thermogenesis",
       "summary": "Use daily cold exposure, more where sun is weak or the field poor, plus targeted ice on the head and neck.",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "steps": [
         "If you're new to it, add cold gradually, at sunrise or after dinner; not everyone needs it.",
         "Simplest daily option: each morning, 60–180 seconds of cold water on bare skin, cold enough that you want to get out but still safe (about 14 °C/57 °F) — a cold shower or plunge, or, if your heart is healthy, face dunking or an ice pack on face and neck. Northern lineages (such as H) at high latitude: a morning cold-water splash.",
@@ -1477,6 +1473,7 @@
       "name": "Exercise, environment first",
       "summary": "Move daily, outdoors and grounded, at moderate intensity — environment first, fitness second.",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "steps": [
         "Move every day in ways that drive blood, lymph and spinal-fluid flow; favor mechanical and gravitational loading.",
         "Mix aerobic intervals (such as uphill sprints) with steady effort, and keep strength work slow and controlled, without breath-holding or straining.",
@@ -1521,6 +1518,7 @@
       "name": "Home TENS / vagus protocol",
       "summary": "Settings and placements for gentle TENS (a skin-electrode nerve stimulator) on the vagus nerve or upper abdomen.",
       "pillar": "support",
+      "group": "vagus-sound",
       "steps": [
         "Use a unit with a biphasic, net-zero-charge waveform (not constant DC).",
         "Placement A: ear clip on the left tragus or concha (where the vagus branches into the ear), return pad on the same side's occipitomastoid suture (the bony ridge behind the ear).",
@@ -1562,6 +1560,7 @@
       "name": "Vagal toning with voice and sound",
       "summary": "Tone the vagus nerve daily with slow breathing, humming, gargling, massage, falling water and resonant sound.",
       "pillar": "support",
+      "group": "vagus-sound",
       "steps": [
         "Slow belly breathing, the main daily practice: in through the nose for 4 seconds, out gently for 8 seconds, for 5–10 minutes.",
         "Hum, chant \"OM\" or sing long tones on the exhale (about 4 s in, 6–8 s out). Before bed, hum, tone, throat-sing (Mongolian style) or strike a frame drum or gong; prefer live sources (voice, gongs, Himalayan bowls) to digital speakers and subwoofers.",
@@ -1609,6 +1608,7 @@
       "name": "Castor oil in the navel",
       "summary": "Put a few drops of castor oil in the navel every night at bedtime.",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "steps": [
         "Buy organic, cold-pressed, hexane-free castor oil.",
         "Every night before sleep, put 3–5 drops directly into the navel.",
@@ -1645,6 +1645,7 @@
       "name": "Tuning forks: 128 Hz and 40 Hz",
       "summary": "Use a 128 Hz fork on stiff or nerve areas and in the evening, and a 40 Hz fork in the morning and at lunch.",
       "pillar": "support",
+      "group": "vagus-sound",
       "steps": [
         "Strike the fork and press its stem against the body.",
         "For pain or stiffness: 128 Hz on stiff joints (such as ankles), along the sciatic nerve or along the vagal path.",
@@ -1689,6 +1690,7 @@
       "name": "Binaural sleep glide",
       "summary": "Play theta, then delta, binaural beats before and while falling asleep.",
       "pillar": "support",
+      "group": "vagus-sound",
       "steps": [
         "About 20 minutes before bed, play theta beats (4–7 Hz).",
         "While falling asleep, switch to pure delta (0.5–3.5 Hz).",
@@ -1718,6 +1720,7 @@
       "name": "Mastic gum and palate reset",
       "summary": "Chew mastic gum daily, the first step for a blocked nose, and pair it with a 40 Hz fork on the palate.",
       "pillar": "support",
+      "group": "vagus-sound",
       "steps": [
         "Get real mastic gum, not falim gum. For gum (periodontal) disease, use the hard resin.",
         "Chew it daily, more on the right side than the left.",
@@ -1762,6 +1765,7 @@
       "name": "Sinus-clearing routine",
       "summary": "A four-part routine for a blocked sinus or hay fever: humming, positioning, CO₂ breathing and morning grounding.",
       "pillar": "support",
+      "group": "breathing",
       "steps": [
         "Sit upright with your mouth shut, breathe in through the nose, then hum low (\"OM\" or \"MMMM\") on each exhale, aiming the vibration at the blocked side, for 5–10 minutes.",
         "Lie on the opposite side so the blocked side faces up, head tilted about 45° down, for 5–7 minutes of slow, quiet nasal breathing.",
@@ -1792,6 +1796,7 @@
       "name": "Nasal and alternate-nostril breathing",
       "summary": "Breathe through the nose day and night, with alternate-nostril breathing and breath holds.",
       "pillar": "support",
+      "group": "breathing",
       "steps": [
         "Stop mouth breathing: lips closed, breathing through the nose day and night; tape the mouth at night.",
         "Practice alternate-nostril breathing.",
@@ -1828,6 +1833,7 @@
       "name": "Rhythmic CO₂ pulses (Ryman protocol)",
       "summary": "Alternate normal air and CO₂-enriched air every 35 seconds for 30 minutes.",
       "pillar": "support",
+      "group": "breathing",
       "steps": [
         "Set up a source of CO₂-raised air.",
         "Switch between room air and the CO₂-raised air every 35 seconds.",
@@ -1856,6 +1862,7 @@
       "name": "Buteyko under-breathing and sauna CO₂",
       "summary": "Raise carbon dioxide gently by breathing less, and use a traditional sauna.",
       "pillar": "support",
+      "group": "breathing",
       "steps": [
         "Cut breathing volume: light, slow, quiet nasal breaths.",
         "Aim for arterial CO₂ of about 40–45 mmHg while oxygen saturation stays normal.",
@@ -1894,6 +1901,7 @@
       "name": "Shoreline sunrise wave breathing",
       "summary": "Breathe breaking-wave spray at the shoreline each morning at sunrise.",
       "pillar": "support",
+      "group": "breathing",
       "steps": [
         "Go to the surf line at sunrise.",
         "Breathe the spray of the breaking waves, and swim in the ocean every morning if you can.",
@@ -1936,6 +1944,7 @@
       "name": "Volcano Protocol",
       "summary": "A combined routine for spinal \"lattice lock\": water jet and 40 Hz fork on the spine, carbonated water with DDW, sauna, and sunrise grounding on volcanic ground.",
       "pillar": "support",
+      "group": "other",
       "steps": [
         "Live or stay somewhere pinned and low-latitude on the Pacific Rim.",
         "Aim a high-power water jet at the mid and lower back (thoracic spine, T5–T12).",
@@ -1976,6 +1985,7 @@
       "name": "Hypnosis session",
       "summary": "Use hypnosis or self-hypnosis as a \"de-frag\" session, set up with water and grounding and followed by the fork and water jet.",
       "pillar": "support",
+      "group": "other",
       "steps": [
         "Learn hypnosis or self-hypnosis (or deep autogenic training).",
         "About 15 minutes before a session, drink a glass of DDW or carbonated water.",
@@ -2009,6 +2019,7 @@
       "name": "HRV and personal scorecard",
       "summary": "Track heart-rate variability (HRV — the beat-to-beat variation in heart timing), above all in deep sleep, plus a few simple markers and a daily journal.",
       "pillar": "support",
+      "group": "other",
       "steps": [
         "Track HRV during deep sleep as your main progress gauge; flexible, rising HRV is the goal.",
         "Treat rigid, flat HRV as a warning sign of lattice lock; chronic congestion and a lost sun-sneeze reflex are others.",
@@ -2052,46 +2063,11 @@
       ]
     },
     {
-      "id": "moon-cycle-routine",
-      "name": "Moon-cycle routine (\"Phase 4\")",
-      "summary": "A routine for re-syncing body rhythms to moon, sun and ground, written to restore the menstrual cycle, with a version for men.",
-      "pillar": "support",
-      "steps": [
-        "After sunset, keep strict darkness (or full blue blocking) and minimal artificial light, strictest in the 3–5 days around the full moon.",
-        "Get morning sun daily; optionally spend time in natural moonlight on clear nights.",
-        "Ground barefoot (or on a conductive mat) 20–60 minutes a day, more around full and new moons and during solar or geomagnetic storms.",
-        "Spend time in stronger-field places when you can.",
-        "Move daily, breathe through the nose and practice breath holds.",
-        "Sleep cool and dark, and add cold exposure.",
-        "Over 2–3 lunar cycles, track HRV, mood, cycle, salivary D/H and BOLT breath-hold scores.",
-        "Men follow the same routine."
-      ],
-      "equipment": "optional",
-      "equipmentDetail": "none (optional HRV monitor, conductive mat)",
-      "cautions": null,
-      "articleIds": [
-        "fertility-cycles-voltage"
-      ],
-      "sources": [
-        {
-          "label": "378976",
-          "url": "https://forum.jackkruse.com/posts/378976/"
-        },
-        {
-          "label": "378974",
-          "url": "https://forum.jackkruse.com/posts/378974/"
-        },
-        {
-          "label": "378967",
-          "url": "https://forum.jackkruse.com/posts/378967/"
-        }
-      ]
-    },
-    {
       "id": "time-expansion-novelty",
       "name": "Slow time down with novelty",
       "summary": "Counter the sense that time is speeding up with novelty, reflection and slow breathing in the sun.",
       "pillar": "support",
+      "group": "other",
       "steps": [
         "Add novelty: new routes, hobbies, learning.",
         "Journal or practice mindfulness.",
@@ -2129,6 +2105,7 @@
       "id": "mitochondria-quantum-devices",
       "title": "Mitochondria as light- and field-driven electronics",
       "pillar": "support",
+      "group": "body-model",
       "summary": "Kruse treats each mitochondrion as an antenna, circuit and particle accelerator tuned by sunlight and Earth's magnetic field, not just a chemical furnace that burns food.",
       "sections": [
         {
@@ -2207,6 +2184,7 @@
       "id": "field-genes-telomeres",
       "title": "The field, the genes and the clock in the cell",
       "pillar": "support",
+      "group": "body-model",
       "summary": "In his model the environment sets the physics, the physics sets how genes behave, and DNA carries physical \"mass\" that light and the daily clock must keep low.",
       "sections": [
         {
@@ -2285,6 +2263,7 @@
       "id": "landauer-erasure",
       "title": "Information, erasure and the chromosome 2 \"safe mode\"",
       "pillar": "support",
+      "group": "body-model",
       "summary": "Kruse frames disease as lost information rather than low energy: corrupted proteins and falling voltage are \"erased\" at a cost in heat, and under enough stress a fuse on chromosome 2 drops the body into a primitive safe mode.",
       "sections": [
         {
@@ -2371,6 +2350,7 @@
       "id": "water-160-vs-78",
       "title": "Water: the \"160 vs 78\" battery",
       "pillar": "water",
+      "group": null,
       "summary": "Kruse says healthy mitochondrial water is structured, with a dielectric he numbers at 160, and disease collapses it to ordinary bulk water at 78; the healthy state is set at conception and held up by potassium, light and a strong field.",
       "sections": [
         {
@@ -2455,6 +2435,7 @@
       "id": "magnetic-excursion-oxygen",
       "title": "Oxygen's spin and the paramagnetic gate",
       "pillar": "magnetism",
+      "group": null,
       "summary": "In his model Earth's field keeps oxygen in its safe triplet state at the end of the electron chain, and a weakening field flips it to reactive singlet oxygen, leaving cells starved even when blood oxygen looks normal.",
       "sections": [
         {
@@ -2543,6 +2524,7 @@
       "id": "marcus-theory-inverted-region",
       "title": "Marcus inversion and the Warburg shift",
       "pillar": "support",
+      "group": "body-model",
       "summary": "Kruse's core failure state: electron transfer stalls in Marcus's \"inverted region,\" and cells retreat to fermentation as a protective emergency mode.",
       "sections": [
         {
@@ -2625,6 +2607,7 @@
       "id": "pin-first",
       "title": "Pin first: magnetism, gravity and \"spaceflight sickness without the rocket\"",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse ranks magnetism ahead of light and water and says chronic illness behaves like spaceflight, so magnetic pinning must come before diet, exercise or drugs.",
       "sections": [
         {
@@ -2705,6 +2688,7 @@
       "id": "lattice-lock",
       "title": "Lattice lock",
       "pillar": "water",
+      "group": null,
       "summary": "His name for the end state of water collapse: body water stiffens and loads with deuterium, the energy motor jams, and the cell can no longer make its own light water or use sunlight; it can build slowly or strike suddenly.",
       "sections": [
         {
@@ -2796,6 +2780,7 @@
       "id": "sunrise-why",
       "title": "Sunrise: dawn UV-A and the master clock",
       "pillar": "light",
+      "group": null,
       "summary": "Kruse says dawn light — UV-A near 380 nm plus red and near-infrared, taken in through bare eyes and skin — is the master signal that sets the body's clocks and readies its energy machinery for the day.",
       "sections": [
         {
@@ -2868,6 +2853,7 @@
       "id": "solar-noon-vitamin-d",
       "title": "Midday UV-B and vitamin D",
       "pillar": "light",
+      "group": null,
       "summary": "In Kruse's model, UV-B and the vitamin D it makes in skin are part of a coded light-and-magnetic-field system with a built-in safety cutoff that pills bypass, and the local field, latitude and season limit how much vitamin D sunlight can make.",
       "sections": [
         {
@@ -2956,6 +2942,7 @@
       "id": "solar-callus",
       "title": "The four-phase sun day and the \"solar callus\"",
       "pillar": "light",
+      "group": null,
       "summary": "Kruse's account of how a person, especially one from a northern maternal lineage, builds tolerance to strong sun by stepping through the day's wavelengths from sunrise to sunset, and why place and altitude change the pace.",
       "sections": [
         {
@@ -3021,6 +3008,7 @@
       "id": "red-nir-light",
       "title": "Red and near-infrared: the sun first",
       "pillar": "light",
+      "group": null,
       "summary": "Kruse values red and near-infrared light highly — it rebuilds cell water, restarts the energy chain and lowers blood sugar — but says it cannot fix an unpinned body on its own, and that the sun is its only complete source.",
       "sections": [
         {
@@ -3101,6 +3089,7 @@
       "id": "melanin-semiconductor",
       "title": "Melanin: the body's solar semiconductor",
       "pillar": "light",
+      "group": null,
       "summary": "Kruse treats melanin as a light-driven semiconductor, spin filter and metal and deuterium trap that daily UV-A and a stable magnetic field must renew, and sees its breakdown as a root of many diseases.",
       "sections": [
         {
@@ -3193,6 +3182,7 @@
       "id": "blue-light-hygiene",
       "title": "Blue light, LEDs and screens",
       "pillar": "light",
+      "group": null,
       "summary": "Kruse blames blue-dominant indoor light and screens, stripped of red and infrared, for damage to the body clock, eyes and metabolism, and calls screen life \"reality subtraction.\"",
       "sections": [
         {
@@ -3274,6 +3264,7 @@
       "id": "deuterium-and-water",
       "title": "Deuterium and what to drink",
       "pillar": "water",
+      "group": null,
       "summary": "Kruse says healthy mitochondria make their own deuterium-depleted water, that deuterium can only be excreted and should be controlled rather than erased, and that it matters most once magnetic or electrical interference has already damaged the cell's engine.",
       "sections": [
         {
@@ -3360,6 +3351,7 @@
       "id": "deuterium-atp-synthase",
       "title": "How deuterium jams the motor",
       "pillar": "water",
+      "group": null,
       "summary": "Kruse's account of how deuterium harms the cell: it scrambles electron spin, pays a heavy energy \"tax\" to move, chokes Complex I, makes the ATP synthase motor stutter and stiffens the water around it.",
       "sections": [
         {
@@ -3444,6 +3436,7 @@
       "id": "co2-brain-clearance",
       "title": "Carbon dioxide: breath, sauna and carbonated water",
       "pillar": "water",
+      "group": null,
       "summary": "Kruse treats carbon dioxide as a brain protector and deuterium flush, raised by gentle under-breathing, rhythmic CO₂ pulses, sauna and naturally carbonated water.",
       "sections": [
         {
@@ -3536,6 +3529,7 @@
       "id": "seafood-meal",
       "title": "Seafood, DHA and careful iodine",
       "pillar": "support",
+      "group": "food",
       "summary": "Kruse favors wild seafood for DHA and minerals, prefers cold, well-mixed waters such as the Pacific Northwest, accepts antioxidants only within whole marine food, and says iodine is safe only for someone who is pinned.",
       "sections": [
         {
@@ -3620,6 +3614,7 @@
       "id": "early-dinner",
       "title": "Meal timing and the heme clock",
       "pillar": "support",
+      "group": "food",
       "summary": "Kruse says when, and under what light, you eat drives diabetes more than what you eat, through a heme-based clock that should switch off the liver's night-time sugar output.",
       "sections": [
         {
@@ -3680,6 +3675,7 @@
       "id": "food-substrate-isotopes",
       "title": "Food: substrate, isotopes and local information",
       "pillar": "support",
+      "group": "food",
       "summary": "Kruse says food supplies fuel and isotopes but not the magnetic field the cell needs; he favors fat over glucose, low-deuterium plant parts and fresh local food, and rejects any diet as a fix for a location problem.",
       "sections": [
         {
@@ -3769,6 +3765,7 @@
       "id": "adipose-capacitor",
       "title": "Fat as a capacitor: obesity, fasting and the buffer",
       "pillar": "support",
+      "group": "food",
       "summary": "Kruse treats body fat as an electrical capacitor and deuterium store that protects heart and brain, so stripping it, or dry fasting without enough of it, backfires; obesity, in his view, is an efficiency failure rather than a calorie surplus.",
       "sections": [
         {
@@ -3854,6 +3851,7 @@
       "id": "earth-field-vs-geology",
       "title": "Field direction, local geology and what global maps miss",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says cells respond to the direction of the local magnetic field and how fast it is changing, not its average strength, and that global field models and ground readings smooth those local changes away.",
       "sections": [
         {
@@ -3938,6 +3936,7 @@
       "id": "barefoot-earth",
       "title": "Grounding, and why the ground matters",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says barefoot contact with conductive earth feeds the body electrons that keep oxygen in its safe state, but how much it helps depends on the ground, your posture and the local magnetic field.",
       "sections": [
         {
@@ -4014,6 +4013,7 @@
       "id": "volcanic-basalt-pinning",
       "title": "Volcanic ground, basalt and passive anchors",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says magnetic volcanic rock locks in a flat local field and holds water and clouds in place, so grounding on basalt beats any device, and passive stone or copper anchors beat powered ones.",
       "sections": [
         {
@@ -4101,6 +4101,7 @@
       "id": "choosing-a-location",
       "title": "Choosing a place to live",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse calls location the final arbiter of mitochondrial health and gives three field numbers, a way to read the declination map, geology to avoid and on-the-ground tests for choosing it.",
       "sections": [
         {
@@ -4190,6 +4191,7 @@
       "id": "electroculture-food",
       "title": "Electroculture: growing food in a weakening field",
       "pillar": "support",
+      "group": "food",
       "summary": "Kruse says a weakening magnetic field and deuterium-heavy water are cutting crop yields, and that electroculture, basalt and low-deuterium water can keep food growing where the field still holds, while melanized fungi keep the rain coming.",
       "sections": [
         {
@@ -4262,6 +4264,7 @@
       "id": "haplogroup-zipcode",
       "title": "Haplogroup and the \"magnetic zipcode\"",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says your maternal mitochondrial lineage sets the gearing of your energy engine and so decides which local field and sun suit you, and a mismatch speeds aging.",
       "sections": [
         {
@@ -4331,6 +4334,7 @@
       "id": "magnetosphere-saa-deuterium",
       "title": "The South Atlantic Anomaly, muons and failing regions",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says Earth's weakening field, worst under the expanding South Atlantic Anomaly and across the Southern Hemisphere, lets in particles that load the body with deuterium, and names the regions he sees failing.",
       "sections": [
         {
@@ -4415,6 +4419,7 @@
       "id": "solar-flares-space-weather",
       "title": "Solar storms, the Schumann signal and the \"thalamic GPS\"",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says the thalamus works as a position sensor locked to Earth's field and resonance, which solar storms and high declination knock out of alignment, with effects on sleep, mood, hearing and even earthquakes.",
       "sections": [
         {
@@ -4495,6 +4500,7 @@
       "id": "geomagnetic-excursions-evolution",
       "title": "The planet's story: excursions, the magnetic forge and volcanic CO₂",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse reads Earth's field history — excursions, ozone, oxygen, oceans and volcanoes — as the large-scale version of the physics that runs the cell.",
       "sections": [
         {
@@ -4577,6 +4583,7 @@
       "id": "reduce-nnemf-block",
       "title": "nnEMF: wireless, wiring and the \"hyper-local excursion\"",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says man-made electromagnetic fields jam cell signalling, scramble electron spins, push heavy-hydrogen fuel into the cell and act like a local magnetic excursion, with low-frequency AC fields the first thing to check.",
       "sections": [
         {
@@ -4659,6 +4666,7 @@
       "id": "nature-contact",
       "title": "Astronauts on Earth: indoor, high-rise and airborne life",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse says people living indoors, high above the ground, sealed in steel or in frequent flight are cut off from sun and field like astronauts, children most of all.",
       "sections": [
         {
@@ -4721,6 +4729,7 @@
       "id": "magnetico-sleep-pad",
       "title": "Magnets, pads and powered devices",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse's view of static magnetic pads and stimulation devices: sometimes useful stand-ins for a lost field, but always behind location, sun and grounding.",
       "sections": [
         {
@@ -4797,6 +4806,7 @@
       "id": "field-proxies",
       "title": "Reading the field at home and in the body",
       "pillar": "magnetism",
+      "group": null,
       "summary": "Kruse's do-it-yourself readouts of a place's magnetic quality and the body's state: beeswax candles, mosquitoes, clouds, animals, tans, blood markers, heart-rate variability and a personal scorecard.",
       "sections": [
         {
@@ -4875,6 +4885,7 @@
       "id": "sleep-space",
       "title": "Sleep sanctuary",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "summary": "Kruse calls insomnia a light-and-magnetic hardware failure, so the bedroom must be dark, cold, grounded, wireless-free and aligned with the field.",
       "sections": [
         {
@@ -4928,6 +4939,7 @@
       "id": "myelin-sleep-battery",
       "title": "Sleep in his model: adenosine, myelin and the nightly flip",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "summary": "Kruse explains sleep as the nightly recharge of an electrical grid: adenosine signals the membrane is tiring, myelin recharges as a proton battery, the brain flips polarity to purge deuterium, and how you wake shows whether it worked.",
       "sections": [
         {
@@ -4997,6 +5009,7 @@
       "id": "cold-thermogenesis-skin-50",
       "title": "Cold thermogenesis and the brain's fluid vortex",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "summary": "Kruse calls cold a \"quantum vice\" that compresses tissue to keep deuterium out — an override for poor sun or field, with lineage and timing caveats.",
       "sections": [
         {
@@ -5073,6 +5086,7 @@
       "id": "morning-movement",
       "title": "Movement, and when exercise becomes a toxin",
       "pillar": "support",
+      "group": "sleep-cold-movement",
       "summary": "Kruse supports daily outdoor movement but says exercise turns harmful when the body is deuterium-loaded or unpinned, or when it happens in sealed, high-CO₂ gyms, so environment comes before fitness.",
       "sections": [
         {
@@ -5153,6 +5167,7 @@
       "id": "vagus-nerve-stimulation",
       "title": "The vagus nerve: deuterium drain and its stimulation",
       "pillar": "support",
+      "group": "vagus-sound",
       "summary": "Kruse calls the vagus nerve the body's main deuterium drain, draws on what he saw when surgeons cut it, and tunes it with voice, sound and gentle stimulation, with firm guardrails on devices.",
       "sections": [
         {
@@ -5247,6 +5262,7 @@
       "id": "tuning-forks",
       "title": "Tuning forks, binaural beats and sound",
       "pillar": "support",
+      "group": "vagus-sound",
       "summary": "Kruse treats sound and vibration as low-risk inputs that recharge the body's piezoelectric tissues, using two tuning forks, analog drums and bowls, humming, and a binaural sleep glide.",
       "sections": [
         {
@@ -5328,6 +5344,7 @@
       "id": "nasal-nitric-oxide",
       "title": "The nose, palate and teeth",
       "pillar": "support",
+      "group": "breathing",
       "summary": "Kruse calls the sinuses the body's nitric-oxide factory and an early-warning system, and treats congestion, palate, sleep-airway and dental choices through that lens.",
       "sections": [
         {
@@ -5414,6 +5431,7 @@
       "id": "jade-maya-skull",
       "title": "Jade, the Maya and the solid-state skull",
       "pillar": "support",
+      "group": "vagus-sound",
       "summary": "Kruse reads the Maya's jade tooth inlays as a solid-state tool that kept teeth light-filled and decay-free, grounded the skull and helped the brain shed deuterium as the field failed, and he suggests jade against the temple as a test for some migraines.",
       "sections": [
         {
@@ -5476,6 +5494,7 @@
       "id": "lattice-lock-release",
       "title": "Releasing lattice lock: Volcano Protocol, hypnosis and shoreline air",
       "pillar": "support",
+      "group": "other",
       "summary": "Kruse's routines for releasing lattice lock: a body-scale copy of the planet's volcanic response, a water-and-salt flush, hypnosis working from the top down, and sunrise sea spray.",
       "sections": [
         {
@@ -5570,6 +5589,7 @@
       "id": "time-and-consciousness",
       "title": "Time, mind and consciousness",
       "pillar": "support",
+      "group": "body-model",
       "summary": "Kruse ties the felt speed of time, memory, wisdom, belief and consciousness to light, water and oxygen's spin in the brain.",
       "sections": [
         {
@@ -5654,6 +5674,7 @@
       "id": "atomic-impurities",
       "title": "Drugs and supplements as \"atomic impurities\"",
       "pillar": "support",
+      "group": "body-model",
       "summary": "Kruse says foreign compounds add electron traps to the body's semiconductors, that some drugs only seem to work in a deuterium-loaded body, and that pills skip the light-driven steps that make the body's own versions work.",
       "sections": [
         {
@@ -5744,6 +5765,7 @@
       "id": "centralized-medicine",
       "title": "His critique of \"centralized medicine\"",
       "pillar": "support",
+      "group": "body-model",
       "summary": "Kruse argues that modern medicine dropped physics for biochemistry and drugs, recast the sun as a hazard, and urges members to verify for themselves and act on light, field and ground.",
       "sections": [
         {
@@ -5819,1104 +5841,6 @@
         {
           "label": "372807",
           "url": "https://forum.jackkruse.com/posts/372807/"
-        }
-      ]
-    },
-    {
-      "id": "cancer-voltage",
-      "title": "Cancer as a voltage failure",
-      "pillar": "support",
-      "summary": "Kruse says any lasting fall in the voltage of the mitochondria's inner membrane can produce cancer, a protective retreat and an electrical short circuit that the environment, not drugs, must reverse.",
-      "sections": [
-        {
-          "body": "Kruse sees cancer as an electrical failure rather than mainly a genetic one. In his model the cell's power plants, the mitochondria, hold a strong charge across their inner membrane, and anything that lets that voltage sag for long enough can tip a cell into cancer; he even names the fields around wind turbines, given years of exposure. The tumor, to him, is a retreat the cell makes to survive, so the fix lies in restoring the environment rather than in drugs."
-        },
-        {
-          "heading": "How a cell falls into cancer",
-          "body": "Kruse describes a healthy cell at about −70 millivolts and a failing one at −15 to −30. At that lower level, he says, a gate in the inner membrane (UCP-2) loses the voltage that keeps it sealed. Water rich in deuterium, a heavy form of hydrogen with an extra neutron, then floods the mitochondria's interior.\n\nIn his account deuterium's extra mass brakes ATP synthase, the spinning motor that makes the cell's energy currency, ATP. Complex IV, the last step of the energy chain, then stops making the cell's own clean, low-deuterium water. Without that water the field across the inner membrane short-circuits.\n\nHe traces the slide one step further back as well. NAD+, the carrier that ferries electrons into the energy chain, can pick up deuterium in place of light hydrogen, and once that buffer is lost oxygen turns reactive, the membrane charge drops, and deuterium floods first the cell's fluid and then the mitochondria's interior. The share of damaged mitochondrial DNA in the cell (its heteroplasmy) climbs as this happens.\n\nThe cell then falls back on fermentation, the ancient oxygen-free way of burning sugar, and begins dividing out of control. This switch is called the Warburg shift, after Otto Warburg, who saw cancer as damaged respiration rather than mutation; Kruse says his voltage model completes Warburg's picture, and he calls cancer an atavism, a throwback to an older way of living, rather than a disease."
-        },
-        {
-          "heading": "The \"matrix fire\" and its causes",
-          "body": "Kruse calls the stalled interior a \"matrix fire.\" Oxygen that can't be used cleanly flips into singlet oxygen, a reactive form that attacks membranes and DNA, and the faint light cells naturally give off (ultra-weak photon emission) turns into chaotic noise. The growth pathways cancer drugs target (PI3K, Akt, mTOR) are, in his reading, readouts of that fire, not its cause.\n\nHe names four things that uncouple Complex IV: missing near-infrared light; nnEMF (non-native electromagnetic fields from wireless devices and wiring); deuterium; and the wrong copper isotope, since he says Complex IV is built to run on heavy copper-65. Like weight gain, he suggests, cancer can be a \"safe mode\": a lower-energy state that staves off sudden organ failure and buys time, which can be won back once the interference is removed."
-        },
-        {
-          "heading": "A body-wide electrical circuit",
-          "body": "Kruse draws support from Björn Nordenström, a radiologist at Sweden's Karolinska Institute who built on Robert O. Becker's work. Nordenström described a second circulation in the body, an electrical one running through blood vessels and the fluid between cells, which he called \"biologically closed electric circuits.\" Between 1978 and 1983 he treated lung and breast tumors by inserting electrodes and passing a weak direct current, which drew white blood cells to the tumor and shut down its blood supply.\n\nChinese doctors later used this \"electrochemical therapy\" on more than 10,000 patients, Kruse notes, reporting success above 70% in some solid tumors, while Western medicine looked away. He tells a similar story about Georges Lakhovsky, who in 1925 at the Salpêtrière hospital in Paris infected geraniums with a tumor-causing bacterium; the one plant circled by an open copper ring shed its tumor while the rest died. Work like this was buried, he says, because a copper ring is free and chemotherapy is not. To him it confirms cancer as a bioelectric short circuit."
-        },
-        {
-          "heading": "Magnetism, the brain and the night",
-          "body": "Magnetism sits at the root of his model. Kruse says oxygen keeps its safe, stable form (triplet oxygen) only when a person is \"pinned\": grounded, sunlit and living under a stable local magnetic field. His shortest chain for glioma, a brain tumor, is no pinning, then singlet oxygen, then glioma. Glioblastoma, he argues, starts when foreign magnetic fields break the junctions that link mitochondria into one network, and restoring that connection can extend survival beyond what doctors expect.\n\nBecause Earth's field is weakening, he expects a magnetic excursion (a large, rapid drop and shift in the field) to drive many cancers. Without spin pinning, chromosomes misalign as cells divide, and the mutations oncology tracks are debris left by that failure.\n\nHe reads Australia's melanoma epidemic as an early example. It began on the west of the continent and has spread to the Sydney coast, which he ties to the South Atlantic Anomaly (SAA), a vast and growing weak patch in Earth's field now reaching into the Indian Ocean. The skin's layered network of small arteries works, in his model, as a \"distal refinery\" that sheds heat and deuterium through cold and sweat. Once those vessels lose their melanin, the light-absorbing pigment, they can no longer shield the skin's mitochondria from the combined load of light and nnEMF, and melanoma follows.\n\nNight is part of the picture. Citing studies from Russel Reiter's group, Kruse says cancer cells drift back toward normal oxygen-burning at night, when mitochondria release melatonin, and return to fermentation by day. He calls this nightly repair \"magnetic chemotherapy,\" and says light at night switches it off."
-        },
-        {
-          "heading": "In practice",
-          "body": "His priorities for cancer and glioma: get magnetically pinned first; ground; take natural UV-A and infrared sunlight and don't fear UV-B; remove nnEMF; and for glioma, sleep in a cold bedroom. At high latitudes, he adds, naturally low-deuterium water won't protect someone who lives indoors under artificial light. He believes UV-A light, life on a zero-declination line and tree resins such as mastic gum, which he says are naturally low in deuterium, can help turn cancer cells back from fermentation toward normal respiration. He calls a ketogenic diet unwise as a cancer strategy because many aggressive tumors (prostate, glioblastoma, triple-negative breast) burn fat too, so cutting glucose alone can select fat-burning clones. Nor does he see drugs as the main answer, pointing to a 15-year Oxford trial in the *New England Journal of Medicine* in which surgery or radiation for localized prostate cancer did not lengthen survival compared with monitoring."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "385641",
-          "url": "https://forum.jackkruse.com/posts/385641/"
-        },
-        {
-          "label": "378783",
-          "url": "https://forum.jackkruse.com/posts/378783/"
-        },
-        {
-          "label": "379984",
-          "url": "https://forum.jackkruse.com/posts/379984/"
-        },
-        {
-          "label": "382301",
-          "url": "https://forum.jackkruse.com/posts/382301/"
-        },
-        {
-          "label": "378767",
-          "url": "https://forum.jackkruse.com/posts/378767/"
-        },
-        {
-          "label": "385873",
-          "url": "https://forum.jackkruse.com/posts/385873/"
-        },
-        {
-          "label": "378207",
-          "url": "https://forum.jackkruse.com/posts/378207/"
-        },
-        {
-          "label": "382394",
-          "url": "https://forum.jackkruse.com/posts/382394/"
-        },
-        {
-          "label": "374830",
-          "url": "https://forum.jackkruse.com/posts/374830/"
-        },
-        {
-          "label": "383346",
-          "url": "https://forum.jackkruse.com/posts/383346/"
-        },
-        {
-          "label": "373641",
-          "url": "https://forum.jackkruse.com/posts/373641/"
-        },
-        {
-          "label": "371193",
-          "url": "https://forum.jackkruse.com/posts/371193/"
-        }
-      ]
-    },
-    {
-      "id": "diabetes-light-field",
-      "title": "Diabetes and blood sugar",
-      "pillar": "support",
-      "summary": "Kruse treats insulin resistance as a protective circuit breaker, and type 1 and type 2 diabetes and the dawn sugar rise as light, deuterium and magnetic problems rather than food problems.",
-      "sections": [
-        {
-          "body": "Kruse treats diabetes as a problem of light, deuterium and magnetism, not of food. In his model the pancreas is one of the body's main exits for deuterium, a heavy form of hydrogen that jams the cell's energy machinery, and diabetes follows when indoor light and an unstable magnetic environment block that exit. He holds that type 2 diabetes is reversible and that counting carbohydrates and insulin units treats only the surface."
-        },
-        {
-          "heading": "Insulin resistance as a circuit breaker",
-          "body": "Kruse calls insulin resistance a protective shield, not a defect: a circuit breaker that trips when a cell is offered more fuel than it can safely burn. Indoor spaces, he says, are dominated by blue light and magnetically \"dead,\" and running the cell's energy chain under that light upsets the electrons' spin, which drives insulin spikes. He puts high blood sugar and insulin down mainly to light and to a lack of \"pinning\" (being grounded under a stable local field), and says meal timing under LEDs drives type 2 diabetes more than food does.\n\nIn a low-field room full of nnEMF (wireless and wiring fields), he says, burning glucose is a \"dirty burn\" that throws off flares of the faint light cells emit and leaves deuterium behind. Extra fuel would stall ATP synthase, the cell's energy motor, and could tip the cell toward cancer, so refusing it is self-protection. Forcing glucose in with injected insulin is, in his phrase, a \"thermodynamic crime,\" like pushing more current through a transformer that is already shorting; he says it damages DNA and the melanin lining the blood vessels.\n\nThe shield works, in his account, through the glycerol-3-phosphate shuttle, a back-door route that carries hydrogen into the mitochondria. He says it runs only during insulin resistance and favors light hydrogen, so deuterium is left behind in the cell fluid instead of jamming the energy motor. He points to animals that use this on purpose: the bar-tailed godwit flying 11,000 km without food, and the naked mole-rat surviving without oxygen. High-dose insulin, by contrast, forces deuterium in; he calls it a \"biophysical degausser\" because it strips cell membranes of their charge.\n\nThe godwit, he adds, makes the flight with high blood sugar and full insulin resistance, burning its own fat and gut, yet performs at its peak. What protects it is the pecten oculi, a comb of blood vessels packed with melanin inside the bird's eye, which he calls a \"photonic heat sink\": it turns the metabolic noise of the flight into usable current and shields the bird's magnetic compass. Humans do the same, in his account, with the choroid plexus (the tissue that makes spinal fluid) and the retina's pigment layer. High sugar is survivable when that melanin shielding is intact, and diabetics, he says, have stripped theirs with nnEMF and blue light. Research on night-active mice misses this, because day-living birds and humans share a melanin-led clock.\n\nFat burning gives the cell another way to set sugar aside. Burning saturated fat, Kruse says, pushes electrons backward through Complex I, the energy chain's entry point, and an iron-sulfur sensor there reads this reverse electron flow as a signal to skip glucose and fructose. That is why, to him, high blood sugar in the cold can be healthy."
-        },
-        {
-          "heading": "The beta cell's jammed motor",
-          "body": "In type 2, Kruse says, the beta cell (the pancreas cell that makes insulin) is usually full of insulin but can't release it. Release needs a burst of energy from ATP synthase, the cell's rotary motor. Table sugar and corn syrup, which he says plants load with deuterium, eaten under blue light without balancing red light, break up the cell's structured water and let deuterium jam that motor. \"Beta-cell fatigue\" is therefore, to him, an isotope jam; left long enough, singlet oxygen (a reactive form of oxygen) damages the cell until the body removes it.\n\nThe pancreas normally clears deuterium through what he calls the vagal \"tailpipe.\" The vagus nerve drives an enzyme, carbonic anhydrase, to make bicarbonate, which binds deuterium and carries it out through the pancreatic ducts into the gut. Sugar under blue light, or a magnetic excursion, knocks the enzyme out of alignment and \"welds the tailpipe shut,\" so deuterium backs up into the beta cells.\n\nClearing that exhaust, Kruse argues, lets the cell resolve its own diabetes whatever the carbohydrate intake. Only once the flush runs, shown by a well-formed (Bristol type 4) stool, can beta cells make insulin again, so the key is clearing deuterium from the vagal nerves that serve them. He says sunlight lowers blood glucose by about 27%, that advanced type 2 patients have regained insulin secretion with deuterium depletion, and that beta-cell stem cells can recover through the light-driven repair Robert O. Becker described. Type 2 diabetics also lose less weight on GLP-1 drugs, he says, because their energy chain is already stalled (\"Marcus-inverted,\" pushed past the point where electrons can flow), so the drug strips muscle rather than fat."
-        },
-        {
-          "heading": "The dawn rise and a shifting field",
-          "body": "The morning rise in blood sugar, the \"dawn phenomenon,\" is in his reading a failure to catch the morning magnetic shift, not a hormone surge. At daybreak the upper atmosphere ionizes and the local field changes, and healthy cells use that wave to wake. A diabetic's damaged membranes can't capture it, so voltage drops and the liver dumps glucose to keep the cell's battery alive.\n\nKruse calls diabetics \"magnetic messes\" who all need an agonic line, a place where compass north and true north coincide, which he treats as the zone of most coherent field. As the poles move, these lines drift across continents, leaving people under a field their ancestry wasn't adapted to, and he expects a weakening field to \"mint\" millions of new diabetics.\n\nIndia is his main example. He has tracked India's diabetes alongside Australia's melanoma for about ten years and treats them as one disease of the South Atlantic Anomaly (SAA), the vast weak patch in Earth's field, which he believes has pushed into the southern Indian Ocean and reached the southern tip of India. A population that ate deuterium-rich staples for 5,000 years without diabetes now has about 170 million diabetics, and he notes new cases of both types among sun-rich, darkly pigmented people on the volcanic island of Réunion.\n\nThe damage, he says, travels through the pancreas's blood supply. Beta cells draw up to a fifth of the pancreas's blood flow from a dense capillary bed, much like the brain's, fed from the superior mesenteric artery, the main artery to the gut. A shifting field and nnEMF load that artery with deuterium and block the body's own melanin-making, \"bleaching\" the arterial tree even while the skin stays dark. He says surgeon friends in India found more disease in the aorta and this artery in diabetics, and he reads the rise in pancreatic cancer since 2015 as the same process with more deuterium."
-        },
-        {
-          "heading": "Type 1",
-          "body": "Type 1 he frames as a deuterium and magnetic problem too, worse at high latitudes and mildest near the equator. Blue light without sunlight's near-infrared can't be used, so the body stores the energy as deuterium in tissue and fat (\"mammals who turn blue light into fat\"), and the pancreas, a midline isotope regulator, stops filtering. Oxygen must stay in its stable triplet state at all times for beta cells to rebuild, he says, and mouth breathing undermines this by cutting nasal nitric oxide. Rising insulin needs despite sun, or a sunburn, mean too little pinning.\n\nEach insulin dose given without other routes forces more deuterium into cells, he says, which is why doctors now meet \"insulin-resistant type 1s,\" whose cells are so packed with heavy water that insulin can no longer open them. Type 1 children are often hyperactive, he adds, because their bodies are trying to make the movement-driven vibration a godwit uses in flight."
-        },
-        {
-          "heading": "The back door to glycogen",
-          "body": "For those other routes Kruse points type 1 families to Dr. G. Moody's book *The Back Door to Glycogen* (the \"Moody Method\"), which he treats as a record of thinking from before insulin became the only answer. Moody held that movement, heat and cold can carry sugar into storage as glycogen without insulin's \"hammer.\" Kruse reads the back door as chewing (his \"mastication pump\"), sunlight and cold, and he redefines type 1 as a lost flow of fluid through the brain's ventricles more than a missing hormone. Banting and Best's insulin won, in his telling, because a chemical path could be sold, in the same era that he ties the first modern wave of type 1 to the field shift after the Carrington Event.\n\nWhether and when beta cells restart can't be predicted, he says, even though the physics they need (unbroken light, water and magnetism) is known; childhood is the best window, before the pancreas becomes locked by deuterium. In children he reads red eyes as a good sign, deuterium leaving through the tear and eyelid glands, and a deep tan as beta cells making insulin again.\n\nHe accepts that light and field alone may not regrow beta cells the immune system has destroyed. For those cases he points to stem-cell-derived beta cells and plasmapheresis (filtering antibodies out of the blood plasma), each protected by sun and pinning."
-        },
-        {
-          "heading": "In practice",
-          "body": "For type 2 and the dawn rise, Kruse's protocol is to ground, strip out nnEMF (wireless and wiring fields) and take in solar infrared; to go out barefoot facing the sunrise during the morning magnetic shift, ideally on an agonic line; to use incandescent rather than LED light and a short burst of red light while grounded to blunt a spike; and to avoid sugar eaten under screens and LEDs. To clear the tailpipe he names copper resonance rings over the neck and solar plexus, or deuterium-depleted water (DDW) with 3% saline. For type 1 his protocol adds incandescent or red bulbs, bare-eyed sunrise, a red and near-infrared panel over the pancreas and brainstem, DDW, seasonal high-fat food with nothing after dark, cold water, and at least 90 minutes a day of barefoot grounding on an agonic line; he also recommends Moody's book and its back-door routes of chewing, sun and cold. He judges progress by a well-formed (Bristol type 4) stool more than by glucose readings, and in children by a deep tan."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "376120",
-          "url": "https://forum.jackkruse.com/posts/376120/"
-        },
-        {
-          "label": "376124",
-          "url": "https://forum.jackkruse.com/posts/376124/"
-        },
-        {
-          "label": "376123",
-          "url": "https://forum.jackkruse.com/posts/376123/"
-        },
-        {
-          "label": "374300",
-          "url": "https://forum.jackkruse.com/posts/374300/"
-        },
-        {
-          "label": "381130",
-          "url": "https://forum.jackkruse.com/posts/381130/"
-        },
-        {
-          "label": "383632",
-          "url": "https://forum.jackkruse.com/posts/383632/"
-        },
-        {
-          "label": "382349",
-          "url": "https://forum.jackkruse.com/posts/382349/"
-        },
-        {
-          "label": "381973",
-          "url": "https://forum.jackkruse.com/posts/381973/"
-        },
-        {
-          "label": "379494",
-          "url": "https://forum.jackkruse.com/posts/379494/"
-        },
-        {
-          "label": "379493",
-          "url": "https://forum.jackkruse.com/posts/379493/"
-        },
-        {
-          "label": "370864",
-          "url": "https://forum.jackkruse.com/posts/370864/"
-        },
-        {
-          "label": "371193",
-          "url": "https://forum.jackkruse.com/posts/371193/"
-        }
-      ]
-    },
-    {
-      "id": "heart-and-cholesterol",
-      "title": "Heart, cholesterol and arteries",
-      "pillar": "support",
-      "summary": "Kruse calls cholesterol the membrane's insulator and light sensor, treats ApoB, Lp(a) and homocysteine as signs of repair and sludge, and traces heart and artery disease to lost melanin, lost field and missing sun.",
-      "sections": [
-        {
-          "body": "Kruse rejects the idea that cholesterol causes heart disease. In his model cholesterol is the insulation and light sensor of cell membranes, and heart and artery disease come from broken-down melanin, a weakening magnetic field and too little sunlight. Forcing cholesterol down, to him, removes one of the body's defenders."
-        },
-        {
-          "heading": "Cholesterol as insulator and light sensor",
-          "body": "Kruse calls cholesterol the main stabilizer of the inner mitochondrial membrane: it sets how stiff and well insulated the membrane is, which lets it hold its strong electric field. Medicine pictures arteries as pipes clogged with grease; he pictures membranes as capacitors that store charge. When an ungrounded person under wireless signals and blue light loses the structure of their cell water, cells make more cholesterol to patch leaking membranes, so cholesterol arrives like a fireman, not an arsonist.\n\nIt is also, in his account, a light sensor. Sulfated cholesterol, carried mainly in HDL, is a \"summer antenna\" tuned to UV-B: when UV-B strikes it in the skin it makes vitamin D3 and releases charge. LDL is the sulfur-poor winter or indoor form that can't catch UV-B, so a high LDL signals light stress, with the liver making ever more LDL to catch energy it can't see.\n\nHe calls cholesterol a \"second magnetic fat\" alongside DHA (the omega-3 fat in seafood), the two working as a spin filter in membranes and nerves. He reads a Korean study of 12.8 million adults, and a review in *BMJ Open*, as showing that low cholesterol is the real danger, with the highest-cholesterol elderly living longest."
-        },
-        {
-          "heading": "Statins, ApoB and Lp(a)",
-          "body": "Statins, Kruse says, block the pathway that makes both cholesterol and CoQ10, an electron carrier in the energy chain. The membrane then loosens, its insulation leaks and its voltage collapses; he calls statins \"quantum de-magnetizers\" and links them to muscle pain and breakdown, memory loss and heart-rhythm problems. They also keep Complex IV, the energy chain's last enzyme, from reaching full efficiency, so a patient may dodge a heart attack now but, held in a low-energy fermenting state, later slide into amyloidosis (protein deposits in organs), ataxia (loss of coordination) or dementia.\n\nLp(a), a cholesterol particle cardiology now targets, he sees as an emergency patch the body sends to insulate a failing vessel wall. He cites a large trial in which a drug cut Lp(a) by 80–90% without reducing heart attacks or strokes, and sees no point in testing for it.\n\nApoB, the main protein on LDL particles, plays the same role. Stalled mitochondria give off flares of faint light that tell the nucleus to make more ApoB and Lp(a), which he calls \"dielectric patch kits\" for leaking water at the vessel wall; the sulfur bridges in Lp(a), he says, hold charge like a capacitor. Stripping these particles out with drugs is, to him, shooting the repair crew while the power plant burns."
-        },
-        {
-          "heading": "How arteries fail",
-          "body": "Heart attacks were barely recognized before about 1911, Kruse notes, and he ties the rise of heart disease to Earth's weakening field since the 1859 Carrington Event and to electrification. A healthy vessel lining, in his model, carries a strong negative charge that repels LDL, built from collagen, sulfated cholesterol and melanin (the dark pigment he treats as a light-to-electricity converter). A weakening field, wireless signals and blue LEDs strip that charge, the lining's nitric oxide output falls, and LDL slips under it.\n\nElastin, the springy protein that lets arteries recoil with each beat, works alongside melanin. Kruse notes that the same embryonic cells (the neural crest) give rise to both the nerves of the great vessels and the pigment cells that put melanin in them. Elastin acts as a spring tuned to the sun's infrared and melanin as a broad light-catcher, and together they carry the current that keeps the lining negative. Deuterium, a heavy form of hydrogen, lodged in elastin turns the spring into a brittle stick, so each heartbeat cracks the wall a little; rising ApoB is the body grouting the cracks, and this is how he believes peripheral artery disease (PAD), the narrowing of arteries outside the heart, begins.\n\nA high coronary calcium score despite good deuterium numbers, he says, means melanin loss, and the scan maps where melanin is missing from the arterial tree. Charged by light, melanin holds metals and calcium in solution, and light-activated vitamin K2 keeps calcium bound to its proteins. When nnEMF (non-native electromagnetic fields) and blue light make melanin drop its metals, calcium is left in the artery wall like a scab. A deuterium-loaded aorta, he adds, \"freezes\" into calcified scar to cut its energy costs, choosing what he calls \"the symmetry of the stone,\" and the organs it feeds inherit that stiffness. So calcified arteries and valves need the field restored, not calcium-channel blockers or peptides.\n\nHigh blood pressure is, to Kruse, the loss of a \"second pump\": blood moving through Earth's field is pushed along by a magnetic (Lorentz) force, and when that assist fades the heart has to push harder. Light at night, he adds, remodels the heart. In heart failure he points to a protocol pairing hypertonic (extra-salty) saline with the diuretic furosemide, credited with better urine output and kidney numbers and fewer deaths and readmissions; to him the salt works by raising the dielectric constant of blood water, its capacity to hold charge, toward the healthy value of 160, which matters more than removing fluid."
-        },
-        {
-          "heading": "Homocysteine and the blood's vortex",
-          "body": "Kruse says the four-chambered heart spins blood into a vortex that pushes deuterium out toward the vessel wall, helped by the lift Earth's field gives moving blood. When that field fails, homocysteine, an amino-acid by-product, pools as \"isotopic sludge\" and scrapes the lining like \"endothelial sandpaper,\" setting off the light flares that summon ApoB and Lp(a).\n\nHe treats raised homocysteine as a gauge both of a place's danger to mammals and of heart-attack risk, a \"Rosetta Stone\" for the heart. To him it means that chewing and the field's lift are not keeping blood moving well enough."
-        },
-        {
-          "heading": "The heart's own brain",
-          "body": "The heart has a \"little brain\" of its own. Citing Armour's mapping of the roughly 40,000 neurons of the intrinsic cardiac nervous system, Kruse says these cells sense how thick and deuterium-laden the blood entering the right atrium is and set the force and rate of each beat to keep the blood vortex fast enough. He calls the heart's magnetic field 60 times stronger than the brain's, and points to transplanted hearts, which beat without any vagus nerve input, as proof of its independence.\n\nHeart-rate variability (HRV), the beat-to-beat change in rhythm, is in his reading this mini-brain's direct readout, and it is the first thing to turn chaotic as the field weakens. Deuterium backing up from the gut can then load the heart's own nerves, and he ties sudden deaths of fit young people in Brazil, under the South Atlantic Anomaly (the large weak patch in Earth's field), to such a stall."
-        },
-        {
-          "heading": "One root with the brain",
-          "body": "Heart and brain disease share one root in his view: failure of the body's non-visual light sensing, the light sensors in skin and tissue outside the eye's vision. Strong sun on the chest lets skin melanin release adenosine, the same molecule emergency doctors use to reset a racing heart, which steadies rhythm. He says sunlight lowers Lp(a), ApoE and calcium scores. Atrial fibrillation set off through the vagus nerve he traces to a deuterium-loaded cardiac nerve plexus. Deuterium in the spinal fluid, he adds, is read by a sensor on the floor of the brainstem as a weaker signal, which turns the vagus down and primes the heart for atrial flutter."
-        },
-        {
-          "heading": "In practice",
-          "body": "His heart protocol: get full sun on the chest, and for a high calcium score combine UV light with grounding. Skip Lp(a) testing, don't push cholesterol below about 200 mg/dL, and take no statins during the field decline, even with familial hypercholesterolemia. He watches homocysteine as a better warning sign than cholesterol. For vagally triggered atrial fibrillation he suggests self-hypnosis to raise CO₂ and calm the cardiac plexus, or simple tricks such as rubbing the eyes, dunking the face in cold water and chewing mastic gum. For calcified arteries or valves, he says, restore the field and cut wireless and night LED light rather than adding drugs."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "383574",
-          "url": "https://forum.jackkruse.com/posts/383574/"
-        },
-        {
-          "label": "382563",
-          "url": "https://forum.jackkruse.com/posts/382563/"
-        },
-        {
-          "label": "375600",
-          "url": "https://forum.jackkruse.com/posts/375600/"
-        },
-        {
-          "label": "383206",
-          "url": "https://forum.jackkruse.com/posts/383206/"
-        },
-        {
-          "label": "384740",
-          "url": "https://forum.jackkruse.com/posts/384740/"
-        },
-        {
-          "label": "379695",
-          "url": "https://forum.jackkruse.com/posts/379695/"
-        },
-        {
-          "label": "382966",
-          "url": "https://forum.jackkruse.com/posts/382966/"
-        },
-        {
-          "label": "382576",
-          "url": "https://forum.jackkruse.com/posts/382576/"
-        },
-        {
-          "label": "378577",
-          "url": "https://forum.jackkruse.com/posts/378577/"
-        },
-        {
-          "label": "380925",
-          "url": "https://forum.jackkruse.com/posts/380925/"
-        },
-        {
-          "label": "370699",
-          "url": "https://forum.jackkruse.com/posts/370699/"
-        },
-        {
-          "label": "371822",
-          "url": "https://forum.jackkruse.com/posts/371822/"
-        }
-      ]
-    },
-    {
-      "id": "aortic-vortex",
-      "title": "The heart's vortex: bicuspid valve, Lasix and rescue drips",
-      "pillar": "support",
-      "summary": "Kruse treats the aortic valve as a vortex generator; he says a two-leaflet valve, salt-stripping diuretics or a heavy deuterium load break the vortex and starve the brain, while catecholamines, hypertonic saline and Lactated Ringer's can restart a stalled system.",
-      "sections": [
-        {
-          "body": "Kruse argues that the heart's job is not just to push blood but to spin it. The aortic valve, in his model, shapes each beat into a centred vortex that carries the pulse's energy up the aorta, sorts deuterium (heavy hydrogen) toward the vessel wall and drives the spinal fluid's flow through the brain. When that vortex breaks, whether from a malformed valve, a drug that strips the blood's salts or a deuterium-loaded body, he says the heart, brain, hair and thyroid fail together. He calls this map of linked failures a \"failing stator\" and expects to see more of it as Earth's field moves through an excursion."
-        },
-        {
-          "heading": "A circle versus a slit",
-          "body": "A normal aortic valve has three leaflets. Kruse says they open symmetrically into a round opening that preserves the left ventricle's own twist, so blood rises up the ascending aorta as an organised, centre-aligned laminar flow (smooth layers that do not mix). Because the stream stays centred, wall shear stress, the frictional drag of blood on the vessel lining, stays at a minimum and the pulse's kinetic energy is conserved. He adds that the aortic wall carries POMC and melanin in its elastin and fibrillin, and that the smooth vortex lets them sort deuterium.\n\nSome people are born with a bicuspid aortic valve (BAV), which has only two leaflets. He calls it a \"vortex destruction event.\" A two-leaflet valve opens as an ellipse or slit and fires blood off-centre. He cites 4D-flow MRI, a scan that tracks blood motion in three dimensions over time, showing an abnormally tight right-handed helical jet striking the outer curve of the ascending aorta, like a firehose aimed into a bend in a pipe.\n\nThe consequences follow in his account. The off-centre jet wastes the pulse's energy as heat instead of delivering it to the brain and organs. Its shear damages the lining and the POMC cells in the wall, which lose their thin, deuterium-poor boundary layer, so the wall \"browns\" (calcifies and degenerates) and stretches into the aneurysm typical of BAV. The heart, in his phrase, is fighting a gear mismatch from day one: it thickens to overcome its own internal friction until it collapses hydraulically, which he gives as the reason BAV so often ends in early heart failure."
-        },
-        {
-          "heading": "Why a valve forms with two leaflets",
-          "body": "Medicine calls BAV a congenital anomaly; Kruse calls it an energy problem in the germ line. Methylation, the tagging of DNA that times the steps of development, needs a steady supply of ATP and well-structured water. A female fetus forming her eggs keeps them in what he calls \"satellite mode,\" with Complex I (the energy chain's entry point) switched down to keep deuterium out. If the mother drinks water at 155–200 parts per million (ppm) deuterium and lacks the sun and field to sort it, he says, deuterium floods the germ line.\n\nThe heavy atom then jams methylation. A carbon–deuterium bond is shorter and tighter than a carbon–hydrogen bond, so enzymes struggle to move methyl groups onto DNA, and the result is hypomethylation (too few tags). The precise timing needed to build a three-leaflet valve is lost, and the embryo falls back on an older two-leaflet design. He points to reptiles such as snakes, turtles and lizards, whose bodies do not need strong vortex power, and calls BAV a \"Pre-Cambrian\" throwback. Congenital anomalies in general are, to him, \"epigenetic scars\" of a deuterium-heavy environment.\n\nHe says the literature already points his way without knowing it. He cites links between variants in the folate pathway (such as MTHFR) and obstruction of the heart's outflow tract, including aortic stenosis. He also cites studies finding abnormal DNA methylation in BAV aortas, global hypomethylation alongside heavily tagged cardiac control genes, while the vessel is still normal in size, before blood-flow damage could explain it."
-        },
-        {
-          "heading": "Brain, hair and thyroid",
-          "body": "The brain feels a broken vortex first, Kruse says, because it is about 2% of body mass yet draws about a fifth of the heart's power. An off-centre pulse makes the spinal fluid's own vortex chaotic, the beating cilia and the brain's glymphatic (waste-clearing) flow lose their driving force, and deuterium silt builds up at the obex, the lower tip of the fourth ventricle. He links this to the early fatigue, dizziness and racing heart many people with BAV report later in life.\n\nHeavy water that settles in the third ventricle, he says, causes a \"dielectric flashover\" in the hypothalamus, the brain's hormone hub, disrupting the stress-hormone axis (HPA), sleep and hormone production. Hair follicles are among the body's fastest-cycling tissues and very sensitive to methylation. With a deuterium-loaded germ line and ordinary 155 ppm water, their mitochondria hit what he calls the \"4.3-second stutter,\" his figure for how often a deuterium atom strikes at that level, and the follicles miniaturize. That, he says, is why large meta-analyses tie baldness at the crown to coronary heart disease. More broadly he reads hair loss as the brain's matrices and central retinal pathways being \"cooked\" by disorder, a sign that foretells dementia.\n\nThe thyroid is drawn in last. Ordered to make more hormone so stalled mitochondria spin faster against heavy water, it burns itself out, which he gives as the reason Hashimoto's thyroiditis and alopecia so often appear together."
-        },
-        {
-          "heading": "Salt, potassium and Lasix",
-          "body": "Kruse treats the blood's salts as \"dopants,\" the impurities engineers add to tune a semiconductor. Sodium keeps blood and spinal fluid able to hold charge. A loop diuretic such as furosemide (Lasix) strips that sodium, the dielectric constant (the water's capacity to hold charge) falls, and the vortex loses its grip. He compares it to the ocean's overturning circulation (AMOC): when seawater freshens, the sinking current that carries oxygen to the depths stalls. In the heart, the left ventricle's natural cycloid vortex weakens, oxygen delivery drops, and the heart's pacemaker nodes fire fast or erratically, producing atrial flutter in a structurally normal heart. Lasix also flushes potassium, which he says collapses the structured water inside cells.\n\nThat is how he reads the heart-failure protocol that pairs hypertonic saline with furosemide: giving the salt back keeps the charge high while the volume comes off. Lasix alone, in his phrase, is a volume fix for a dielectric problem, like lightening a struggling conveyor belt while cutting power to its motor."
-        },
-        {
-          "heading": "Restarting a stalled vortex",
-          "body": "Kruse says he saw sudden \"acute lattice lock,\" his term for body water abruptly stiffening with deuterium, in intensive-care patients during COVID while working in a Missouri hospital. In organ-donor protocols, he notes, high-dose dopamine drips are used to keep organs perfused, and at that dose dopamine acts much like racemic epinephrine. He says he watched several apparently dead patients revive on Levophed (norepinephrine). In his reading dopamine, a highly conductive and paramagnetic catecholamine, restores conduction in the brain's striatum and the heart, offers a bypass around the drag of deuterium's kinetic isotope effect (the slowing of reactions by heavier atoms), restarts the heart's vortex and \"thaws\" a lock that had been diagnosed as brain death. Absent brainstem reflexes, he argues, are often a hydraulic \"magnetic stall\" rather than death.\n\nHe calls every epi-pen, dopamine drip and 3% saline bolus a \"magnetic de-fragger,\" says other drugs can do the same only if they are deuterium-depleted first, and says he built his own protocol for this in Missouri. His complaint is that these tools are used at the harvest end of the timeline instead of as first-line rescue.\n\nHe gives Lactated Ringer's, a standard IV fluid, a similar role. Its lactate, he proposes, feeds the glycerol-3-phosphate (G3P) shuttle, which hands electrons straight to CoQ10 and Complex III and so bypasses the deuterium-jammed Complex I step he calls the \"NADD+\" stall; its pH shift, he suggests, also helps eject deuterium by changing how fast protons tunnel in the mitochondrial matrix. He says he used the G3P shunt, among other measures, to de-frag lattice-locked clients."
-        },
-        {
-          "heading": "In practice",
-          "body": "Before conception, Kruse wants the mother on 92.5 ppm deuterium-depleted water and a methylation-rich diet (choline, methionine and B vitamins from pasture-raised animal foods), not synthetic folate. Anyone born with BAV, he says, should drink 92.5 ppm water for life so the heart's motor is not wrecking the aortic wall under a heavy load. He never wants Lasix used alone and gives salt back with the diuretic. In hospital he asks for Lactated Ringer's rather than glucose or plain saline drips, and in a sudden collapse he wants clinicians to consider catecholamines and hypertonic saline early; intravenous saline is a clinician's tool."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "372947",
-          "url": "https://forum.jackkruse.com/posts/372947/"
-        },
-        {
-          "label": "372949",
-          "url": "https://forum.jackkruse.com/posts/372949/"
-        },
-        {
-          "label": "372951",
-          "url": "https://forum.jackkruse.com/posts/372951/"
-        },
-        {
-          "label": "372952",
-          "url": "https://forum.jackkruse.com/posts/372952/"
-        },
-        {
-          "label": "372982",
-          "url": "https://forum.jackkruse.com/posts/372982/"
-        },
-        {
-          "label": "373058",
-          "url": "https://forum.jackkruse.com/posts/373058/"
-        },
-        {
-          "label": "372547",
-          "url": "https://forum.jackkruse.com/posts/372547/"
-        },
-        {
-          "label": "372924",
-          "url": "https://forum.jackkruse.com/posts/372924/"
-        },
-        {
-          "label": "373625",
-          "url": "https://forum.jackkruse.com/posts/373625/"
-        },
-        {
-          "label": "373174",
-          "url": "https://forum.jackkruse.com/posts/373174/"
-        }
-      ]
-    },
-    {
-      "id": "neurodegeneration",
-      "title": "Neurodegeneration and MS",
-      "pillar": "support",
-      "summary": "Kruse traces Alzheimer's, Parkinson's, ALS, MS and even depression to lost light, field and vagal tone, with deuterium backing up from the gut, misplaced copper and melanin breakdown doing the damage.",
-      "sections": [
-        {
-          "body": "Kruse traces Alzheimer's, Parkinson's, ALS and multiple sclerosis to lost sunlight, a weak or unstable magnetic field and a failing vagus nerve. In each, he says, deuterium (heavy hydrogen), misplaced copper and broken-down melanin do the damage. The misfolded proteins medicine targets are, to him, the body's defenses rather than the cause."
-        },
-        {
-          "heading": "Alzheimer's starts outside the brain",
-          "body": "Citing an 86,000-patient study, Kruse argues Alzheimer's is a body-wide disease. In his model the vagus nerve is a cable whose steady pacing keeps the linings of the gut, lungs and blood vessels charged so they can keep deuterium out. Being unpinned (not grounded under a stable field), nnEMF (wireless and wiring fields) and blue light drain that tone.\n\nIn the lungs, he says, the structured water then collapses and incoming oxygen flips into singlet oxygen, a reactive form. In the gut, singlet oxygen damages fats and the lining can no longer sort out heavy hydrogen, so deuterium leaks into the blood. The blood carries both up to the thalamus and hippocampus, where deuterium jams the brain's navigation cells and memory and sense of place fail. He also describes a back route: when the gut's morning bicarbonate flush stalls, heavy water climbs the vagus to the floor of the brainstem."
-        },
-        {
-          "heading": "The brain's isotope centrifuge",
-          "body": "Kruse asks why the brain, about 2% of body weight, takes 15–25% of the heart's output. His answer is that blood flow powers a vortex of cerebrospinal fluid (CSF, the clear fluid bathing brain and spinal cord) between the third and fourth ventricles, the brain's central fluid chambers. Driven by each heartbeat and steered by tiny hairs lining the ventricles, the vortex spins light hydrogen away from deuterium and vents the heavy isotope through the vagus.\n\nUnder the South Atlantic Anomaly, a large weak patch in Earth's field, he says life pays a constant \"Landauer tax\": with little outside field to lift the vortex, each thought costs more heat. He calls dementia the biological version of the planet losing its magnetic memory, and expects people carrying heavy deuterium to fare worst as the old field fades."
-        },
-        {
-          "heading": "Plaques as \"deuterium trash cans\"",
-          "body": "Citing Stephanie Seneff and Anthony Kyriakopoulos, Kruse says that once the vagal drain and melanin fail, cells deliberately fold amyloid and alpha-synuclein into rigid fibrils, using cardiolipin (an inner-membrane fat) and copper to do it. These fibrils are vaults that lock deuterium away from the energy chain, which is why he calls plaques \"deuterium trash cans.\" He also blames misplaced copper: the energy chain's last enzyme should run on heavy copper-65, and the wrong isotope there, he says, always goes with neurodegeneration."
-        },
-        {
-          "heading": "Thick fluid: depression and SSRIs",
-          "body": "Kruse proposes renaming major depression \"Isotopic Viscosity Syndrome\": a brain whose fluid has thickened as the field declines, which he says is why depression is surging. He cites a 2025 *JAMA Psychiatry* study by Kochunov and colleagues finding that depression is marked by local drops in brain blood flow that pull neighboring neurons out of sync, a functional change that tracks how severe the symptoms are.\n\nSSRIs, the most common antidepressants, can make this worse in his view. Sertraline carries two chlorine atoms that grip electrons and make nearby water denser and more viscous (thicker and slower-flowing), so the spinal fluid turns to \"jello.\" On scans this shows as enlarged ventricles and a shrinking brain; the hairs lining the ventricles can't beat through the sludge, and heavy water presses on the pituitary and brainstem. The brain, using a fifth of the body's power, drowns first."
-        },
-        {
-          "heading": "Parkinson's",
-          "body": "In Kruse's model the substantia nigra's neuromelanin, a dark pigment bound to iron, is a magnetic battery that keeps the spins of incoming oxygen aligned. nnEMF, artificial light or dehydration warp it, oxygen goes singlet, and Lewy bodies (clumps of misfolded alpha-synuclein) build up as corrupted proteins the cell can't clear. Skin cells facing the same voltage drop can escape into cancer; dopamine neurons can't, so they die.\n\nParkinson's strikes where the field is weakest, he says, so patients who learn to pin themselves magnetically will win. Cutting the vagus nerve lowers risk, in his reading, because it blocks deuterium flowing from gut to brain. From his years at Charity Hospital, moving from general surgery to neurosurgery, he recalls that patients who had a truncal vagotomy (cutting the main vagus trunks, once common for ulcers) developed less Parkinson's. With the stomach and pancreas cut off, deuterium could no longer back up into the brain, an accidental \"isotopic firewall.\" This, he says, gives the Braak hypothesis, the idea that Parkinson's begins in the gut, its missing mechanism: the gut is the body's main deuterium sink.\n\nThe entry point, he says, is the area postrema, a small patch on the floor of the fourth ventricle with no blood–brain barrier. Deuterium backing up from the gut gets in there, gathers in the lateral ventricles and reaches the basal ganglia and substantia nigra beside them, where it jams ATP synthase and uncouples the neuromelanin shield; medicine sees the result as Lewy bodies and tremor.\n\nEvery Parkinson's patient is heavy with deuterium, Kruse says, which makes light-driven repair very hard, and L-DOPA, the standard drug, only treats symptoms. He reads Sardinia's historically low Parkinson's rate as low deuterium rather than the L-DOPA in its fava beans: a traditional diet rich in folate and fiber, strong UV-A light and local field conditions. He reports a man with severe Parkinson's who had not walked or talked in three years talking and walking 50 yards on the beach after four weeks at Costa del Sol in El Salvador."
-        },
-        {
-          "heading": "Why the adult brain degenerates",
-          "body": "Kruse links neurodegeneration to infancy. Babies are unusually fat because the brain uses most of their energy, and body fat feeds it until the solar clock matures. An adult brain stripped of its light shielding runs that program in reverse, its cells turning senescent and storing fat droplets, but the skull has no fat reserve, so the brain degenerates instead. Complex brains, he adds, appeared only after Earth's field strengthened, and degeneration is life's retreat when it weakens again."
-        },
-        {
-          "heading": "ALS and MS",
-          "body": "ALS he calls a waking form of dream-sleep paralysis. With the body clock destroyed, the brainstem can't tell day fields from night fields and sends the paralysis commands of REM sleep while the person is awake. He says it is rare in tanned tropical people and worsened by long flights across time zones, especially over the weakening South Atlantic field.\n\nHe also sees ALS as the Parkinson's backflow aimed downward. Instead of rising into the brain, deuterium drains through the obex, the narrow point where the fourth ventricle opens into the spinal canal, and settles around the nerve roots, \"lattice-locking\" the spinal fluid until the motor neurons leaving there burn out. Motor neurons go first because they have the highest energy demand and the most complex mitochondrial networks.\n\nHe reads the genetic finding behind a 2026 Breakthrough Prize, a repeated stretch of DNA in the C9ORF72 gene shared by ALS and frontotemporal dementia, as a weak point rather than the cause. The repeats fold into knots that are sensitive to hydrogen's mass; when the chemical tags around them carry deuterium, the knots stiffen and the gene can't be read properly, so its proteins misfold. ALS is 1.2–1.5 times more common in men and starts later in women, which he credits to periodic pelvic flushing in women that keeps the bottom of the spinal fluid \"highway\" clear; the advantage fades after menopause, when the pelvic water stagnates.\n\nMS, in his account, is spin failure at the nodes of Ranvier, the gaps in a nerve's insulation where signals jump. Its rise with latitude reflects collapsing water structure and melanin, not low vitamin D, and the misfolded proteins in MS are readouts of a poor local field. Hence his \"agonic line therapy\": living where compass north and true north coincide, which he says matters more than deuterium-depleted water."
-        },
-        {
-          "heading": "In practice",
-          "body": "For MS his protocol puts relocation first: move to a low-latitude spot with a flat, stable field on a good agonic line, then use grounded Mu-metal shielding (a magnetic-shield alloy), block non-native frequencies and use targeted coherent light. Off a good line he adds deuterium-depleted water, a seafood diet rich in DHA and iodine, and red and infrared light; he favors relocation over sleeping pills and says thin MS patients shouldn't dry fast. For Parkinson's he says to get magnetically pinned by living where the field is strong, points to sunlit beach relocation like the El Salvador case, and rates the Neuropod the best vagus nerve stimulator for neurodegenerative disease."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "381219",
-          "url": "https://forum.jackkruse.com/posts/381219/"
-        },
-        {
-          "label": "378266",
-          "url": "https://forum.jackkruse.com/posts/378266/"
-        },
-        {
-          "label": "379654",
-          "url": "https://forum.jackkruse.com/posts/379654/"
-        },
-        {
-          "label": "378213",
-          "url": "https://forum.jackkruse.com/posts/378213/"
-        },
-        {
-          "label": "378212",
-          "url": "https://forum.jackkruse.com/posts/378212/"
-        },
-        {
-          "label": "379956",
-          "url": "https://forum.jackkruse.com/posts/379956/"
-        },
-        {
-          "label": "380978",
-          "url": "https://forum.jackkruse.com/posts/380978/"
-        },
-        {
-          "label": "381551",
-          "url": "https://forum.jackkruse.com/posts/381551/"
-        },
-        {
-          "label": "383017",
-          "url": "https://forum.jackkruse.com/posts/383017/"
-        },
-        {
-          "label": "381339",
-          "url": "https://forum.jackkruse.com/posts/381339/"
-        },
-        {
-          "label": "371511",
-          "url": "https://forum.jackkruse.com/posts/371511/"
-        },
-        {
-          "label": "372744",
-          "url": "https://forum.jackkruse.com/posts/372744/"
-        }
-      ]
-    },
-    {
-      "id": "immunity-barriers",
-      "title": "Immunity, inflammation and the body's barriers",
-      "pillar": "support",
-      "summary": "Kruse describes the body's barriers as isotope filters that fail together, inflammation as a containment breach carried by positive charge, and infections and parasites as signs of a deuterated terrain.",
-      "sections": [
-        {
-          "body": "Kruse sees the body's barriers (blood–brain, gut, retina, spinal cord) as filters built to keep deuterium, a heavy form of hydrogen, away from the mitochondria, and says they fail together. Inflammation, in his model, starts when mitochondria lose their electrical containment, and infections reveal the state of the body's terrain more than the strength of the germ."
-        },
-        {
-          "heading": "Barriers as isotope filters",
-          "body": "The blood–brain barrier's main job, Kruse says, is to keep deuterium out of brain mitochondria, whose strong membrane field can't tolerate its drag. The barrier's lining cells sort light hydrogen from heavy using one-handed (chiral) molecules, tuned by morning UV-A light. Wireless signals and blue LEDs make calcium channels in those cells leak, the tight seals between cells loosen, and deuterium floods the spinal fluid.\n\nThe brainstem senses the breach and releases GDF15, a stress signal from struggling mitochondria; he calls the surge a \"mitokine storm.\" It shows up first as fatigue, poor focus and psychiatric distress and can eventually push brain tissue into fermentation and brain cancer.\n\nBecause mitochondria link into one network across the body, he says, barriers never fail alone. The retinal barrier (macular degeneration), the gut barrier (fatty liver) and the spinal barrier (MS) go down together, and treating them as separate organ diseases misses the shared cause."
-        },
-        {
-          "heading": "Inflammation as a containment breach",
-          "body": "Mitochondria descend from bacteria and still carry bacterial markers: circular DNA, cardiolipin (an inner-membrane fat) and bacterial-style proteins. Inside the mitochondrion these are harmless; once they leak, the immune system's sensors read them as infection. What decides whether inflammation fires, in Kruse's account, is whether the inner membrane keeps these contents electrically and magnetically contained. Autoimmunity is then a clean-up of a damaged grid rather than a mistake, with antibodies tagging broken mitochondrial parts.\n\nInflammation itself, he says, is a build-up of positive charge. That charge was once carried mostly by spare protons (ordinary hydrogen nuclei) but, as the field weakens, increasingly by deuterons, the heavier nuclei of deuterium. That is why, to him, minor problems now progress faster than textbooks predict and worsen with each generation.\n\nSevere allergic reactions fit the same picture. When a deuterium-loaded person exercises, the blood grows thicker and hotter; if the body's electrical brake fails, inflammation surges, and anaphylaxis is the body blowing a fuse, a desperate vagal reset that stops the engine before a total burnout."
-        },
-        {
-          "heading": "Viruses as scouts",
-          "body": "He frames viral illness the same way. Letting a virus replicate is a cell's emergency shutdown when its field fails, and a cytokine storm (a runaway immune flare) is containment failure, with the cell dying because its containment dissolved rather than because the virus killed it. The spike protein, which he describes as strongly positively charged, short-circuits membrane charge along the same final path as chronic disease. He is blunter about the mRNA shots: once the injection has \"integrated,\" he says, no one recovers. The damage waits until a person stops doing the right things, then catches up with the inner mitochondrial membrane, and the spike protein problem never goes away.\n\nFast-replicating viruses, Kruse argues, are the biosphere's scouts, adapting to environmental shifts before complex life does. He reads the unusual person-to-person spread of the Andes strain of hantavirus as a way of skipping a degraded outer environment by jumping straight between sheltered human bodies. In the noisy water of a weak-field region, ubiquitin, the cell's tag marking proteins for destruction, starts tagging the host's own respiratory proteins, leaving an energy gap the virus exploits in the vessel lining and lungs.\n\nThe large cortisol surge of acute hantavirus is, to him, the brain sensing the energy chain stalling and dumping more glucose, and with it more deuterium, to force current through. The fluid that floods the lungs in fatal cases is the vagal exhaust collapsing and the lung's air–water interface shorting out."
-        },
-        {
-          "heading": "Tolerance needs light and timing",
-          "body": "Immune tolerance, Kruse says, depends on mitochondria signaling \"self.\" Citing Zhang and colleagues in *Nature* (2025), he says steady EPO signaling to dendritic cells (the immune system's scouts) switches on calming regulatory T cells; magnetically stable mitochondria keep that signal steady, while wireless and blue light scramble it so the immune system reads chaos as invasion. Eating indoors after dark puts the gut's clock out of step with the brain's, which he says tips the thymus toward inflammatory T cells. Vitamin A, in his account, is a pigment whose light- and field-driven shape changes program immunity in the gut, airways and urinary tract.\n\nIn one family he read positive antibodies against voltage-gated calcium channels as proof that their \"melanin–water battery\" had run down. Calcium then floods cells and either \"petrifies\" them, as in Lambert–Eaton myasthenic syndrome (a muscle-weakness disorder), or \"shreds\" them, as in PANS/PANDAS; he calls Lambert–Eaton the \"astronaut on Earth\" syndrome. He likewise ties a Toronto child's primary immunodeficiency to too little magnetic flux in that city."
-        },
-        {
-          "heading": "Infections read the terrain",
-          "body": "To Kruse more deuterium means more bacterial overgrowth, and candida means a deuterated gut. In PANS/PANDAS, the sudden childhood tics and OCD linked to strep, he sees the strep as a clean-up crew rather than the cause. Mold illness and Lyme lower alpha-MSH, a skin and immune hormone made alongside melanin, and he says mold troubles only people who can't make melanin.\n\nChronic infections such as Epstein–Barr virus, Lyme and filarial worms, he says, thrive in heavy, low-oxygen water once the body reverts to a primitive \"Archean\" state; they mislead doctors but are scavengers of deuterium decay, not its cause. In a child stuck in a \"magnetic stall,\" even pinworms may be tolerated as crude backup immune regulators, though their presence still signals a child too heavy to clear its own waste.\n\nThe same logic applies to Protomyxzoa rheumatica, a blood parasite some practitioners target directly. Kruse calls it a marker of a collapsed water table: its sugary biofilms (protective slime layers) trap deuterium, thicken the blood and lower its dielectric constant, the water's capacity to hold charge, and deuterated dietary fats harden them. In one member he blamed an indoor, tech-heavy life in the Arizona desert, whose groundwater carries fluoride, which he calls the most damaging atom for water's dielectric.\n\nHe says thousands have reversed mold illness on clean, low-EMF land with equatorial sun. Infrared sunlight expands the body's structured water and squeezes toxins out of membranes, and barefoot grounding speeds blood and spinal-fluid flow to flush them. Binders, charcoal and glutathione fail, he says, when cell voltage has collapsed, because detox needs energy."
-        },
-        {
-          "heading": "In practice",
-          "body": "Kruse's mold and inflammation protocol: move to a clean, low-nnEMF property (low in wireless and wiring fields) with clean indoor and outdoor air; maximize equatorial sun; and ground barefoot at an equatorial shoreline. For inflammation and viral illness he says to ground, get sunlight, re-pin to a good field and clear deuterium, and to eat by daylight. He advises against relying on binders, charcoal, glutathione or antifungals while cell voltage is collapsed. For parasites and biofilms he treats the medium rather than the bug: UV-A to build melanin and 3% saline to clear deuterium, until the water's dielectric climbs back toward a healthy 160 and the immune system can clear the biofilm itself."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "382727",
-          "url": "https://forum.jackkruse.com/posts/382727/"
-        },
-        {
-          "label": "373627",
-          "url": "https://forum.jackkruse.com/posts/373627/"
-        },
-        {
-          "label": "382733",
-          "url": "https://forum.jackkruse.com/posts/382733/"
-        },
-        {
-          "label": "381869",
-          "url": "https://forum.jackkruse.com/posts/381869/"
-        },
-        {
-          "label": "381877",
-          "url": "https://forum.jackkruse.com/posts/381877/"
-        },
-        {
-          "label": "382234",
-          "url": "https://forum.jackkruse.com/posts/382234/"
-        },
-        {
-          "label": "378819",
-          "url": "https://forum.jackkruse.com/posts/378819/"
-        },
-        {
-          "label": "385785",
-          "url": "https://forum.jackkruse.com/posts/385785/"
-        },
-        {
-          "label": "384272",
-          "url": "https://forum.jackkruse.com/posts/384272/"
-        },
-        {
-          "label": "382546",
-          "url": "https://forum.jackkruse.com/posts/382546/"
-        },
-        {
-          "label": "373347",
-          "url": "https://forum.jackkruse.com/posts/373347/"
-        },
-        {
-          "label": "373451",
-          "url": "https://forum.jackkruse.com/posts/373451/"
-        }
-      ]
-    },
-    {
-      "id": "gut-liver-axis",
-      "title": "Gut and liver: the light-and-deuterium axis",
-      "pillar": "support",
-      "summary": "Kruse treats the gut as a light-and-deuterium organ flushed each morning by pancreatic bicarbonate, and the liver as the first organ to fail, linked to brain and pelvis by one fluid axis.",
-      "sections": [
-        {
-          "body": "In Kruse's model the liver is the first organ to fail and the gut is an organ run by light and deuterium, a heavy form of hydrogen. One shared fluid route links liver, pelvis, gut and brain, so he expects their diseases to travel together. The gut's job, as he sees it, is to flush deuterium out each morning, and most gut disease follows when that flush backs up."
-        },
-        {
-          "heading": "Why the liver goes first",
-          "body": "The liver carries the body's largest daily load of fluid, electrons and deuterium and serves as its deuterium sink, so Kruse says its mitochondria fail first. He reads high liver enzymes with a clean scan as deuterium overload, and points to antibodies against mitochondria in about 95% of primary biliary cholangitis. Fatty liver, to him, is a pressure-relief valve: when nerve noise breaks the gut barrier, the liver packs its cells with fat to shield them from singlet oxygen, a reactive form of oxygen.\n\nThe portal vein, liver and pelvic organs share one fluid conveyor that runs on up to the brain. That, he says, is why ovarian failure, sperm DNA damage, gut disease, brain fog, abnormal lipids and early artery disease cluster in the same people, rather than because of family history."
-        },
-        {
-          "heading": "The morning bicarbonate flush",
-          "body": "Morning sunlight's infrared, in Kruse's account, sets off the cortisol awakening response, the natural hormone rise after waking. That switches on the glucagon gene network on chromosome 2 and releases about 2 liters of bicarbonate fluid from the pancreas. This downward flush, guided by the vagus nerve, sweeps deuterium out through the gut, and a well-formed (Bristol type 4) stool shows it is working. Skipping food at the cortisol peak, he says, stalls it.\n\nDiet can help or hinder the flush. He points to the Hunza people, whose roughly 100 grams a day of fiber from apricots and whole grains acts as a \"deuterium sponge\" in the gut, since plant cellulose is naturally low in deuterium; it shields the vagus and frees the bicarbonate loop to do its work. Plain baking soda, he adds, can stand in for missing pancreatic bicarbonate: it flushes deuterium and raises acetylcholine, the vagus nerve's chemical messenger, which tells the spleen and immune system the crisis is over and ends what he calls the cell danger response, the cell's defensive lockdown.\n\nWhen the vagus fails in an ungrounded person under blue LEDs and nnEMF (wireless and wiring fields), the flush stalls and reverses. He calls this an \"isotopic backwash\": heavy water is pushed into the stomach lining, the valve at the bottom of the esophagus and the crypts of the colon. Reflux, hiatal hernia, colon polyps and colon cancer are, to him, one \"hydraulic failure,\" with polyps a primitive low-voltage shelter that comes before cancer.\n\nKruse saw the same backup as a surgeon. After truncal vagotomy, the old ulcer operation that cuts the main vagus trunks, patients developed gallstones, dumping syndrome and gastroparesis (a stalled stomach), and his first rupture of a spleen without injury came two weeks after one. He reads all of these as gut organs filling with deuterium once the exhaust was cut."
-        },
-        {
-          "heading": "The gut as a light organ",
-          "body": "Gut bacteria, Kruse says, give off far more faint light (ultra-weak photon emission) than human cells, and that light organizes the gut's water. The gut lining sheds its cells every day or two, carrying deuterium away with them. The nerve route from the brainstem to the abdomen's nerve hubs (the celiac ganglion and the organ of Zuckerkandl) depends on melanin, the light-absorbing pigment, and blue light and nnEMF crash it.\n\nA broken body clock shows up here first. Citing Li Cheng and colleagues (2026, *Microbiological Research*), Kruse says circadian disruption raises sebacic acid in the gut and shifts the microbiome away from Akkermansia, a mucus-protecting species; the mucus thins and immune B cells inflame the lining. The leaky barrier then speeds deuterium into the mitochondria, which he says is why shift workers have more leaky gut, inflammatory bowel disease and metabolic disease.\n\nThe microbiome then turns inflammatory, producing SIBO, Crohn's, colitis and leaky gut; deuterium favors the wrong bacteria, he says, and medicine then blames the bacteria. Crohn's lesions form where heavy water settles unevenly in the gut wall. Cutting out a Crohn's segment, he adds, only detunes the gut, which behaves like a tuned antenna. Intussusception, the bowel telescoping into itself, he calls a motor stall rather than a mechanical accident: deuterium clogs the energy motors of the gut's muscle and nerves, which lack insulating myelin and so are especially exposed."
-        },
-        {
-          "heading": "Signs and gauges",
-          "body": "When the abdominal melanin network fails, Kruse says, pigment gathers at boundaries as an emergency shield: melasma on the face and a darkened colon wall (melanosis coli) seen at colonoscopy. Polycythemia vera, a condition of thickened blood, traps heat and deuterium in small vessels like a stalled ocean current.\n\nFirst-morning urine should be dark, he says, as proof of an overnight deuterium dump; clear urine means heavy isotopes were held back. He also reads tests as gauges of the interior. High homocysteine and TMAO (a by-product of gut bacteria) are \"silt\" markers showing the vagus and the bicarbonate flush aren't clearing deuterium, while white-matter changes on MRI and slow flow on thermography show body fluids thickened like \"ketchup.\""
-        },
-        {
-          "heading": "In practice",
-          "body": "No separate protocol is linked here, but Kruse's advice follows from the model. Stand barefoot on wet sand, surf or dewy grass at dawn with sun on skin and eyes, and make the bedroom a \"magnetic sanctuary\" with all wireless off so the liver can clear deuterium in sleep. Eat a morning meal near the cortisol peak so the bicarbonate flush can run. Avoid ungrounded high-rise living, and avoid surgery for Crohn's where possible. Instead of waiting for structural disease, he tracks four markers: morning glucose, LDL, vitamin B12 and pigment changes such as melasma, and adds homocysteine, TMAO, a Bristol type 4 stool and dark first-morning urine as signs of whether the exhaust is clearing."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "384737",
-          "url": "https://forum.jackkruse.com/posts/384737/"
-        },
-        {
-          "label": "384739",
-          "url": "https://forum.jackkruse.com/posts/384739/"
-        },
-        {
-          "label": "380983",
-          "url": "https://forum.jackkruse.com/posts/380983/"
-        },
-        {
-          "label": "384732",
-          "url": "https://forum.jackkruse.com/posts/384732/"
-        },
-        {
-          "label": "374819",
-          "url": "https://forum.jackkruse.com/posts/374819/"
-        },
-        {
-          "label": "374284",
-          "url": "https://forum.jackkruse.com/posts/374284/"
-        },
-        {
-          "label": "375734",
-          "url": "https://forum.jackkruse.com/posts/375734/"
-        },
-        {
-          "label": "375886",
-          "url": "https://forum.jackkruse.com/posts/375886/"
-        },
-        {
-          "label": "382730",
-          "url": "https://forum.jackkruse.com/posts/382730/"
-        },
-        {
-          "label": "382565",
-          "url": "https://forum.jackkruse.com/posts/382565/"
-        },
-        {
-          "label": "372138",
-          "url": "https://forum.jackkruse.com/posts/372138/"
-        },
-        {
-          "label": "372499",
-          "url": "https://forum.jackkruse.com/posts/372499/"
-        }
-      ]
-    },
-    {
-      "id": "graves-light-circuit",
-      "title": "Graves', thyroid and the eyes",
-      "pillar": "support",
-      "summary": "Kruse traces Graves' disease, thyroid and adrenal flares and several eye diseases to a broken eye-to-brain light circuit plus night light and wireless.",
-      "sections": [
-        {
-          "body": "Kruse traces Graves' disease, thyroid flares and several eye diseases to a broken light circuit running from the eye to the brain's master clock, made worse by night light and wireless signals. Fix the eye's light and magnetic inputs, he argues, and the thyroid loses its upstream drive."
-        },
-        {
-          "heading": "The broken circuit",
-          "body": "Graves' disease, an overactive thyroid often with bulging eyes, is to Kruse a downstream symptom of a broken retina-to-hypothalamus pathway, the circuit that sets the body's clock and temperature. Mistimed blue light bleaches melanopsin, the retina's daylight sensor, so the master clock in the brain can't read the time. This is worse in an \"unpinned\" location, one where a person isn't grounded under a stable magnetic field.\n\nThe hypothalamus then loses its metabolic set point, and the thyroid overdrives to cover what it reads as an energy shortfall. Meanwhile nnEMF (wireless and wiring fields) opens calcium channels in the eye muscles, raising their metabolic rate and loading them with deuterium, a heavy form of hydrogen. A higher metabolic rate is exactly the wrong direction in Graves', he says.\n\nThe same failure reaches the adrenal glands. A third ventricle (the fluid chamber beside the hypothalamus) heavy with deuterium stretches the window in which thyroid-stimulating hormone (TSH) can do its repair work, and a stalled thyroid forces the adrenals to over-rev on adrenaline to keep the cell's energy motor spinning. That ends in the adrenal burnout of Addison's disease, which he says doctors treat as permanent."
-        },
-        {
-          "heading": "Heme, histamine and lost tolerance",
-          "body": "Heme, the iron-containing molecule in blood and many enzymes, is the body's magnetic antenna in Kruse's model, and immune tolerance depends on it. Citing Zhang and colleagues in *Nature* (2025), he says stable mitochondria send a steady \"self\" signal to the immune system's dendritic cells; spin chaos from wireless and blue light breaks that signal, so antibodies attack the eye muscles and thyroid.\n\nWhen heme collapses, histidine, the amino acid that anchors its iron, is diverted into histamine, causing itching and thyroid flares. He ties the rise in thyroid disease since the 1980s to the weakening magnetic field and calls all thyroid disease \"altered topology.\"\n\nHe names drug effects too: tetracycline antibiotics blacken the thyroid, and lithium concentrates there and disrupts hormone-making, pushing people toward an underactive thyroid. He calls Hashimoto's thyroiditis pre-cancerous. Eyelid (meibomian) gland trouble is part of the same picture: light and fields thicken the oil to wax and plug the ducts, bulging eyes that don't close in sleep dry the glands out, and the overactive thyroid burns them out."
-        },
-        {
-          "heading": "Other eye diseases",
-          "body": "The retinal barrier fails along with the body's other barriers, Kruse says. Without a stable field, neuropsin (a UV-A sensor in the eye) can no longer check oxygen's state, the pigment layer's melanin breaks down and macular degeneration speeds up; he reports that a member's father fully reversed his. For glaucoma in the tropics, he says, the driver to remove is artificial light and wireless at night, and a red-light device adds nothing for someone already outdoors all day.\n\nHe describes the failing retina as a \"frosted lens.\" Heavy water in the space beneath the retina changes how light bends there, so light scatters off deuterium before melanin can convert it. The light-sensing cells aren't broken; sight fails because the medium does, its dielectric constant (water's capacity to hold charge) falling from a healthy 160 to 78.\n\nRetinitis pigmentosa he calls epigenetic, not genetic. nnEMF and blue light damage the melanin and heme proteins of the retina's pigment layer, the retina's charge falls, and that loss alters the genes blamed for the disease. Phones, Wi-Fi, no grounding and contact lenses worn around the clock, he says, speed it up."
-        },
-        {
-          "heading": "In practice",
-          "body": "His Graves' and eye protocol: plenty of dawn sun into bare eyes while grounded in a well-pinned field; a bedroom free of wireless; red light or fully blue- and green-blocking glasses after sunset; and nothing that raises metabolic rate, including supplements, peptides and stimulating exercise. For eyelid gland problems he uses sun on the eyes and lids rather than drops. For glaucoma, sun rather than devices, no eyewear outdoors, and total darkness without wireless at night. For retinitis pigmentosa, cut nnEMF, ground or pin, build tolerance to strong sun gradually, and never wear contact lenses around the clock."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "382234",
-          "url": "https://forum.jackkruse.com/posts/382234/"
-        },
-        {
-          "label": "382239",
-          "url": "https://forum.jackkruse.com/posts/382239/"
-        },
-        {
-          "label": "382237",
-          "url": "https://forum.jackkruse.com/posts/382237/"
-        },
-        {
-          "label": "384734",
-          "url": "https://forum.jackkruse.com/posts/384734/"
-        },
-        {
-          "label": "378299",
-          "url": "https://forum.jackkruse.com/posts/378299/"
-        },
-        {
-          "label": "375722",
-          "url": "https://forum.jackkruse.com/posts/375722/"
-        },
-        {
-          "label": "382730",
-          "url": "https://forum.jackkruse.com/posts/382730/"
-        },
-        {
-          "label": "382384",
-          "url": "https://forum.jackkruse.com/posts/382384/"
-        },
-        {
-          "label": "377239",
-          "url": "https://forum.jackkruse.com/posts/377239/"
-        },
-        {
-          "label": "373170",
-          "url": "https://forum.jackkruse.com/posts/373170/"
-        },
-        {
-          "label": "371637",
-          "url": "https://forum.jackkruse.com/posts/371637/"
-        }
-      ]
-    },
-    {
-      "id": "nerve-pain-head-injury",
-      "title": "Nerves, head and pain",
-      "pillar": "support",
-      "summary": "Kruse explains CRPS, head and facial trauma, Bell's palsy, voice and hearing loss, tinnitus, facial pain, headaches, spinal-cord softening and osteoporosis as local failures of light, field and fluid.",
-      "sections": [
-        {
-          "body": "Kruse explains complex regional pain syndrome, head and facial injuries, Bell's palsy, tinnitus, headaches and osteoporosis as local failures of light, magnetic field and body fluid. In each case he puts grounding and a good field ahead of drugs."
-        },
-        {
-          "heading": "Complex regional pain syndrome",
-          "body": "CRPS, a severe burning pain that persists after an injury, is in Kruse's model a local crash of melanin and magnetism rather than a mysterious nerve misfire. Melanin, the dark pigment he treats as the tissue's light-to-electricity converter, loses its link to Earth's field in the affected limb. Without \"pinning\" (being grounded under a stable field), he says light isn't strong enough to settle it, and sunlight or light therapy on an ungrounded limb can speed the damage. So grounding and a good field come first, ahead of nerve blocks or painkillers."
-        },
-        {
-          "heading": "Head and facial trauma",
-          "body": "Discussing a member hit in the face by a baseball, Kruse read the injury as a \"de-pinning\" of the sphenoid, the bone at the center of the skull that he treats as the brain's switchboard. The blow, he says, cavitated the spinal fluid and broke up the structured water around the brain's balance centers. Deuterium, a heavy form of hydrogen, then seeped in over the following year, which is why vertigo appeared a year after the injury.\n\nThe flattened nose also cut nasal nitric oxide, a gas he says shields incoming oxygen from flipping into a reactive form. His approach is to ground, use a 3% saline method with structural decompression, and get sunlight to restart nasal nitric oxide, rather than relying on anti-vertigo drugs. After a brain bleed with new symptoms, he tells members to get examined and imaged by their surgeon."
-        },
-        {
-          "heading": "Bell's palsy, voice and the inner ear",
-          "body": "Bell's palsy, a sudden one-sided facial weakness, is today often the first sign that someone is in a \"Marcus inversion well,\" a place whose field stalls the cell's energy chain. Kruse got it himself within a day of arriving in South America; he had standard treatment, but judged the location the cause and cut the trip short.\n\nA voice that gets \"stuck\" he traces to the far end of the left vagus nerve. In one member he blamed CT scanning, which he says \"de-gausses\" tissue, plus a compressive \"vise\" under the arch of the aorta, where the left recurrent laryngeal nerve (the branch that runs the voice box) loops back up. The nerve then acts like a heat-losing resistor instead of a clean conductor, and he compares it to astronauts losing function in the brain's speech area once they leave Earth's field.\n\nTinnitus, he says, is the inner ear's fluid losing its structure, so the hair cells generate noise. Astronauts develop it within days in orbit, and on Earth it means something in the environment must be removed. For Ménière's disease he warns that a diuretic makes it worse. Hearing loss carried through bone, he adds, can be repaired with light, but where someone lives sets a ceiling: a place with a decent field but poor UV and near-infrared light limits how far repair can go."
-        },
-        {
-          "heading": "Headaches and facial pain",
-          "body": "Headache, brain swelling and seizures come in his model from spinal fluid losing its charge. The fluid thickens, drains poorly and pressure rises, and solar storms can tip a vulnerable brain into this state. Migraines he attributes to deuterium loading in the trigeminal (Gasserian) ganglion, a nerve hub beside the brain.\n\nRight-sided facial pain follows the drainage. The right lymphatic duct and the right-side veins carry most of the brain's waste fluid, Kruse says; when that fluid is deuterium-heavy and slow, it presses on the first branch of the trigeminal nerve in Meckel's cave, a fluid pocket beside the brainstem, causing a pressure-type trigeminal neuralgia felt in the right eye."
-        },
-        {
-          "heading": "The spinal cord",
-          "body": "Meckel's cave matters for the spinal cord too. He says it supplies the mechanical \"dither\" that keeps water in the fourth ventricle moving, so carbon dioxide from the blood is stirred in, deuterium can be separated out, and the vagal region can clear it from a damaged stretch of cord. That is why he holds that myelomalacia, a softening of the spinal cord usually seen as permanent, can reverse, and why he looks for a blockage at Meckel's cave, often alongside sleep problems."
-        },
-        {
-          "heading": "Bone and osteoporosis",
-          "body": "Bone is not a calcium rock, Kruse says, but a crystal-and-collagen semiconductor held together at its junctions by copper-65. Under Earth's field, walking and other loading generate a steady current that charges bone and tells bone-building cells to keep working. In space, or under nnEMF (wireless and wiring fields) and night light on Earth, the copper loses its alignment and is pushed out, the bone's charge flips and osteoporosis follows. With the field weakening, he says, Earth now behaves increasingly like space.\n\nCiting Becker's work on bone growing in response to magnetic pressure, he reads a bone spur (osteophyte) on the spine as a calcified shadow of magnetic turbulence, laid down at the level where deuterium stalled, and calls such spurs \"magnetic tafoni,\" after the honeycomb hollows wind carves in rock."
-        },
-        {
-          "heading": "In practice",
-          "body": "His nerve pain, head injury and Bell's palsy protocol: for CRPS, secure grounding and a good field before putting sun or light on the limb; for head or face trauma with vertigo, ground, use his 3% saline approach with structural decompression, and get sunlight for nasal nitric oxide; after a brain bleed with new symptoms, get examined and imaged; and if Bell's palsy appears soon after arriving somewhere, suspect the place. For Ménière's, avoid diuretics. For hearing loss and spinal-cord softening he relies on light and on clearing the fluid routes rather than writing them off. He cautions against making nerve blocks, painkillers or anti-vertigo drugs the main strategy."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "381930",
-          "url": "https://forum.jackkruse.com/posts/381930/"
-        },
-        {
-          "label": "381468",
-          "url": "https://forum.jackkruse.com/posts/381468/"
-        },
-        {
-          "label": "381953",
-          "url": "https://forum.jackkruse.com/posts/381953/"
-        },
-        {
-          "label": "385704",
-          "url": "https://forum.jackkruse.com/posts/385704/"
-        },
-        {
-          "label": "384185",
-          "url": "https://forum.jackkruse.com/posts/384185/"
-        },
-        {
-          "label": "377363",
-          "url": "https://forum.jackkruse.com/posts/377363/"
-        },
-        {
-          "label": "385877",
-          "url": "https://forum.jackkruse.com/posts/385877/"
-        },
-        {
-          "label": "376041",
-          "url": "https://forum.jackkruse.com/posts/376041/"
-        },
-        {
-          "label": "382943",
-          "url": "https://forum.jackkruse.com/posts/382943/"
-        },
-        {
-          "label": "373261",
-          "url": "https://forum.jackkruse.com/posts/373261/"
-        },
-        {
-          "label": "373274",
-          "url": "https://forum.jackkruse.com/posts/373274/"
-        },
-        {
-          "label": "370740",
-          "url": "https://forum.jackkruse.com/posts/370740/"
-        }
-      ]
-    },
-    {
-      "id": "pregnancy-and-birth",
-      "title": "Pregnancy and birth",
-      "pillar": "support",
-      "summary": "Kruse says a pregnant woman needs grounded sun more than extra calories, treats labor and nausea as functional signals, and links parents' deuterium load to birth defects and to the child's later insulin resistance.",
-      "sections": [
-        {
-          "body": "Kruse says a pregnant woman needs grounded sunlight more than extra calories. He reads severe pregnancy nausea and labor pain as purposeful signals rather than problems to suppress, and links the parents' load of deuterium, a heavy form of hydrogen, at conception to birth defects."
-        },
-        {
-          "heading": "Sun before calories",
-          "body": "Standard prenatal advice, in Kruse's view, sets women up for gestational diabetes and preeclampsia: avoid the sun, wear chemical sunscreen, eat a calorie surplus and take synthetic prenatal pills. In a sun-starved mother surrounded by wireless signals, he says, extra food only piles up unused electrons and loads deuterium into the liver.\n\nGrounded, full-spectrum sun does the opposite in his account. Near-infrared light hydrates the mother's melanin (the light-absorbing pigment), UV light anchors her organ clocks through light sensors in the skin and eyes, and her blood carries the sun's energy to the placenta, so she doesn't need to overeat.\n\nThe placenta, he says, is the fetus's stand-in ground, which he calls a \"placental stator.\" Because the fetus can't touch the Earth, the placenta's twisted, one-handed villi act as a giant spin filter, creating a small magnetic field under the fetus that keeps its energy chain working during rapid growth.\n\nThe mother is also the baby's filter, or \"fab plant.\" Nature, in his account, meant her to turn plant vitamin K1 into MK-4, the animal form of vitamin K, filtering out deuterium on the way, and to pass it on slowly through breast milk. The placenta likewise meters vitamin K on purpose, so babies are not \"born deficient.\""
-        },
-        {
-          "heading": "Nausea, the heart and early warnings",
-          "body": "Severe pregnancy nausea (hyperemesis gravidarum) is a protective brain alarm in Kruse's model. When deuterium floods the mother's blood, a stress hormone called GDF15 acts on the vomiting center at the floor of the brain. It stops her eating so she burns fat, which makes the clean, low-deuterium water the embryo needs to copy its mitochondria cleanly. Anti-nausea drugs silence the alarm without fixing its cause.\n\nPregnancy is a huge draw on the mother's mitochondria, he says. If her body water is loaded with deuterium, her heart muscle can tear itself apart trying to spin its energy motors \"against concrete,\" as happens to astronauts. He sees Takotsubo or \"broken-heart\" cardiomyopathy, a sudden ballooning of the heart, as more than a grief reaction: anything that suddenly destroys melanin and the hormones made along its pathway (dopamine, noradrenaline, adrenaline) can dilate the heart, and nnEMF and a weakening field both qualify.\n\nIf the stress continues, he says, the fetus's liver raises alpha-fetoprotein (AFP), the protein measured in maternal blood tests, as a distress flare and shield. Morning sickness and newborn jaundice are, to him, early warnings of an oxygen problem before birth that later shows up as eye and skin disease."
-        },
-        {
-          "heading": "Labor as an ignition switch",
-          "body": "Labor pain is a \"spintronic ignition switch,\" Kruse says. Contractions squeeze tissue the way pressure squeezes a crystal, sending an electrical surge up the spine that switches on oxytocin, endorphins and anti-inflammatory signals. Epidurals cut that signal, and he links them to worse tearing, breastfeeding trouble and postpartum fog. The squeeze of the birth canal and the mother's vaginal microbes, he adds, set the newborn's immune baseline."
-        },
-        {
-          "heading": "Conception and after",
-          "body": "Parents who conceive under light stress, wireless exposure and no grounding, Kruse says, can't make low-deuterium water, so their sperm and eggs fill with deuterium. The embryo's spine needs very fluid water to lengthen; under the heavy load it protects itself with scar-like collagen that tethers the spinal cord to the base of the spine. He links the same germline load to heart defects.\n\nThe load carries into later life. Skin oils and the fat under the skin should act as deuterium sinks, but a mother with heavy body water, processed carbohydrates, little sun and a weak field forces the fetus to build its machinery with heavy hydrogen. Cells that can't make energy then cut back their insulin receptors to avoid damage, which he calls the true origin of insulin resistance, type 2 diabetes and obesity. For the child, he adds, a healthy mother of modest intellect is a better start than a brilliant one who is heavily deuterated, eats from a deuterium-heavy region and waits until 40 to conceive.\n\nPostpartum depression, like sleep apnea, is in his view a disease of lost magnetism. The mother must become magnetically \"pinned\" (grounded under a stable, strong field) to let old depressive memories go and start fresh, and he says moving to Florida is not enough."
-        },
-        {
-          "heading": "In practice",
-          "body": "His pregnancy protocols: plenty of grounded sun with UV and infrared, including bare-eyed morning light; no chemical sunscreen or sun avoidance; no forced calorie surplus and no synthetic prenatal pills; and a wireless-free home, fixing the environment first in a high-risk pregnancy. He wants both parents' deuterium load dealt with before conception. He favors unmedicated vaginal birth without an epidural where possible, and breastfeeding. For severe nausea he says to fix light, grounding and field rather than taking anti-nausea drugs, and for postpartum depression, light, water, magnetism and pinning rather than SSRIs."
-        }
-      ],
-      "relatedProtocolIds": [
-        "pregnancy-sun"
-      ],
-      "sources": [
-        {
-          "label": "384323",
-          "url": "https://forum.jackkruse.com/posts/384323/"
-        },
-        {
-          "label": "382424",
-          "url": "https://forum.jackkruse.com/posts/382424/"
-        },
-        {
-          "label": "382425",
-          "url": "https://forum.jackkruse.com/posts/382425/"
-        },
-        {
-          "label": "380942",
-          "url": "https://forum.jackkruse.com/posts/380942/"
-        },
-        {
-          "label": "380967",
-          "url": "https://forum.jackkruse.com/posts/380967/"
-        },
-        {
-          "label": "380128",
-          "url": "https://forum.jackkruse.com/posts/380128/"
-        },
-        {
-          "label": "380129",
-          "url": "https://forum.jackkruse.com/posts/380129/"
-        },
-        {
-          "label": "372298",
-          "url": "https://forum.jackkruse.com/posts/372298/"
-        },
-        {
-          "label": "373363",
-          "url": "https://forum.jackkruse.com/posts/373363/"
-        },
-        {
-          "label": "372980",
-          "url": "https://forum.jackkruse.com/posts/372980/"
-        }
-      ]
-    },
-    {
-      "id": "children-and-autism",
-      "title": "Children, infants and autism",
-      "pillar": "support",
-      "summary": "Kruse calls autism a \"magnetic decline disease\" and warns that indoor childhood, blue-light phototherapy, the newborn vitamin K shot and early deuterium load set children up for lifelong problems.",
-      "sections": [
-        {
-          "body": "Kruse calls autism a \"magnetic decline disease\" and says an indoor childhood, blue-light treatment for newborn jaundice and an early overload of deuterium (a heavy form of hydrogen) set children up for lifelong problems. Children have less buffering than adults, in his view, so their environment matters even more."
-        },
-        {
-          "heading": "Autism as magnetic decline",
-          "body": "Building on Douglas Wallace's work linking certain mitochondrial haplogroups (maternal lineages) to higher odds of autism, Kruse says a vulnerable lineage living in a mismatched place crosses an energy threshold. The brain uses about 20% of the body's energy at 2% of its mass, so it is the first to fail. A high-declination city, where compass north strays far from true north, combined with heavy nnEMF (wireless and wiring fields), pushes the brain's energy chain into a stall.\n\nHe adds that the fusion site on chromosome 2 trips under field loss and nnEMF, that autism rates track declination, and that a mother's vitamin D deficiency adds risk. He predicts autism should be rarest where agonic lines (zero-declination lines) cross the tropics or the equator.\n\nAutistic sensory reactions, Kruse says, are protective triage: a brain that can't process everything sheds costly input, and a vacuum cleaner's noise sets off an alarm in unbuffered tissue. Autistic children sleep badly because a weak planetary field, LED light and indoor EMF disrupt their body clock."
-        },
-        {
-          "heading": "Infants and the unfinished vagus",
-          "body": "An infant's vagus nerve is not yet myelinated (insulated), so in Kruse's model it can't cope with a deuterium overload. Deuterium jams the baby's energy motors, and the 2 Hz rhythm he believes keeps tissues in sync breaks down. The baby becomes a \"foreign astronaut\" in its own crib, unable to lock its clocks to the sun and planet, and is set up for developmental delay, sensory problems, gut imbalance, broken sleep and early metabolic trouble. How badly a child is hit, he says, depends on the mother's condition before and during pregnancy.\n\nBlue-light phototherapy for newborn jaundice, which he says replaced full-spectrum light over the past 35 years, permanently disrupts the clock run by heme, the iron-containing molecule in blood. Citing Oláh and colleagues (2013), he notes more atypical moles, a melanoma risk marker, in children who had it.\n\nHe groups cradle cap (infant seborrheic dermatitis) with jaundice as an early sign of mitochondrial trouble rather than a passing effect of the mother's hormones, since children who have it show more metabolic problems later. Skin, to him, is the outward map of how efficiently mitochondria run, and in adults the same rash is a recognized marker of metabolic syndrome."
-        },
-        {
-          "heading": "The newborn vitamin K shot",
-          "body": "Kruse questions the routine vitamin K injection at birth. Turning the injected K1 into MK-4, the form mammals use to manage calcium, has to pass through menadione, a step that uses up glutathione, which he calls the cell's main defense against deuterium and oxidative stress; he likens the drain to what acetaminophen does in adults. Nature delivers vitamin K as a \"slow leak\" through the placenta and breast milk, and a large dose is, to him, a high-voltage event in a low-voltage infant whose detox systems aren't yet running.\n\nIn a hospital full of nnEMF he calls the shot an \"nnEMF multiplier.\" With glutathione drained, the inner mitochondrial membrane fails, ATP synthase slows on deuterium-laden fuel, and the brain fails to prune its connections and lay down myelin. He calls this \"isotopic ossification\" and links it to developmental delay and autism."
-        },
-        {
-          "heading": "Indoor childhood",
-          "body": "Children kept indoors under blue light and away from the ground are, to Kruse, low-capacitance \"astronauts\" with no outside field to guide their electrons. PANS/PANDAS, the sudden onset of tics, rage and OCD often blamed on strep, he calls a disorder of a deuterated terrain, set up by desert living, wireless-heavy classrooms, blue light and deuterium-rich tap water. Strep, in his account, arrives as a clean-up crew, so antibiotics kill the helpers.\n\nPinworms, likewise, settle in the still, heavy-water \"ponds\" of a child whose drainage routes aren't flushing, and chronic infections in children mean both child and parents are carrying deuterium. The worms' night itching, he adds, blocks the brain's deep-sleep clean-up.\n\nHe says GLP-1 weight-loss drugs leave about 1 in 8 children with vitamin D deficiency within a year. Bedwetting is often a deuterium-loaded skull base acting on the pituitary's water-balance signal, not a behavior problem or a missing hormone."
-        },
-        {
-          "heading": "In practice",
-          "body": "His pregnancy, birth and childhood protocol: no blue-light phototherapy for newborn jaundice; no heavy deuterium load for an infant before its nerves are insulated, which for him includes a skeptical look at the high-dose vitamin K shot; and children kept grounded. For autistic children who sleep badly, cut night-time LED light and indoor EMF. For PANS/PANDAS, take the child out of wireless-heavy rooms, put bare feet on the earth, use full sun including near-infrared, and favor deuterium depletion over repeated antibiotics. No GLP-1 drugs for children. For autism generally he suggests living on or near an agonic line, ideally in the tropics."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "383989",
-          "url": "https://forum.jackkruse.com/posts/383989/"
-        },
-        {
-          "label": "383988",
-          "url": "https://forum.jackkruse.com/posts/383988/"
-        },
-        {
-          "label": "384985",
-          "url": "https://forum.jackkruse.com/posts/384985/"
-        },
-        {
-          "label": "383901",
-          "url": "https://forum.jackkruse.com/posts/383901/"
-        },
-        {
-          "label": "379276",
-          "url": "https://forum.jackkruse.com/posts/379276/"
-        },
-        {
-          "label": "380942",
-          "url": "https://forum.jackkruse.com/posts/380942/"
-        },
-        {
-          "label": "384272",
-          "url": "https://forum.jackkruse.com/posts/384272/"
-        },
-        {
-          "label": "385644",
-          "url": "https://forum.jackkruse.com/posts/385644/"
-        },
-        {
-          "label": "378082",
-          "url": "https://forum.jackkruse.com/posts/378082/"
-        },
-        {
-          "label": "373362",
-          "url": "https://forum.jackkruse.com/posts/373362/"
-        },
-        {
-          "label": "372980",
-          "url": "https://forum.jackkruse.com/posts/372980/"
-        },
-        {
-          "label": "370870",
-          "url": "https://forum.jackkruse.com/posts/370870/"
-        }
-      ]
-    },
-    {
-      "id": "fertility-cycles-voltage",
-      "title": "Fertility, cycles and pelvic voltage",
-      "pillar": "support",
-      "summary": "Kruse ties menstrual rhythm, egg and sperm quality, erections and orgasm to lunar ground currents, sunlight and pelvic voltage, which devices and indoor life collapse.",
-      "sections": [
-        {
-          "body": "Kruse ties menstrual rhythm, erections and sperm quality to sunlight, moon-driven currents in the ground and the electrical charge of pelvic tissue. Devices, high-rise living and indoor life collapse that charge, he says, and fertility shows it first because one pathway governs both fertility and longevity."
-        },
-        {
-          "heading": "Sperm as the purest test",
-          "body": "Sperm gave up their repair machinery to travel light, Kruse says, so they can't compensate when the environment fails, which makes them the clearest readout of where a man lives. If DNA damage in sperm climbs from about 20% to 35% within a few months, he reads that as a new, ongoing stressor acting across two or three of the 74–90-day sperm production cycles.\n\nIn his example the stressor was a move to a 24th-floor apartment. High up, he says, the body sits thousands of volts above the ground, unable to draw electrons from the Earth, and acts like an ungrounded antenna. Deuterium, a heavy form of hydrogen, then adds mass to the sperm's DNA so that its copying machinery stalls and breaks."
-        },
-        {
-          "heading": "Eggs kept offline",
-          "body": "Eggs take the opposite strategy. Citing a *Nature* paper showing that egg cells suppress Complex I, the energy chain's entry point and its main source of reactive oxygen, Kruse says the female germline is kept largely offline from before birth, like a satellite powering down to cross a radiation zone. That lets an egg stay a quiet \"quantum seed\" for decades.\n\nEgg quality is falling, he says, because night light, nnEMF and the weakening field force Complex I back on, so the egg burns deuterium-heavy fuel and \"browns\" from within. Citing a 2026 paper in which long days (18 hours of light, 6 of dark) disrupted the ovary's NAD+ metabolism (a key electron carrier) and impaired its follicles, he calls a long light day a trap that mimics indoor \"magnetic darkness.\"\n\nA broken body clock also stalls the vagus-driven bicarbonate flush that clears deuterium from the gut, sending it into the pelvis and the follicular fluid around the egg. The follicle then shifts to fermentation and fails to ovulate, and he expects ovarian failure to cluster where the field is weakest."
-        },
-        {
-          "heading": "Cycles and the moon",
-          "body": "Citing Harold Saxton Burr's recordings of tree voltage and the work of Georges Lakhovsky, Kruse says living tissue tracks the moon, the sun and magnetic storms. Moon-driven ground currents (telluric currents) once synchronized women's cycles to a place's \"electromagnetic terroir,\" the way they time coral spawning a few days after the late-spring full moon. Women living together in nature, he says, synchronize like pendulum clocks on a shared wall, and city light and a weakened field break both rhythms."
-        },
-        {
-          "heading": "Hormones as stand-ins for charge",
-          "body": "Hormones, in Kruse's model, are stand-ins for the body's local electrical charge. Night light and nnEMF (wireless and wiring fields) damage melanin and the eye's daylight sensor, and lack of grounding drains charge from the mitochondria.\n\nSex hormones start as cholesterol turned into pregnenolone inside the mitochondria by iron-containing enzymes that depend on a stable field. In a weak field, he says, the cell diverts pregnenolone to the stress hormone cortisol to survive, which he calls the \"pregnenolone steal.\" Progesterone then crashes and the monthly cycle fades; he warns of widespread infertility, endometriosis and early menopause. Heavy menstrual bleeding signals a missing \"Zeeman handshake,\" his term for the field keeping electron spins aligned."
-        },
-        {
-          "heading": "Erectile dysfunction and orgasm",
-          "body": "Kruse calls erectile dysfunction the male version of a lost cycle: a whole-body voltage collapse, not a plumbing problem. An erection needs nitric oxide from an iron-containing enzyme that depends on precise electron spins. A phone in the pocket or a laptop on the lap exposes the groin to alternating fields that, citing Liboff and Blackman's work on ion cyclotron resonance, pull calcium out of cells and drop pelvic voltage, while the pregnenolone steal sends cholesterol to cortisol instead of testosterone. Ancestral men, he says, stayed virile because full sun and bare feet kept their pelvic tissue charged.\n\nOrgasm, in his model, is a fluid surge that pushes the brain into an urgent \"de-frag,\" which is why sleep afterward is often the deepest dream sleep. Female ejaculation, fluid from the Skene's glands around the urethra (the female counterpart of the prostate), is to him a normal, healthy flush of the pelvic nerve network, not incontinence. Inability to climax, dementia and thyroid disease share one culprit in his view: a clogged deuterium exhaust.\n\nHe sees the lower spine and pelvis as a sump below the brainstem where heavy water settles, and female ejaculation as its \"lumbo-sacral de-frag\": strong pelvic-floor contractions spin deuterium out of the Skene's glands. Most women, he notes, don't know these glands make PSA (prostate-specific antigen). PSA is a protease, an enzyme that cuts proteins, and he suggests it acts as a local cleaner for the protein \"sludge\" that ubiquitin has tagged for removal once deuterium disturbs it, so the fluid is the isotopic and protein exhaust of a cellular reboot. He links this periodic flush to women's lower rate of ALS. A light-starved perineum, in his account, lets pelvic melanin slide back into its precursors and weakens the flush.\n\nClimax gets harder, he says, because dopamine can't drive the pelvic muscles against a thicker, deuterium-heavy base. Intravenous 3% saline, given by a clinician, pulls that heavy fluid out of the pelvic tissue into the blood to be cleared, lowering viscosity so dopamine can work again; he suggests timing it three to five days before a period so the body sheds the load with it."
-        },
-        {
-          "heading": "In practice",
-          "body": "For men his protocol is to take phones and laptops out of pockets and off the lap and clear alternating-current sources from the workspace; use groin cold (ice packs or cold plunges); and sleep on a grounded sheet with the bed aligned north–south. For sperm DNA damage, live at ground level (or shield and ground the bed) and drink certified deuterium-depleted water under 105 ppm for 90 days, one full production cycle. Before conceiving, he wants both partners' deuterium load addressed. For women with difficult climax he points to UV-A sunlight on the perineum and, with a clinician, the pre-period 3% saline flush. His moon-cycle routine, written to restore the menstrual cycle, calls for strict darkness or full blue-blocking after sunset (strictest around the full moon), morning sun, 20–60 minutes of barefoot grounding a day with more near full and new moons, time in stronger-field places, cool dark sleep and cold, and tracking cycle, mood and heart-rate variability over two to three lunar months."
-        }
-      ],
-      "relatedProtocolIds": [
-        "moon-cycle-routine"
-      ],
-      "sources": [
-        {
-          "label": "378967",
-          "url": "https://forum.jackkruse.com/posts/378967/"
-        },
-        {
-          "label": "378968",
-          "url": "https://forum.jackkruse.com/posts/378968/"
-        },
-        {
-          "label": "383871",
-          "url": "https://forum.jackkruse.com/posts/383871/"
-        },
-        {
-          "label": "378974",
-          "url": "https://forum.jackkruse.com/posts/378974/"
-        },
-        {
-          "label": "378976",
-          "url": "https://forum.jackkruse.com/posts/378976/"
-        },
-        {
-          "label": "378971",
-          "url": "https://forum.jackkruse.com/posts/378971/"
-        },
-        {
-          "label": "384732",
-          "url": "https://forum.jackkruse.com/posts/384732/"
-        },
-        {
-          "label": "373379",
-          "url": "https://forum.jackkruse.com/posts/373379/"
-        },
-        {
-          "label": "373384",
-          "url": "https://forum.jackkruse.com/posts/373384/"
-        },
-        {
-          "label": "372385",
-          "url": "https://forum.jackkruse.com/posts/372385/"
-        },
-        {
-          "label": "372386",
-          "url": "https://forum.jackkruse.com/posts/372386/"
-        },
-        {
-          "label": "373079",
-          "url": "https://forum.jackkruse.com/posts/373079/"
-        }
-      ]
-    },
-    {
-      "id": "glp1-drug-damage",
-      "title": "GLP-1 drugs, anorexia and the lost fat capacitor",
-      "pillar": "support",
-      "summary": "Kruse says GLP-1 weight-loss drugs force a crude deuterium flush that ends in lost pleasure, lost muscle and collagen, a hijacked vagus, vision loss and a \"welded-shut\" exhaust, and that anorexia shares the damage without the fat buffer.",
-      "sections": [
-        {
-          "body": "Kruse considers GLP-1 weight-loss drugs (semaglutide, tirzepatide, retatrutide) harmful overall. In his model they force a crude, off-schedule flush of deuterium, a heavy form of hydrogen. The flush brings short-term benefits but leaves people unable to feel pleasure, losing muscle and collagen, and with the body's own deuterium exhaust shut. He groups anorexia with them because it shares the damage but lacks the body fat that would buffer it."
-        },
-        {
-          "heading": "The exhaust the drugs hijack",
-          "body": "Kruse's starting point is the body's natural deuterium exit. Morning sunlight's infrared triggers the cortisol awakening response, the hormone rise after waking. That switches on the glucagon gene on chromosome 2, the same gene that makes GLP-1 in the gut, and releases about 2 liters of bicarbonate fluid from the pancreas. Guided by the vagus nerve, the flush carries deuterium out through the gut.\n\nMuch modern hunger, he says, is a false famine. Deuterium-heavy food eaten indoors under LEDs jams ATP synthase, the cell's energy motor, and the brain reads the resulting electron shortage as a lack of calories; he calls this the \"hunger mirror.\" GLP-1 drugs silence that signal without fixing what sends it."
-        },
-        {
-          "heading": "A crude flush",
-          "body": "The injected drug, Kruse says, bypasses sunlight's timing and forces a continuous, crude deuterium purge, a \"quantum centrifuge.\" For a while this clears deuterium from blood-vessel linings and kidney filters. That, he argues, explains the roughly 20% drop in heart and kidney events in the SELECT and FLOW trials, which did not track weight loss. He calls it a \"cardioprotective illusion\": a real effect, but not a cure, and paid for later in the ways below."
-        },
-        {
-          "heading": "Loss of pleasure",
-          "body": "The first cost is anhedonia, a loss of pleasure that he distinguishes from depression because there is no guilt or worthlessness. The drugs act in the brainstem and reward centers and damp the pulsed dopamine surges behind wanting. He adds that the forced clamp on mitochondrial energy leaves none of the loose fluctuation dopamine needs. Users lose interest not only in food but in sex, work, hobbies and friends, and he wants this screened with the SHAPS pleasure scale rather than depression questionnaires."
-        },
-        {
-          "heading": "Muscle, collagen and hair",
-          "body": "Citing Helen Blau's lab at Stanford, Kruse says semaglutide raises 15-PGDH, an aging enzyme he calls a \"gerozyme.\" It breaks down prostaglandin E2, a repair signal, and so locks muscle stem cells in dormancy. With muscle unable to repair, even moderate exercise acts like overtraining.\n\nAny drug that drives up metabolic rate, he says, forces ATP synthase to turn against a deuterium-heavy, \"concrete\" medium and damages the junctions of the inner mitochondrial membrane. GLP-1 drugs do the same, which he compares to the muscle astronauts lose in space, and he sees an underactive thyroid as the body's adaptive slowdown under deuterium.\n\nIn his model the drugs plus nnEMF (wireless and wiring fields) stall the energy chain and flip oxygen into its reactive singlet form. Mitochondrial DNA then leaks out, sets off the cell's virus alarms and jams the 2 Hz rhythm he says stem cells listen to. The stem-cell niche is left overheated and dried out, a state he calls \"focal lattice lock.\"\n\nThe multi-agonists that also hit the glucagon receptor (tirzepatide and retatrutide) push tissue further, he says. The chromosome 2 \"fuse\" blows, and muscle and collagen revert to loose, primitive tissue, so he expects hypermobile, Ehlers-Danlos-like connective tissue and 35-year-olds with the bones of 80-year-olds. In type 2 diabetics, whose energy chain is already stalled, the calorie cut comes out of muscle rather than fat.\n\nHair loss is triage. A sudden shock and a reduced supply of nutrients push many follicles into their shedding phase about two to four months in, and losing weight faster than 3–4 lb a week is the strongest predictor. He watches ferritin, zinc, vitamin D3, B12 and protein, notes that about 1 in 8 children on these drugs develop vitamin D deficiency within a year, and estimates the drugs cost ten to twenty years of life."
-        },
-        {
-          "heading": "The welded-shut exhaust",
-          "body": "While the drug forces its flush, Kruse says, the natural route idles and fails. GLP-1 drugs cut the pancreas's bicarbonate output and slow the gut, and GLP-1 receptors on the vagus nerve's sensory hub (the nodose ganglion) overload with deuterium; gastroparesis, bowel problems and fatty liver follow. The liver's P450 enzymes, which process steroids and fat-soluble vitamins, are scrambled. In his view users move from a stalled small intestine to Crohn's disease and then gut cancer, and the deuterium backing up from the gut can reach the brain and set up Parkinson's.\n\nHe points to 3,636 active lawsuits gathered in one federal case (MDL 3094), mostly over gastroparesis, a paralyzed stomach, as evidence that the drugs hijack the vagus. Without the nerve's electrical instructions the stomach lining stalls, building up deuterium and low oxygen. Low oxygen also blocks DHA, the omega-3 fat that needs high oxygen pressure to enter the brain, cutting the brain off from light-driven melanin repair.\n\nThe same lawsuits now include permanent vision loss from NAION, a stroke of the optic nerve, which he calls the eye syndrome of spaceflight produced on Earth. The optic nerve is so dense with mitochondria that deuterium easily locks it up, and its UV-A light sensor can no longer turn light into electricity.\n\nHe compares the drugs to Pervitin, the methamphetamine given to soldiers in the Second World War: both flood the body with CLIP, a misprocessed fragment of the hormone precursor POMC, and \"weld shut\" the vagal bicarbonate exhaust. When the drug stops, deuterium backs into the insulin-making beta cells, POMC keeps yielding CLIP instead of fat-burning alpha-MSH, and hunger rebounds frantically, with weight returning as fat alongside inflammation and insulin resistance. Grey-market retatrutide is worse still, he says, and he predicts a rise in insulin-secreting tumors (insulinomas)."
-        },
-        {
-          "heading": "Anorexia: the same damage without the buffer",
-          "body": "Anorexia, in Kruse's account, shares the GLP-1 damage but lacks the \"fat capacitor,\" body fat acting as an electrical buffer and energy store. Leptin, the fat hormone he calls the master photoelectric transducer because it reports stored energy to the brain, approaches zero. Its \"carrier wave\" vanishes and the brain reads endless starvation, producing distorted body image and obsessive loops. The starved gut has also wasted, so it can't extract enough energy from food."
-        },
-        {
-          "heading": "In practice",
-          "body": "Kruse's GLP-1 damage protocol has four core steps: morning sun where the field is clean, ideally at zero declination and away from all wireless; deuterium-depleted water at 90–105 ppm with frequent cold immersion at 45–55 °F; unshielded early-morning infrared and UV-A on skin and eyes; and pure, fresh (2S)-hesperidin timed to sun exposure. For gut damage he adds the \"bicarb hack,\" oral baking soda to restart the flush, and he rules the drugs out for children. His anorexia recovery base keeps the same foundation but replaces ice baths with short, gentle dips in 80–85 °F water, going colder only as fat returns. It maximizes morning UV-A and infrared so melanin can supply charge directly, bypassing the weakened gut, and adds liquid ionic magnesium and trace copper-histidine timed with the morning sun."
-        }
-      ],
-      "relatedProtocolIds": [],
-      "sources": [
-        {
-          "label": "379259",
-          "url": "https://forum.jackkruse.com/posts/379259/"
-        },
-        {
-          "label": "379222",
-          "url": "https://forum.jackkruse.com/posts/379222/"
-        },
-        {
-          "label": "379224",
-          "url": "https://forum.jackkruse.com/posts/379224/"
-        },
-        {
-          "label": "375421",
-          "url": "https://forum.jackkruse.com/posts/375421/"
-        },
-        {
-          "label": "374819",
-          "url": "https://forum.jackkruse.com/posts/374819/"
-        },
-        {
-          "label": "378782",
-          "url": "https://forum.jackkruse.com/posts/378782/"
-        },
-        {
-          "label": "376131",
-          "url": "https://forum.jackkruse.com/posts/376131/"
-        },
-        {
-          "label": "384898",
-          "url": "https://forum.jackkruse.com/posts/384898/"
-        },
-        {
-          "label": "377298",
-          "url": "https://forum.jackkruse.com/posts/377298/"
-        },
-        {
-          "label": "379285",
-          "url": "https://forum.jackkruse.com/posts/379285/"
-        },
-        {
-          "label": "373652",
-          "url": "https://forum.jackkruse.com/posts/373652/"
-        },
-        {
-          "label": "372274",
-          "url": "https://forum.jackkruse.com/posts/372274/"
         }
       ]
     }

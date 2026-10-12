@@ -133,7 +133,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 ### Grounded sun in pregnancy
 - **id:** pregnancy-sun
 - **pillar:** light
-- **app:** ready
+- **app:** hold
 - **summary:** In pregnancy, put grounded full-spectrum sun ahead of extra calories.
 - **steps:**
   1. Get plenty of sun with UV and infrared while grounded, including bare-eyed morning light; don't skip the grounding.
@@ -220,8 +220,9 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 
 ### Wild seafood, DHA and careful iodine
 - **id:** seafood-meal
-- **pillar:** water
+- **pillar:** support
 - **app:** ready
+- **group:** food
 - **summary:** Get DHA, magnesium and antioxidants from wild seafood rather than pills, and keep iodine low unless you are pinned.
 - **steps:**
   1. Eat wild-caught seafood regularly for DHA (in its natural, un-esterified form) and magnesium. In North America, source from the Pacific: wild sockeye or halibut, or small, short-lived fish such as sardines and anchovies, rather than East Coast oysters.
@@ -238,8 +239,9 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 
 ### Eat in daylight, nothing after dark
 - **id:** early-dinner
-- **pillar:** water
+- **pillar:** support
 - **app:** ready
+- **group:** food
 - **summary:** Eat in daylight — a first meal in the morning and the main meal near solar noon — and nothing after dark.
 - **steps:**
   1. Eat a first meal in the morning, near the natural cortisol peak; don't skip it.
@@ -253,8 +255,9 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 
 ### Saturated fat as main fuel
 - **id:** saturated-fat-fuel
-- **pillar:** water
+- **pillar:** support
 - **app:** ready
+- **group:** food
 - **summary:** Run mainly on saturated fat, keep carbs for full-sun equatorial living, and fix light and location before diet.
 - **steps:**
   1. Favor saturated fats: grass-fed ghee, coconut oil, lard, tallow, butter, clarified butter.
@@ -273,8 +276,9 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 
 ### Eat food from your own zip code
 - **id:** zip-code-food
-- **pillar:** water
+- **pillar:** support
 - **app:** ready
+- **group:** food
 - **summary:** Eat fresh, seasonal food grown where you live, ideally from your own garden.
 - **steps:**
   1. Grow or buy food from your own zip code; fresh-picked beats shipped produce displayed under LEDs.
@@ -292,8 +296,9 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 
 ### Coherent dry fast
 - **id:** coherent-dry-fast
-- **pillar:** water
+- **pillar:** support
 - **app:** ready
+- **group:** food
 - **summary:** Dry fast (no food or water) only if you carry enough body fat, grounded in morning sun, and never indoors.
 - **steps:**
   1. Check you have fat to draw on: not below about 20% body fat if you are in strong sun, and not with a BMI under about 24.
@@ -599,6 +604,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** sleep-space
 - **pillar:** support
 - **app:** ready
+- **group:** sleep-cold-movement
 - **summary:** Make the bedroom cold, totally dark, grounded and wireless-free.
 - **steps:**
   1. Switch off Wi-Fi, routers and all wireless devices before sleep, and keep devices out of the room.
@@ -615,6 +621,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** cold-thermogenesis
 - **pillar:** support
 - **app:** ready
+- **group:** sleep-cold-movement
 - **summary:** Use daily cold exposure, more where sun is weak or the field poor, plus targeted ice on the head and neck.
 - **steps:**
   1. If you're new to it, add cold gradually, at sunrise or after dinner; not everyone needs it.
@@ -634,6 +641,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** exercise
 - **pillar:** support
 - **app:** ready
+- **group:** sleep-cold-movement
 - **summary:** Move daily, outdoors and grounded, at moderate intensity — environment first, fitness second.
 - **steps:**
   1. Move every day in ways that drive blood, lymph and spinal-fluid flow; favor mechanical and gravitational loading.
@@ -653,6 +661,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** tens-vagus
 - **pillar:** support
 - **app:** ready
+- **group:** vagus-sound
 - **summary:** Settings and placements for gentle TENS (a skin-electrode nerve stimulator) on the vagus nerve or upper abdomen.
 - **steps:**
   1. Use a unit with a biphasic, net-zero-charge waveform (not constant DC).
@@ -673,6 +682,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** vagus-nerve-stimulation
 - **pillar:** support
 - **app:** ready
+- **group:** vagus-sound
 - **summary:** Tone the vagus nerve daily with slow breathing, humming, gargling, massage, falling water and resonant sound.
 - **steps:**
   1. Slow belly breathing, the main daily practice: in through the nose for 4 seconds, out gently for 8 seconds, for 5–10 minutes.
@@ -694,6 +704,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** castor-oil-navel
 - **pillar:** support
 - **app:** ready
+- **group:** sleep-cold-movement
 - **summary:** Put a few drops of castor oil in the navel every night at bedtime.
 - **steps:**
   1. Buy organic, cold-pressed, hexane-free castor oil.
@@ -709,6 +720,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** tuning-forks
 - **pillar:** support
 - **app:** ready
+- **group:** vagus-sound
 - **summary:** Use a 128 Hz fork on stiff or nerve areas and in the evening, and a 40 Hz fork in the morning and at lunch.
 - **steps:**
   1. Strike the fork and press its stem against the body.
@@ -727,6 +739,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** binaural-sleep-audio
 - **pillar:** support
 - **app:** ready
+- **group:** vagus-sound
 - **summary:** Play theta, then delta, binaural beats before and while falling asleep.
 - **steps:**
   1. About 20 minutes before bed, play theta beats (4–7 Hz).
@@ -741,6 +754,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** mastic-gum
 - **pillar:** support
 - **app:** ready
+- **group:** vagus-sound
 - **summary:** Chew mastic gum daily, the first step for a blocked nose, and pair it with a 40 Hz fork on the palate.
 - **steps:**
   1. Get real mastic gum, not falim gum. For gum (periodontal) disease, use the hard resin.
@@ -759,6 +773,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** sinus-hum-reset
 - **pillar:** support
 - **app:** ready
+- **group:** breathing
 - **summary:** A four-part routine for a blocked sinus or hay fever: humming, positioning, CO₂ breathing and morning grounding.
 - **steps:**
   1. Sit upright with your mouth shut, breathe in through the nose, then hum low ("OM" or "MMMM") on each exhale, aiming the vibration at the blocked side, for 5–10 minutes.
@@ -775,6 +790,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** nasal-breathing
 - **pillar:** support
 - **app:** ready
+- **group:** breathing
 - **summary:** Breathe through the nose day and night, with alternate-nostril breathing and breath holds.
 - **steps:**
   1. Stop mouth breathing: lips closed, breathing through the nose day and night; tape the mouth at night.
@@ -790,6 +806,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** co2-pulse-breathing
 - **pillar:** support
 - **app:** ready
+- **group:** breathing
 - **summary:** Alternate normal air and CO₂-enriched air every 35 seconds for 30 minutes.
 - **steps:**
   1. Set up a source of CO₂-raised air.
@@ -804,6 +821,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** buteyko-breathing
 - **pillar:** support
 - **app:** ready
+- **group:** breathing
 - **summary:** Raise carbon dioxide gently by breathing less, and use a traditional sauna.
 - **steps:**
   1. Cut breathing volume: light, slow, quiet nasal breaths.
@@ -821,6 +839,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** shoreline-wave-breathing
 - **pillar:** support
 - **app:** ready
+- **group:** breathing
 - **summary:** Breathe breaking-wave spray at the shoreline each morning at sunrise.
 - **steps:**
   1. Go to the surf line at sunrise.
@@ -837,6 +856,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** volcano-protocol
 - **pillar:** support
 - **app:** ready
+- **group:** other
 - **summary:** A combined routine for spinal "lattice lock": water jet and 40 Hz fork on the spine, carbonated water with DDW, sauna, and sunrise grounding on volcanic ground.
 - **steps:**
   1. Live or stay somewhere pinned and low-latitude on the Pacific Rim.
@@ -857,6 +877,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** hypnosis-defrag
 - **pillar:** support
 - **app:** ready
+- **group:** other
 - **summary:** Use hypnosis or self-hypnosis as a "de-frag" session, set up with water and grounding and followed by the fork and water jet.
 - **steps:**
   1. Learn hypnosis or self-hypnosis (or deep autogenic training).
@@ -871,6 +892,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** hrv-tracking
 - **pillar:** support
 - **app:** ready
+- **group:** other
 - **summary:** Track heart-rate variability (HRV — the beat-to-beat variation in heart timing), above all in deep sleep, plus a few simple markers and a daily journal.
 - **steps:**
   1. Track HRV during deep sleep as your main progress gauge; flexible, rising HRV is the goal.
@@ -891,7 +913,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 ### Moon-cycle routine ("Phase 4")
 - **id:** moon-cycle-routine
 - **pillar:** support
-- **app:** ready
+- **app:** hold
 - **summary:** A routine for re-syncing body rhythms to moon, sun and ground, written to restore the menstrual cycle, with a version for men.
 - **steps:**
   1. After sunset, keep strict darkness (or full blue blocking) and minimal artificial light, strictest in the 3–5 days around the full moon.
@@ -910,6 +932,7 @@ Plain instructions for each practice, paraphrased from Dr. Jack Kruse's forum po
 - **id:** time-expansion-novelty
 - **pillar:** support
 - **app:** ready
+- **group:** other
 - **summary:** Counter the sense that time is speeding up with novelty, reflection and slow breathing in the sun.
 - **steps:**
   1. Add novelty: new routes, hobbies, learning.
