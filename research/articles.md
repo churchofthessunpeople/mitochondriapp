@@ -285,7 +285,7 @@ In practice, Kruse's answer is the "pin first" order: fix your magnetic and wire
 
 ### Marcus inversion and the Warburg shift
 - **id:** marcus-theory-inverted-region
-- **pillar:** light
+- **pillar:** support
 - **summary:** Kruse's core failure state: electron transfer stalls in Marcus's "inverted region," and cells retreat to fermentation as a protective emergency mode.
 - **protocols:** none
 
@@ -811,7 +811,7 @@ The linked protocols: drink carbonated water with DDW, favouring naturally carbo
 
 ### Seafood, DHA and careful iodine
 - **id:** seafood-meal
-- **pillar:** water
+- **pillar:** support
 - **summary:** Kruse favors wild seafood for DHA and minerals, prefers cold, well-mixed waters such as the Pacific Northwest, accepts antioxidants only within whole marine food, and says iodine is safe only for someone who is pinned.
 - **protocols:** seafood-meal
 
@@ -859,7 +859,7 @@ His seafood-meal guidance: eat wild-caught seafood for DHA and magnesium, favour
 
 ### Meal timing and the heme clock
 - **id:** early-dinner
-- **pillar:** water
+- **pillar:** support
 - **summary:** Kruse says when, and under what light, you eat drives diabetes more than what you eat, through a heme-based clock that should switch off the liver's night-time sugar output.
 - **protocols:** early-dinner
 
@@ -893,7 +893,7 @@ His early-dinner protocol: eat the main meal near solar noon, ideally outdoors; 
 
 ### Food: substrate, isotopes and local information
 - **id:** food-substrate-isotopes
-- **pillar:** water
+- **pillar:** support
 - **summary:** Kruse says food supplies fuel and isotopes but not the magnetic field the cell needs; he favors fat over glucose, low-deuterium plant parts and fresh local food, and rejects any diet as a fix for a location problem.
 - **protocols:** saturated-fat-fuel, zip-code-food
 
@@ -939,7 +939,7 @@ His saturated-fat-fuel protocol: favour ghee, coconut oil, lard and clarified bu
 
 ### Fat as a capacitor: obesity, fasting and the buffer
 - **id:** adipose-capacitor
-- **pillar:** water
+- **pillar:** support
 - **summary:** Kruse treats body fat as an electrical capacitor and deuterium store that protects heart and brain, so stripping it, or dry fasting without enough of it, backfires; obesity, in his view, is an efficiency failure rather than a calorie surplus.
 - **protocols:** saturated-fat-fuel, coherent-dry-fast, glp1-damage-offset, anorexia-recovery
 
@@ -1157,7 +1157,7 @@ In practice, the relocation checklist gathers his criteria: the three World Magn
 
 ### Electroculture: growing food in a weakening field
 - **id:** electroculture-food
-- **pillar:** magnetism
+- **pillar:** support
 - **summary:** Kruse says a weakening magnetic field and deuterium-heavy water are cutting crop yields, and that electroculture, basalt and low-deuterium water can keep food growing where the field still holds, while melanized fungi keep the rain coming.
 - **protocols:** zip-code-food
 
