@@ -9,19 +9,21 @@
     "lint": "eslint .",
     "content:build": "node scripts/build-public-content.mjs",
     "volcanoes:build": "node scripts/build-active-volcanoes.mjs",
-    "test": "tsx --test src/lib/public-content.test.ts src/lib/public-place.test.ts src/lib/region-scoring.test.ts src/lib/solar-activity.test.ts src/lib/sun-phases.test.ts src/lib/bedrock.test.ts src/lib/active-volcanoes.test.ts"
+    "test": "tsx --test src/lib/public-content.test.ts src/lib/public-place.test.ts src/lib/region-scoring.test.ts src/lib/solar-activity.test.ts src/lib/sun-phases.test.ts src/lib/geo.test.ts src/lib/bedrock.test.ts src/lib/active-volcanoes.test.ts"
   },
   "dependencies": {
     "lucide-react": "^1.24.0",
     "next": "^16.2.10",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/tz-lookup": "^6.1.2",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.10",
     "postcss": "^8.5.16",

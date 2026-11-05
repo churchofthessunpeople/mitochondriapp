@@ -32,6 +32,7 @@ import {
 import { ACTIVE_SINCE_YEAR } from "@/lib/active-volcanoes.data";
 import { getSunTimesForLocalDay } from "@/lib/sun";
 import { computeSunPhases } from "@/lib/sun-phases";
+import { fetchUvForecast, type UvForecast } from "@/lib/uv-forecast";
 
 export const dynamic = "force-dynamic";
 
@@ -172,7 +173,7 @@ export async function POST(request: Request) {
       place.timezone,
     );
 
-    const [elevationM, geomagRaw, artificialEm, bedrock] = await Promise.all([
+    const [elevationM, geomagRaw, artificialEm, bedrock, uvForecast] = await Promise.all([
       withDeadline(
         fetchElevationMeters(place.latitude, place.longitude),
         1_200,
@@ -189,6 +190,11 @@ export async function POST(request: Request) {
         null,
       ),
       withDeadline(fetchBedrock(place.latitude, place.longitude), 2_500, null),
+      withDeadline(
+        fetchUvForecast(place.latitude, place.longitude),
+        2_500,
+        null as UvForecast | null,
+      ),
     ]);
 
     const geomag = geomagRaw ? formatGeomagDisplay(geomagRaw) : null;
@@ -221,7 +227,10 @@ export async function POST(request: Request) {
         place.latitude,
         place.longitude,
         place.timezone,
+        elevationM ?? 0,
       ),
+      elevationM: elevationM ?? null,
+      uvForecast,
       factors: {
         latitudeLabel: factors.latitudeLabel,
         bandLabel: factors.bandLabel,

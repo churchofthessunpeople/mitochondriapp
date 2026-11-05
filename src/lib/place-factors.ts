@@ -66,30 +66,30 @@ export function latitudeBand(latitude: number): {
   if (a <= 12) {
     return {
       bandLabel: "Deep tropics",
-      uvSeasonLabel: "Year-round strong UV potential",
+      uvSeasonLabel: "UV-B every day of the year, strongest of anywhere",
     };
   }
   if (a <= 23.5) {
     return {
       bandLabel: "Tropics",
-      uvSeasonLabel: "Year-round UV season",
+      uvSeasonLabel: "UV-B nearly all year (brief winter gap at the far edge)",
     };
   }
   if (a <= 35) {
     return {
       bandLabel: "Subtropical",
-      uvSeasonLabel: "Long UV season (most of year)",
+      uvSeasonLabel: "Long UV-B season (roughly 8-11 months)",
     };
   }
   if (a <= 48) {
     return {
       bandLabel: "Mid-latitude",
-      uvSeasonLabel: "Seasonal UV — peak late spring–early fall",
+      uvSeasonLabel: "Seasonal UV-B (roughly 5-7 months, centered on summer)",
     };
   }
   return {
     bandLabel: "High latitude",
-    uvSeasonLabel: "Short UV season — long dark winters",
+    uvSeasonLabel: "Short UV-B season (a few months at most, none far north)",
   };
 }
 

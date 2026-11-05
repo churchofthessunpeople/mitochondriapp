@@ -2,6 +2,8 @@
  * Geocoding + distance helpers for ZIP → location assignment.
  */
 
+import tzlookup from "tz-lookup";
+
 export type GeocodedPlace = {
   postalCode: string;
   latitude: number;
@@ -95,6 +97,25 @@ const US_STATE_TZ: Record<string, string> = {
 };
 
 /**
+ * IANA zone for a coordinate. Uses the polygon lookup so split-zone states
+ * (FL panhandle, west TX, IN, KY, TN, ND, ...) and territories are right;
+ * falls back to the state map only if the lookup throws.
+ */
+export function timezoneForCoordinates(
+  latitude: number,
+  longitude: number,
+  stateAbbr = "",
+): string {
+  try {
+    const zone = tzlookup(latitude, longitude);
+    if (zone) return zone;
+  } catch {
+    /* fall through */
+  }
+  return US_STATE_TZ[stateAbbr] ?? "America/New_York";
+}
+
+/**
  * Geocode a US ZIP via Zippopotam.us (no API key).
  * Accepts 5-digit or ZIP+4 (uses first 5).
  */
@@ -143,7 +164,7 @@ export async function geocodeUsZip(rawZip: string): Promise<GeocodedPlace> {
   }
 
   const stateAbbr = place["state abbreviation"] ?? "";
-  const timezone = US_STATE_TZ[stateAbbr] ?? "America/New_York";
+  const timezone = timezoneForCoordinates(latitude, longitude, stateAbbr);
   const placeName = place["place name"] ?? code;
   const state = place.state ?? stateAbbr;
 

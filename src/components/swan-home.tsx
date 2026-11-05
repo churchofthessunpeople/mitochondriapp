@@ -16,6 +16,7 @@ import {
 import {
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -26,6 +27,7 @@ import {
   type PublicActivity,
   type PublicArticle,
   type PublicContentBundle,
+  type PublicGlossaryEntry,
   type PublicPillar,
   type PublicSource,
   type SupportGroup,
@@ -43,7 +45,83 @@ import {
   type SolarFlare,
 } from "@/lib/solar-activity";
 import { isSunlitAt } from "@/lib/sun";
-import type { SunPhaseWindow, UvbSeason } from "@/lib/sun-phases";
+import {
+  computeSunPhases,
+  localDayKey,
+  sunNow,
+  UVB_MIN_ELEVATION_DEG,
+  type SunNow,
+  type SunPhaseId,
+  type SunPhaseWindow,
+  type SunPhases,
+  type UvbSeason,
+} from "@/lib/sun-phases";
+import { summarizeUvDay, uvCategory, type UvDaySummary } from "@/lib/uv-forecast";
+
+const PHASE_LABELS: Record<SunPhaseId, string> = {
+  night: "Night",
+  sunrise: "Sunrise light",
+  uva: "UV-A (morning)",
+  uvb: "UV-B window",
+  daylight: "Daylight",
+  sunset: "Sunset light",
+};
+
+/**
+ * Sun phases for the place's *current* local day, recomputed on the client so
+ * the "now" readout stays right as the clock moves and across midnight.
+ */
+function useLiveSun(place: PublicPlaceResult): {
+  phases: SunPhases | null;
+  now: SunNow | null;
+  uvDay: UvDaySummary | null;
+} {
+  const [tick, setTick] = useState<number | null>(null);
+  useEffect(() => {
+    const first = window.setTimeout(() => setTick(Date.now()), 0);
+    const id = window.setInterval(() => setTick(Date.now()), 30_000);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(id);
+    };
+  }, []);
+
+  const day = tick == null ? null : localDayKey(new Date(tick), place.timezone);
+  const phases = useMemo(
+    () =>
+      day == null
+        ? null
+        : computeSunPhases(
+            new Date(tick!),
+            place.latitude,
+            place.longitude,
+            place.timezone,
+            place.elevationM ?? 0,
+          ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [day, place.latitude, place.longitude, place.timezone, place.elevationM],
+  );
+  const now = useMemo(
+    () =>
+      phases && tick != null
+        ? sunNow(phases, new Date(tick), place.latitude, place.longitude, {
+            altitudeM: place.elevationM ?? 0,
+            forecast: place.uvForecast,
+          })
+        : null,
+    [phases, tick, place.latitude, place.longitude, place.elevationM, place.uvForecast],
+  );
+  const uvDay = useMemo(() => {
+    if (!phases?.solarNoon || !place.uvForecast) return null;
+    const noon = Date.parse(phases.solarNoon);
+    return summarizeUvDay(
+      place.uvForecast,
+      new Date(noon - 12 * 3_600_000),
+      new Date(noon + 12 * 3_600_000),
+    );
+  }, [phases, place.uvForecast]);
+  return { phases, now, uvDay };
+}
 
 type Icon = LucideIcon;
 type OpenPanel = PublicPillar | "place" | null;
@@ -155,7 +233,8 @@ function PlaceContext({
 }) {
   const isLight = pillar === "light";
   const { geomag, bedrock, dipZone } = place.factors;
-  const uvb = place.sunPhases?.uvbWindow;
+  const live = useLiveSun(place);
+  const uvb = (live.phases ?? place.sunPhases)?.uvbWindow;
 
   const lightLine = `Sunrise ${formatClock(place.sun.sunrise, place.timezone)} · ${
     uvb
@@ -459,6 +538,7 @@ function ActivityDialog({
   activities,
   allActivities,
   articles,
+  glossary,
   place,
   onClose,
 }: {
@@ -466,6 +546,7 @@ function ActivityDialog({
   activities: PublicActivity[];
   allActivities: PublicActivity[];
   articles: PublicArticle[];
+  glossary: PublicGlossaryEntry[];
   place: PublicPlaceResult | null;
   onClose: () => void;
 }) {
@@ -596,6 +677,7 @@ function ActivityDialog({
           ) : view.kind === "article" ? (
             <ArticleDetail
               article={view.article}
+              glossary={glossary}
               practices={pickById(
                 allActivities,
                 view.article.relatedProtocolIds,
@@ -800,25 +882,62 @@ function PracticeDetail({
 
 function ArticleDetail({
   article,
+  glossary,
   practices,
   onOpenPractice,
 }: {
   article: PublicArticle;
+  glossary: PublicGlossaryEntry[];
   practices: PublicActivity[];
   onOpenPractice: (activity: PublicActivity) => void;
 }) {
+  const terms = glossary.filter((entry) => article.terms.includes(entry.term));
   return (
     <article className="article-detail">
       <p className="article-summary">{article.summary}</p>
-      <p className="activity-choice__meta">{readingTimeLabel(article)}</p>
-      <div className="article-sections">
-        {article.sections.map((section, index) => (
-          <section key={`${index}-${section.heading ?? "intro"}`}>
-            {section.heading ? <h3>{section.heading}</h3> : null}
-            <Paragraphs text={section.body} />
-          </section>
-        ))}
-      </div>
+
+      <section className="key-points" aria-label="Key points">
+        <p className="eyebrow">Key points</p>
+        <ul>
+          {article.keyPoints.map((point) => (
+            <li key={point}>
+              <InlineText text={point} />
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <details className="article-more">
+        <summary>
+          <span>Read the full explanation</span>
+          <span className="activity-choice__meta">{readingTimeLabel(article)}</span>
+        </summary>
+        <div className="article-sections">
+          {article.sections.map((section, index) => (
+            <section key={`${index}-${section.heading ?? "intro"}`}>
+              {section.heading ? <h3>{section.heading}</h3> : null}
+              <Paragraphs text={section.body} />
+            </section>
+          ))}
+        </div>
+      </details>
+
+      {terms.length ? (
+        <details className="article-more article-terms">
+          <summary>
+            <span>Terms used</span>
+            <span className="activity-choice__meta">{terms.length}</span>
+          </summary>
+          <dl>
+            {terms.map((entry) => (
+              <div key={entry.term}>
+                <dt>{entry.term}</dt>
+                <dd>{entry.meaning}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      ) : null}
 
       {practices.length ? (
         <section className="practice-reading" aria-label="Related practices">
@@ -850,6 +969,7 @@ function PlaceDialog({
   scrollToSolar,
   activities,
   articles,
+  glossary,
   onResolved,
   onClose,
 }: {
@@ -860,6 +980,7 @@ function PlaceDialog({
   scrollToSolar: boolean;
   activities: PublicActivity[];
   articles: PublicArticle[];
+  glossary: PublicGlossaryEntry[];
   onResolved: (place: PublicPlaceResult) => void;
   onClose: () => void;
 }) {
@@ -999,6 +1120,7 @@ function PlaceDialog({
           ) : view?.kind === "article" ? (
             <ArticleDetail
               article={view.article}
+              glossary={glossary}
               practices={pickById(activities, view.article.relatedProtocolIds)}
               onOpenPractice={(activity) => openView({ kind: "practice", activity })}
             />
@@ -1056,7 +1178,8 @@ function PlaceResult({
 }) {
   const { factors } = place;
   const { bedrock, dipZone, volcano } = factors;
-  const phases = place.sunPhases;
+  const live = useLiveSun(place);
+  const phases = live.phases ?? place.sunPhases;  const sunRightNow = live.now;
   return (
     <div className="place-result" aria-live="polite">
       <div className="place-result__location">
@@ -1108,6 +1231,43 @@ function PlaceResult({
           </>
         ) : null}
       </div>
+      {sunRightNow ? (
+        <p className="place-sun-now" aria-live="off">
+          <strong>Right now: {PHASE_LABELS[sunRightNow.phase]}.</strong>{" "}
+          {sunRightNow.elevationDeg > 0
+            ? `Sun ${Math.round(sunRightNow.elevationDeg)}° up. UV index ${sunRightNow.uvIndex.toFixed(1)} (${uvCategory(sunRightNow.uvIndex)})${
+                sunRightNow.uvSource === "forecast" &&
+                sunRightNow.clearSkyUvIndex - sunRightNow.uvIndex >= 1
+                  ? `, ${sunRightNow.clearSkyUvIndex.toFixed(1)} under a clear sky`
+                  : ""
+              }. ${
+                (sunRightNow.uvSource === "forecast"
+                  ? sunRightNow.uvIndex >= 3
+                  : sunRightNow.elevationDeg >= UVB_MIN_ELEVATION_DEG)
+                  ? "Enough UV-B to make vitamin D."
+                  : "Too little UV-B to make vitamin D."
+              }`
+            : "Sun is below the horizon."}
+          {sunRightNow.until
+            ? ` Phase changes ${formatClock(sunRightNow.until, place.timezone)}.`
+            : ""}
+        </p>
+      ) : null}
+      {live.uvDay && live.uvDay.peakUv >= 0.5 ? (
+        <p className="place-sun-now">
+          <strong>Today&apos;s UV:</strong> peaks at {live.uvDay.peakUv.toFixed(1)} around{" "}
+          {formatClock(live.uvDay.peakAt, place.timezone)}
+          {live.uvDay.usefulWindow
+            ? `; UV index 3 or higher from ${formatWindow(live.uvDay.usefulWindow, place.timezone)} (${live.uvDay.hoursAtOrAbove3} h)`
+            : "; never reaches 3, so little vitamin D today"}
+          .
+        </p>
+      ) : null}
+      <p className="dialog-note">
+        {place.uvForecast
+          ? `UV index: ${place.uvForecast.source}, including forecast clouds, ozone, haze and your altitude. The UV-A/UV-B windows above are sun-angle rules (45°), not forecasts.`
+          : "The live UV forecast is unavailable, so UV index is estimated from the sun's angle and your altitude for a clear sky. Clouds and ozone change the real value."}
+      </p>
       <div className="place-result__section">
         <p className="eyebrow">
           <PlaceTermLabel term="field" onOpen={onTerm} />
@@ -1368,6 +1528,7 @@ export function SwanHome({ content }: { content: PublicContentBundle }) {
                 : content.activities.filter((activity) => activity.pillar === panel)
             }
             articles={content.articles}
+            glossary={content.glossary}
             place={place}
             onClose={() => setPanel(null)}
           />
@@ -1383,6 +1544,7 @@ export function SwanHome({ content }: { content: PublicContentBundle }) {
             scrollToSolar={scrollToSolar}
             activities={content.activities}
             articles={content.articles}
+            glossary={content.glossary}
             onResolved={(nextPlace) => {
               setPlace(nextPlace);
               setStoredZip(nextPlace.postalCode);

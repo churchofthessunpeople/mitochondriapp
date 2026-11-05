@@ -1,5 +1,6 @@
 import type { PublicSource } from "./public-content";
 import type { SunPhases } from "./sun-phases";
+import type { UvForecast } from "./uv-forecast";
 
 export type PublicSunTimes = {
   sunrise: string | null;
@@ -88,6 +89,10 @@ export type PublicPlaceResult = {
   timezone: string;
   sun: PublicSunTimes;
   sunPhases: SunPhases;
+  /** Metres above sea level (best effort), used for the UV altitude correction. */
+  elevationM: number | null;
+  /** Real hourly UV index forecast, or null if the service was unavailable. */
+  uvForecast: UvForecast | null;
   factors: PublicPlaceFactors;
 };
 

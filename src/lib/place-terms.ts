@@ -39,12 +39,12 @@ export const PLACE_TERMS: Record<PlaceTermId, PlaceTerm> = {
   },
   uva: {
     label: "UV-A",
-    tip: "From 90 minutes after sunrise until the UV-B window opens. In Kruse's four-phase day, morning UV-A builds tolerance for stronger midday sun.",
+    tip: "From 90 minutes after sunrise until the UV-B window opens (or solar noon when the sun never gets high enough). UV-A is present all day; this is Kruse's morning phase, which builds tolerance for stronger midday sun.",
     articleId: "solar-callus",
   },
   uvb: {
     label: "UV-B",
-    tip: "When the sun is more than 45° up, so your shadow is shorter than you. The date is the last day this season with a window. Kruse ties UV-B to vitamin D made in skin.",
+    tip: "When the sun is more than 45° up, so your shadow is shorter than you. Based on sun angle only, not a UV forecast: clouds, altitude and ozone aren't included. The date is the last day this season with a window. Kruse ties UV-B to vitamin D made in skin.",
     articleId: "solar-noon-vitamin-d",
   },
   field: {
