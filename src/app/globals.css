@@ -896,6 +896,87 @@ html.light ::selection {
   line-height: 1.55;
 }
 
+.key-points {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.key-points ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.75rem 0.85rem 0.75rem 1.9rem;
+  border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  color: var(--fg);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  list-style: disc outside;
+}
+
+.key-points li::marker {
+  color: color-mix(in srgb, var(--accent) 75%, var(--muted));
+}
+
+.article-more {
+  margin-top: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+.article-more > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0 0.2rem;
+  color: var(--fg);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.article-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.article-more > summary > span:first-child::before {
+  content: "+";
+  display: inline-block;
+  width: 1.1rem;
+  color: color-mix(in srgb, var(--accent) 75%, var(--muted));
+}
+
+.article-more[open] > summary > span:first-child::before {
+  content: "\2212";
+}
+
+.article-more > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.article-terms dl {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding-top: 0.75rem;
+}
+
+.article-terms dt {
+  color: var(--fg);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.article-terms dd {
+  margin: 0.1rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
 .article-sections {
   display: grid;
   gap: 1.25rem;

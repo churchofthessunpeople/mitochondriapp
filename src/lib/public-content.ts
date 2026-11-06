@@ -40,14 +40,22 @@ export type PublicArticle = {
   pillar: PublicPillar;
   group: SupportGroup | null;
   summary: string;
+  keyPoints: string[];
   sections: PublicArticleSection[];
+  terms: string[];
   relatedProtocolIds: string[];
   sources: PublicSource[];
+};
+
+export type PublicGlossaryEntry = {
+  term: string;
+  meaning: string;
 };
 
 export type PublicContentBundle = {
   activities: PublicActivity[];
   articles: PublicArticle[];
+  glossary: PublicGlossaryEntry[];
 };
 
 export const PUBLIC_PILLARS: readonly {
@@ -173,10 +181,22 @@ function parseContent(value: unknown): PublicContentBundle {
   if (
     !isRecord(value) ||
     !Array.isArray(value.activities) ||
-    !Array.isArray(value.articles)
+    !Array.isArray(value.articles) ||
+    !Array.isArray(value.glossary)
   ) {
     throw new Error("Invalid public content bundle.");
   }
+
+  const glossary = value.glossary.map((rawEntry, index): PublicGlossaryEntry => {
+    if (!isRecord(rawEntry)) {
+      throw new Error(`Invalid glossary entry at index ${index}.`);
+    }
+    return {
+      term: requiredString(rawEntry.term, "term", `glossary[${index}]`),
+      meaning: requiredString(rawEntry.meaning, "meaning", `glossary[${index}]`),
+    };
+  });
+  const glossaryTerms = new Set(glossary.map((entry) => entry.term));
 
   const articles = value.articles.map((rawArticle, index): PublicArticle => {
     if (!isRecord(rawArticle)) {
@@ -198,6 +218,17 @@ function parseContent(value: unknown): PublicContentBundle {
       };
     });
 
+    const keyPoints = idList(rawArticle.keyPoints, `${id}.keyPoints`);
+    if (keyPoints.length === 0) {
+      throw new Error(`Public article has no key points: ${id}`);
+    }
+    const terms = idList(rawArticle.terms, `${id}.terms`);
+    for (const term of terms) {
+      if (!glossaryTerms.has(term)) {
+        throw new Error(`Missing glossary term ${term} for article ${id}`);
+      }
+    }
+
     const pillar = pillarOf(rawArticle.pillar, id);
     return {
       id,
@@ -205,7 +236,9 @@ function parseContent(value: unknown): PublicContentBundle {
       pillar,
       group: groupOf(rawArticle.group, pillar, id),
       summary: requiredString(rawArticle.summary, "summary", id),
+      keyPoints,
       sections,
+      terms,
       relatedProtocolIds: idList(rawArticle.relatedProtocolIds, `${id}.relatedProtocolIds`),
       sources: sourceList(rawArticle.sources, id),
     };
@@ -262,7 +295,7 @@ function parseContent(value: unknown): PublicContentBundle {
     }
   }
 
-  return { activities, articles };
+  return { activities, articles, glossary };
 }
 
 const PUBLIC_CONTENT = parseContent(rawContent);

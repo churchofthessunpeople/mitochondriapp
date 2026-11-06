@@ -7,6 +7,10 @@ import {
   getPublicArticleById,
 } from "./public-content";
 import { PLACE_TERMS } from "./place-terms";
+import rawDiseaseAllowList from "../../content/disease-allowlist.json";
+import { DISEASE_TERMS } from "../../scripts/disease-terms.mjs";
+
+const diseaseAllowList = rawDiseaseAllowList as { id: string; term: string; reason: string }[];
 
 test("every activity has steps, sources and existing articles", () => {
   const content = getPublicContent();
@@ -50,8 +54,10 @@ test("public text carries no markdown or internal ids", () => {
     ]),
     ...content.articles.flatMap((article) => [
       article.summary,
+      ...article.keyPoints,
       ...article.sections.map((section) => section.body),
     ]),
+    ...content.glossary.map((entry) => entry.meaning),
   ];
   for (const text of texts) {
     assert.equal(text.includes("**"), false, text.slice(0, 80));
@@ -97,6 +103,55 @@ test("condition-specific articles stay out of the public app", () => {
     "children-and-autism",
   ]) {
     assert.equal(getPublicArticleById(id), undefined, id);
+  }
+});
+
+test("articles lead with key points and stay within the word budget", () => {
+  for (const article of getPublicContent().articles) {
+    assert.ok(
+      article.keyPoints.length >= 3 && article.keyPoints.length <= 5,
+      `${article.id} has ${article.keyPoints.length} key points`,
+    );
+    const words = article.sections
+      .map((section) => section.body)
+      .join(" ")
+      .split(/\s+/)
+      .filter(Boolean).length;
+    assert.ok(words <= 1200, `${article.id} has ${words} words`);
+  }
+});
+
+test("article terms resolve to glossary entries the app ships", () => {
+  const content = getPublicContent();
+  const used = new Set(content.articles.flatMap((article) => article.terms));
+  const shipped = new Set(content.glossary.map((entry) => entry.term));
+  assert.ok(shipped.size > 0);
+  for (const term of used) assert.ok(shipped.has(term), term);
+  for (const term of shipped) assert.ok(used.has(term), `${term} ships but no article uses it`);
+});
+
+test("public text names no diseases outside the allow-list", () => {
+  const content = getPublicContent();
+  const items: [string, (string | null | undefined)[]][] = [
+    ...content.activities.map((a): [string, (string | null)[]] => [
+      a.id,
+      [a.name, a.summary, ...a.steps, a.equipmentDetail, a.cautions],
+    ]),
+    ...content.articles.map((a): [string, (string | undefined)[]] => [
+      a.id,
+      [a.title, a.summary, ...a.keyPoints, ...a.sections.flatMap((s) => [s.heading, s.body])],
+    ]),
+    ...content.glossary.map((g): [string, string[]] => [`glossary:${g.term}`, [g.term, g.meaning]]),
+  ];
+  for (const [id, texts] of items) {
+    const text = texts.filter(Boolean).join("\n");
+    for (const { term, pattern } of DISEASE_TERMS) {
+      if (!pattern.test(text)) continue;
+      assert.ok(
+        diseaseAllowList.some((entry) => entry.id === id && entry.term === term),
+        `${id} names ${term}`,
+      );
+    }
   }
 });
 
