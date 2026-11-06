@@ -56,6 +56,13 @@ import {
   type SunPhases,
   type UvbSeason,
 } from "@/lib/sun-phases";
+import {
+  AlignmentCompare,
+  AlignmentSection,
+  recommendedPracticeIds,
+  useHaplogroup,
+} from "@/components/place-alignment";
+import { scoreAlignment } from "@/lib/kruse-alignment";
 import { summarizeUvDay, uvCategory, type UvDaySummary } from "@/lib/uv-forecast";
 
 const PHASE_LABELS: Record<SunPhaseId, string> = {
@@ -1024,30 +1031,33 @@ function PlaceDialog({
     return () => cancelAnimationFrame(frame);
   }, [scrollToSolar]);
 
+  async function lookupPlace(zipCode: string): Promise<PublicPlaceResult> {
+    const response = await fetch("/api/place", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ zip: zipCode }),
+    });
+    const data = (await response.json()) as unknown;
+    if (!response.ok || !isPublicPlaceResult(data)) {
+      const errorMessage =
+        typeof data === "object" &&
+        data !== null &&
+        "error" in data &&
+        typeof data.error === "string"
+          ? data.error
+          : "We could not resolve that ZIP code.";
+      throw new Error(errorMessage);
+    }
+    return data;
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch("/api/place", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ zip }),
-      });
-      const data = (await response.json()) as unknown;
-      if (!response.ok || !isPublicPlaceResult(data)) {
-        const errorMessage =
-          typeof data === "object" &&
-          data !== null &&
-          "error" in data &&
-          typeof data.error === "string"
-            ? data.error
-            : "We could not resolve that ZIP code.";
-        throw new Error(
-          errorMessage,
-        );
-      }
+      const data = await lookupPlace(zip);
       onResolved(data);
       try {
         window.localStorage.setItem("mito-place-zip", data.postalCode);
@@ -1154,7 +1164,15 @@ function PlaceDialog({
               {error}
             </p>
           ) : null}
-          {place ? <PlaceResult place={place} onTerm={openTerm} /> : null}
+          {place ? (
+            <PlaceResult
+              place={place}
+              onTerm={openTerm}
+              activities={activities}
+              onOpenPractice={(activity) => openView({ kind: "practice", activity })}
+              onLookup={lookupPlace}
+            />
+          ) : null}
           <SolarActivitySection
             solar={solar}
             unavailable={solarUnavailable}
@@ -1172,14 +1190,27 @@ function PlaceDialog({
 function PlaceResult({
   place,
   onTerm,
+  activities,
+  onOpenPractice,
+  onLookup,
 }: {
   place: PublicPlaceResult;
   onTerm: OpenTerm;
+  activities: PublicActivity[];
+  onOpenPractice: (activity: PublicActivity) => void;
+  onLookup: (zip: string) => Promise<PublicPlaceResult>;
 }) {
+  const [haplogroup, setHaplogroup] = useHaplogroup();
   const { factors } = place;
   const { bedrock, dipZone, volcano } = factors;
   const live = useLiveSun(place);
-  const phases = live.phases ?? place.sunPhases;  const sunRightNow = live.now;
+  const phases = live.phases ?? place.sunPhases;
+  const sunRightNow = live.now;
+  const alignment = useMemo(
+    () => scoreAlignment(place, phases, haplogroup),
+    [place, phases, haplogroup],
+  );
+  const recommended = pickById(activities, recommendedPracticeIds(alignment));
   return (
     <div className="place-result" aria-live="polite">
       <div className="place-result__location">
@@ -1190,6 +1221,28 @@ function PlaceResult({
           {factors.elevationLabel ? ` · ${factors.elevationLabel}` : ""}
         </p>
       </div>
+      <AlignmentSection
+        place={place}
+        phases={phases}
+        haplogroup={haplogroup}
+        onHaplogroup={setHaplogroup}
+        actions={
+          recommended.length ? (
+            <section className="practice-reading" aria-label="What to do here">
+              <p className="eyebrow">What to do here</p>
+              {recommended.map((activity) => (
+                <ChoiceButton
+                  key={activity.id}
+                  name={activity.name}
+                  description={activity.summary}
+                  meta={`${PILLAR_LABELS[activity.pillar]} · ${equipmentLabel(activity.equipment)}`}
+                  onClick={() => onOpenPractice(activity)}
+                />
+              ))}
+            </section>
+          ) : null
+        }
+      />
       <div className="place-data-grid">
         <div>
           <PlaceTermLabel term="sunrise" onOpen={onTerm} />
@@ -1357,8 +1410,10 @@ function PlaceResult({
           <p>{factors.artificialEm.summaryLine}</p>
           <p className="place-result__detail">
             {factors.artificialEm.detailLine}
-          </p>        </div>
+          </p>
+        </div>
       ) : null}
+      <AlignmentCompare place={place} haplogroup={haplogroup} onLookup={onLookup} />
     </div>
   );
 }

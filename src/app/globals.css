@@ -1384,3 +1384,201 @@ span.place-term__tip {
     transition: none;
   }
 }
+
+/* Kruse alignment score */
+.alignment {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--bg) 32%, transparent);
+}
+
+.alignment__total {
+  margin: 0;
+  color: var(--fg);
+  font-size: 1rem;
+  text-align: center;
+}
+
+.alignment__total strong {
+  color: var(--accent);
+}
+
+.alignment__bar {
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg) 14%, transparent);
+}
+
+.alignment__bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.alignment__coverage,
+.alignment__weights,
+.alignment__caveat,
+.alignment__lineage-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.alignment__lineage {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.alignment__lineage select {
+  min-height: 44px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  color: var(--fg);
+  background: var(--bg);
+  font: inherit;
+}
+
+.alignment__group {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.alignment__group .eyebrow {
+  margin: 0;
+  text-align: left;
+}
+
+.alignment__row {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.alignment__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alignment__label {
+  flex: 1 1 auto;
+  color: var(--fg);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.alignment__points {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.alignment__chip {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.64rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.alignment__chip--aligned {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.alignment__chip--mixed {
+  color: var(--fg);
+}
+
+.alignment__chip--misaligned {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.alignment__chip--unknown {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.alignment__value {
+  margin: 0;
+  color: var(--fg);
+  font-size: 0.78rem;
+}
+
+.alignment__why {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.alignment-compare {
+  display: grid;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.alignment-compare .eyebrow {
+  margin: 0;
+  text-align: center;
+}
+
+.alignment-compare__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.alignment-compare__table th,
+.alignment-compare__table td {
+  padding: 0.4rem 0.35rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  color: var(--fg);
+  font-weight: 400;
+}
+
+.alignment-compare__table thead th {
+  color: var(--muted);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+}
+
+.alignment-compare__table tbody th {
+  color: var(--muted);
+}
+
+.alignment-compare__total th,
+.alignment-compare__total td {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.alignment-compare__table small {
+  color: var(--muted);
+}
+
+.alignment-compare__value {
+  display: block;
+}
+
+.place-sun-now {
+  margin: 0;
+  color: var(--fg);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}

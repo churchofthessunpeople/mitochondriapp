@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "content:build": "node scripts/build-public-content.mjs",
     "volcanoes:build": "node scripts/build-active-volcanoes.mjs",
-    "test": "tsx --test src/lib/public-content.test.ts src/lib/public-place.test.ts src/lib/region-scoring.test.ts src/lib/solar-activity.test.ts src/lib/sun-phases.test.ts src/lib/geo.test.ts src/lib/bedrock.test.ts src/lib/active-volcanoes.test.ts"
+    "test": "tsx --test src/lib/public-content.test.ts src/lib/public-place.test.ts src/lib/region-scoring.test.ts src/lib/solar-activity.test.ts src/lib/sun-phases.test.ts src/lib/geo.test.ts src/lib/kruse-alignment.test.ts src/lib/bedrock.test.ts src/lib/active-volcanoes.test.ts"
   },
   "dependencies": {
     "lucide-react": "^1.24.0",

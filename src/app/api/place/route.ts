@@ -8,8 +8,10 @@ import {
   type ArtificialEmSnapshot,
 } from "@/lib/artificial-em";
 import {
+  fetchDeclinationGradientQuick,
   fetchGeomagFieldQuick,
   formatGeomagDisplay,
+  type DeclinationGradient,
   type GeomagField,
 } from "@/lib/geomag";
 import {
@@ -19,6 +21,7 @@ import {
 import {
   normalizePublicZip,
   type PublicBedrock,
+  type PublicGeomag,
   type PublicDipZone,
   type PublicPlaceResult,
   type PublicVolcano,
@@ -57,9 +60,18 @@ function serializeTime(value: Date | string | null): string | null {
 
 function serializeGeomag(
   geomag: ReturnType<typeof formatGeomagDisplay> | null,
-) {
+  gradient: DeclinationGradient | null,
+): PublicGeomag | null {
   if (!geomag) return null;
   return {
+    totalNt: geomag.totalNt,
+    inclinationDeg: geomag.inclinationDeg,
+    declinationDeg: geomag.declinationDeg,
+    declinationKnown: geomag.source === "bgs-wmm",
+    svDeclinationDegPerYear: geomag.svDeclinationDegPerYear ?? null,
+    svInclinationDegPerYear: geomag.svInclinationDegPerYear ?? null,
+    svTotalNtPerYear: geomag.svTotalNtPerYear ?? null,
+    declinationGradient: gradient,
     totalUtLabel: geomag.totalUtLabel,
     totalGaussLabel: geomag.totalGaussLabel,
     inclinationLabel: geomag.inclinationLabel,
@@ -89,6 +101,7 @@ function serializeBedrock(bedrock: Bedrock | null): PublicBedrock | null {
   return {
     unitName: bedrock.unitName,
     rockLabel: bedrock.rockLabel,
+    kind: bedrock.kind,
     ageLabel: bedrock.ageLabel,
     note: bedrock.note,
     source: BEDROCK_SOURCE,
@@ -103,6 +116,7 @@ function serializeVolcano(lat: number, lng: number): PublicVolcano {
       ? "Kruse says active volcanoes pin the local field best, because every magnetic field needs moving charge."
       : null;
   return {
+    hawaii: isHawaii(lat, lng),
     nearest: nearest
       ? {
           name: nearest.name,
@@ -173,7 +187,7 @@ export async function POST(request: Request) {
       place.timezone,
     );
 
-    const [elevationM, geomagRaw, artificialEm, bedrock, uvForecast] = await Promise.all([
+    const [elevationM, geomagRaw, artificialEm, bedrock, uvForecast, gradient] = await Promise.all([
       withDeadline(
         fetchElevationMeters(place.latitude, place.longitude),
         1_200,
@@ -195,6 +209,7 @@ export async function POST(request: Request) {
         2_500,
         null as UvForecast | null,
       ),
+      fetchDeclinationGradientQuick(place.latitude, place.longitude),
     ]);
 
     const geomag = geomagRaw ? formatGeomagDisplay(geomagRaw) : null;
@@ -212,6 +227,7 @@ export async function POST(request: Request) {
       postalCode: place.postalCode,
       placeName: place.placeName,
       state: place.state ?? place.stateAbbr ?? "",
+      stateAbbr: place.stateAbbr ?? "",
       country: place.country,
       latitude: place.latitude,
       longitude: place.longitude,
@@ -241,7 +257,7 @@ export async function POST(request: Request) {
         volcano: serializeVolcano(place.latitude, place.longitude),
         bedrock: serializeBedrock(bedrock),
         dipZone: serializeDipZone(factors.inclinationZone),
-        geomag: serializeGeomag(factors.geomag),
+        geomag: serializeGeomag(factors.geomag, gradient),
         artificialEm: serializeArtificialEm(factors.artificialEm),
       },
     };

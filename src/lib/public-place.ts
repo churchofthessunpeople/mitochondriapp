@@ -18,6 +18,17 @@ export type PublicGeomag = {
   model: string;
   date: string;
   source: string;
+  /** Numeric readings for scoring. */
+  totalNt: number;
+  inclinationDeg: number;
+  declinationDeg: number;
+  /** True when declination came from the real model, not the offline dipole fallback. */
+  declinationKnown: boolean;
+  /** Annual change; null if unavailable. */
+  svDeclinationDegPerYear: number | null;
+  svInclinationDegPerYear: number | null;
+  svTotalNtPerYear: number | null;
+  declinationGradient: { degPer100Km: number; agonicKm: number | null } | null;
 };
 
 export type PublicArtificialEm = {
@@ -31,6 +42,7 @@ export type PublicArtificialEm = {
 export type PublicBedrock = {
   unitName: string;
   rockLabel: string;
+  kind: "volcanic" | "iron-rich" | "carbonate" | "clay-delta" | "other";
   ageLabel: string | null;
   note: string | null;
   source: string;
@@ -51,6 +63,8 @@ export type PublicDipZone = {
 };
 
 export type PublicVolcano = {
+  /** Kruse rules Hawaii out even though it is volcanic. */
+  hawaii: boolean;
   /** Closest volcano active since `activeSinceYear`, if within `radiusKm`. */
   nearest: {
     name: string;
@@ -83,6 +97,8 @@ export type PublicPlaceResult = {
   postalCode: string;
   placeName: string;
   state: string;
+  /** Two-letter state or territory code, e.g. "TX". */
+  stateAbbr: string;
   country: string;
   latitude: number;
   longitude: number;

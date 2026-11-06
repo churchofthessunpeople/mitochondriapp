@@ -33,6 +33,8 @@ export type SunPhases = {
   /** Modelled clear-sky UV index at solar noon (altitude-adjusted). */
   noonUvIndex: number | null;
   uvbSeason: UvbSeason;
+  /** Days per year the solar-noon sun reaches 45 degrees (UV-B possible). */
+  uvbDaysPerYear: number;
   /** Local civil day these windows belong to, `YYYY-MM-DD`. */
   day: string;
 };
@@ -165,13 +167,19 @@ export function computeSunPhases(
   const day = isoDay(anchor);
 
   let uvbSeason: UvbSeason = { kind: hasUvb ? "all-year" : "never" };
-  for (let d = 1; d <= 366; d++) {
+  let seasonFound = false;
+  // Days in the next 365 whose solar-noon sun reaches 45 degrees.
+  let uvbDays = 0;
+  for (let d = 0; d < 365; d++) {
     const elevation = noonElevation(anchor + d * DAY_MS, latitude, longitude);
-    if (elevation != null && elevation >= UVB_MIN_ELEVATION_DEG !== hasUvb) {
+    const up = elevation != null && elevation >= UVB_MIN_ELEVATION_DEG;
+    if (up) uvbDays++;
+    if (!seasonFound && d > 0 && elevation != null && up !== hasUvb) {
       uvbSeason = { kind: hasUvb ? "ends" : "returns", date: isoDay(anchor + d * DAY_MS) };
-      break;
+      seasonFound = true;
     }
   }
+  const uvbDaysPerYear = uvbDays;
 
   if (!noon) {
     return {
@@ -183,6 +191,7 @@ export function computeSunPhases(
       noonElevationDeg,
       noonUvIndex,
       uvbSeason,
+      uvbDaysPerYear,
       day,
     };
   }
@@ -223,6 +232,7 @@ export function computeSunPhases(
     noonElevationDeg,
     noonUvIndex,
     uvbSeason,
+    uvbDaysPerYear,
     day,
   };
 }
