@@ -4,6 +4,11 @@
 
 **Captured:** 2026-07-21
 
+**Note (2026-11-15):** This was written for the earlier tracker app. The
+level/XP system, logging, streaks and accounts it builds on have since been
+removed (see `DESIGN.md`, Non-goals), so reviving it would mean rebuilding those
+first.
+
 ## Concept
 
 Tamagotchi-style companion that develops as the user logs activities. The existing level/XP system would become the growth engine; the Mitopet is the visible face of that progress.

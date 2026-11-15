@@ -41,7 +41,8 @@ next-env.d.ts
 
 # drizzle
 /drizzle/meta
-# Keep source catalogs used by scripts/build-volcanic-anchors.mjs
+# Keep the source catalogs behind src/lib/volcanic-anchors.data.ts
+# (its generator script is no longer in the repo)
 # Ignore failed/partial downloads
 data/volcano/*
 !data/volcano/github_volcanoes.csv
@@ -51,3 +52,11 @@ data/volcano/*
 
 # full forum post downloads (research source only)
 /research/raw/
+
+# private research: notes, critiques, scratch merges and personal plans stay local
+/research/notes/
+/research/rewrite/
+/research/archive/
+/research/inconsistencies.md
+/research/daily-protocol.md
+/research/el-salvador-trip-relocate.md

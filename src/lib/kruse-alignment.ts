@@ -335,7 +335,7 @@ export function scoreAlignment(
     }),
   );
 
-  // ---- Ground and hazards (20) -------------------------------------------
+  // ---- Ground and hazards (15) -------------------------------------------
   const volcKm = volcano.nearest?.distanceKm ?? null;
   let anchor = volcKm == null ? 0 : anchorFractionFromKm(volcKm);
   if (bedrock?.kind === "volcanic") anchor = Math.max(anchor, 0.85);
@@ -390,7 +390,7 @@ export function scoreAlignment(
       id: "altitude",
       group: "ground",
       label: "Altitude",
-      weight: 4,
+      weight: 3,
       fraction: elevationM == null ? null : 1 - (elevationM - 500) / 2500,
       value: elevationM == null ? "unavailable" : `${Math.round(elevationM)} m (${Math.round(elevationM * 3.28084)} ft)`,
       explanation:

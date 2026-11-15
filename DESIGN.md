@@ -38,14 +38,14 @@ replaces the list inside the same dialog with its how-to and article.
 `content/public-content.json` is the runtime source of truth:
 
 - `activities` contains stable ids, names, descriptions, pillar assignment,
-  how-to copy, equipment guidance, optional approaches, and an article id.
+  how-to copy, equipment guidance, cautions, and linked article ids.
 - `articles` contains title, summary, pillar, and readable sections.
 - Tracker-only fields such as points, durations, completions, and auto-log flags
   are not part of the public runtime model.
 
-The bundle was materialized from the previous seed and article content before
-the database and tracker runtime were removed. Future editorial changes should
-edit the bundle and article files directly, then run the normal checks.
+The bundle is generated; don't edit it by hand. Editorial changes go in
+`research/protocols.md` and `research/articles.md`, then `npm run content:build`
+regenerates it and runs the content checks (see `content/README.md`).
 
 ## Place context
 

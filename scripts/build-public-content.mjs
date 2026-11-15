@@ -3,12 +3,16 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { DISEASE_TERMS } from "./disease-terms.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (file) => readFileSync(path.join(root, file), "utf8").replace(/\r\n/g, "\n");
 const PILLARS = new Set(["light", "water", "magnetism", "support"]);
 // Must match SUPPORT_GROUPS in src/lib/public-content.ts.
 const SUPPORT_GROUPS = new Set(["food", "vagus-sound", "breathing", "sleep-cold-movement", "body-model", "other"]);
+// Body words per public article; each research pass rebalances within this instead of only adding.
+const ARTICLE_WORDS = { min: 800, max: 1200 };
+const KEY_POINTS = { min: 3, max: 5 };
 
 function field(entry, name) {
   const match = entry.match(new RegExp(`^- \\*\\*${name}:\\*\\* (.*)$`, "m"));
@@ -60,11 +64,21 @@ const protocols = entries(read("research/protocols.md")).map(({ title, lines, te
 });
 
 const articlesDoc = read("research/articles.md");
-const articles = entries(articlesDoc.slice(0, articlesDoc.indexOf("\n## Glossary"))).map(({ title, lines, text }) => {
+const glossaryAt = articlesDoc.indexOf("\n## Glossary");
+const articles = entries(articlesDoc.slice(0, glossaryAt)).map(({ title, lines, text }) => {
   const sourcesAt = lines.findIndex((line) => /^- \*\*sources:\*\*/.test(line));
-  const bodyLines = lines
-    .slice(1, sourcesAt)
-    .filter((line) => !/^- \*\*(id|pillar|group|app|summary|protocols):\*\*/.test(line) && !/^## /.test(line));
+  const keyPoints = [];
+  let inKeyPoints = false;
+  const bodyLines = lines.slice(1, sourcesAt).filter((line) => {
+    if (/^- \*\*key points:\*\*/.test(line)) return !(inKeyPoints = true);
+    if (inKeyPoints) {
+      const point = line.match(/^\s+- (.*)$/);
+      if (point) return !keyPoints.push(point[1].trim());
+      if (line.trim() === "") return false;
+      inKeyPoints = false;
+    }
+    return !/^- \*\*(id|pillar|group|app|summary|protocols):\*\*/.test(line) && !/^## /.test(line);
+  });
   const sections = [];
   let current = { heading: null, paragraphs: [], buffer: [] };
   const flush = () => {
@@ -89,6 +103,7 @@ const articles = entries(articlesDoc.slice(0, articlesDoc.indexOf("\n## Glossary
     group: field(text, "group"),
     app: field(text, "app"),
     summary: field(text, "summary"),
+    keyPoints,
     protocolIds: idList(field(text, "protocols")),
     sections: sections.map((section) => ({
       ...(section.heading ? { heading: section.heading } : {}),
@@ -97,6 +112,31 @@ const articles = entries(articlesDoc.slice(0, articlesDoc.indexOf("\n## Glossary
     sources: sourceList(field(text, "sources")),
   };
 });
+
+// Glossary rows are `| Term | Plain meaning |`. A term matches on its name before any trailing
+// "(...)", and each side of "A / B". Names with inner capitals (ATP, ApoB) match case-sensitively.
+const glossary = articlesDoc
+  .slice(glossaryAt)
+  .split("\n")
+  .filter((line) => /^\| /.test(line))
+  .slice(1)
+  .map((line) => line.split("|").map((cell) => cell.trim()))
+  .map(([, term, meaning]) => ({ term, meaning: meaning.replace(/([.!?]["”])\.$/, "$1") }));
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function termPatterns(term) {
+  return term
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .split(/\s+\/\s+/)
+    .map((name) => name.trim())
+    .filter(Boolean)
+    .map((name) => {
+      const caseSensitive = /[A-Z]/.test(name.slice(1)) || /^[A-Z]{2,}/.test(name);
+      return new RegExp(`(?<![\\w-])${escapeRegex(name)}(?:s|es)?(?![\\w-])`, caseSensitive ? "" : "i");
+    });
+}
+const glossaryPatterns = glossary.map((entry) => ({ ...entry, patterns: termPatterns(entry.term) }));
+const termsIn = (text) =>
+  glossaryPatterns.filter(({ patterns }) => patterns.some((pattern) => pattern.test(text))).map(({ term }) => term);
 
 // Readers never see internal ids: swap cross-references for display names.
 // Some ids name both a protocol and an article; in running text they mean the protocol.
@@ -172,17 +212,28 @@ const bundle = {
       sources: p.sources,
     };
   }),
-  articles: shownArticles.map((a) => ({
-    id: a.id,
-    title: a.title,
-    pillar: a.pillar,
-    group: a.group,
-    summary: clean(a.summary),
-    sections: a.sections.map((s) => ({ ...s, body: clean(s.body) })),
-    relatedProtocolIds: a.protocolIds.filter((id) => readyIds.has(id)),
-    sources: a.sources,
-  })),
+  articles: shownArticles.map((a) => {
+    const summary = clean(a.summary);
+    const keyPoints = a.keyPoints.map(clean);
+    const sections = a.sections.map((s) => ({ ...s, body: clean(s.body) }));
+    return {
+      id: a.id,
+      title: a.title,
+      pillar: a.pillar,
+      group: a.group,
+      summary,
+      keyPoints,
+      sections,
+      terms: termsIn([summary, ...keyPoints, ...sections.map((s) => s.body)].join("\n")),
+      relatedProtocolIds: a.protocolIds.filter((id) => readyIds.has(id)),
+      sources: a.sources,
+    };
+  }),
 };
+const usedTerms = new Set(bundle.articles.flatMap((a) => a.terms));
+bundle.glossary = glossary
+  .filter(({ term }) => usedTerms.has(term))
+  .map(({ term, meaning }) => ({ term, meaning: clean(meaning) }));
 
 for (const [kind, items] of [["activity", bundle.activities], ["article", bundle.articles]]) {
   const seen = new Set();
@@ -201,8 +252,14 @@ for (const activity of bundle.activities) {
   if (!activity.steps.length) errors.push(`activity ${activity.id}: no steps`);
   if (!activity.articleIds.length) errors.push(`activity ${activity.id}: every linked article is held back`);
 }
+const warnings = [];
 for (const article of bundle.articles) {
   if (!article.sections.length) errors.push(`article ${article.id}: no body`);
+  const words = article.sections.reduce((sum, s) => sum + s.body.split(/\s+/).filter(Boolean).length, 0);
+  if (words > ARTICLE_WORDS.max) errors.push(`article ${article.id}: ${words} words, over the ${ARTICLE_WORDS.max} budget`);
+  if (words < ARTICLE_WORDS.min) warnings.push(`article ${article.id}: ${words} words, under ${ARTICLE_WORDS.min}`);
+  if (article.keyPoints.length < KEY_POINTS.min || article.keyPoints.length > KEY_POINTS.max)
+    errors.push(`article ${article.id}: ${article.keyPoints.length} key points, needs ${KEY_POINTS.min}-${KEY_POINTS.max}`);
   for (const id of article.relatedProtocolIds)
     if (!bundle.activities.find((a) => a.id === id && a.articleIds.includes(article.id)))
       errors.push(`article ${article.id}: one-way link to ${id}`);
@@ -210,6 +267,33 @@ for (const article of bundle.articles) {
 const leftover = JSON.stringify(bundle).match(/\*\*|^#+ /m);
 if (leftover) errors.push(`markdown left in output: ${leftover[0]}`);
 
+// Public text explains the model; it never names diseases or diagnoses.
+const allowed = JSON.parse(read("content/disease-allowlist.json"));
+const allowUsed = new Set();
+const publicTexts = [
+  ...bundle.activities.map((a) => [`activity ${a.id}`, a.id, [a.name, a.summary, ...a.steps, a.equipmentDetail, a.cautions]]),
+  ...bundle.articles.map((a) => [`article ${a.id}`, a.id, [a.title, a.summary, ...a.keyPoints, ...a.sections.flatMap((s) => [s.heading, s.body])]]),
+  ...bundle.glossary.map((g) => [`glossary ${g.term}`, `glossary:${g.term}`, [g.term, g.meaning]]),
+];
+for (const [label, id, texts] of publicTexts) {
+  const text = texts.filter(Boolean).join("\n");
+  for (const { term, pattern } of DISEASE_TERMS) {
+    const match = text.match(pattern);
+    if (!match) continue;
+    const allow = allowed.findIndex((entry) => entry.id === id && entry.term === term);
+    if (allow >= 0) {
+      allowUsed.add(allow);
+      continue;
+    }
+    const snippet = text.slice(Math.max(0, match.index - 60), match.index + match[0].length + 60).replace(/\s+/g, " ");
+    errors.push(`${label}: names "${term}" in "…${snippet}…"`);
+  }
+}
+allowed.forEach((entry, index) => {
+  if (!allowUsed.has(index)) warnings.push(`disease allow-list entry no longer needed: ${entry.id} ${entry.term}`);
+});
+
+if (warnings.length) console.warn(warnings.join("\n"));
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);

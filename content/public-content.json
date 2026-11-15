@@ -68,12 +68,13 @@
         "After a shower, use at most tallow or coconut oil — no petroleum- or silicone-based lotions, and no moisturizers with hidden UV filters.",
         "Go out on cloudy days too.",
         "Northern maternal lineages (such as haplogroup H) living in the tropics: avoid long exposure between 11 a.m. and 3 p.m. unless you are moving or grounded.",
-        "A sunny latitude only helps if you are actually outdoors in it; staying pale means you aren't getting enough.",
-        "Treat midday UV-B as the Vitamin D receptor's environmental switch: real photons on bare skin while grounded, not an oral D3 pill as a stand-in — he also ties that UV-B/VDR step to pulling Complexes I and III out of a Marcus jam and to better night sleep after a full-spectrum day. He says sunlight never overdoses vitamin D because the local magnetic field steers the radical-pair cutoff; pills do not share that cutoff."
+        "A sunny latitude only helps if you are actually outdoors in it; staying pale means you aren't getting enough. A built tan is not unlimited protection either: darker skin still can't take any amount of extra UV, and a tanned body still needs some UV-B.",
+        "Treat midday UV-B as the Vitamin D receptor's environmental switch: real photons on bare skin while grounded, not an oral D3 pill as a stand-in — he also ties that UV-B/VDR step to pulling Complexes I and III out of a Marcus jam and to better night sleep after a full-spectrum day. He says sunlight never overdoses vitamin D because the local magnetic field steers the radical-pair cutoff; pills do not share that cutoff.",
+        "Keep midday UV-B (and morning UV-A near 380 nm) in the stack and cut indoor blue plus wireless: in his model the leptin–melanocortin appetite/energy path is wavelength-gated — UV-B drives the productive higher-state route, while chronic blue and nnEMF push low-energy paths that dull the same receptors."
       ],
       "equipment": "none",
       "equipmentDetail": null,
-      "cautions": "Never burn on purpose; if you redden, cut back. Don't use sunscreen or sunglasses. Leave UV-C lamps alone. Oral vitamin D does not replace UV-driven receptor geometry in his model.",
+      "cautions": "Never burn on purpose; if you redden, cut back. Don't use sunscreen or sunglasses. Leave UV-C lamps alone. Oral vitamin D does not replace UV-driven receptor geometry in his model. Clinic narrow-band UV lamps are not a stand-in for outdoor solar timing in this stack.",
       "articleIds": [
         "solar-noon-vitamin-d",
         "melanin-semiconductor",
@@ -93,12 +94,12 @@
           "url": "https://forum.jackkruse.com/posts/378979/"
         },
         {
-          "label": "377533",
-          "url": "https://forum.jackkruse.com/posts/377533/"
+          "label": "387626",
+          "url": "https://forum.jackkruse.com/posts/387626/"
         },
         {
-          "label": "376133",
-          "url": "https://forum.jackkruse.com/posts/376133/"
+          "label": "387667",
+          "url": "https://forum.jackkruse.com/posts/387667/"
         }
       ]
     },
@@ -187,7 +188,8 @@
         "Don't eat sugary food under screens or LEDs at night.",
         "Never wear sunglasses. If you wear contact lenses, go back to glasses, and take the glasses off whenever you're outdoors.",
         "Sleep in total darkness, with no artificial light at night — he treats night blue on the retina as a false \"day\" signal that crashes melatonin and over-wakes alerting pathways, desynchronizing body clocks.",
-        "Don't switch on artificial light before sunrise; let daylight come first, every day."
+        "Don't switch on artificial light before sunrise; let daylight come first, every day.",
+        "Prefer a warm shower before bed and cold by day so night core-cooling assists melatonin (“Sleep sanctuary”, “Cold thermogenesis”)."
       ],
       "equipment": "required",
       "equipmentDetail": "incandescent and red bulbs; 100% blue-blocking glasses",
@@ -196,6 +198,10 @@
         "blue-light-hygiene"
       ],
       "sources": [
+        {
+          "label": "387235",
+          "url": "https://forum.jackkruse.com/posts/387235/"
+        },
         {
           "label": "382553",
           "url": "https://forum.jackkruse.com/posts/382553/"
@@ -211,10 +217,6 @@
         {
           "label": "382234",
           "url": "https://forum.jackkruse.com/posts/382234/"
-        },
-        {
-          "label": "372047",
-          "url": "https://forum.jackkruse.com/posts/372047/"
         }
       ]
     },
@@ -271,7 +273,7 @@
         "Get red and infrared from sunrise and daylight first; with hours of daily sun, a panel is unnecessary.",
         "In the tropics, skip light devices and use the sun.",
         "Firelight is another natural infrared-rich source.",
-        "Don't rely on single-wavelength devices.",
+        "Don't rely on single-wavelength devices, or on red and near-infrared alone. Keep morning UV-A and midday UV-B in the same day: he calls isolated red/NIR \"pressing the gas pedal with no brakes.\"",
         "If you use a panel: 660 and 850 nm, 30 minutes a day before exercise (see “Pin first, then light, then exercise and diet”). Use red light in the morning; afternoon sessions do little. If the device can pulse, set it to 40 Hz.",
         "At high latitude (around 48°N and above): red/NIR daily, above all in winter, then maximize morning UV-A and midday UV-B through the summer — he treats morning red/IR as rehydrating melanin that blue light and weak winter sun dry out.",
         "If you're deuterium-loaded, rebuild with red and near-infrared before leaning on UV.",
@@ -280,7 +282,7 @@
       ],
       "equipment": "optional",
       "equipmentDetail": "optional 660/850 nm panel",
-      "cautions": "Fix grounding and your local field first; infrared can't make up for them. He treats NIR as a low-friction lubricant for the mitochondrial proton wave, not the sole driver of the ATP motor — still need sun geometry, UV-B by day, and a cold dark night. Don't combine methylene blue with 670/830 nm light unless you are grounded and away from wireless and blue light.",
+      "cautions": "Fix grounding and your local field first; infrared can't make up for them. He treats NIR as a low-friction lubricant for the mitochondrial proton wave, not the sole driver of the ATP motor — still need sun geometry, UV-B by day, and a cold dark night. Don't combine methylene blue with 670/830 nm light unless you are grounded and away from wireless and blue light. Prefer unpolarized sunlight over artificial red for molecular photorepair — in his model man-made sources are polarized and secondary to the sun for that job.",
       "articleIds": [
         "red-nir-light"
       ],
@@ -302,8 +304,8 @@
           "url": "https://forum.jackkruse.com/posts/374624/"
         },
         {
-          "label": "372927",
-          "url": "https://forum.jackkruse.com/posts/372927/"
+          "label": "388032",
+          "url": "https://forum.jackkruse.com/posts/388032/"
         }
       ]
     },
@@ -362,7 +364,7 @@
       "steps": [
         "General range: 25–105 ppm deuterium (tap water is near 150 ppm); 25 ppm water is fine to drink.",
         "Treat 92.5 ppm as the most deuterium a depleted water should carry; go lower if you can afford it, but don't aim for 0 ppm.",
-        "Condition-specific targets: 90–105 ppm for GLP-1 drug damage and anorexia; certified under 105 ppm for 90 days for sperm DNA damage; 25–50 ppm for chronic illness; below 100 ppm for movement disorders; below 92 ppm if you live near the SAA. Children: 80–130 ppm.",
+        "Condition-specific targets: 90–105 ppm for GLP-1 drug damage and anorexia; certified under 105 ppm for 90 days for sperm DNA damage; 25–50 ppm for chronic illness and for southern-latitude / steep-inclination mitigation ladders; below 100 ppm for movement disorders; below 92 ppm if you live near the SAA. Children: 80–130 ppm.",
         "Buy it (any commercial brand will do; get the lowest ppm you can afford), or make it with zinc and copper electrodes and a small current in a decanter (no voltage or run time is given).",
         "Pair it with carbonated water (see “Carbonated water with DDW”) and with 3% sea salt (see “Sea salt with DDW (\"Jade and Salt\")”).",
         "Set your own use by your history and response rather than a universal rule.",
@@ -371,12 +373,20 @@
       ],
       "equipment": "required",
       "equipmentDetail": "DDW, bought or home-made",
-      "cautions": "Fix location and light first; DDW comes after them. Feeling worse at first is expected in a deuterium-loaded body and isn't, on its own, a reason to stop.",
+      "cautions": "Fix location and light first; DDW comes after them. Feeling worse at first is expected in a deuterium-loaded body and isn't, on its own, a reason to stop. Pair DDW with carbonated water / endogenous CO₂ quiet-zone support during magnetic decline (see “Carbonated water with DDW”).",
       "articleIds": [
         "deuterium-and-water",
         "deuterium-atp-synthase"
       ],
       "sources": [
+        {
+          "label": "387411",
+          "url": "https://forum.jackkruse.com/posts/387411/"
+        },
+        {
+          "label": "387354",
+          "url": "https://forum.jackkruse.com/posts/387354/"
+        },
         {
           "label": "381973",
           "url": "https://forum.jackkruse.com/posts/381973/"
@@ -388,14 +398,6 @@
         {
           "label": "379259",
           "url": "https://forum.jackkruse.com/posts/379259/"
-        },
-        {
-          "label": "377446",
-          "url": "https://forum.jackkruse.com/posts/377446/"
-        },
-        {
-          "label": "375785",
-          "url": "https://forum.jackkruse.com/posts/375785/"
         }
       ]
     },
@@ -445,7 +447,7 @@
     {
       "id": "sea-salt-ddw",
       "name": "Sea salt with DDW (\"Jade and Salt\")",
-      "summary": "Take mineral-rich sea salt (ideally with rare-earth traces) with DDW, while grounded and in the sun; use it to de-frag before hard work — he also frames 92.5 ppm DDW + ~3% salt as a manual “dielectric stator” when the planetary field fades.",
+      "summary": "Take mineral-rich sea salt (ideally with rare-earth traces; prefer unrefined bitterns over table salt) with DDW, while grounded and in the sun; use it to de-frag before hard work — he also frames 92.5 ppm DDW + ~3% salt as a manual “dielectric stator” / Melanin Renovation support when the planetary field fades.",
       "pillar": "water",
       "group": null,
       "steps": [
@@ -585,9 +587,9 @@
         "Favor saturated fats: grass-fed ghee, coconut oil, lard, tallow, butter, clarified butter.",
         "Skip industrial seed oils (soy, corn, canola, sunflower, safflower and similar linoleic-acid oils); in his model those short omega-6 chains replace marine DHA in the mitochondrial membrane fat cardiolipin and flatten its geometry.",
         "Eat egg yolks for choline.",
-        "Eat carbs only if you live near the equator under full UV, and cut them when sun is weak or the field is declining. Eat local fruit only in season and on days of strong sun — never at night or on cloudy or rainy days.",
+        "Eat carbs only if you live near the equator under full UV, and cut them when sun is weak or the field is declining — he still keeps some carbohydrate metabolism in the model for diamagnetic CO₂ quiet zones around the respiratory complexes (pair with “Carbonated water with DDW” when endogenous CO₂ falls). Eat local fruit only in season and on days of strong sun — never at night or on cloudy or rainy days.",
         "Avoid year-round fructose and never use corn syrup (beet sugar is the lesser harm); in the tropics, also skip local cane sugar and corn products.",
-        "Don't use protein as a main fuel: no daily protein powder, and no carnivore diet in the tropics.",
+        "Don't use protein as a main fuel: no daily protein powder, and no carnivore diet in the tropics. Anywhere else, an all-meat diet only fits an outdoor, high-UV, grounded life on a steady day–night rhythm; don't run it year-round indoors under artificial light. Let latitude, season and your light decide the fuel.",
         "As you shift to burning animal fat, notice whether your breathing and mental clarity change.",
         "If a keto flu won't lift, look at your light and magnetic environment, and do deep cold before changing diet further.",
         "Get potassium from greens cooked in fat — beet greens, Swiss chard or spinach with lard, tallow, ghee or butter — plus avocado and salted macadamias or walnuts. Don't rely on potatoes, sweet potatoes or coconut water for it. Keep spinach moderate (no daily raw spinach smoothies) and get iron from red meat.",
@@ -595,12 +597,16 @@
       ],
       "equipment": "none",
       "equipmentDetail": null,
-      "cautions": "No diet fixes a location or light problem.",
+      "cautions": "No diet fixes a location or light problem: \"you can't out-eat a broken light environment.\" Do not treat zero-carb dogma as universal — biophysical CO₂ quiet zones still matter in his framing. His Leptin Rx is a reset for a broken body clock, not a diet; the diet he uses is the seasonal Epi-Paleo one.",
       "articleIds": [
         "food-substrate-isotopes",
         "adipose-capacitor"
       ],
       "sources": [
+        {
+          "label": "387058",
+          "url": "https://forum.jackkruse.com/posts/387058/"
+        },
         {
           "label": "383944",
           "url": "https://forum.jackkruse.com/posts/383944/"
@@ -610,16 +616,12 @@
           "url": "https://forum.jackkruse.com/posts/382681/"
         },
         {
-          "label": "383819",
-          "url": "https://forum.jackkruse.com/posts/383819/"
+          "label": "387985",
+          "url": "https://forum.jackkruse.com/posts/387985/"
         },
         {
-          "label": "381576",
-          "url": "https://forum.jackkruse.com/posts/381576/"
-        },
-        {
-          "label": "381025",
-          "url": "https://forum.jackkruse.com/posts/381025/"
+          "label": "387993",
+          "url": "https://forum.jackkruse.com/posts/387993/"
         }
       ]
     },
@@ -674,11 +676,11 @@
     {
       "id": "coherent-dry-fast",
       "name": "Coherent dry fast",
-      "summary": "Dry fast (no food or water) only if you carry enough body fat, grounded in morning sun, and never indoors.",
+      "summary": "Dry fast (no food or water) only if you carry enough body fat, grounded in morning sun, and never indoors — he treats fat stores as a protective capacitor, not waste to burn off.",
       "pillar": "support",
       "group": "food",
       "steps": [
-        "Check you have fat to draw on: not below about 20% body fat if you are in strong sun, and not with a BMI under about 24.",
+        "Check you have fat to draw on: not below about 20% body fat if you are in strong sun, and not with a BMI under about 24. Women: stay well above the ~18–22% body-fat floor he ties to fertility and mitochondrial water-making capacity.",
         "Build your baseline beforehand on saturated fats (ghee, coconut oil, lard, clarified butter).",
         "Fast barefoot and grounded in morning sun.",
         "Add cold exposure if you can.",
@@ -686,11 +688,19 @@
       ],
       "equipment": "none",
       "equipmentDetail": null,
-      "cautions": "Never fast indoors under LEDs and wireless; fix light and field first. Don't force fat loss by calorie restriction or GLP-1 drugs in a poor light or EMF setting.",
+      "cautions": "Strong cautions — skip this practice unless reserves are clearly adequate. Never fast indoors under LEDs and wireless; fix light and field first. Do not treat body fat as inherently pathologic or use a dry fast (or calorie restriction / GLP-1 drugs) to force cosmetic fat loss in a poor light, EMF or magnetic ZIP — leave a bad location rather than crash-dieting deuterium into remaining stores. Thin or underweight bodies, and anyone already near the body-fat floor above, should not dry fast.",
       "articleIds": [
         "adipose-capacitor"
       ],
       "sources": [
+        {
+          "label": "386857",
+          "url": "https://forum.jackkruse.com/posts/386857/"
+        },
+        {
+          "label": "386862",
+          "url": "https://forum.jackkruse.com/posts/386862/"
+        },
         {
           "label": "383740",
           "url": "https://forum.jackkruse.com/posts/383740/"
@@ -726,12 +736,20 @@
       ],
       "equipment": "optional",
       "equipmentDetail": "none (optional meter; indoor grounding system)",
-      "cautions": "Grass isn't enough where the field is \"dead\" or declination changes steeply, and grounding alone does little there. Florida and the Yucatán are poor grounding sites during the field decline.",
+      "cautions": "Grass isn't enough where the field is \"dead\" or declination changes steeply, and grounding alone does little there — he calls thriving by grounding inside the SAA or any declining ZIP an oxymoron. Florida, the Yucatán and wet high-grid coastal soils are poor grounding sites during the field decline; leave saturated alluvial lowlands for elevated dry basalt or mountain ground when you can.",
       "articleIds": [
         "barefoot-earth",
         "volcanic-basalt-pinning"
       ],
       "sources": [
+        {
+          "label": "387354",
+          "url": "https://forum.jackkruse.com/posts/387354/"
+        },
+        {
+          "label": "386572",
+          "url": "https://forum.jackkruse.com/posts/386572/"
+        },
         {
           "label": "382383",
           "url": "https://forum.jackkruse.com/posts/382383/"
@@ -743,14 +761,6 @@
         {
           "label": "382414",
           "url": "https://forum.jackkruse.com/posts/382414/"
-        },
-        {
-          "label": "383401",
-          "url": "https://forum.jackkruse.com/posts/383401/"
-        },
-        {
-          "label": "373835",
-          "url": "https://forum.jackkruse.com/posts/373835/"
         }
       ]
     },
@@ -771,12 +781,20 @@
       ],
       "equipment": "required",
       "equipmentDetail": "grounding; optional 660/850 nm panel, bed shielding",
-      "cautions": "Don't start sick, unpinned people on Zone 2 or HIIT training, supplement stacks, peptides, Cialis or GLP-1 drugs — he treats those exogenous chemicals as rogue \"impurities\" that trap electrons and dump heat into the mitochondrial network when light and field aren't already stable. High-dose oral vitamin D3 and \"longevity\" pills do not fix a place locked under steep (vertical) field geometry — change the magnetic environment or relocate first. A sunny vacation alone won't fix low vitamin D if you otherwise live indoors under blue light and wireless.",
+      "cautions": "Don't start sick, unpinned people on Zone 2 or HIIT training, supplement stacks, peptides, Cialis or GLP-1 drugs — he treats those exogenous chemicals as rogue \"impurities\" that trap electrons and dump heat into the mitochondrial network when light and field aren't already stable. High-dose oral vitamin D3 and \"longevity\" pills (NMN included) do not fix a place locked under steep (vertical) field geometry — change the magnetic environment or relocate first; do not pour chemical tokens into an ungrounded κ=78 matrix. A sunny vacation alone won't fix low vitamin D if you otherwise live indoors under blue light and wireless. Grounding inside the SAA or a declining ZIP is not a substitute for leaving.",
       "articleIds": [
         "pin-first",
         "magnetic-excursion-oxygen"
       ],
       "sources": [
+        {
+          "label": "386614",
+          "url": "https://forum.jackkruse.com/posts/386614/"
+        },
+        {
+          "label": "386572",
+          "url": "https://forum.jackkruse.com/posts/386572/"
+        },
         {
           "label": "379642",
           "url": "https://forum.jackkruse.com/posts/379642/"
@@ -784,14 +802,6 @@
         {
           "label": "379527",
           "url": "https://forum.jackkruse.com/posts/379527/"
-        },
-        {
-          "label": "379534",
-          "url": "https://forum.jackkruse.com/posts/379534/"
-        },
-        {
-          "label": "374140",
-          "url": "https://forum.jackkruse.com/posts/374140/"
         },
         {
           "label": "382564",
@@ -811,12 +821,14 @@
         "Look for an agonic line crossing a volcanic chain at a strong-sun, lower-latitude baseline; prefer iron-rich volcanic / plutonic ground where field lines lie flatter against the crust. Follow agonic lines, not latitude alone.",
         "Compare the town's ESA Swarm (field-mapping satellite) map on the same date across years to see which way it's heading.",
         "Avoid the South Atlantic Anomaly, the Caribbean included.",
-        "Check the ground: basalt or wet black sand to stand on; a beach with a good field reading is ideal. Don't buy black sand — live where it occurs naturally.",
+        "Check the ground: basalt or wet black sand to stand on; a beach with a good field reading is ideal, and a beach only counts if the field there runs horizontal. Don't buy black sand — live where it occurs naturally.",
         "Before buying land, compare mosquito activity by day and night, burn a 24-hour beeswax candle on site (see “Beeswax candle test”) and study the local water cycle. A nearby volcano wearing a steady cloud cap is a good sign; a bare one in humid country, a bad one.",
         "Avoid places with aurorae, clusters of sick people, dying birds, bees or fish, or surges of old diseases (such as flea-borne typhus in Los Angeles County).",
         "Reject smart houses and live on the ground floor.",
         "Judge all factors together. Don't pick a place for low wireless alone, and don't let mitigation gear talk you into staying somewhere bad.",
-        "Places to rule out: California (he cites roughly +11° to +12° east declination off the agonic — enough, in his model, to tip Complexes I–III into a Marcus inversion while UV-B stays too weak to rebuild membrane water), Tennessee, Kansas, deserts (Arizona and South Texas included), northern tech hubs, Colorado, Hawaii, Minnesota, Mexico, the UK, Germany, Portugal and the Azores, continental China and Mongolia, Belgium and Canada; also Australia, New Zealand and the rest of the Southern Hemisphere, Puerto Rico, the Bahamas and Peru. Florida, the Yucatán and coastal Louisiana rate poorly, and the US east of the Rockies is at risk; the Pacific Northwest is the only US option (weigh its offshore volcanic risk). In Asia, look at the Philippines or pinned parts of Japan, or the Hong Kong region if you can accept its crowding.",
+        "Places to rule out: California (he cites roughly +11° to +13° east declination off the agonic — Malibu ~+13° — enough, in his model, to tip Complexes I–III into a Marcus inversion while UV-B stays too weak to rebuild membrane water), Tennessee, Kansas, deserts (Arizona and South Texas included), Texas and Louisiana more broadly (Gulf decline / SAA pressure; he rejects NOAA's claim that the Lake Charles agonic offsets the risk), northern tech hubs, Colorado, Hawaii (Kīlauea / Pacific field-distress framing), Minnesota, Mexico, the UK, Germany, Portugal and the Azores, continental China and Mongolia, Belgium and Canada; also Australia, New Zealand and the rest of the Southern Hemisphere, Puerto Rico, the Bahamas and Peru. Florida, the Yucatán and coastal Louisiana rate poorly, and the US east of the Rockies is at risk — he now says the East Coast's vertical field is pulling the land as far west as the Mississippi into decline, counts St. Louis with Illinois across the river, and reads the latest Swarm maps as showing Texas with far more vertical than horizontal field (New York ~−14° declination is a far-declination example); the Pacific Northwest is the only US option (weigh its offshore volcanic risk). In Asia, look at the Philippines or pinned parts of Japan, or the Hong Kong region if you can accept its crowding. Melbourne and Johannesburg are further examples of deeply unpinned declination zones to leave.",
+        "Preferred volcanic / horizontal-field sanctuaries he names: El Salvador's volcanic front (see “El Salvador specifics”), Vanuatu as an oceanic oasis that mimics El Salvador's geogenic advantages (useful if you are near New Zealand), and Zimbabwe's Great Dyke mafic shield if you stay in SAA-edge Africa — site strictly on dense high-resistance intrusions, not low-lying wet agricultural basins. Prefer tropical, humidity-buffered, horizontally pinned ground over high-latitude intensity alone.",
+        "If you must remain in Queensland, Australia: he still does not call the state magnetically \"safe\" on a pure horizontal baseline; leave the wet coastal strip (Sunshine Coast–Brisbane–Gold Coast) and anchor on dry basaltic hinterland such as the Atherton Tableland or Main Range / Lamington volcanics, then run aggressive morning cryo, DDW at 25–50 ppm, and a Faraday–Zeeman sleep build (“Sleep sanctuary”, “Live low: ground floor, or shield the bed”) — mitigation, not a green light for the continent.",
         "Move a sick child living at high latitude (around 55°N) somewhere both on an agonic line and at low latitude. Move before starting a family, not after.",
         "Northern lineages should move gradually (see “Four-phase sun day (building a \"solar callus\")”); until then, use summer light, ground on iron-rich bedrock and use cold.",
         "Before a permanent move, try a two-to-three-month stay in the candidate place when you can, and notice how sleep, energy and clarity change before you uproot fully.",
@@ -825,31 +837,31 @@
       ],
       "equipment": "required",
       "equipmentDetail": "World Magnetic Model and Swarm maps; beeswax candles",
-      "cautions": "Your maternal haplogroup (ancestral lineage) sets how much declination you tolerate; for African L lineages 2–4° can matter, and he treats even a few degrees off the agonic as enough to skew Complexes I–III. Agonic lines move with the poles, so recheck — he ties field-line geometry to mitochondrial junction geometry and membrane voltage. Match lineage to circuit: pale / uncoupled northern haplotypes evolved for strong field and low UV struggle under equatorial sun without a melanin shield unless they acclimate (see “Four-phase sun day (building a \"solar callus\")”); coupled tropical lineages at high latitude lack the winter \"internal light\" machinery and need strong sun seasons, pinning, or relocation — not oral vitamin D as the fix. Northern lineages historically \"outsourced\" spin filtering to strong vertical fields after dropping melanin; sun without a stable magnetic forge is incomplete in his model.",
+      "cautions": "Your maternal haplogroup (ancestral lineage) sets how much declination you tolerate; for African L lineages 2–4° can matter, and he treats even a few degrees off the agonic as enough to skew Complexes I–III. Agonic lines move with the poles, so recheck — he ties field-line geometry to mitochondrial junction geometry and membrane voltage. Match lineage to circuit: pale / uncoupled northern haplotypes evolved for strong field and low UV struggle under equatorial sun without a melanin shield unless they acclimate (see “Four-phase sun day (building a \"solar callus\")”); coupled tropical lineages at high latitude lack the winter \"internal light\" machinery and need strong sun seasons, pinning, or relocation — not oral vitamin D as the fix. Northern lineages historically \"outsourced\" spin filtering to strong vertical fields after dropping melanin; sun without a stable magnetic forge is incomplete in his model. Grounding alone inside the SAA or any declining ZIP is not a thrive fix.",
       "articleIds": [
         "choosing-a-location",
         "haplogroup-zipcode"
       ],
       "sources": [
         {
-          "label": "381530",
-          "url": "https://forum.jackkruse.com/posts/381530/"
+          "label": "387397",
+          "url": "https://forum.jackkruse.com/posts/387397/"
         },
         {
-          "label": "381955",
-          "url": "https://forum.jackkruse.com/posts/381955/"
+          "label": "387411",
+          "url": "https://forum.jackkruse.com/posts/387411/"
         },
         {
-          "label": "379559",
-          "url": "https://forum.jackkruse.com/posts/379559/"
+          "label": "387385",
+          "url": "https://forum.jackkruse.com/posts/387385/"
         },
         {
-          "label": "385581",
-          "url": "https://forum.jackkruse.com/posts/385581/"
+          "label": "387653",
+          "url": "https://forum.jackkruse.com/posts/387653/"
         },
         {
-          "label": "374053",
-          "url": "https://forum.jackkruse.com/posts/374053/"
+          "label": "387960",
+          "url": "https://forum.jackkruse.com/posts/387960/"
         }
       ]
     },
@@ -912,7 +924,7 @@
       "pillar": "magnetism",
       "group": null,
       "steps": [
-        "Start with ESA Swarm satellite data, then add USGS, NOAA and NASA sources. For a home readout, build a cheap fluxgate magnetometer (an optically pumped one is better).",
+        "Start with ESA Swarm satellite data, then add USGS, NOAA and NASA sources. For a home readout, build a cheap fluxgate magnetometer (an optically pumped one is better). A handheld DC gauss meter reads field density at one spot and changes with how you hold the probe: zero it, measure outdoors away from buildings, rebar, cars and power lines, and note the direction. Central America should read about 0.3–0.4 gauss; a bigger number alone isn't \"better.\" Confirm any suspected local anomaly with a magnetometer, not dowsing, and use magnetic viewing film (a \"ferroscreen\") to learn what fields look like.",
         "Check NOAA declination drift and secular-acceleration (\"jerk\" — a sudden change in how fast the field is shifting) charts for your zip code, comparing the same date across years.",
         "Watch for unusual blocked weather patterns and track your own HRV.",
         "If your area shows a jerk or turns toward a vertical field, move before official charts catch up.",
@@ -943,12 +955,12 @@
           "url": "https://forum.jackkruse.com/posts/383408/"
         },
         {
-          "label": "374031",
-          "url": "https://forum.jackkruse.com/posts/374031/"
+          "label": "387840",
+          "url": "https://forum.jackkruse.com/posts/387840/"
         },
         {
-          "label": "376043",
-          "url": "https://forum.jackkruse.com/posts/376043/"
+          "label": "387843",
+          "url": "https://forum.jackkruse.com/posts/387843/"
         }
       ]
     },
@@ -963,15 +975,24 @@
         "Burn one at home, or on land you're considering, and time it to the end.",
         "On time means normal; faster (a 24-hour candle gone in about 18 hours) means field decline or heavy wireless — he links that ~25% faster burn to roughly a 10% planetary field loss (~2.5× non-linear).",
         "Slower and clean means a strong field; slower with leftover wax means artificial over-clamping, such as from heavy static magnets.",
-        "On land, read the result together with day-versus-night mosquito activity."
+        "On land, read the result together with day-versus-night mosquito activity.",
+        "Do not trust one candle alone — use a battery of checks; as a free agonic readout, notice whether dogs circle then align north–south before they defecate under calm field conditions."
       ],
       "equipment": "required",
       "equipmentDetail": "rated pure-beeswax candle",
-      "cautions": "If the source of disturbance is visibly overhead, the test isn't needed. Don't answer a fast candle with supplement stacks — fix location, grounding and wireless load (see “Pin first, then light, then exercise and diet”).",
+      "cautions": "If the source of disturbance is visibly overhead, the test isn't needed. Don't answer a fast candle with supplement stacks — fix location, grounding and wireless load (see “Pin first, then light, then exercise and diet”). A fast burn can also flag crustal radon outgassing in high-uranium lithologies.",
       "articleIds": [
         "field-proxies"
       ],
       "sources": [
+        {
+          "label": "386649",
+          "url": "https://forum.jackkruse.com/posts/386649/"
+        },
+        {
+          "label": "387006",
+          "url": "https://forum.jackkruse.com/posts/387006/"
+        },
         {
           "label": "383849",
           "url": "https://forum.jackkruse.com/posts/383849/"
@@ -983,10 +1004,6 @@
         {
           "label": "385832",
           "url": "https://forum.jackkruse.com/posts/385832/"
-        },
-        {
-          "label": "383331",
-          "url": "https://forum.jackkruse.com/posts/383331/"
         }
       ]
     },
@@ -1000,16 +1017,25 @@
         "Choose a home on the ground or first floor.",
         "If you must stay higher for now, build a \"High-Altitude Counter-Faraday Shield\": conductive mesh around the bed, wired to dedicated ground rods driven into real earth.",
         "Fuller version: vapor-permeable nickel-copper-carbon mesh around sleeping and living spaces, and ground rods at least 30 ft into the water table, kept separate from the utility ground and connected to carbon-fiber sleeping mats.",
-        "Alternatively, use copper vortex devices (Slim Spurling coils, Lakhovsky rings) with grounded carbon mats.",
+        "In a declining ZIP, escalate to a Faraday–Zeeman sleep sanctuary (see “Sleep sanctuary”): Mu-Metal against ELF grid noise, grounded 10-gauge copper mesh, paramagnetic / volcanic stone cladding, and heavy copper arrays around the sleep space.",
+        "Alternatively, use open-gap copper vortex devices (Lakhovsky rings; closed Spurling coils only for a definite placement) with grounded carbon mats (see “Basalt stone and copper ring (passive alternative to TENS)”).",
         "Other indoor options: Helmholtz coils giving a pure 21 Hz sine-wave field at about 50 µT, and drinking water distilled at the tap to below 65 ppm deuterium."
       ],
       "equipment": "required",
-      "equipmentDetail": "shielding mesh, ground wire and rods, carbon mats; optional copper vortex devices, Helmholtz coils",
+      "equipmentDetail": "shielding mesh, ground wire and rods, carbon mats; optional Mu-Metal, copper mesh, volcanic stone, open copper vortex devices, Helmholtz coils",
       "cautions": null,
       "articleIds": [
         "nature-contact"
       ],
       "sources": [
+        {
+          "label": "387411",
+          "url": "https://forum.jackkruse.com/posts/387411/"
+        },
+        {
+          "label": "387377",
+          "url": "https://forum.jackkruse.com/posts/387377/"
+        },
         {
           "label": "384732",
           "url": "https://forum.jackkruse.com/posts/384732/"
@@ -1021,10 +1047,6 @@
         {
           "label": "384808",
           "url": "https://forum.jackkruse.com/posts/384808/"
-        },
-        {
-          "label": "384606",
-          "url": "https://forum.jackkruse.com/posts/384606/"
         }
       ]
     },
@@ -1162,16 +1184,21 @@
         "Don't worry about a pad's dead zone.",
         "Cheap alternative: coil heavy-gauge copper pipe from a hardware store and put it under the pillow.",
         "If you try a different pad, measure the field it gives off and how you respond.",
-        "Skip it in El Salvador if you get outside on the volcanic ground. In decline areas, TENS may be the wiser choice (see “Home TENS / vagus protocol”). In the Southern Hemisphere, relocate rather than rely on a pad."
+        "Skip it in El Salvador if you get outside on the volcanic ground. In decline areas, TENS may be the wiser choice (see “Home TENS / vagus protocol”). In the Southern Hemisphere, relocate rather than rely on a pad.",
+        "DIY decline-ZIP option inside a Faraday–Zeeman build: embed a neodymium magnet matrix in the bed frame aimed at roughly ≥200–2000 gauss to force horizontal spin-pinning overnight (see “Sleep sanctuary”) — still a bridge, not a reason to stay."
       ],
       "equipment": "required",
-      "equipmentDetail": "static magnetic pad or copper-pipe coil",
+      "equipmentDetail": "static magnetic pad or copper-pipe coil; optional neodymium bed matrix in declined ZIPs",
       "cautions": "A strong vertical field at night and a very different one by day can confuse the brain's sense of direction. Avoid heavy static-magnet jewelry such as magnetic bracelets; wear magnetic necklaces only on flights.",
       "articleIds": [
         "magnetico-sleep-pad",
         "earth-field-vs-geology"
       ],
       "sources": [
+        {
+          "label": "387411",
+          "url": "https://forum.jackkruse.com/posts/387411/"
+        },
         {
           "label": "384185",
           "url": "https://forum.jackkruse.com/posts/384185/"
@@ -1187,36 +1214,41 @@
         {
           "label": "377101",
           "url": "https://forum.jackkruse.com/posts/377101/"
-        },
-        {
-          "label": "373835",
-          "url": "https://forum.jackkruse.com/posts/373835/"
         }
       ]
     },
     {
       "id": "copper-ring-basalt",
       "name": "Basalt stone and copper ring (passive alternative to TENS)",
-      "summary": "Current-free alternatives to electrical nerve stimulation: basalt against the skull, copper rings (open or closed), copper–rare-earth jewelry when ungrounded, or a stone in the pillow.",
+      "summary": "Current-free alternatives to electrical nerve stimulation: basalt against the skull, an open-gap copper ring as the default, copper–rare-earth jewelry when ungrounded, or a stone in the pillow.",
       "pillar": "magnetism",
       "group": null,
       "steps": [
         "Ground yourself first.",
         "Rest a smooth black basalt stone (or volcanic clay) on the bony ridge behind the ear (occipitomastoid suture) or on the side of the temple (pterion).",
-        "At home, wear a plain copper ring about 30 cm (12 in) across around the neck over the vagus nerve or around the head — Lakhovsky-style with ends left unjoined, or a Spurling-style closed coil of copper wire.",
+        "At home, wear a plain copper ring about 30 cm (12 in) across around the neck over the vagus nerve or around the head — default is Lakhovsky-style with ends left unjoined (an open gap). Prefer unclosed copper loops with basalt as passive paramagnetic resonators around the skull.",
+        "Use a Spurling-style closed coil of copper wire only when a definite placement calls for it (for example step 7), not as the everyday default.",
         "When traveling or otherwise ungrounded, wear copper jewelry that also carries a rare-earth magnet (e.g. neodymium) so a static local field travels with you.",
-        "Or keep a small paramagnetic (weakly magnet-attracted) stone in the pillow, or hold a piece of green jade (nephrite) shaped to fit the eye socket against the temple while using screens; without jade, wear a 30 cm coiled copper necklace.",
-        "For head pressure and nausea, use the neck ring in place of a vagus stimulator.",
-        "For blood sugar, place Spurling or Lakhovsky copper rings over the neck's vagal \"choke point\" and the solar plexus.",
+        "Or keep a small paramagnetic (weakly magnet-attracted) stone in the pillow, or hold a piece of green jade (nephrite) shaped to fit the eye socket against the temple while using screens; without jade, wear a 30 cm open copper necklace.",
+        "For head pressure and nausea, use the open neck ring in place of a vagus stimulator.",
+        "For blood sugar, place copper rings over the neck's vagal \"choke point\" and the solar plexus — closed Spurling geometry is acceptable here if that is the form you have.",
         "At home scale: build with, or line living spaces with, local basalt or volcanic stone; don't import basalt sand into a home with no tie to the regional field."
       ],
       "equipment": "required",
-      "equipmentDetail": "black basalt stone or volcanic clay; 30 cm copper ring (open or closed); optional copper–neodymium necklace; optional jade (nephrite)",
+      "equipmentDetail": "black basalt stone or volcanic clay; 30 cm open-gap copper ring (closed coil only for a stated placement); optional copper–neodymium necklace; optional jade (nephrite)",
       "cautions": "A bridge while you fix your location, not a substitute for volcanic ground. Jump conduction from nearby wireless is a real worry; still prefer the jewelry on planes over flying bare.",
       "articleIds": [
         "volcanic-basalt-pinning"
       ],
       "sources": [
+        {
+          "label": "386723",
+          "url": "https://forum.jackkruse.com/posts/386723/"
+        },
+        {
+          "label": "386724",
+          "url": "https://forum.jackkruse.com/posts/386724/"
+        },
         {
           "label": "378797",
           "url": "https://forum.jackkruse.com/posts/378797/"
@@ -1228,14 +1260,6 @@
         {
           "label": "378787",
           "url": "https://forum.jackkruse.com/posts/378787/"
-        },
-        {
-          "label": "376035",
-          "url": "https://forum.jackkruse.com/posts/376035/"
-        },
-        {
-          "label": "376042",
-          "url": "https://forum.jackkruse.com/posts/376042/"
         }
       ]
     },
@@ -1410,66 +1434,81 @@
       "steps": [
         "Switch off Wi-Fi, routers and all wireless devices before sleep, and keep devices out of the room. Turning off the bedroom's breaker at night helps too; also check the spot for geopathic stress.",
         "Turn the lights off at a reasonable hour and make the room totally dark — no screens; night blue undoes the day's retinal clock charge.",
-        "Keep the room cold; in his model a small overnight drop in brain/CSF temperature helps shrink respiratory-complex spacing so heavy hydrogen is cleared.",
-        "Sleep on a grounded sheet; no electric (adjustable) bed.",
+        "Keep the room cold; in his model a small overnight drop in brain/CSF temperature helps shrink respiratory-complex spacing so heavy hydrogen is cleared. Use cold showers by day and a warm shower before bed so night core-cooling assists mitochondrial melatonin.",
+        "Sleep on a grounded sheet; no electric (adjustable) bed. In a declining ZIP, wire the sheet or carbon mat to a dedicated copper ground rod driven into real earth (separate from utility ground) where horizontal field still exists.",
         "Align the bed north–south (see “North–south bed”).",
-        "Earn the night with full morning and midday outdoor light (“Sunrise light on bare eyes and skin”, “Midday sun and UV-B, unfiltered”); he says solar UV-B/VDR prep during the day is what lets sleep finish the purge."
+        "Elevate the head of the bed a little (or use a recliner) so gravity helps drain the skull-base fluid path overnight — he treats this as everyday glymphatic help in a heavy-water environment, not only a hospital trick.",
+        "Earn the night with full morning and midday outdoor light (“Sunrise light on bare eyes and skin”, “Midday sun and UV-B, unfiltered”); he says solar UV-B/VDR prep during the day is what lets sleep finish the purge. Prefer outdoor grounded training over sealed high-CO₂ gyms when you can.",
+        "Where the local field is steep or declining and you cannot leave yet, build a Faraday–Zeeman sleep sanctuary: dual-layer Mu-Metal (or equivalent) against low-frequency grid noise, 10-gauge solid copper mesh grounded against microwave towers, paramagnetic / volcanic stone cladding where you can, and optionally a neodymium magnet matrix in the bed frame aimed at roughly ≥200–2000 gauss to force horizontal spin-pinning overnight (“Magnetic sleep pad (Magnetico) guidance”, “Live low: ground floor, or shield the bed”)."
       ],
       "equipment": "required",
-      "equipmentDetail": "grounded sheet; blackout",
-      "cautions": "When sleep won't come, avoid sleeping pills, melatonin supplements and Bluetooth sleep trackers, Oura-type rings included; for persistent sleep problems, look at relocation and nnEMF rather than pills or machine pressure alone (he rates CPAP as missing the field/light cause). Indoor Faraday living (concrete/steel/wireless) mimics a magnetic decline in his model.",
+      "equipmentDetail": "grounded sheet; blackout; optional bed risers or recliner; optional Mu-Metal / copper mesh / volcanic stone / neodymium bed matrix in declined ZIPs",
+      "cautions": "When sleep won't come, avoid sleeping pills, melatonin supplements and Bluetooth sleep trackers, Oura-type rings included; for persistent sleep problems, look at relocation and nnEMF rather than pills or machine pressure alone (he rates CPAP as missing the field/light cause). Indoor Faraday living (concrete/steel/wireless) mimics a magnetic decline in his model — a deliberate Faraday–Zeeman build is a bridge, not a reason to stay in a bad ZIP.",
       "articleIds": [
         "sleep-space",
         "myelin-sleep-battery"
       ],
       "sources": [
         {
+          "label": "387411",
+          "url": "https://forum.jackkruse.com/posts/387411/"
+        },
+        {
+          "label": "387235",
+          "url": "https://forum.jackkruse.com/posts/387235/"
+        },
+        {
+          "label": "387377",
+          "url": "https://forum.jackkruse.com/posts/387377/"
+        },
+        {
           "label": "382666",
           "url": "https://forum.jackkruse.com/posts/382666/"
         },
         {
-          "label": "382704",
-          "url": "https://forum.jackkruse.com/posts/382704/"
-        },
-        {
-          "label": "378783",
-          "url": "https://forum.jackkruse.com/posts/378783/"
-        },
-        {
           "label": "384114",
           "url": "https://forum.jackkruse.com/posts/384114/"
-        },
-        {
-          "label": "370683",
-          "url": "https://forum.jackkruse.com/posts/370683/"
         }
       ]
     },
     {
       "id": "cold-thermogenesis",
       "name": "Cold thermogenesis",
-      "summary": "Use daily cold exposure, more where sun is weak or the field poor, plus targeted ice on the head and neck — he treats cold as a deuterium sieve that helps sustain wakefulness.",
+      "summary": "Use daily cold exposure, more where sun is weak or the field poor, plus targeted ice on the head and neck — he treats cold as a deuterium sieve and Curie-law band-gap narrow that helps sustain wakefulness.",
       "pillar": "support",
       "group": "sleep-cold-movement",
       "steps": [
         "If you're new to it, add cold gradually, at sunrise or after sunset, keeping it a couple of hours apart from your last meal; not everyone needs it.",
         "Simplest daily option: each morning, 60–180 seconds of cold water on bare skin, cold enough that you want to get out but still safe (about 14 °C/57 °F) — a cold shower or plunge, or, if your heart is healthy, face dunking or an ice pack on face and neck. Northern lineages (such as H) at high latitude: a morning cold-water splash.",
-        "Use whole-body cold in winter, at high latitude, and wherever sun is poor or the field weak or skewed. Northern lineages (H, J, T, U, K) living in high-UV or high-radiation zones should be strict about it.",
+        "Use whole-body cold in winter, at high latitude, and wherever sun is poor or the field weak or skewed. Northern lineages (H, J, T, U, K) living in high-UV or high-radiation zones should be strict about it. In steep-inclination or southern-latitude declined ZIPs (for example Queensland hinterland mitigation), use aggressive morning cryo-compression — ice slurry / ultra-cold ice bath — to narrow semiconductor band gaps from within.",
         "Do deep cold before attempting diet changes, and use plenty of cold and grounding while losing fat.",
         "In the tropics, swimming in natural water counts, and so does free-diving in cold water (see “Swim and soak in natural water”).",
         "At dawn, don't let cold compete with light: feet in the surf, body in the air.",
         "Targeted cold: ice on the roof of the mouth, under the chin or on the back of the neck. Chewing ice cools the teeth too.",
-        "Wear a compression shirt during cold sessions.",
+        "Wear a compression shirt on the neuroectoderm during cold sessions — he says cooling plus compression makes the ectoderm more superconducting.",
         "Sun first, cold afterwards. For a painful joint, put sun on it and then cold on that same joint.",
-        "Pair cold with UV-B daytime sun (see “Midday sun and UV-B, unfiltered”): in his model cold shrinks the spacing between respiratory complexes so heavy hydrogen is filtered, and solar UV-B/VDR keeps the membrane out of a Marcus jam so waking energy holds."
+        "Pair cold with UV-B daytime sun (see “Midday sun and UV-B, unfiltered”): in his model cold shrinks the spacing between respiratory complexes so heavy hydrogen is filtered, and solar UV-B/VDR keeps the membrane out of a Marcus jam so waking energy holds.",
+        "Keep cold by day; use a warm shower before bed so night core-cooling assists melatonin (see “Sleep sanctuary”)."
       ],
       "equipment": "required",
-      "equipmentDetail": "cold water (shower, tub, sea, lake); ice packs; optional compression shirt",
-      "cautions": "East and Southeast Asian maternal lineages (D5b1, F) in a weak field should skip deep cold (55–65 °F) until pinned, first maximizing morning light, grounding and nnEMF shielding. In a high-declination zone such as California he treats deep cold as a short bridge only — not a sustainable stand-in for relocating to flatter field geometry (see “Relocation checklist”). An ice face dunk before sleep may calm you or wire you, depending on how deuterium-loaded you are; clear deuterium first. Cold-and-dark alone is not a license to skip sleep or morning light.",
+      "equipmentDetail": "cold water (shower, tub, sea, lake); ice packs; optional compression shirt; optional ice slurry for deep cryo",
+      "cautions": "East and Southeast Asian maternal lineages (D5b1, F) in a weak field should skip deep cold (55–65 °F) until pinned, first maximizing morning light, grounding and nnEMF shielding. In a high-declination zone such as California he treats deep cold as a short bridge only — not a sustainable stand-in for relocating to flatter field geometry (see “Relocation checklist”). An ice face dunk before sleep may calm you or wire you, depending on how deuterium-loaded you are; clear deuterium first. Cold-and-dark alone is not a license to skip sleep or morning light. If trying to conceive, favor cold over influencer sauna heat protocols — he cites Finnish sauna data cutting sperm counts for months.",
       "articleIds": [
         "cold-thermogenesis-skin-50"
       ],
       "sources": [
+        {
+          "label": "387411",
+          "url": "https://forum.jackkruse.com/posts/387411/"
+        },
+        {
+          "label": "387057",
+          "url": "https://forum.jackkruse.com/posts/387057/"
+        },
+        {
+          "label": "386274",
+          "url": "https://forum.jackkruse.com/posts/386274/"
+        },
         {
           "label": "385515",
           "url": "https://forum.jackkruse.com/posts/385515/"
@@ -1477,18 +1516,6 @@
         {
           "label": "382381",
           "url": "https://forum.jackkruse.com/posts/382381/"
-        },
-        {
-          "label": "379370",
-          "url": "https://forum.jackkruse.com/posts/379370/"
-        },
-        {
-          "label": "374910",
-          "url": "https://forum.jackkruse.com/posts/374910/"
-        },
-        {
-          "label": "375714",
-          "url": "https://forum.jackkruse.com/posts/375714/"
         }
       ]
     },
@@ -1550,7 +1577,7 @@
         "Don't go straight from screens into a workout.",
         "Don't spend years running ungrounded in rubber-soled shoes.",
         "Keep intensity moderate; don't overtrain. Don't shred large fat stores until light, grounding and arterial melanin can hold the released deuterium.",
-        "Don't assume hard competitive exercise protects you, and don't make building muscle a goal in old age.",
+        "Don't assume hard competitive exercise protects you, and don't make building muscle a goal in old age. He calls heavy training done indoors, out of the sun or in a place with a declining field \"a toxin,\" and points to elite endurance athletes as the warning.",
         "If you must use a gym, choose one with open doors or windows, go at quiet hours, carry a portable CO₂ monitor, and get fresh air afterwards.",
         "Through the day, walk and talk outdoors in daylight rather than sitting for long stretches, silent, under artificial light."
       ],
@@ -1578,8 +1605,8 @@
           "url": "https://forum.jackkruse.com/posts/377231/"
         },
         {
-          "label": "375567",
-          "url": "https://forum.jackkruse.com/posts/375567/"
+          "label": "387551",
+          "url": "https://forum.jackkruse.com/posts/387551/"
         }
       ]
     },
@@ -1948,16 +1975,20 @@
         "In Tummo-style breathing, remember that the breath hold, not the active phase, raises CO₂.",
         "Prefer this under-breathing over hard hyperventilation styles that dump CO₂; pair Buteyko with cold thermogenesis when you use cold.",
         "Optional: train the diaphragm with brass or wind instruments for hypoxia tolerance.",
-        "Use a traditional sauna, paired with carbonated water and DDW.",
+        "Use a traditional sauna, paired with carbonated water and DDW — unless you are trying to conceive, in which case favor cold over sauna heat (sexual function, sperm and fertility, “Cold thermogenesis”).",
         "While asleep, wear a Buteyko breathing belt to slow breathing."
       ],
       "equipment": "optional",
       "equipmentDetail": "none (optional pulse oximeter; traditional sauna; Buteyko belt)",
-      "cautions": "Oxygen saturation must not fall. Cold and sauna can work against each other if misused.",
+      "cautions": "Oxygen saturation must not fall. Cold and sauna can work against each other if misused. Skip sauna heat protocols when fertility is the goal.",
       "articleIds": [
         "co2-brain-clearance"
       ],
       "sources": [
+        {
+          "label": "387057",
+          "url": "https://forum.jackkruse.com/posts/387057/"
+        },
         {
           "label": "379565",
           "url": "https://forum.jackkruse.com/posts/379565/"
@@ -3698,7 +3729,7 @@
         },
         {
           "heading": "UV-B as a safety brake",
-          "body": "Kruse treats UV-B and UV-A as a pair of brakes on the mitochondrial energy chain. Vitamin D's receptor, which he places on the inner mitochondrial membrane, slows electron flow between Complexes III and IV, while UV-A releases nitric oxide, which briefly slows Complex IV. Together, he says, they keep the chain out of \"Marcus inversion\" — his term for electron flow that stalls when it is pushed too hard — whenever Earth's field is unstable.\n\nThat is why he calls UV-B \"term life insurance\" for anyone who is not \"pinned\" (living grounded and sunlit under a stable local magnetic field), and why he says it should not be feared. Citing Slominski, Holick and Reiter (2026), he treats vitamin D and the circadian clock as one coupled loop. Mitochondria, he adds, make melatonin in daytime using UV, so vitamin D and melatonin are twin products of the sun rather than day-and-night opposites.\n\nHe illustrates the brake with the elephant, whose unarmoured skin makes plenty of vitamin D; its receptor works like a clutch that keeps a large brain from overheating under the midday sun."
+          "body": "Kruse treats UV-B and UV-A as a pair of brakes on the mitochondrial energy chain. Vitamin D's receptor, which he places on the inner mitochondrial membrane, slows electron flow between Complexes III and IV, while UV-A releases nitric oxide, which briefly slows Complex IV. Together, he says, they keep the chain out of \"Marcus inversion\" — his term for electron flow that stalls when it is pushed too hard — whenever Earth's field is unstable. The slowing is the point, he says: sunlight paces energy production on purpose, so the aim is a steady, ordered chain, not a motor making as much ATP as it can.\n\nThat is why he calls UV-B \"term life insurance\" for anyone who is not \"pinned\" (living grounded and sunlit under a stable local magnetic field), and why he says it should not be feared. Citing Slominski, Holick and Reiter (2026), he treats vitamin D and the circadian clock as one coupled loop. Mitochondria, he adds, make melatonin in daytime using UV, so vitamin D and melatonin are twin products of the sun rather than day-and-night opposites.\n\nHe illustrates the brake with the elephant, whose unarmoured skin makes plenty of vitamin D; its receptor works like a clutch that keeps a large brain from overheating under the midday sun."
         },
         {
           "heading": "The built-in cutoff",
@@ -3718,7 +3749,7 @@
         },
         {
           "heading": "Why pills fall short",
-          "body": "An oral pill delivers pure D3 with none of the cutoff products and none of the light-run steps; in his phrase, it gives the body \"the ink without the book.\" Kruse cites an observational study of more than 5,000 older adults that linked routine supplementation in people with normal levels to slightly faster slipping in thinking skills. In his reading the extra vitamin D acts as an \"atomic impurity\" in an ungrounded brain under artificial light, and he says supplemental vitamin D carries deuterium into the head.\n\nHe reads the flat results of two large supplement trials, VITAL and ViDA, the same way: a pill cannot repair a shortfall that is physical rather than chemical. Sun on skin, he says, drives a current and lifts the cell's water toward its structured state (his \"160\"). A pill raises 25-hydroxyvitamin D, the blood marker doctors test, while delivering no photons and none of the infrared that thins the blood, so the lab value looks fine while the body stays locked up; he likens it to photoshopping a bank balance. He treats a low blood level as a dashboard gauge reporting high deuterium and weak magnetic drive, which a pill only paints over."
+          "body": "An oral pill delivers pure D3 with none of the cutoff products and none of the light-run steps; in his phrase, it gives the body \"the ink without the book.\" Kruse cites an observational study of more than 5,000 older adults that linked routine supplementation in people with normal levels to slightly faster slipping in thinking skills. In his reading the extra vitamin D acts as an \"atomic impurity\" in an ungrounded brain under artificial light.\n\nHe reads the flat results of two large supplement trials, VITAL and ViDA, the same way: a pill cannot repair a shortfall that is physical rather than chemical. Sun on skin, he says, drives a current and lifts the cell's water toward its structured state (his \"160\"). A pill raises 25-hydroxyvitamin D, the blood marker doctors test, while delivering no photons and none of the infrared that thins the blood, so the lab value looks fine while the body stays locked up; he likens it to photoshopping a bank balance. He treats a low blood level as a dashboard gauge reporting high deuterium and weak magnetic drive, which a pill only paints over."
         },
         {
           "heading": "In practice",
@@ -3728,6 +3759,7 @@
       "terms": [
         "25-hydroxyvitamin D (25-OH-D)",
         "Atomic impurity / rogue dopant",
+        "ATP / ATP synthase",
         "Beta-endorphin",
         "Complex IV (cytochrome c oxidase)",
         "Deuterium (deuteron)",
@@ -3803,8 +3835,8 @@
           "url": "https://forum.jackkruse.com/posts/373131/"
         },
         {
-          "label": "372255",
-          "url": "https://forum.jackkruse.com/posts/372255/"
+          "label": "388036",
+          "url": "https://forum.jackkruse.com/posts/388036/"
         }
       ]
     },
@@ -3947,7 +3979,7 @@
         },
         {
           "heading": "Why NIR alone is not enough",
-          "body": "Yet Kruse says NIR \"lubricates rather than drives.\" It thins the water around ATP synthase and speeds Complex IV, but it does nothing to align electron spins, the job his model gives to the magnetic field. If Complexes I–III upstream are already in Marcus inversion from a weak field or nnEMF (non-native electromagnetic fields from wireless and wiring), spinning ATP synthase harder only pulls more electrons through the crash; he likens it to sending more cars onto a NASCAR pile-up. Relying on red or near-infrared alone breaks nature's rules in his view: UV-A releases nitric oxide that briefly brakes the synthase, and UV-B via the vitamin D receptor slows the hand-off between Complexes III and IV — the pair that keeps an inverted chain from dumping destructive free radicals.\n\nDevices have further limits. Most panels emit a few narrow bands that stop at 850 or 940 nm, well short of the 1878 nm band; their light is far more uniform than sunlight's broad, scrambled mix; and even \"flicker-free\" drivers add electrical noise that the cell must spend energy sorting. A costly panel, he says, can leave someone merely better lit while their deuterium load stays put.\n\nFor people who are unpinned he goes further. When oxygen is in its singlet state and NAD⁺ is loaded with deuterium, he says metabolism becomes blind to light, so magnetism matters more than light, a catch-22 he calls rare in human history. Such a person can lack near-infrared while standing naked in the sun. The precondition for using light is what he calls a \"paramagnetic lock\": membranes, cholesterol rafts and structured water acting together as an ordered antenna that keeps oxygen in its stable form.\n\nHe also warns against a popular combination. Methylene blue shuttles electrons past Complexes I and III, and 670 or 830 nm light excites Complex IV; in an ungrounded person living under wireless and blue light, he likens the pairing to a turbocharger on a short-circuiting transformer."
+          "body": "Yet Kruse says NIR \"lubricates rather than drives.\" It thins the water around ATP synthase and speeds Complex IV, but it does nothing to align electron spins, the job his model gives to the magnetic field. If Complexes I–III upstream are already in Marcus inversion from a weak field or nnEMF (non-native electromagnetic fields from wireless and wiring), spinning ATP synthase harder only pulls more electrons through the crash; he likens it to sending more cars onto a NASCAR pile-up. Red or near-infrared on its own is, in his words, a half truth, like \"pressing the gas pedal with no brakes\": UV-A releases nitric oxide that briefly slows Complex IV, and UV-B via the vitamin D receptor steadies the hand-off between Complexes III and IV. He adds that neuropsin, the body's UV-A sensor, needs UV-A and near-infrared together to keep the clock running.\n\nDevices have further limits. Most panels emit a few narrow bands that stop at 850 or 940 nm, well short of the 1878 nm band; their light is far more uniform than sunlight's broad, scrambled mix; and even \"flicker-free\" drivers add electrical noise that the cell must spend energy sorting. A costly panel, he says, can leave someone merely better lit while their deuterium load stays put.\n\nFor people who are unpinned he goes further. When oxygen is in its singlet state and NAD⁺ is loaded with deuterium, he says metabolism becomes blind to light, so magnetism matters more than light, a catch-22 he calls rare in human history. Such a person can lack near-infrared while standing naked in the sun. The precondition for using light is what he calls a \"paramagnetic lock\": membranes, cholesterol rafts and structured water acting together as an ordered antenna that keeps oxygen in its stable form.\n\nHe also warns against a popular combination. Methylene blue shuttles electrons past Complexes I and III, and 670 or 830 nm light excites Complex IV; in an ungrounded person living under wireless and blue light, he likens the pairing to a turbocharger on a short-circuiting transformer."
         },
         {
           "heading": "In practice",
@@ -3976,6 +4008,7 @@
         "Nanoscopic sunburn",
         "Near-infrared (NIR)",
         "Negative hydrogen ion",
+        "Neuropsin (OPN5)",
         "Nitric oxide",
         "nnEMF (non-native EMF)",
         "Paramagnetic",
@@ -4034,8 +4067,8 @@
           "url": "https://forum.jackkruse.com/posts/370865/"
         },
         {
-          "label": "373212",
-          "url": "https://forum.jackkruse.com/posts/373212/"
+          "label": "388032",
+          "url": "https://forum.jackkruse.com/posts/388032/"
         }
       ]
     },
@@ -5024,7 +5057,7 @@
         },
         {
           "heading": "Ranking the fuels",
-          "body": "Kruse ranks fuels by their isotopes. Glucose is a \"deuterium bomb,\" because plants pack deuterium into their storage sugars. Burning fat yields deuterium-depleted water and plenty of CO₂, and he calls animal fat the most deuterium-depleted fuel — keto, for him, is a hack of the body's water, not of its macronutrients. Protein is a fuel of desperation. Carbohydrates suit life near the equator under full sun. Fructose drains ATP and halts the cell's clean-water production; he says it evolved as a winter fat-storage switch. Because UV-B slows electron flow, heavy fat and protein under tropical sun fit poorly.\n\nThe same logic works inside a single plant. As fruit and tubers ripen, plants park deuterium in their sugars and starches while the leaves stay light, so Kruse calls it an oversight to chase potassium with potatoes, sweet potatoes or coconut water while trying to cut deuterium. His lighter sources are leafy greens, animal fat, avocado, salted nuts and wild marine foods such as squid, octopus, halibut, salmon and clams. Wild ocean fish beat freshwater fish, which he says carry more deuterium from still inland water.\n\nPlant-only and juicing diets often help at first, he says, because people stop eating deuterium-heavy processed oils, wheat and corn, a \"system restore\" on a crashed computer. But he calls whole-food plant eating a clean, low-torque fuel that in time cannot make enough internal light to keep the system running.\n\nSeason changes the engine too. Summer, in his model, leaves metabolism open to deuterium from tropical carbohydrates, while winter cold and fat switch on brown fat, so cells need less insulin.\n\nSaturated fats such as ghee, coconut oil, lard and clarified butter template structured water: citing Abha Sharma and Gerald Pollack, he says they expand the ordered, charge-holding layer of water, with cold ghee producing especially large ones. Seed oils, in his view, harm mainly an ungrounded engine. Egg-yolk choline helps the liver clear deuterium and improves sleep. And salt cannot rescue a deuterium-loaded system.\n\nHe also recasts antinutrients, the plant compounds said to block mineral uptake, as largely a deuterium problem. Melanin pulls the deuterium out into the blood, where the glucagon system clears it, so in his view the sun, not avoiding foods, is what neutralises them. Spinach is his cautionary tale: its high oxalate binds iron and calcium, so little of its iron is absorbed compared with the heme iron in meat."
+          "body": "Kruse ranks fuels by their isotopes. Glucose is a \"deuterium bomb,\" because plants pack deuterium into their storage sugars. Burning fat yields deuterium-depleted water and plenty of CO₂, and he calls animal fat the most deuterium-depleted fuel — keto, for him, is a hack of the body's water, not of its macronutrients. Protein is a fuel of desperation. Carbohydrates suit life near the equator under full sun. Fructose drains ATP and halts the cell's clean-water production; he says it evolved as a winter fat-storage switch. Because UV-B slows electron flow, heavy fat and protein under tropical sun fit poorly.\n\nHe applies the same rule to all-meat eating indoors. Fat and protein feed electrons in at Complexes II and III, which he calls the most magnetically sensitive links of the chain. Under artificial light, without UV, infrared or grounding, he says that flow backs up and blood-sugar control slips even in lean people.\n\nThe same logic works inside a single plant. As fruit and tubers ripen, plants park deuterium in their sugars and starches while the leaves stay light, so Kruse calls it an oversight to chase potassium with potatoes, sweet potatoes or coconut water while trying to cut deuterium. His lighter sources are leafy greens, animal fat, avocado, salted nuts and wild marine foods such as squid, octopus, halibut, salmon and clams. Wild ocean fish beat freshwater fish, which he says carry more deuterium from still inland water.\n\nPlant-only and juicing diets often help at first, he says, because people stop eating deuterium-heavy processed oils, wheat and corn, a \"system restore\" on a crashed computer. But he calls whole-food plant eating a clean, low-torque fuel that in time cannot make enough internal light to keep the system running.\n\nSeason changes the engine too. Summer, in his model, leaves metabolism open to deuterium from tropical carbohydrates, while winter cold and fat switch on brown fat, so cells need less insulin.\n\nSaturated fats such as ghee, coconut oil, lard and clarified butter template structured water: citing Abha Sharma and Gerald Pollack, he says they expand the ordered, charge-holding layer of water, with cold ghee producing especially large ones. Seed oils, in his view, harm mainly an ungrounded engine. Egg-yolk choline helps the liver clear deuterium and improves sleep. And salt cannot rescue a deuterium-loaded system.\n\nHe also recasts antinutrients, the plant compounds said to block mineral uptake, as largely a deuterium problem. Melanin pulls the deuterium out into the blood, where the glucagon system clears it, so in his view the sun, not avoiding foods, is what neutralises them. Spinach is his cautionary tale: its high oxalate binds iron and calcium, so little of its iron is absorbed compared with the heme iron in meat."
         },
         {
           "heading": "Carbon spin and corn syrup",
@@ -5036,15 +5069,14 @@
         },
         {
           "heading": "Fresh, local and in season",
-          "body": "Food also carries information from where it grew. A freshly picked garden tomato, Kruse says, holds solar infrared, structured water and faint coherent light that the gut reads to set its clock; shipping and display under blue LEDs destroy all three. Hence his long-standing advice to eat within your zip code and in season — a tropical banana in Boston in December is, for him, a quantum error. Weston Price, he argues, mapped local magnetic dynamos, not a food formula.\n\nHe adds that deuterium-heavy rain from stalled ocean circulation can turn local food toxic. He redraws John Wesley Powell's 100th meridian, the old line between the humid US East and the arid West, as a boundary of good-quality water that has since moved east. Mississippi-valley water and food, he warns, are more deuterium-heavy than ever, and he says deuterium cuts crop growth by 40%."
+          "body": "Food also carries information from where it grew. A freshly picked garden tomato, Kruse says, holds solar infrared, structured water and faint coherent light that the gut reads to set its clock; shipping and display under blue LEDs destroy all three. Hence his long-standing advice to eat within your zip code and in season — a tropical banana in Boston in December is, for him, a quantum error. Weston Price, he argues, mapped local magnetic dynamos, not a food formula.\n\nHe adds that deuterium-heavy rain from stalled ocean circulation can turn local food toxic. Mississippi-valley water and food, he warns, are more deuterium-heavy than ever."
         },
         {
           "heading": "In practice",
-          "body": "His “Saturated fat as main fuel” protocol: favour ghee, coconut oil, lard and clarified butter; eat egg yolks for choline; keep carbohydrates for equatorial life under full sun, avoid year-round fructose and never use corn syrup; don't make protein a main fuel (no daily protein powder, no carnivore in the tropics); and treat a keto flu that won't lift as a light and magnetic signal, starting with deep cold. His “Eat food from your own zip code” protocol: grow or buy food from where you live, eat in season, get nutrients — potassium included — from local whole food eaten in sunlight rather than pills, avoid maize-derived glucose and supplement bases, and avoid food and water from weak-shield zones such as the SAA."
+          "body": "His “Saturated fat as main fuel” protocol: favour ghee, coconut oil, lard and clarified butter; eat egg yolks for choline; keep carbohydrates for equatorial life under full sun, avoid year-round fructose and never use corn syrup; don't make protein a main fuel (no daily protein powder, no carnivore in the tropics or indoors); and treat a keto flu that won't lift as a light and magnetic signal, starting with deep cold. His “Eat food from your own zip code” protocol: grow or buy food from where you live, eat in season, get nutrients — potassium included — from local whole food eaten in sunlight rather than pills, avoid maize-derived glucose and supplement bases, and avoid food and water from weak-shield zones such as the SAA."
         }
       ],
       "terms": [
-        "100th meridian",
         "Antinutrients",
         "ATP / ATP synthase",
         "C3 / C4 plants",
@@ -5057,6 +5089,7 @@
         "Dopant",
         "Doping / dopant",
         "Exclusion-zone (EZ) water / structured water",
+        "Grounding (earthing)",
         "Heme",
         "Input / exhaust",
         "Light hydrogen",
@@ -5092,8 +5125,8 @@
           "url": "https://forum.jackkruse.com/posts/381025/"
         },
         {
-          "label": "382681",
-          "url": "https://forum.jackkruse.com/posts/382681/"
+          "label": "387985",
+          "url": "https://forum.jackkruse.com/posts/387985/"
         },
         {
           "label": "383944",
@@ -5635,11 +5668,11 @@
         },
         {
           "heading": "Where he says no, and where he says yes",
-          "body": "He still rules out California's \"double deficit\" of high declination and weak steady UV-B — Malibu around −13° — and treats deserts as magnetically poor even under strong UV. From 2024–2026 he ranks the West Coast better than the East because the Pacific thermohaline still runs while the Atlantic (AMOC) and Southern Ocean have stalled; Florida's lost oranges since about 2012 mark the same signal. Texas stays weak. Iceland is not a relocation answer. His longer no-list includes Colorado, Hawaii, Minnesota, Canada, the UK, Germany, Mexico's Yucatán and Australia; South America is most dangerous as the anomaly grows. In the US only the Pacific Northwest is really pinned (a growing offshore lava dome). Pacific Rim spots like Bali, even the Aleutians, can beat Miami. His own choice remains El Salvador's volcanic coast over Yucatán cenotes, avoiding crowded wireless beaches like El Zonte."
+          "body": "He still rules out California's \"double deficit\" of high declination and weak steady UV-B — Malibu around −13° — and treats deserts as magnetically poor even under strong UV. From 2024–2026 he ranks the West Coast better than the East because the Pacific thermohaline still runs while the Atlantic (AMOC) and Southern Ocean have stalled; Florida's lost oranges since about 2012 mark the same signal, and he now says the East Coast's vertical field drags land as far as the Mississippi into decline. Texas stays weak: Swarm shows its vertical field far above its horizontal. His longer no-list includes Colorado, Hawaii, Minnesota, Canada, the UK, Germany, Mexico's Yucatán and Australia; South America is most dangerous as the anomaly grows. In the US only the Pacific Northwest is really pinned (a growing offshore lava dome). His own choice remains El Salvador's volcanic coast over Yucatán cenotes, avoiding crowded wireless beaches like El Zonte."
         },
         {
           "heading": "After the move",
-          "body": "Before a permanent move he often recommends a two-to-three-month stay in a candidate place, so the body can answer whether a city such as New York, Chicago or Miami is still livable. After moving, he warns people can feel worse first. Borrowing Becker's \"adaptive healing,\" he says tissue has to rebuild for the new environment, as modern current through 1920s wiring can burn a house down. Northern lineages should adapt to tropical sun gradually.\n\nIn practice, the relocation checklist gathers his criteria: the three World Magnetic Model numbers, avoiding the South Atlantic Anomaly, reading declination and Swarm maps, steering clear of stressed faults such as New Madrid, grounding on basalt or wet black sand, testing lots with mosquitoes, candles and the water cycle, a trial stay of months when possible, no smart house, and ground-floor living. The El Salvador guide adds his local notes: buy an empty lot and build, favor areas near active volcanoes, and use the Costa del Sol beach for sunrise grounding."
+          "body": "Before a permanent move he often recommends a two-to-three-month stay in a candidate place, so the body can answer whether a city such as New York, Chicago or Miami is still livable. After moving, he warns people can feel worse first. Borrowing Becker's \"adaptive healing,\" he says tissue has to rebuild for the new environment. Northern lineages should adapt to tropical sun gradually.\n\nIn practice, the relocation checklist gathers his criteria: the three World Magnetic Model numbers, avoiding the South Atlantic Anomaly, reading declination and Swarm maps, steering clear of stressed faults such as New Madrid, grounding on basalt or wet black sand, testing lots with mosquitoes, candles and the water cycle, a trial stay of months when possible, no smart house, and ground-floor living. The El Salvador guide adds his local notes: buy an empty lot and build, favor areas near active volcanoes, and use the Costa del Sol beach for sunrise grounding."
         }
       ],
       "terms": [
@@ -5679,8 +5712,8 @@
           "url": "https://forum.jackkruse.com/posts/381530/"
         },
         {
-          "label": "382029",
-          "url": "https://forum.jackkruse.com/posts/382029/"
+          "label": "387653",
+          "url": "https://forum.jackkruse.com/posts/387653/"
         },
         {
           "label": "382792",
@@ -5691,8 +5724,8 @@
           "url": "https://forum.jackkruse.com/posts/379985/"
         },
         {
-          "label": "380680",
-          "url": "https://forum.jackkruse.com/posts/380680/"
+          "label": "387960",
+          "url": "https://forum.jackkruse.com/posts/387960/"
         },
         {
           "label": "382918",
@@ -6227,7 +6260,7 @@
         },
         {
           "heading": "The magnetic forge today",
-          "body": "Kruse frames current changes as planetary rebalancing, not something humans caused. Earth, he says, is leaving a sunlight-dominated era for a \"magnetic forge\" like Laschamp's. He puts the present at about 9% of a Laschamp-scale collapse; at 30–50% he expects Earth's core and outer shell to decouple, his \"Tau\" stage. By his stochastic estimate, a roughly 10% field decline multiplies biologic stress about two-and-a-half-fold — reason enough, in his view, for the scale of modern mismatch. He cites satellite work showing that molten iron under the equatorial Pacific switched from westward to eastward flow in 2010 and has weakened since about 2020.\n\nHe also sees the planet keeping a sleep–wake cycle, as Robert Becker found the body's direct current does: today's racing pole is a night-to-day flip he dates to 1859, felt by deuterium-heavy people as a kind of jet lag."
+          "body": "Kruse frames current changes as planetary rebalancing, not something humans caused. He now traces the start of the decline further out: in his account the solar system has drifted into a cloud of interstellar neutral hydrogen that squeezes the sun's protective bubble, with its strongest edge reached about 1,900 years ago. Earth, he says, is leaving a sunlight-dominated era for a \"magnetic forge\" like Laschamp's. He puts the present at about 9% of a Laschamp-scale collapse; at 30–50% he expects Earth's core and outer shell to decouple, his \"Tau\" stage. By his stochastic estimate, a roughly 10% field decline multiplies biologic stress about two-and-a-half-fold — reason enough, in his view, for the scale of modern mismatch. He cites satellite work showing that molten iron under the equatorial Pacific switched from westward to eastward flow in 2010 and has weakened since about 2020.\n\nHe also sees the planet keeping a sleep–wake cycle, as Robert Becker found the body's direct current does: today's racing pole is a night-to-day flip he dates to 1859, felt by deuterium-heavy people as a kind of jet lag."
         },
         {
           "heading": "Oceans, weather and volcanoes",
@@ -6301,8 +6334,8 @@
           "url": "https://forum.jackkruse.com/posts/371463/"
         },
         {
-          "label": "370527",
-          "url": "https://forum.jackkruse.com/posts/370527/"
+          "label": "387801",
+          "url": "https://forum.jackkruse.com/posts/387801/"
         }
       ]
     },
@@ -6659,11 +6692,11 @@
         },
         {
           "heading": "Reading a place",
-          "body": "His best-known proxy is a rated beeswax candle burned where you live. On schedule means normal. Faster, such as a 24-hour candle gone in 18, means field decline or a heavy wireless load. Slower and clean means a strong local field, while slower with leftover wax means an artificial \"over-clamp,\" as when a member set a candle on a magnetic bracelet. He reads the flame as a check of the local dielectric constant — the same charge-holding property he tracks in cell water — because that dielectric shapes the ionosphere's water content above you and how readily energy moves between ground, ocean and air. He uses only beeswax, which he describes as deuterium-depleted and made of one-handed molecules, because paraffin is heavy in deuterium and spoils the reading. He also reads the World Magnetic Model declination map the same way: green agonic for aligned cristae, packed blue or red lines for local interference that mirrors the warped junctions in mitochondrial images.\n\nAuroras are a reading in themselves. Seeing them overhead means, to Kruse, that the field beneath you is poor and that it is time to move. The aurora that reached Puerto Rico, at 18Â°N, in May 2024 is his warning to everyone living along the Atlantic from Greenland to the Caribbean.\n\nOn land he pairs candles with mosquitoes: insects active by day as well as night mark a weak spot, a method he calls \"magnetic dowsing\" and used to buy property in El Salvador. Insects work as sensors, he explains, because their chitin shells are piezoelectric, turning pressure and fields into tiny currents. Mosquitoes spreading into Iceland show him that the magnetic barrier that kept them out has given way. In a humid region the sky offers another clue: a volcano that has lost its cloud cap signals a local \"magnetic stall,\" a cone no longer able to hold its water.\n\nAnimals tell the same story. In his account, traditional trackers read land by behavior: herds splintering into small erratic groups, dull dry coats even near water, and grazing shifted to pre-dawn and dusk. His shortlist of signs that a place is failing is aurorae, unwell people and dying animals, especially birds, bees and fish. He watches reports from his Gulf of Mexico shrimp supplier and names godwits, Arctic terns and albatrosses as bird canaries.\n\nInstruments have limits. Even a high-grade ground magnetometer, he says, cannot see what he is tracking, which has to be measured from above by the Swarm satellites. He expects diamond-based quantum magnetometers could one day map crustal \"oases\" where the local field still holds strong."
+          "body": "His best-known proxy is a rated beeswax candle burned where you live. On schedule means normal. Faster, such as a 24-hour candle gone in 18, means field decline or a heavy wireless load. Slower and clean means a strong local field, while slower with leftover wax means an artificial \"over-clamp,\" as when a member set a candle on a magnetic bracelet. He reads the flame as a check of the local dielectric constant — the same charge-holding property he tracks in cell water — because that dielectric shapes the ionosphere's water content above you and how readily energy moves between ground, ocean and air. He uses only beeswax, which he describes as deuterium-depleted and made of one-handed molecules, because paraffin is heavy in deuterium and spoils the reading. He also reads the World Magnetic Model declination map the same way: green agonic for aligned cristae, packed blue or red lines for local interference that mirrors the warped junctions in mitochondrial images.\n\nAuroras are a reading in themselves. Seeing them overhead means, to Kruse, that the field beneath you is poor and that it is time to move. The aurora that reached Puerto Rico, at 18Â°N, in May 2024 is his warning to everyone living along the Atlantic from Greenland to the Caribbean.\n\nOn land he pairs candles with mosquitoes: insects active by day as well as night mark a weak spot, a method he calls \"magnetic dowsing\" and used to buy property in El Salvador. Insects work as sensors, he explains, because their chitin shells are piezoelectric, turning pressure and fields into tiny currents. Mosquitoes spreading into Iceland show him that the magnetic barrier that kept them out has given way. In a humid region the sky offers another clue: a volcano that has lost its cloud cap signals a local \"magnetic stall,\" a cone no longer able to hold its water.\n\nAnimals tell the same story. In his account, traditional trackers read land by behavior: herds splintering into small erratic groups, dull dry coats even near water, and grazing shifted to pre-dawn and dusk. His shortlist of signs that a place is failing is aurorae, unwell people and dying animals, especially birds, bees and fish. He watches reports from his Gulf of Mexico shrimp supplier and names godwits, Arctic terns and albatrosses as bird canaries.\n\nInstruments have limits. Even a high-grade ground magnetometer, he says, cannot see what he is tracking, which has to be measured from above by the Swarm satellites. A handheld gauss meter, he notes, reads field density at one spot and shifts with the probe's angle and nearby steel, so he tells members to measure outdoors, away from buildings and vehicles, and not to treat a single number as a verdict. He expects diamond-based quantum magnetometers could one day map crustal \"oases\" where the local field still holds strong."
         },
         {
           "heading": "Reading the body",
-          "body": "In the blood, a rapidly shifting potassium level means, to Kruse, that the nearest agonic line (where compass north and true north agree) is moving away or that the person is spoiling their own magnetic tracking. High ferritin, the iron-storage marker, reflects a weak local field and poor choices around light and grounding. His four everyday proxies are morning blood sugar (his \"magnetic dawning phenomenon\"), LDL, vitamin B12 and new pigment changes.\n\nOther routine labs he reads as physics. A blood urea-to-creatinine ratio near 10 shows, to him, well-hydrated cell water easing proton flow, while one above 20 shows structured water collapsing. A strong cortisol rise after waking alongside high HRV means the morning reset has locked in. Vitamin D of 40â€“60 ng/mL with low blood calcium signals a motor spinning well, whereas a reading above 100 with high calcium he calls a \"crime scene\" of lost charge.\n\nA tan shows only the outside, though it can still test official numbers: his clients in Calgary all report they cannot hold a tan, which makes him doubt the field strength quoted for the area. For what he calls the \"interior tan,\" the state of melanin and water deep inside, he looks at homocysteine and TMAO, which he treats as \"silt\" markers of poor deuterium clearance, and at slow flow on thermal imaging, which he calls the ideal fast test because it reflects how thick the blood is. He predicts that a zip-code map of homocysteine would overlay the declination map, peaking in weak-field zones."
+          "body": "In the blood, a rapidly shifting potassium level means, to Kruse, that the nearest agonic line (where compass north and true north agree) is moving away or that the person is spoiling their own magnetic tracking. High ferritin, the iron-storage marker, reflects a weak local field and poor choices around light and grounding. His four everyday proxies are morning blood sugar (his \"magnetic dawning phenomenon\"), LDL, vitamin B12 and new pigment changes.\n\nOther routine labs he reads as physics. A blood urea-to-creatinine ratio near 10 shows, to him, well-hydrated cell water easing proton flow, while one above 20 shows structured water collapsing. A strong cortisol rise after waking alongside high HRV means the morning reset has locked in. Vitamin D of 40â€“60 ng/mL with low blood calcium signals a motor spinning well, whereas a reading above 100 with high calcium he calls a \"crime scene\" of lost charge.\n\nA tan shows only the outside. For what he calls the \"interior tan,\" the state of melanin and water deep inside, he looks at homocysteine and TMAO, which he treats as \"silt\" markers of poor deuterium clearance, and at slow flow on thermal imaging, which he calls the ideal fast test because it reflects how thick the blood is. He predicts that a zip-code map of homocysteine would overlay the declination map, peaking in weak-field zones."
         },
         {
           "heading": "Blood, teeth and bone",
@@ -6758,8 +6791,8 @@
           "url": "https://forum.jackkruse.com/posts/371128/"
         },
         {
-          "label": "373184",
-          "url": "https://forum.jackkruse.com/posts/373184/"
+          "label": "387840",
+          "url": "https://forum.jackkruse.com/posts/387840/"
         }
       ]
     },
@@ -7087,11 +7120,11 @@
         },
         {
           "heading": "Why movement matters",
-          "body": "In Kruse's model the real purpose of exercise is electrical. Bone and collagen are piezoelectric (they make a small current when squeezed or bent), so movement releases current that supports the spiral flow and charge of the blood. That keeps deuterium circulating and away from the mitochondria, and moving joints spin deuterium out of themselves. Mechanical and gravitational loading, together with a stable local field and grounding, also keep the elastin in artery walls healthy.\n\nHe adds a pump. Citing a 2026 Nature Neuroscience mouse study by Greenawalt, Drew and colleagues, he says abdominal muscle contractions physically move the brain and drive the fluid flow that cleans it during waking hours. Astronauts lose this pump as their core weakens in microgravity. He thinks the researchers stopped short: in his model the motion does more than wash the brain, it sorts its water, spinning heavy water away from light. He calls this \"centrifugal fractionation.\"\n\nHe also reads one study's gene data as showing that single workouts produce only weak, messy changes, while weeks of steady training produce an ordered shift. Long-running pulsed electric current in sea squirts produced the same shift, which in his model shows that sustained current, not effort itself, rebuilds the cell.\n\nWorking muscle makes deuterium as well as using it, in his view. He points out that Olympic athletes and racehorse trainers load up on bicarbonate before events, and argues the real reason is not lactate but heavy hydrogen: rapid ATP turnover builds deuterium in the muscle, and fatigue sets in when the pancreas cannot clear it fast enough. He describes muscle as partly a water reservoir the body uses to keep its electrical resistance low."
+          "body": "In Kruse's model the real purpose of exercise is electrical. Bone and collagen are piezoelectric (they make a small current when squeezed or bent), so movement releases current that supports the spiral flow and charge of the blood. That keeps deuterium circulating and away from the mitochondria, and moving joints spin deuterium out of themselves.\n\nHe adds a pump. Citing a 2026 Nature Neuroscience mouse study by Greenawalt, Drew and colleagues, he says abdominal muscle contractions physically move the brain and drive the fluid flow that cleans it during waking hours. Astronauts lose this pump as their core weakens in microgravity. He thinks the researchers stopped short: in his model the motion does more than wash the brain, it sorts its water, spinning heavy water away from light. He calls this \"centrifugal fractionation.\"\n\nHe also reads one study's gene data as showing that single workouts produce only weak, messy changes, while weeks of steady training produce an ordered shift. Long-running pulsed electric current in sea squirts produced the same shift, which in his model shows that sustained current, not effort itself, rebuilds the cell.\n\nWorking muscle makes deuterium as well as using it, in his view. He points out that Olympic athletes and racehorse trainers load up on bicarbonate before events, and argues the real reason is not lactate but heavy hydrogen: rapid ATP turnover builds deuterium in the muscle, and fatigue sets in when the pancreas cannot clear it fast enough. He describes muscle as partly a water reservoir the body uses to keep its electrical resistance low."
         },
         {
           "heading": "When exercise turns harmful",
-          "body": "Kruse cites a Nature Aging study that defines muscle aging as an energy crisis in which the key energy-making enzymes decline. He agrees that structured training beats counting steps. But in his view exercise is a toxin when cell water is deuterium-loaded or when oxygen has flipped into its reactive \"singlet\" state instead of its stable \"triplet\" state — spinning ATP against water thickened like maple syrup. Where someone is already on a good agonic line under proper sun, he rates extra gym work near zero benefit. Deuterium-loaded people, he says, lose lifespan when they train, most visibly astronauts.\n\nHe lists specific traps. Compression-and-cooling machines such as Vasper, he says, cause bursts of reperfusion damage in energy-poor muscle. Building muscle in old age is one of the costliest things a cell can do and steals energy from DNA repair, immunity and overnight brain clearance, leaving \"a big frame on a bankrupt core.\" Watching television and then working out undoes the benefit, because screen light loads the cell with deuterium and disrupts its clock, and years of running ungrounded in rubber-soled shoes wear out joints. Flights and altitude raise the risk of muscle loss."
+          "body": "Kruse cites a Nature Aging study that defines muscle aging as an energy crisis in which the key energy-making enzymes decline. He agrees that structured training beats counting steps. But in his view exercise is a toxin when cell water is deuterium-loaded or when oxygen has flipped into its reactive \"singlet\" state instead of its stable \"triplet\" state — spinning ATP against water thickened like maple syrup. Where someone is already on a good agonic line under proper sun, he rates extra gym work near zero benefit. Deuterium-loaded people, he says, lose lifespan when they train, most visibly astronauts. He extends this to place: heavy training indoors, out of the sun or where the local field is declining dumps heat that, in his model, disorders cell water, and he points to hard-training endurance athletes as the visible warning.\n\nHe lists specific traps. Compression-and-cooling machines such as Vasper, he says, cause bursts of reperfusion damage in energy-poor muscle. Building muscle in old age is one of the costliest things a cell can do and steals energy from DNA repair, immunity and overnight brain clearance, leaving \"a big frame on a bankrupt core.\" Watching television and then working out undoes the benefit, because screen light loads the cell with deuterium and disrupts its clock, and years of running ungrounded in rubber-soled shoes wear out joints. Flights and altitude raise the risk of muscle loss."
         },
         {
           "heading": "The price of bulk",
@@ -7118,7 +7151,6 @@
         "Cell danger response",
         "Centrifugal fractionation",
         "Deuterium (deuteron)",
-        "Elastin",
         "Exclusion-zone (EZ) water / structured water",
         "Fascia",
         "Grounding (earthing)",
@@ -7171,8 +7203,8 @@
           "url": "https://forum.jackkruse.com/posts/375540/"
         },
         {
-          "label": "382055",
-          "url": "https://forum.jackkruse.com/posts/382055/"
+          "label": "387551",
+          "url": "https://forum.jackkruse.com/posts/387551/"
         },
         {
           "label": "372152",

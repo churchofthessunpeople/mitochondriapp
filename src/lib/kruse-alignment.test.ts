@@ -72,6 +72,23 @@ test("group weights sum to 100 with magnetism first and sun second", () => {
   assert.equal(sorted[1]![0], "sun");
 });
 
+test("criterion weights add up to each group's weight for every lineage", () => {
+  // CA has a named view, so all five groups are present.
+  const named = place({
+    lat: 34, lng: -118, state: "CA", totalNt: 46_000, dip: 58, decl: 11,
+    volcanoKm: 300, load: 3,
+  });
+  for (const lineage of ["unknown", "L", "HJUT", "ABCDF"] as const) {
+    const result = scoreAlignment(named, named.sunPhases, lineage);
+    for (const group of result.groups) {
+      const sum = result.criteria
+        .filter((c) => c.group === group.id)
+        .reduce((total, c) => total + c.weight, 0);
+      assert.equal(sum, group.weight, `${lineage} ${group.id}`);
+    }
+  }
+});
+
 test("an ideal tropical volcanic place scores far above a high-latitude steep-dip place", () => {
   const a = scoreAlignment(ideal, ideal.sunPhases);
   const b = scoreAlignment(poor, poor.sunPhases);
